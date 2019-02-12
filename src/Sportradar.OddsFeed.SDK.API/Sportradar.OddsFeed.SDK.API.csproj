@@ -1,0 +1,277 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0138441B-7929-4B88-85B1-378AB8556C74}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Sportradar.OddsFeed.SDK.API</RootNamespace>
+    <AssemblyName>Sportradar.OddsFeed.SDK.API</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <CodeContractsAssemblyMode>0</CodeContractsAssemblyMode>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;CONTRACTS_FULL</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeContractsEnableRuntimeChecking>True</CodeContractsEnableRuntimeChecking>
+    <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
+    <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
+    <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
+    <CodeContractsRuntimeSkipQuantifiers>False</CodeContractsRuntimeSkipQuantifiers>
+    <CodeContractsRunCodeAnalysis>True</CodeContractsRunCodeAnalysis>
+    <CodeContractsNonNullObligations>True</CodeContractsNonNullObligations>
+    <CodeContractsBoundsObligations>True</CodeContractsBoundsObligations>
+    <CodeContractsArithmeticObligations>True</CodeContractsArithmeticObligations>
+    <CodeContractsEnumObligations>True</CodeContractsEnumObligations>
+    <CodeContractsRedundantAssumptions>True</CodeContractsRedundantAssumptions>
+    <CodeContractsAssertsToContractsCheckBox>True</CodeContractsAssertsToContractsCheckBox>
+    <CodeContractsRedundantTests>True</CodeContractsRedundantTests>
+    <CodeContractsMissingPublicRequiresAsWarnings>True</CodeContractsMissingPublicRequiresAsWarnings>
+    <CodeContractsMissingPublicEnsuresAsWarnings>False</CodeContractsMissingPublicEnsuresAsWarnings>
+    <CodeContractsInferRequires>True</CodeContractsInferRequires>
+    <CodeContractsInferEnsures>False</CodeContractsInferEnsures>
+    <CodeContractsInferEnsuresAutoProperties>True</CodeContractsInferEnsuresAutoProperties>
+    <CodeContractsInferObjectInvariants>False</CodeContractsInferObjectInvariants>
+    <CodeContractsSuggestAssumptions>False</CodeContractsSuggestAssumptions>
+    <CodeContractsSuggestAssumptionsForCallees>False</CodeContractsSuggestAssumptionsForCallees>
+    <CodeContractsSuggestRequires>True</CodeContractsSuggestRequires>
+    <CodeContractsNecessaryEnsures>True</CodeContractsNecessaryEnsures>
+    <CodeContractsSuggestObjectInvariants>False</CodeContractsSuggestObjectInvariants>
+    <CodeContractsSuggestReadonly>True</CodeContractsSuggestReadonly>
+    <CodeContractsRunInBackground>True</CodeContractsRunInBackground>
+    <CodeContractsShowSquigglies>True</CodeContractsShowSquigglies>
+    <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
+    <CodeContractsEmitXMLDocs>False</CodeContractsEmitXMLDocs>
+    <CodeContractsCustomRewriterAssembly />
+    <CodeContractsCustomRewriterClass />
+    <CodeContractsLibPaths />
+    <CodeContractsExtraRewriteOptions />
+    <CodeContractsExtraAnalysisOptions />
+    <CodeContractsSQLServerOption>.\SQLExpress</CodeContractsSQLServerOption>
+    <CodeContractsBaseLineFile />
+    <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
+    <CodeContractsSkipAnalysisIfCannotConnectToCache>False</CodeContractsSkipAnalysisIfCannotConnectToCache>
+    <CodeContractsFailBuildOnWarnings>False</CodeContractsFailBuildOnWarnings>
+    <CodeContractsBeingOptimisticOnExternal>True</CodeContractsBeingOptimisticOnExternal>
+    <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>
+    <CodeContractsReferenceAssembly>%28none%29</CodeContractsReferenceAssembly>
+    <CodeContractsAnalysisWarningLevel>3</CodeContractsAnalysisWarningLevel>
+    <DocumentationFile>bin\Debug\Sportradar.OddsFeed.SDK.API.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Common.Logging, Version=3.4.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.3.4.1\lib\net40\Common.Logging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Common.Logging.Core, Version=3.4.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.Core.3.4.1\lib\net40\Common.Logging.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Metrics, Version=0.5.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Metrics.NET.0.5.5\lib\net45\Metrics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Configuration, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.RegistrationByConvention, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RabbitMQ.Client, Version=3.6.9.0, Culture=neutral, PublicKeyToken=89e7d7c5feba84ce, processorArchitecture=MSIL">
+      <HintPath>..\packages\RabbitMQ.Client.3.6.9\lib\net45\RabbitMQ.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Contracts\ConfigurationBuilderContract.cs" />
+    <Compile Include="Contracts\OddsFeedV1Contract.cs" />
+    <Compile Include="IConfigurationBuilder.cs" />
+    <Compile Include="IBookingManager.cs" />
+    <Compile Include="Internal\BookingManager.cs" />
+    <Compile Include="Internal\ConfigurationSectionProvider.cs" />
+    <Compile Include="Internal\Config\ConfigurationBuilder.cs" />
+    <Compile Include="Internal\Config\ConfigurationBuilderBase.cs" />
+    <Compile Include="Internal\Config\CustomConfigurationBuilder.cs" />
+    <Compile Include="Internal\Config\EnvironmentSelector.cs" />
+    <Compile Include="Internal\Config\RecoveryConfigurationBuilder.cs" />
+    <Compile Include="Internal\Config\ReplayConfigurationBuilder.cs" />
+    <Compile Include="Internal\Config\TokenSetter.cs" />
+    <Compile Include="Internal\IConfigurationSectionProvider.cs" />
+    <Compile Include="Internal\IOddsFeedConfigurationSection.cs" />
+    <Compile Include="Internal\IRecoveryOperation.cs" />
+    <Compile Include="Internal\ITimestampTracker.cs" />
+    <Compile Include="Internal\ProducerEqualityComparer.cs" />
+    <Compile Include="Internal\RecoveryInfo.cs" />
+    <Compile Include="Internal\RecoveryInitiationException.cs" />
+    <Compile Include="Internal\ProducerRecoveryManager.cs" />
+    <Compile Include="Internal\RecoveryOperation.cs" />
+    <Compile Include="Internal\RecoveryResult.cs" />
+    <Compile Include="Internal\RecoveryStatusChangeReason.cs" />
+    <Compile Include="Internal\TimestampTracker.cs" />
+    <Compile Include="IOddsFeedV1.cs" />
+    <Compile Include="IReplayScenario.cs" />
+    <Compile Include="Internal\Replay\ReplayScenario.cs" />
+    <Compile Include="Contracts\ProducersProviderContract.cs" />
+    <Compile Include="Contracts\CashOutProbabilitiesProviderContract.cs" />
+    <Compile Include="Contracts\EntityDispatcherInternalContract.cs" />
+    <Compile Include="Contracts\EntityTypeMapperContract.cs" />
+    <Compile Include="Contracts\GlobalEventDispatcherContract.cs" />
+    <Compile Include="Contracts\OddsFeedConfigurationBuilderContract.cs" />
+    <Compile Include="Contracts\OddsFeedConfigurationContract.cs" />
+    <Compile Include="Contracts\OddsFeedContract.cs" />
+    <Compile Include="Contracts\OddsFeedSessionBuilderContract.cs" />
+    <Compile Include="Contracts\OddsFeedSessionContract.cs" />
+    <Compile Include="Contracts\FeedRecoveryManagerContract.cs" />
+    <Compile Include="Contracts\EventRecoveryRequestIssuerContract.cs" />
+    <Compile Include="Contracts\ProducerRecoveryManagerContract.cs" />
+    <Compile Include="Contracts\ProducerRecoveryManagerFactoryContract.cs" />
+    <Compile Include="Contracts\SessionMessageManagerContract.cs" />
+    <Compile Include="EventArguments\AliveEventArgs.cs" />
+    <Compile Include="EventArguments\FeedCloseEventArgs.cs" />
+    <Compile Include="EventArguments\SnapshotCompleteEventArgs.cs" />
+    <Compile Include="EventArguments\UnparsableMessageEventArgs.cs" />
+    <Compile Include="Internal\IFeedSystemSession.cs" />
+    <Compile Include="Internal\Producer.cs" />
+    <Compile Include="Internal\ProducersProvider.cs" />
+    <Compile Include="Internal\SystemFeedSession.cs" />
+    <Compile Include="IProducersProvider.cs" />
+    <Compile Include="Internal\CashOutProbabilitiesProvider.cs" />
+    <Compile Include="Internal\CompositeMessageProcessor.cs" />
+    <Compile Include="Internal\ConnectionValidationResult.cs" />
+    <Compile Include="Internal\ConnectionValidator.cs" />
+    <Compile Include="Internal\FeedRecoveryManager.cs" />
+    <Compile Include="ICashOutProbabilitiesProvider.cs" />
+    <Compile Include="Internal\IFeedRecoveryManager.cs" />
+    <Compile Include="Internal\IRecoveryRequestIssuer.cs" />
+    <Compile Include="Internal\IRecoveryTrackerFactory.cs" />
+    <Compile Include="Internal\IProducerRecoveryManager.cs" />
+    <Compile Include="Internal\ISessionMessageManager.cs" />
+    <Compile Include="Internal\OddsFeedConfigurationBuilder.cs" />
+    <Compile Include="Internal\OddsFeedConfigurationInternal.cs" />
+    <Compile Include="Internal\ProducerManager.cs" />
+    <Compile Include="Internal\ProducerRecoveryManagerFactory.cs" />
+    <Compile Include="Internal\IOddsFeedConfigurationInternal.cs" />
+    <Compile Include="Internal\BasicMessageData.cs" />
+    <Compile Include="Internal\ConfiguredConnectionFactory.cs" />
+    <Compile Include="Internal\BookmakerDetailsFetcher.cs" />
+    <Compile Include="Internal\DispatcherStore.cs" />
+    <Compile Include="Internal\EntityTypeMapper.cs" />
+    <Compile Include="Internal\IEntityDispatcherInternal.cs" />
+    <Compile Include="Internal\IEntityTypeMapper.cs" />
+    <Compile Include="Internal\IMessageDataExtractor.cs" />
+    <Compile Include="Internal\IDispatcherStore.cs" />
+    <Compile Include="Internal\ISpecificEntityDispatcherInternal.cs" />
+    <Compile Include="Internal\MessageDataExtractor.cs" />
+    <Compile Include="Internal\OddsFeedConfigurationSection.cs" />
+    <Compile Include="Internal\RecoveryRequestIssuer.cs" />
+    <Compile Include="Internal\Replay\HttpDataRestful.cs" />
+    <Compile Include="Internal\Replay\IDataRestful.cs" />
+    <Compile Include="Internal\Replay\ReplayManager.cs" />
+    <Compile Include="Internal\Replay\ReplayResponse.cs" />
+    <Compile Include="Internal\Replay\ReplayStatus.cs" />
+    <Compile Include="Internal\SessionMessageManager.cs" />
+    <Compile Include="Internal\SpecificEntityDispatcher.cs" />
+    <Compile Include="Internal\SportDataProvider.cs" />
+    <Compile Include="Internal\ProducerRecoveryStatus.cs" />
+    <Compile Include="Internal\TrackerStatusChangeEventArgs.cs" />
+    <Compile Include="Internal\UnityFeedBootstrapper.cs" />
+    <Compile Include="IOddsFeedConfiguration.cs" />
+    <Compile Include="EventArguments\BetCancelEventArgs.cs" />
+    <Compile Include="EventArguments\BetSettlementEventArgs.cs" />
+    <Compile Include="EventArguments\BetStopEventArgs.cs" />
+    <Compile Include="EventArguments\FixtureChangeEventArgs.cs" />
+    <Compile Include="EventArguments\ProducerStatusChangeEventArgs.cs" />
+    <Compile Include="EntityDispatcherBase.cs" />
+    <Compile Include="IOddsFeed.cs" />
+    <Compile Include="EventArguments\OddsChangeEventArgs.cs" />
+    <Compile Include="EventArguments\RollbackBetCancelEventArgs.cs" />
+    <Compile Include="EventArguments\RollbackBetSettlementEventArgs.cs" />
+    <Compile Include="IEntityDispatcher.cs" />
+    <Compile Include="IOddsFeedConfigurationBuilder.cs" />
+    <Compile Include="IOddsFeedSession.cs" />
+    <Compile Include="IOddsFeedSessionBuilder.cs" />
+    <Compile Include="IEventRecoveryRequestIssuer.cs" />
+    <Compile Include="IReplayManager.cs" />
+    <Compile Include="IReplayResponse.cs" />
+    <Compile Include="IReplayStatus.cs" />
+    <Compile Include="ISpecificEntityDispatcher.cs" />
+    <Compile Include="ISportDataProvider.cs" />
+    <Compile Include="Feed.cs" />
+    <Compile Include="Internal\IGlobalEventDispatcher.cs" />
+    <Compile Include="Internal\EntityDispatcher.cs" />
+    <Compile Include="Internal\OddsFeedConfiguration.cs" />
+    <Compile Include="Internal\OddsFeedSession.cs" />
+    <Compile Include="Internal\OddsFeedSessionBuilder.cs" />
+    <Compile Include="MessageType.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReplayFeed.cs" />
+    <Compile Include="ReplayPlayerStatus.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="APIDiagram.cd" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Sportradar.OddsFeed.SDK.Common\Sportradar.OddsFeed.SDK.Common.csproj">
+      <Project>{400D70D5-C152-4F49-BD8F-CA995BFFC188}</Project>
+      <Name>Sportradar.OddsFeed.SDK.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sportradar.OddsFeed.SDK.Entities.REST\Sportradar.OddsFeed.SDK.Entities.REST.csproj">
+      <Project>{562afe79-9f12-4030-9215-adea27fc9461}</Project>
+      <Name>Sportradar.OddsFeed.SDK.Entities.REST</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sportradar.OddsFeed.SDK.Entities\Sportradar.OddsFeed.SDK.Entities.csproj">
+      <Project>{70a849ea-72ac-43c3-a68a-5089d9a591d4}</Project>
+      <Name>Sportradar.OddsFeed.SDK.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sportradar.OddsFeed.SDK.Messages\Sportradar.OddsFeed.SDK.Messages.csproj">
+      <Project>{44421776-15e6-4a08-8f4e-25d08ac05618}</Project>
+      <Name>Sportradar.OddsFeed.SDK.Messages</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

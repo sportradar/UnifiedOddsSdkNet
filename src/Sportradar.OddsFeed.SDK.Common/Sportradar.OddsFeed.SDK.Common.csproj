@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{400D70D5-C152-4F49-BD8F-CA995BFFC188}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Sportradar.OddsFeed.SDK.Common</RootNamespace>
+    <AssemblyName>Sportradar.OddsFeed.SDK.Common</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <CodeContractsAssemblyMode>0</CodeContractsAssemblyMode>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeContractsEnableRuntimeChecking>True</CodeContractsEnableRuntimeChecking>
+    <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
+    <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
+    <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
+    <CodeContractsRuntimeSkipQuantifiers>False</CodeContractsRuntimeSkipQuantifiers>
+    <CodeContractsRunCodeAnalysis>True</CodeContractsRunCodeAnalysis>
+    <CodeContractsNonNullObligations>True</CodeContractsNonNullObligations>
+    <CodeContractsBoundsObligations>True</CodeContractsBoundsObligations>
+    <CodeContractsArithmeticObligations>True</CodeContractsArithmeticObligations>
+    <CodeContractsEnumObligations>True</CodeContractsEnumObligations>
+    <CodeContractsRedundantAssumptions>True</CodeContractsRedundantAssumptions>
+    <CodeContractsAssertsToContractsCheckBox>True</CodeContractsAssertsToContractsCheckBox>
+    <CodeContractsRedundantTests>True</CodeContractsRedundantTests>
+    <CodeContractsMissingPublicRequiresAsWarnings>True</CodeContractsMissingPublicRequiresAsWarnings>
+    <CodeContractsMissingPublicEnsuresAsWarnings>False</CodeContractsMissingPublicEnsuresAsWarnings>
+    <CodeContractsInferRequires>True</CodeContractsInferRequires>
+    <CodeContractsInferEnsures>False</CodeContractsInferEnsures>
+    <CodeContractsInferEnsuresAutoProperties>True</CodeContractsInferEnsuresAutoProperties>
+    <CodeContractsInferObjectInvariants>False</CodeContractsInferObjectInvariants>
+    <CodeContractsSuggestAssumptions>False</CodeContractsSuggestAssumptions>
+    <CodeContractsSuggestAssumptionsForCallees>False</CodeContractsSuggestAssumptionsForCallees>
+    <CodeContractsSuggestRequires>False</CodeContractsSuggestRequires>
+    <CodeContractsNecessaryEnsures>True</CodeContractsNecessaryEnsures>
+    <CodeContractsSuggestObjectInvariants>False</CodeContractsSuggestObjectInvariants>
+    <CodeContractsSuggestReadonly>True</CodeContractsSuggestReadonly>
+    <CodeContractsRunInBackground>True</CodeContractsRunInBackground>
+    <CodeContractsShowSquigglies>True</CodeContractsShowSquigglies>
+    <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
+    <CodeContractsEmitXMLDocs>False</CodeContractsEmitXMLDocs>
+    <CodeContractsCustomRewriterAssembly />
+    <CodeContractsCustomRewriterClass />
+    <CodeContractsLibPaths />
+    <CodeContractsExtraRewriteOptions />
+    <CodeContractsExtraAnalysisOptions />
+    <CodeContractsSQLServerOption>.\SQLExpress</CodeContractsSQLServerOption>
+    <CodeContractsBaseLineFile />
+    <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
+    <CodeContractsSkipAnalysisIfCannotConnectToCache>False</CodeContractsSkipAnalysisIfCannotConnectToCache>
+    <CodeContractsFailBuildOnWarnings>False</CodeContractsFailBuildOnWarnings>
+    <CodeContractsBeingOptimisticOnExternal>True</CodeContractsBeingOptimisticOnExternal>
+    <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>
+    <CodeContractsReferenceAssembly>%28none%29</CodeContractsReferenceAssembly>
+    <CodeContractsAnalysisWarningLevel>3</CodeContractsAnalysisWarningLevel>
+    <DocumentationFile>bin\Debug\Sportradar.OddsFeed.SDK.Common.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Common.Logging, Version=3.4.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.3.4.1\lib\net40\Common.Logging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Common.Logging.Core, Version=3.4.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.Core.3.4.1\lib\net40\Common.Logging.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Metrics, Version=0.5.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Metrics.NET.0.5.5\lib\net45\Metrics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Contracts\DeserializerContract.cs" />
+    <Compile Include="Contracts\OpenableContract.cs" />
+    <Compile Include="Contracts\HealthStatusProviderContract.cs" />
+    <Compile Include="Contracts\SemaphorePoolContract.cs" />
+    <Compile Include="Contracts\TimerContract.cs" />
+    <Compile Include="Exceptions\CacheItemNotFoundException.cs" />
+    <Compile Include="Exceptions\CommunicationException.cs" />
+    <Compile Include="Exceptions\DeserializationException.cs" />
+    <Compile Include="Exceptions\FeedSdkException.cs" />
+    <Compile Include="Exceptions\MappingException.cs" />
+    <Compile Include="Exceptions\NameExpressionException.cs" />
+    <Compile Include="Exceptions\NameGenerationException.cs" />
+    <Compile Include="Internal\ExtensionMethods.cs" />
+    <Compile Include="Internal\IDeserializer.cs" />
+    <Compile Include="Internal\IncrementalSequenceGenerator.cs" />
+    <Compile Include="Internal\ISequenceGenerator.cs" />
+    <Compile Include="Internal\ITimer.cs" />
+    <Compile Include="Internal\Log\LogAttribute.cs" />
+    <Compile Include="Internal\Log\LoggerType.cs" />
+    <Compile Include="Internal\Log\LogProxy.cs" />
+    <Compile Include="Internal\Log\LogProxyFactory.cs" />
+    <Compile Include="Internal\Metrics\FormatHelper.cs" />
+    <Compile Include="Internal\Metrics\IHealthStatusProvider.cs" />
+    <Compile Include="Internal\Metrics\MetricsReporter.cs" />
+    <Compile Include="Internal\Metrics\Reports\BaseReport.cs" />
+    <Compile Include="Internal\Metrics\Reports\CounterReport.cs" />
+    <Compile Include="Internal\Metrics\Reports\EnvironmentReport.cs" />
+    <Compile Include="Internal\Metrics\Reports\GaugeReport.cs" />
+    <Compile Include="Internal\Metrics\Reports\HealthStatusReport.cs" />
+    <Compile Include="Internal\Metrics\Reports\HistogramReport.cs" />
+    <Compile Include="Internal\Metrics\Reports\MeterReport.cs" />
+    <Compile Include="Internal\Metrics\Reports\MetricDataReport.cs" />
+    <Compile Include="Internal\Metrics\Reports\TimerReport.cs" />
+    <Compile Include="Internal\RealTimeProvider.cs" />
+    <Compile Include="Internal\SafeInvoker.cs" />
+    <Compile Include="Internal\SdkInfo.cs" />
+    <Compile Include="Internal\SdkTimer.cs" />
+    <Compile Include="Internal\StringExtensions.cs" />
+    <Compile Include="Internal\ITimeProvider.cs" />
+    <Compile Include="Internal\TimeProviderAccessor.cs" />
+    <Compile Include="IOpenable.cs" />
+    <Compile Include="Internal\ISemaphorePool.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ExceptionHandlingStrategy.cs" />
+    <Compile Include="SdkEnvironment.cs" />
+    <Compile Include="SdkLoggerFactory.cs" />
+    <Compile Include="Internal\SemaphorePool.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Sportradar.OddsFeed.SDK.Messages\Sportradar.OddsFeed.SDK.Messages.csproj">
+      <Project>{44421776-15E6-4A08-8F4E-25D08AC05618}</Project>
+      <Name>Sportradar.OddsFeed.SDK.Messages</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

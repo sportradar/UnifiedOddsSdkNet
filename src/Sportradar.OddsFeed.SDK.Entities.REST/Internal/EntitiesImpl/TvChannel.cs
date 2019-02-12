@@ -1,0 +1,83 @@
+﻿/*
+* Copyright (C) Sportradar AG. See LICENSE for full license governing this code
+*/
+using System;
+
+namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
+{
+    /// <summary>
+    /// Represents a TV channel
+    /// </summary>
+    /// <seealso cref="ITvChannel" />
+    internal class TvChannel : EntityPrinter, ITvChannel
+    {
+        /// <summary>
+        /// The <see cref="Name"/> property backing field
+        /// </summary>
+        private readonly string _name;
+
+        /// <summary>
+        /// The <see cref="StartTime"/> property backing field
+        /// </summary>
+        private readonly DateTime? _startTime;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TvChannel"/> class.
+        /// </summary>
+        /// <param name="name">a name of the channel represented by the current <see cref="ITvChannel" /> instance</param>
+        /// <param name="startTime">a <see cref="DateTime" /> specifying when the coverage on the channel represented by the current <see cref="ITvChannel" /> starts</param>
+        public TvChannel(string name, DateTime? startTime)
+        {
+            _name = name;
+            _startTime = startTime;
+        }
+
+        /// <summary>
+        /// Gets a name of the channel represented by the current <see cref="ITvChannel" /> instance
+        /// </summary>
+        public string Name => _name;
+
+        /// <summary>
+        /// Gets a <see cref="DateTime" /> specifying when the coverage on the channel represented by the
+        /// current <see cref="ITvChannel" /> starts, or a null reference if the time is not known.
+        /// </summary>
+        /// <value>The start time.</value>
+        public DateTime? StartTime => _startTime;
+
+        /// <summary>
+        /// Constructs and returns a <see cref="string"/> containing the id of the current instance
+        /// </summary>
+        /// <returns>A <see cref="string"/> containing the id of the current instance.</returns>
+        protected override string PrintI()
+        {
+            return $"Name={_name}";
+        }
+
+        /// <summary>
+        /// Constructs and returns a <see cref="string"/> containing compacted representation of the current instance
+        /// </summary>
+        /// <returns>A <see cref="string"/> containing compacted representation of the current instance.</returns>
+        protected override string PrintC()
+        {
+            return $"Name={_name}, StartTime={_startTime}";
+        }
+
+        /// <summary>
+        /// Constructs and return a <see cref="string"/> containing details of the current instance
+        /// </summary>
+        /// <returns>A <see cref="string"/> containing details of the current instance.</returns>
+        protected override string PrintF()
+        {
+            return PrintC();
+        }
+
+        /// <summary>
+        /// Constructs and returns a <see cref="string" /> containing a JSON representation of the current instance
+        /// </summary>
+        /// <returns>a <see cref="string" /> containing a JSON representation of the current instance.</returns>
+        protected override string PrintJ()
+        {
+            return PrintJ(GetType(), this);
+        }
+    }
+}

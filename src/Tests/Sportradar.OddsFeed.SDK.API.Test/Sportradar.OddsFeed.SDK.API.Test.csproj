@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{782FDD8F-E0E5-423F-95E0-26C7549EABF2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Sportradar.OddsFeed.SDK.API.Test</RootNamespace>
+    <AssemblyName>Sportradar.OddsFeed.SDK.API.Test</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Castle.Core.4.3.1\lib\net45\Castle.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Common.Logging, Version=3.4.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Common.Logging.3.4.1\lib\net40\Common.Logging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Common.Logging.Core, Version=3.4.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Common.Logging.Core.3.4.1\lib\net40\Common.Logging.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Common.Logging.Log4Net208, Version=3.4.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Common.Logging.Log4Net208.3.4.1\lib\net40\Common.Logging.Log4Net208.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Metrics, Version=0.5.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Metrics.NET.0.5.5\lib\net45\Metrics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Configuration, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.RegistrationByConvention, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Moq, Version=4.9.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Moq.4.9.0\lib\net45\Moq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RabbitMQ.Client, Version=3.6.9.0, Culture=neutral, PublicKeyToken=89e7d7c5feba84ce, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\RabbitMQ.Client.3.6.9\lib\net45\RabbitMQ.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Runtime.CompilerServices.Unsafe.4.5.1\lib\netstandard1.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Threading.Tasks.Extensions.4.5.1\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.XML" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ConfigurationBuilderTests.cs" />
+    <Compile Include="OddsFeedConfigurationBuilderTests.cs" />
+    <Compile Include="ConnectValidatorTest.cs" />
+    <Compile Include="DispatcherStoreTests.cs" />
+    <Compile Include="FeedMessageBuilder.cs" />
+    <Compile Include="OddsFeedConfigurationInternalTests.cs" />
+    <Compile Include="ProducerManagerTest.cs" />
+    <Compile Include="HttpDataRestfulTest.cs" />
+    <Compile Include="LogProxyTest.cs" />
+    <Compile Include="MessageDataExtractorTest.cs" />
+    <Compile Include="ProducerRecoveryManagerTests.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReplayManagerTest.cs" />
+    <Compile Include="RecoveryOperationTests.cs" />
+    <Compile Include="TimestampTrackerTests.cs" />
+    <Compile Include="UnityFeedBootstrapTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="log4net.sdk.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="log4net.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Sportradar.OddsFeed.SDK.API\Sportradar.OddsFeed.SDK.API.csproj">
+      <Project>{0138441b-7929-4b88-85b1-378ab8556c74}</Project>
+      <Name>Sportradar.OddsFeed.SDK.API</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Sportradar.OddsFeed.SDK.Common\Sportradar.OddsFeed.SDK.Common.csproj">
+      <Project>{400D70D5-C152-4F49-BD8F-CA995BFFC188}</Project>
+      <Name>Sportradar.OddsFeed.SDK.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Sportradar.OddsFeed.SDK.Entities.REST\Sportradar.OddsFeed.SDK.Entities.REST.csproj">
+      <Project>{562afe79-9f12-4030-9215-adea27fc9461}</Project>
+      <Name>Sportradar.OddsFeed.SDK.Entities.REST</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Sportradar.OddsFeed.SDK.Entities\Sportradar.OddsFeed.SDK.Entities.csproj">
+      <Project>{70a849ea-72ac-43c3-a68a-5089d9a591d4}</Project>
+      <Name>Sportradar.OddsFeed.SDK.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Sportradar.OddsFeed.SDK.Messages\Sportradar.OddsFeed.SDK.Messages.csproj">
+      <Project>{44421776-15e6-4a08-8f4e-25d08ac05618}</Project>
+      <Name>Sportradar.OddsFeed.SDK.Messages</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sportradar.OddsFeed.SDK.Test.Shared\Sportradar.OddsFeed.SDK.Test.Shared.csproj">
+      <Project>{F3B33428-1A5D-4E42-8DC7-6E1434D94F36}</Project>
+      <Name>Sportradar.OddsFeed.SDK.Test.Shared</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

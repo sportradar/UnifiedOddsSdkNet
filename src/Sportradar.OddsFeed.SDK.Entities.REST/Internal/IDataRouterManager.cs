@@ -1,0 +1,164 @@
+﻿/*
+* Copyright (C) Sportradar AG. See LICENSE for full license governing this code
+*/
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
+using Sportradar.OddsFeed.SDK.Messages;
+
+namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
+{
+    /// <summary>
+    /// Defines a contract for classes implementing getting information from UF Sports API
+    /// </summary>
+    public interface IDataRouterManager
+    {
+        /// <summary>
+        /// Gets the <see cref="SportEventSummaryDTO"/> or its derived type from the summary endpoint
+        /// </summary>
+        /// <param name="id">The id of the sport event to be fetched</param>
+        /// <param name="culture">The language to be fetched</param>
+        /// <param name="requester">The cache item which invoked request</param>
+        Task GetSportEventSummaryAsync(URN id, CultureInfo culture, ISportEventCI requester);
+
+        /// <summary>
+        /// Gets the <see cref="FixtureDTO"/> from the fixture endpoint
+        /// </summary>
+        /// <param name="id">The id of the sport event to be fetched</param>
+        /// <param name="culture">The language to be fetched</param>
+        /// <param name="requester">The cache item which invoked request</param>
+        Task GetSportEventFixtureAsync(URN id, CultureInfo culture, ISportEventCI requester);
+
+        /// <summary>
+        /// Gets all tournaments for sport endpoint
+        /// </summary>
+        /// <param name="culture">The culture to be fetched</param>
+        Task GetAllTournamentsForAllSportAsync(CultureInfo culture);
+
+        /// <summary>
+        /// Gets all categories for sport endpoint
+        /// </summary>
+        /// <param name="id">The id of the sport to be fetched</param>
+        /// <param name="culture">The language to be fetched</param>
+        Task GetSportCategoriesAsync(URN id, CultureInfo culture);
+        
+        /// <summary>
+        /// Gets all available sports endpoint
+        /// </summary>
+        /// <param name="culture">The culture to be fetched</param>
+        Task GetAllSportsAsync(CultureInfo culture);
+
+        /// <summary>
+        /// Gets the currently live sport events
+        /// </summary>
+        /// <param name="culture">The culture</param>
+        /// <returns>The list of the sport event ids with the sportId each belongs to</returns>
+        Task<IEnumerable<Tuple<URN, URN>>> GetLiveSportEventsAsync(CultureInfo culture);
+
+        /// <summary>
+        /// Gets the sport events for specific date
+        /// </summary>
+        /// <param name="date">The date</param>
+        /// <param name="culture">The culture</param>
+        /// <returns>The list of the sport event ids with the sportId it belongs to</returns>
+        Task<IEnumerable<Tuple<URN, URN>>> GetSportEventsForDateAsync(DateTime date, CultureInfo culture);
+
+        /// <summary>
+        /// Gets the sport events for specific tournament
+        /// </summary>
+        /// <param name="id">The id of the tournament</param>
+        /// <param name="culture">The culture to be fetched</param>
+        /// <param name="requester">The cache item which invoked request</param>
+        /// <returns>The list of ids of the sport events with the sportId belonging to specified tournament</returns>
+        Task<IEnumerable<Tuple<URN, URN>>> GetSportEventsForTournamentAsync(URN id, CultureInfo culture, ISportEventCI requester);
+
+        /// <summary>
+        /// Gets the player profile endpoint
+        /// </summary>
+        /// <param name="id">The id of the player</param>
+        /// <param name="culture">The culture to be fetched</param>
+        /// <param name="requester">The cache item which invoked request</param>
+        Task GetPlayerProfileAsync(URN id, CultureInfo culture, ISportEventCI requester);
+
+        /// <summary>
+        /// Gets the competitor endpoint
+        /// </summary>
+        /// <param name="id">The id of the competitor</param>
+        /// <param name="culture">The culture to be fetched</param>
+        /// <param name="requester">The cache item which invoked request</param>
+        Task GetCompetitorAsync(URN id, CultureInfo culture, ISportEventCI requester);
+
+        /// <summary>
+        /// Gets the seasons for tournament
+        /// </summary>
+        /// <param name="id">The id of the tournament</param>
+        /// <param name="culture">The culture to be fetched</param>
+        /// <param name="requester">The cache item which invoked request</param>
+        /// <returns>The list of ids of the seasons for specified tournament</returns>
+        Task<IEnumerable<URN>> GetSeasonsForTournamentAsync(URN id, CultureInfo culture, ISportEventCI requester);
+
+        /// <summary>
+        /// Gets the information about ongoing sport event (timeline)
+        /// </summary>
+        /// <param name="id">The id of the sport event</param>
+        /// <param name="culture">The culture to be fetched</param>
+        /// <param name="requester">The cache item which invoked request</param>
+        Task GetInformationAboutOngoingEventAsync(URN id, CultureInfo culture, ISportEventCI requester);
+
+        /// <summary>
+        /// Gets the market descriptions (static list of market descriptions)
+        /// </summary>
+        /// <param name="culture">The culture to be fetched</param>
+        Task GetMarketDescriptionsAsync(CultureInfo culture);
+
+        /// <summary>
+        /// Gets the variant market description (dynamic - single - variant market description)
+        /// </summary>
+        /// <param name="id">The id of the market</param>
+        /// <param name="variant">The variant URN</param>
+        /// <param name="culture">The culture to be fetched</param>
+        Task GetVariantMarketDescriptionAsync(int id, string variant, CultureInfo culture);
+
+        /// <summary>
+        /// Gets the variant descriptions (static list of variant descriptions)
+        /// </summary>
+        /// <param name="culture">The culture to be fetched</param>
+        Task GetVariantDescriptionsAsync(CultureInfo culture);
+
+        /// <summary>
+        /// Gets the <see cref="DrawDTO"/> from lottery draw summary endpoint
+        /// </summary>
+        /// <param name="drawId">The id of the draw to be fetched</param>
+        /// <param name="culture">The language to be fetched</param>
+        /// <param name="requester">The cache item which invoked request</param>
+        Task GetDrawSummaryAsync(URN drawId, CultureInfo culture, ISportEventCI requester);
+
+        /// <summary>
+        /// Gets the <see cref="DrawDTO"/> from the lottery draw fixture endpoint
+        /// </summary>
+        /// <param name="drawId">The id of the draw to be fetched</param>
+        /// <param name="culture">The language to be fetched</param>
+        /// <param name="requester">The cache item which invoked request</param>
+        Task GetDrawFixtureAsync(URN drawId, CultureInfo culture, ISportEventCI requester);
+
+        /// <summary>
+        /// Gets the lottery draw schedule
+        /// </summary>
+        /// <param name="lotteryId">The id of the lottery</param>
+        /// <param name="culture">The culture to be fetched</param>
+        /// <param name="requester">The cache item which invoked request</param>
+        /// <returns>The lottery with its schedule</returns>
+        Task GetLotteryScheduleAsync(URN lotteryId, CultureInfo culture, ISportEventCI requester);
+
+        /// <summary>
+        /// Gets the seasons for tournament
+        /// </summary>
+        /// <param name="culture">The culture to be fetched</param>
+        /// <returns>The list of ids of the seasons for specified tournament</returns>
+        Task<IEnumerable<URN>> GetAllLotteriesAsync(CultureInfo culture);
+    }
+}

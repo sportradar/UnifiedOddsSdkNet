@@ -1,0 +1,467 @@
+﻿/*
+* Copyright (C) Sportradar AG. See LICENSE for full license governing this code
+*/
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping.Lottery;
+using Sportradar.OddsFeed.SDK.Messages;
+using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+// ReSharper disable UnusedMember.Local
+
+namespace Sportradar.OddsFeed.SDK.Test.Shared
+{
+    public class TestDataRouterManager : IDataRouterManager
+    {
+        private static readonly string DirPath = Directory.GetCurrentDirectory() + @"\REST XMLs\";
+
+        private const string FixtureXml = "fixtures.{culture}.xml";
+        private const string SportCategoriesXml = "sport_categories.{culture}.xml";
+        private const string ScheduleXml = "schedule.{culture}.xml";
+        private const string TourScheduleXml = "tournament_schedule.{culture}.xml";
+        private const string SportsXml = "sports.{culture}.xml";
+        private const string MatchDetailsXml = "event_details.{culture}.xml";
+        private const string RaceDetailsXml = "race_summary.xml";
+        private const string TournamentScheduleXml = "tournaments.{culture}.xml";
+        private const string TournamentInfoXml = "tournament_info.xml";
+        private const string TournamentExtraInfoXml = "tournament_info_extra.xml";
+        private const string PlayerProfileXml = "{culture}.player.1.xml";
+        private const string CompetitorProfileXml = "{culture}.competitor.1.xml";
+
+        private readonly ICacheManager _cacheManager;
+        private readonly IDeserializer<RestMessage> _restDeserializer = new Deserializer<RestMessage>();
+
+        public int TotalRestCalls => RestCalls.Sum(s => s.Value);
+
+        public readonly Dictionary<string, int> RestCalls;
+
+        private readonly object _lock = new object();
+
+        internal TestDataRouterManager(ICacheManager cacheManager)
+        {
+            Contract.Requires(cacheManager != null);
+
+            _cacheManager = cacheManager;
+            RestCalls = new Dictionary<string, int>();
+        }
+
+        private string GetFile(string template, CultureInfo culture)
+        {
+            var filePath = FileHelper.FindFile(template.Replace("{culture}", culture.TwoLetterISOLanguageName));
+            if (string.IsNullOrEmpty(filePath))
+            {
+                filePath = FileHelper.FindFile(template.Replace("{culture}", TestData.Culture.TwoLetterISOLanguageName));
+            }
+            var fi = new FileInfo(filePath);
+            if (fi.Exists)
+            {
+                return fi.FullName;
+
+            }
+            throw new ArgumentException($"Missing file {filePath}, for template {template} and lang:{culture.TwoLetterISOLanguageName}.");
+        }
+
+        private void RecordCall(string callType)
+        {
+            lock (_lock)
+            {
+                if (RestCalls.ContainsKey(callType))
+                {
+                    int value;
+                    RestCalls.TryGetValue(callType, out value);
+                    RestCalls[callType] = value + 1;
+                }
+                else
+                {
+                    RestCalls.Add(callType, 1);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the count of the calls (per specific method or all together if not type provided)
+        /// </summary>
+        /// <param name="callType">Type of the call</param>
+        /// <returns>The count calls</returns>
+        public int GetCallCount(string callType)
+        {
+            if (string.IsNullOrEmpty(callType))
+            {
+                return TotalRestCalls;
+            }
+
+            if (!RestCalls.ContainsKey(callType))
+            {
+                return 0;
+            }
+
+            int value;
+            RestCalls.TryGetValue(callType, out value);
+            return value;
+        }
+
+        public Task GetSportEventSummaryAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        {
+            RecordCall("GetSportEventSummaryAsync");
+            var strId = id?.ToString().Replace(":", "_") ?? string.Empty;
+            var filePath = GetFile($"summary_{strId}.{culture.TwoLetterISOLanguageName}.xml", culture);
+            if (string.IsNullOrEmpty(filePath) && id?.TypeGroup != ResourceTypeGroup.BASIC_TOURNAMENT && id?.TypeGroup != ResourceTypeGroup.TOURNAMENT && id?.TypeGroup != ResourceTypeGroup.SEASON)
+            {
+                filePath = GetFile(MatchDetailsXml, culture);
+            }
+
+            if (string.IsNullOrEmpty(filePath))
+            {
+                return Task.FromResult(false);
+            }
+            var mapper = new SportEventSummaryMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(_restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(id, result, culture, DtoType.SportEventSummary, requester);
+            }
+
+            return Task.FromResult(true);
+        }
+
+        public Task GetSportEventFixtureAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        {
+            RecordCall("GetSportEventFixtureAsync");
+            var filePath = GetFile(FixtureXml, culture);
+            var restDeserializer = new Deserializer<fixturesEndpoint>();
+            var mapper = new FixtureMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(id, result, culture, DtoType.Fixture, requester);
+            }
+
+            return Task.FromResult(true);
+        }
+
+        public Task GetAllTournamentsForAllSportAsync(CultureInfo culture)
+        {
+            RecordCall("GetAllTournamentsForAllSportAsync");
+            var filePath = GetFile(TournamentScheduleXml, culture);
+            var restDeserializer = new Deserializer<tournamentsEndpoint>();
+            var mapper = new TournamentsMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(URN.Parse($"sr:sports:{result.Items.Count()}"), result, culture, DtoType.SportList, null);
+            }
+
+            return Task.FromResult(true);
+        }
+
+        public Task GetSportCategoriesAsync(URN id, CultureInfo culture)
+        {
+            RecordCall("GetSportCategoriesAsync");
+            var filePath = GetFile(SportCategoriesXml, culture);
+            var restDeserializer = new Deserializer<sportCategoriesEndpoint>();
+            var mapper = new SportCategoriesMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result?.Categories != null)
+            {
+                foreach (var category in result.Categories)
+                {
+                    _cacheManager.SaveDto(id, category, culture, DtoType.Category, null);
+                }
+            }
+
+            return Task.FromResult(true);
+        }
+
+        public Task GetAllSportsAsync(CultureInfo culture)
+        {
+            RecordCall("GetAllSportsAsync");
+            var filePath = GetFile(SportsXml, culture);
+            var restDeserializer = new Deserializer<sportsEndpoint>();
+            var mapper = new SportsMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(URN.Parse($"sr:sports:{result.Items.Count()}"), result, culture, DtoType.SportList, null);
+            }
+
+            return Task.FromResult(true);
+        }
+
+        public Task<IEnumerable<Tuple<URN, URN>>> GetLiveSportEventsAsync(CultureInfo culture)
+        {
+            RecordCall("GetLiveSportEventsAsync");
+            var filePath = GetFile("live_events.xml", culture);
+            var restDeserializer = new Deserializer<scheduleEndpoint>();
+            var mapper = new DateScheduleMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(URN.Parse($"sr:sport_events:{result.Items.Count()}"), result, culture, DtoType.SportEventSummaryList, null);
+                var urns = new List<Tuple<URN, URN>>();
+                foreach (var item in result.Items)
+                {
+                    urns.Add(new Tuple<URN, URN>(item.Id, item.SportId));
+                }
+                return Task.FromResult(urns.AsEnumerable());
+            }
+
+            return Task.FromResult(null as IEnumerable<Tuple<URN, URN>>);
+        }
+
+        public Task<IEnumerable<Tuple<URN, URN>>> GetSportEventsForDateAsync(DateTime date, CultureInfo culture)
+        {
+            RecordCall("GetSportEventsForDateAsync");
+            var filePath = GetFile(ScheduleXml, culture);
+            var restDeserializer = new Deserializer<scheduleEndpoint>();
+            var mapper = new DateScheduleMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(URN.Parse($"sr:sport_events:{result.Items.Count()}"), result, culture, DtoType.SportEventSummaryList, null);
+                var urns = new List<Tuple<URN, URN>>();
+                foreach (var item in result.Items)
+                {
+                    urns.Add(new Tuple<URN, URN>(item.Id, item.SportId));
+                }
+                return Task.FromResult(urns.AsEnumerable());
+            }
+
+            return Task.FromResult(null as IEnumerable<Tuple<URN, URN>>);
+        }
+
+        public Task<IEnumerable<Tuple<URN, URN>>> GetSportEventsForTournamentAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        {
+            RecordCall("GetSportEventsForTournamentAsync");
+            var filePath = GetFile(TourScheduleXml, culture);
+            var restDeserializer = new Deserializer<tournamentSchedule>();
+            var mapper = new TournamentScheduleMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(URN.Parse($"sr:sport_events:{result.Items.Count()}"), result, culture, DtoType.SportEventSummaryList, requester);
+                var urns = new List<Tuple<URN, URN>>();
+                foreach (var item in result.Items)
+                {
+                    urns.Add(new Tuple<URN, URN>(item.Id, item.SportId));
+                }
+                return Task.FromResult(urns.AsEnumerable());
+            }
+
+            return Task.FromResult(null as IEnumerable<Tuple<URN, URN>>);
+        }
+
+        public Task GetPlayerProfileAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        {
+            RecordCall("GetPlayerProfileAsync");
+            var filePath = GetFile($"{culture.TwoLetterISOLanguageName}.player.{id?.Id ?? 1}.xml", culture);
+            if (string.IsNullOrEmpty(filePath))
+            {
+                filePath = GetFile(PlayerProfileXml, culture);
+            }
+            var restDeserializer = new Deserializer<playerProfileEndpoint>();
+            var mapper = new PlayerProfileMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(id, result, culture, DtoType.PlayerProfile, requester);
+            }
+
+            return Task.FromResult(true);
+        }
+
+        public Task GetCompetitorAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        {
+            RecordCall("GetCompetitorAsync");
+            var filePath = GetFile($"{culture.TwoLetterISOLanguageName}.competitor.{id?.Id ?? 1}.xml", culture);
+            if (string.IsNullOrEmpty(filePath))
+            {
+                filePath = GetFile(CompetitorProfileXml, culture);
+            }
+            var restDeserializer = new Deserializer<competitorProfileEndpoint>();
+            var mapper = new CompetitorProfileMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(id, result, culture, DtoType.CompetitorProfile, requester);
+            }
+
+            return Task.FromResult(true);
+        }
+
+        public Task<IEnumerable<URN>> GetSeasonsForTournamentAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        {
+            RecordCall("GetSeasonsForTournamentAsync");
+            var filePath = GetFile("tournament_seasons.{culture}.xml", culture);
+            var restDeserializer = new Deserializer<tournamentSeasons>();
+            var mapper = new TournamentSeasonsMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(id, result, culture, DtoType.TournamentSeasons, requester);
+                var urns = new List<URN>();
+                foreach (var item in result.Seasons)
+                {
+                    urns.Add(item.Id);
+                }
+                return Task.FromResult(urns.AsEnumerable());
+            }
+
+            return Task.FromResult(null as IEnumerable<URN>);
+        }
+
+        public Task GetInformationAboutOngoingEventAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        {
+            RecordCall("GetInformationAboutOngoingEventAsync");
+            var filePath = GetFile("match_timeline.{culture}.xml", culture);
+            var restDeserializer = new Deserializer<matchTimelineEndpoint>();
+            var mapper = new MatchTimelineMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(id, result, culture, DtoType.MatchTimeline, requester);
+            }
+
+            return Task.FromResult(true);
+        }
+
+        public Task GetMarketDescriptionsAsync(CultureInfo culture)
+        {
+            RecordCall("GetMarketDescriptionsAsync");
+            var filePath = GetFile("invariant_market_descriptions.{culture}.xml", culture);
+            var restDeserializer = new Deserializer<market_descriptions>();
+            var mapper = new MarketDescriptionsMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(URN.Parse("sr:markets:" + result.Items?.Count()), result, culture, DtoType.MarketDescriptionList, null);
+            }
+
+            return Task.FromResult(true);
+        }
+
+        public Task GetVariantMarketDescriptionAsync(int id, string variant, CultureInfo culture)
+        {
+            RecordCall("GetVariantMarketDescriptionAsync");
+            var filePath = GetFile("variant_market_description.{culture}.xml", culture);
+            var restDeserializer = new Deserializer<market_descriptions>();
+            var mapper = new MarketDescriptionMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(URN.Parse("sr:variant:" + result.Id), result, culture, DtoType.MarketDescription, null);
+            }
+
+            return Task.FromResult(true);
+        }
+
+        public Task GetVariantDescriptionsAsync(CultureInfo culture)
+        {
+            RecordCall("GetVariantDescriptionsAsync");
+            var filePath = GetFile("variant_market_descriptions.{culture}.xml", culture);
+            var restDeserializer = new Deserializer<variant_descriptions>();
+            var mapper = new VariantDescriptionsMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(URN.Parse("sr:variants:" + result.Items?.Count()), result, culture, DtoType.VariantDescriptionList, null);
+            }
+
+            return Task.FromResult(true);
+        }
+
+        public Task GetDrawSummaryAsync(URN drawId, CultureInfo culture, ISportEventCI requester)
+        {
+            RecordCall("GetDrawSummaryAsync");
+            var filePath = GetFile("draw_summary.{culture}.xml", culture);
+            var restDeserializer = new Deserializer<draw_summary>();
+            var mapper = new DrawSummaryMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(result.Id, result, culture, DtoType.LotteryDraw, requester);
+            }
+
+            return Task.FromResult(true);
+        }
+
+        public Task GetDrawFixtureAsync(URN drawId, CultureInfo culture, ISportEventCI requester)
+        {
+            RecordCall("GetDrawFixtureAsync");
+            var filePath = GetFile("draw_fixture.{culture}.xml", culture);
+            var restDeserializer = new Deserializer<draw_fixtures>();
+            var mapper = new DrawFixtureMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(result.Id, result, culture, DtoType.LotteryDraw, requester);
+            }
+
+            return Task.FromResult(true);
+        }
+
+        public Task GetLotteryScheduleAsync(URN lotteryId, CultureInfo culture, ISportEventCI requester)
+        {
+            RecordCall("GetLotteryScheduleAsync");
+            var filePath = GetFile("lottery_schedule.{culture}.xml", culture);
+            var restDeserializer = new Deserializer<lottery_schedule>();
+            var mapper = new LotteryScheduleMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(result.Id, result, culture, DtoType.Lottery, requester);
+            }
+
+            return Task.FromResult(true);
+        }
+
+        public Task<IEnumerable<URN>> GetAllLotteriesAsync(CultureInfo culture)
+        {
+            RecordCall("GetAllLotteriesAsync");
+            var filePath = GetFile("lotteries.{culture}.xml", culture);
+            var restDeserializer = new Deserializer<lotteries>();
+            var mapper = new LotteriesMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(URN.Parse($"sr:lotteries:{result.Items.Count()}"), result, culture, DtoType.LotteryList, null);
+                var urns = new List<URN>();
+                foreach (var item in result.Items)
+                {
+                    urns.Add(item.Id);
+                }
+                return Task.FromResult(urns.AsEnumerable());
+            }
+
+            return Task.FromResult(null as IEnumerable<URN>);
+        }
+    }
+}

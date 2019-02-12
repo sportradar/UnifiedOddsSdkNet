@@ -1,0 +1,360 @@
+﻿/*
+* Copyright (C) Sportradar AG. See LICENSE for full license governing this code
+*/
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics.Contracts;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
+using Sportradar.OddsFeed.SDK.Messages;
+
+namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
+{
+    /// <summary>
+    ///Implementation of the <see cref="IStageCI"/> interface
+    /// </summary>
+    /// <seealso cref="CompetitionCI" />
+    /// <seealso cref="IStageCI" />
+    public class StageCI : CompetitionCI, IStageCI
+    {
+        /// <summary>
+        /// The category identifier
+        /// </summary>
+        private URN _categoryId;
+        /// <summary>
+        /// The parent stage
+        /// </summary>
+        private StageCI _parentStage;
+        /// <summary>
+        /// The child stages
+        /// </summary>
+        private IEnumerable<StageCI> _childStages;
+        /// <summary>
+        /// The stage type
+        /// </summary>
+        private StageType _stageType;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StageCI"/> class
+        /// </summary>
+        /// <param name="id">The identifier</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to obtain summary and fixture</param>
+        /// <param name="semaphorePool">The semaphore pool</param>
+        /// <param name="defaultCulture">The default culture</param>
+        public StageCI(URN id,
+                       IDataRouterManager dataRouterManager,
+                       ISemaphorePool semaphorePool,
+                       CultureInfo defaultCulture)
+            : base(id, dataRouterManager, semaphorePool, defaultCulture)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StageCI"/> class
+        /// </summary>
+        /// <param name="eventSummary">The event summary</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to obtain summary and fixture</param>
+        /// <param name="semaphorePool">The semaphore pool</param>
+        /// <param name="currentCulture">The current culture</param>
+        /// <param name="defaultCulture">The default culture</param>
+        public StageCI(StageDTO eventSummary,
+                       IDataRouterManager dataRouterManager,
+                       ISemaphorePool semaphorePool,
+                       CultureInfo currentCulture,
+                       CultureInfo defaultCulture)
+            : base(eventSummary, dataRouterManager, semaphorePool, currentCulture, defaultCulture)
+        {
+            Merge(eventSummary, currentCulture, true);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StageCI"/> class
+        /// </summary>
+        /// <param name="fixture">The event summary</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to obtain summary and fixture</param>
+        /// <param name="semaphorePool">The semaphore pool</param>
+        /// <param name="currentCulture">The current culture</param>
+        /// <param name="defaultCulture">The default culture</param>
+        public StageCI(FixtureDTO fixture,
+                        IDataRouterManager dataRouterManager,
+                        ISemaphorePool semaphorePool,
+                        CultureInfo currentCulture,
+                        CultureInfo defaultCulture)
+            : base(fixture, dataRouterManager, semaphorePool, currentCulture, defaultCulture)
+        {
+            Merge(fixture, currentCulture, true);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StageCI"/> class
+        /// </summary>
+        /// <param name="tournamentSummary">The tournament summary</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to obtain summary and fixture</param>
+        /// <param name="semaphorePool">The semaphore pool</param>
+        /// <param name="currentCulture">The current culture</param>
+        /// <param name="defaultCulture">The default culture</param>
+        public StageCI(TournamentInfoDTO tournamentSummary,
+                        IDataRouterManager dataRouterManager,
+                        ISemaphorePool semaphorePool,
+                        CultureInfo currentCulture,
+                        CultureInfo defaultCulture)
+            : base(tournamentSummary, dataRouterManager, semaphorePool, currentCulture, defaultCulture)
+        {
+            Merge(tournamentSummary, currentCulture, true);
+        }
+
+        /// <summary>
+        /// get category identifier as an asynchronous operation.
+        /// </summary>
+        /// <returns>A <see cref="Task{URN}" /> representing the asynchronous operation</returns>
+        public async Task<URN> GetCategoryIdAsync()
+        {
+            if (_categoryId != null)
+            {
+                return _categoryId;
+            }
+            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+            return _categoryId;
+        }
+
+        /// <summary>
+        /// get parent stage as an asynchronous operation.
+        /// </summary>
+        /// <param name="cultures">A <see cref="IEnumerable{CultureInfo}" /> specifying the languages to which the returned instance should be translated</param>
+        /// <returns>A <see cref="Task{StageCI}" /> representing the asynchronous operation</returns>
+        public async Task<StageCI> GetParentStageAsync(IEnumerable<CultureInfo> cultures)
+        {
+            if (_parentStage != null)
+            {
+                return _parentStage;
+            }
+            ////the requested data does not contain translatable values - fetch just for default language
+            await FetchMissingSummary(cultures).ConfigureAwait(false);
+            return _parentStage;
+        }
+
+        /// <summary>
+        /// get stages as an asynchronous operation.
+        /// </summary>
+        /// <param name="cultures">The cultures</param>
+        /// <returns>A <see cref="Task{T}" /> representing the asynchronous operation</returns>
+        public async Task<IEnumerable<StageCI>> GetStagesAsync(IEnumerable<CultureInfo> cultures)
+        {
+            if (_childStages != null)
+            {
+                return _childStages;
+            }
+            ////the requested data does not contain translatable values - fetch just for default language
+            await FetchMissingSummary(cultures).ConfigureAwait(false);
+            return _childStages;
+        }
+
+        /// <summary>
+        /// get type as an asynchronous operation.
+        /// </summary>
+        /// <returns>A <see cref="Task{URN}" /> representing the asynchronous operation</returns>
+        public async Task<StageType> GetTypeAsync()
+        {
+            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+            return _stageType;
+        }
+
+        /// <summary>
+        /// Merges the specified event summary
+        /// </summary>
+        /// <param name="eventSummary">The event summary</param>
+        /// <param name="culture">The culture</param>
+        /// <param name="useLock"></param>
+        public void Merge(StageDTO eventSummary, CultureInfo culture, bool useLock)
+        {
+            if (useLock)
+            {
+                lock (MergeLock)
+                {
+                    ActualMerge(eventSummary, culture);
+                }
+            }
+            else
+            {
+                ActualMerge(eventSummary, culture);
+            }
+        }
+
+        /// <summary>
+        /// Merges the specified event summary
+        /// </summary>
+        /// <param name="eventSummary">The event summary</param>
+        /// <param name="culture">The culture</param>
+        private void ActualMerge(StageDTO eventSummary, CultureInfo culture)
+        {
+            base.Merge(eventSummary, culture, false);
+
+            if (eventSummary.ParentStage != null)
+            {
+                // no translatable data - just replace with new value
+                _parentStage = new StageCI(eventSummary.ParentStage, DataRouterManager, SemaphorePool, culture, DefaultCulture);
+            }
+            else
+            {
+                if (eventSummary.Tournament != null)
+                {
+                    _parentStage = new StageCI(eventSummary.Tournament.Id, DataRouterManager, SemaphorePool, culture);
+                }
+            }
+            if (eventSummary.Stages != null)
+            {
+                // no translatable data - just replace with new value
+                _childStages = new ReadOnlyCollection<StageCI>(eventSummary
+                                                              .Stages.Select(r => new StageCI(r, DataRouterManager, SemaphorePool, culture,
+                                                                                              DefaultCulture)).ToList());
+            }
+
+            if (eventSummary.Type != null)
+            {
+                _stageType = eventSummary.Type.Value == SportEventType.Parent
+                                 ? StageType.Parent
+                                 : StageType.Child;
+            }
+
+            if (eventSummary.Tournament?.Category != null)
+            {
+                _categoryId = eventSummary.Tournament.Category.Id;
+            }
+        }
+
+        /// <summary>
+        /// Merges the specified event summary
+        /// </summary>
+        /// <param name="eventSummary">The event summary</param>
+        /// <param name="culture">The culture</param>
+        /// <param name="useLock">Should the lock mechanism be used during merge</param>
+        public void Merge(TournamentInfoDTO eventSummary, CultureInfo culture, bool useLock)
+        {
+            if (useLock)
+            {
+                lock (MergeLock)
+                {
+                    ActualMergeTournament(eventSummary, culture);
+                }
+            }
+            else
+            {
+                ActualMergeTournament(eventSummary, culture);
+            }
+        }
+
+        /// <summary>
+        /// Merges the specified event summary
+        /// </summary>
+        /// <param name="eventSummary">The event summary</param>
+        /// <param name="culture">The culture</param>
+        private void ActualMergeTournament(TournamentInfoDTO eventSummary, CultureInfo culture)
+        {
+            base.Merge(eventSummary, culture, false);
+
+            if (eventSummary.Category != null)
+            {
+                _categoryId = eventSummary.Category.Id;
+            }
+
+            if (eventSummary.Type != null)
+            {
+                _stageType = eventSummary.Type.Value == SportEventType.Parent
+                                 ? StageType.Parent
+                                 : StageType.Child;
+            }
+
+            if (eventSummary.Competitors != null)
+            {
+                if (Competitors == null)
+                {
+                    Competitors = new List<TeamCompetitorCI>(eventSummary.Competitors.Select(t => new TeamCompetitorCI(t, culture, DataRouterManager)));
+                }
+                else
+                {
+                    MergeCompetitors(eventSummary.Competitors, culture);
+                }
+            }
+
+            if (eventSummary.Category != null)
+            {
+                _categoryId = eventSummary.Category.Id;
+            }
+        }
+
+        /// <summary>
+        /// Merges the specified fixture
+        /// </summary>
+        /// <param name="fixture">The fixture</param>
+        /// <param name="culture">The culture</param>
+        /// <param name="useLock">Should the lock mechanism be used during merge</param>
+        public new void MergeFixture(FixtureDTO fixture, CultureInfo culture, bool useLock)
+        {
+            if (useLock)
+            {
+                lock (MergeLock)
+                {
+                    base.MergeFixture(fixture, culture, false);
+                    _categoryId = fixture.Tournament?.Category?.Id;
+
+                    if (fixture.Type != null)
+                    {
+                        _stageType = fixture.Type.Value == SportEventType.Parent
+                                         ? StageType.Parent
+                                         : StageType.Child;
+                    }
+                }
+            }
+            else
+            {
+                base.MergeFixture(fixture, culture, false);
+                _categoryId = fixture.Tournament?.Category?.Id;
+
+                if (fixture.Type != null)
+                {
+                    _stageType = fixture.Type.Value == SportEventType.Parent
+                                     ? StageType.Parent
+                                     : StageType.Child;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Merges the competitors
+        /// </summary>
+        /// <param name="competitors">The competitors</param>
+        /// <param name="culture">The culture</param>
+        private void MergeCompetitors(IEnumerable<CompetitorDTO> competitors, CultureInfo culture)
+        {
+            Contract.Requires(culture != null);
+
+            if (competitors == null)
+            {
+                return;
+            }
+
+            var tempCompetitors = Competitors == null
+                ? new List<TeamCompetitorCI>()
+                : new List<TeamCompetitorCI>(Competitors);
+
+            foreach (var competitor in competitors)
+            {
+                var tempCompetitor = tempCompetitors.FirstOrDefault(c => c.Id.Equals(competitor.Id));
+                if (tempCompetitor == null)
+                {
+                    tempCompetitors.Add(new TeamCompetitorCI(competitor, culture, DataRouterManager));
+                }
+                else
+                {
+                    tempCompetitor.Merge(competitor, culture);
+                }
+            }
+            Competitors = new ReadOnlyCollection<TeamCompetitorCI>(tempCompetitors);
+        }
+    }
+}

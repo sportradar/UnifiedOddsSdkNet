@@ -1,0 +1,128 @@
+﻿/*
+* Copyright (C) Sportradar AG. See LICENSE for full license governing this code
+*/
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics.Contracts;
+using System.Linq;
+using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
+using Sportradar.OddsFeed.SDK.Messages;
+using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
+namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
+{
+    /// <summary>
+    /// A data-transfer-object containing basic information about a competition
+    /// </summary>
+    public class CompetitionDTO : SportEventSummaryDTO
+    {
+        /// <summary>
+        /// Gets the sport event status
+        /// </summary>
+        /// <value>The sport event status</value>
+        public SportEventStatusDTO Status { get; }
+
+        /// <summary>
+        /// Gets a <see cref="BookingStatus"/> enum member specifying the booking status of the associated sport event
+        /// </summary>
+        /// <remarks>For more information see <see cref="BookingStatus"/> enumeration</remarks>
+        public BookingStatus? BookingStatus { get; }
+
+        /// <summary>
+        /// Gets the venue info
+        /// </summary>
+        public VenueDTO Venue { get; internal set; }
+
+        /// <summary>
+        /// Gets the sport event conditions
+        /// </summary>
+        public SportEventConditionsDTO Conditions { get; }
+
+        /// <summary>
+        /// Gets a <see cref="IEnumerable{T}"/> representing the competitors of the associated sport event
+        /// </summary>
+        public IEnumerable<TeamCompetitorDTO> Competitors { get; }
+
+        /// <summary>
+        /// Gets the home away competitors
+        /// </summary>
+        /// <value>The home away competitors</value>
+        internal IDictionary<HomeAway, URN> HomeAwayCompetitors { get; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CompetitionDTO"/> class
+        /// </summary>
+        /// <param name="sportEvent">A <see cref="sportEvent"/> instance containing basic information about the sport event</param>
+        internal CompetitionDTO(sportEvent sportEvent)
+            : base(sportEvent)
+        {
+            BookingStatus? bookingStatus;
+            if (RestMapperHelper.TryGetBookingStatus(sportEvent.liveodds, out bookingStatus))
+            {
+                BookingStatus = bookingStatus;
+            }
+
+            if (sportEvent.competitors != null && sportEvent.competitors.Any())
+            {
+                Competitors = new ReadOnlyCollection<TeamCompetitorDTO>(sportEvent.competitors.Select(c => new TeamCompetitorDTO(c)).ToList());
+                HomeAwayCompetitors = RestMapperHelper.FillHomeAwayCompetitors(sportEvent.competitors);
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CompetitionDTO"/> class
+        /// </summary>
+        /// <param name="matchSummary">A <see cref="matchSummaryEndpoint"/> instance containing basic information about the sport event</param>
+        internal CompetitionDTO(matchSummaryEndpoint matchSummary)
+            : this(matchSummary.sport_event)
+        {
+            Contract.Requires(matchSummary != null);
+
+            Conditions = matchSummary.sport_event_conditions == null
+                ? null
+                : new SportEventConditionsDTO(matchSummary.sport_event_conditions);
+
+            Status = matchSummary.sport_event_status == null
+                ? null
+                : new SportEventStatusDTO(matchSummary.sport_event_status, matchSummary.statistics, HomeAwayCompetitors);
+
+            Venue = matchSummary.sport_event_conditions?.venue == null
+                ? null
+                : new VenueDTO(matchSummary.sport_event_conditions.venue);
+
+            if (Venue == null && matchSummary.venue != null)
+            {
+                Venue = new VenueDTO(matchSummary.venue);
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CompetitionDTO"/> class
+        /// </summary>
+        /// <param name="stageSummary">A <see cref="stageSummaryEndpoint"/> instance containing basic information about the sport event</param>
+        internal CompetitionDTO(stageSummaryEndpoint stageSummary)
+            : this(stageSummary.sport_event)
+        {
+            Contract.Requires(stageSummary != null);
+
+            Conditions = stageSummary.sport_event.sport_event_conditions == null
+                ? null
+                : new SportEventConditionsDTO(stageSummary.sport_event.sport_event_conditions);
+
+            Status = stageSummary.sport_event_status == null
+                ? null
+                : new SportEventStatusDTO(stageSummary.sport_event_status);
+
+            Venue = stageSummary.sport_event.sport_event_conditions?.venue == null
+                ? null
+                : new VenueDTO(stageSummary.sport_event.sport_event_conditions.venue);
+
+            if (Venue == null && stageSummary.sport_event.venue != null)
+            {
+                Venue = new VenueDTO(stageSummary.sport_event.venue);
+            }
+        }
+    }
+}
