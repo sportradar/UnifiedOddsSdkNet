@@ -53,7 +53,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         public static ICompetitor GetCompetitor(int id = 0, int playerCount = 0)
         {
-            return new Competitor(new CompetitorCI(new CompetitorDTO(MFR.GetTeam(id)), TestData.Culture, new TestDataRouterManager(new CacheManager())), null, TestData.Cultures3, new TestSportEventFactory(), (ICompetitionCI) null);
+            return new Competitor(new CompetitorCI(new CompetitorDTO(MFR.GetTeam(id)), TestData.Culture, null), null, TestData.Cultures3, new TestSportEventFactory(), (ICompetitionCI) null);
         }
 
         internal static CoverageInfo GetCoverageInfo(int subItemCount = 0)

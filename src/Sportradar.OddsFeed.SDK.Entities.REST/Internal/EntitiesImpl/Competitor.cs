@@ -142,6 +142,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 throw new ArgumentNullException(nameof(ci));
             }
 
+            _competitorCI = ci;
             _competitorId = ci.Id;
             _profileCache = profileCache;
             _cultures = cultures.ToList();
@@ -175,6 +176,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 throw new ArgumentNullException(nameof(ci));
             }
 
+            _competitorCI = ci;
             _competitorId = ci.Id;
             _profileCache = profileCache;
             _cultures = cultures.ToList();
@@ -315,15 +317,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
 
         private CompetitorCI GetCompetitor()
         {
-            if (_competitorCI != null)
-                return _competitorCI;
-
-            lock (_lock)
-            {
-                if (_competitorCI == null)
-                    _competitorCI = _profileCache.GetCompetitorProfileAsync(_competitorId, _cultures).Result;
-                return _competitorCI;
-            }
+            return _profileCache != null
+                ? _profileCache.GetCompetitorProfileAsync(_competitorId, _cultures).Result
+                : _competitorCI;
         }
     }
 }

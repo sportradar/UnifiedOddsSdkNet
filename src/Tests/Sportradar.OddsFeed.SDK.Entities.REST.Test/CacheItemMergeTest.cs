@@ -46,7 +46,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             var competitorDTO1 = new CompetitorDTO(teamType1);
             var competitorDTO2 = new CompetitorDTO(teamType2);
 
-            var competitorCI = new CompetitorCI(competitorDTO1, _cultureFirst, new TestDataRouterManager(new CacheManager()));
+            var competitorCI = new CompetitorCI(competitorDTO1, _cultureFirst, null);
             competitorCI.Merge(competitorDTO2, _cultureSecond);
 
             Assert.IsNotNull(competitorCI);
