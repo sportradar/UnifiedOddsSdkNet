@@ -68,7 +68,8 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                 return fi.FullName;
 
             }
-            throw new ArgumentException($"Missing file {filePath}, for template {template} and lang:{culture.TwoLetterISOLanguageName}.");
+            return string.Empty; // ""
+            //throw new ArgumentException($"Missing file {filePath}, for template {template} and lang:{culture.TwoLetterISOLanguageName}.");
         }
 
         private void RecordCall(string callType)
@@ -292,7 +293,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         {
             RecordCall("GetCompetitorAsync");
             var filePath = GetFile($"{culture.TwoLetterISOLanguageName}.competitor.{id?.Id ?? 1}.xml", culture);
-            if (string.IsNullOrEmpty(filePath))
+            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
             {
                 filePath = GetFile(CompetitorProfileXml, culture);
             }

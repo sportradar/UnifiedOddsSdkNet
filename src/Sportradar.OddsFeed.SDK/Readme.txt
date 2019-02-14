@@ -9,6 +9,17 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2019-02-14  1.16.0.0
+Exposed Timestamps on IMessage
+Added RecoveryInfo (info about last recovery) to the Producer - extended with IProducerV1
+Added support for replay feed to the Feed instance
+Cache distribution goes only to caches that process specific dto type
+Added SDK examples based on replay server
+Fix: Sport.Categories now returns all categories, delayed fetching until needed
+Fix: fixed legacy market mappings (mapping to Lo or Lcco market mapping)
+Fix: calling GetSportAsync from multiple threads
+Fix: Competitor returning null values for AssociatedPlayers
+
 2019-01-07  1.15.0.0
 ICoveredInfo extended with ICoveredInfoV1 - exposed CoveredFrom property
 Added GetOutcomeType method to IMarketDefinition (to replace GetIncludesOutcomesOfType)

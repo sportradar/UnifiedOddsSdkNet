@@ -281,9 +281,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             catch (Exception ex)
             {
                 ExecutionLog.Error($"Fetching summary for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH EX.", ex);
-                if (((DataRouterManager)DataRouterManager).ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                var drm = DataRouterManager as DataRouterManager;
+                if (drm != null)
                 {
-                    throw;
+                    if (drm.ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                    {
+                        throw;
+                    }
                 }
             }
             finally

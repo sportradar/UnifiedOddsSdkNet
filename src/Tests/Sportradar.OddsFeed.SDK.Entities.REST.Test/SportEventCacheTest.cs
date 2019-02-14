@@ -139,7 +139,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             }).GetAwaiter().GetResult();
 
             Assert.AreEqual(TestData.Cultures.Count * 3, _dataRouterManager.GetCallCount(DateSchedule), $"{DateSchedule} should be called exactly {TestData.Cultures.Count * 3} times.");
-            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly {TestData.Cultures.Count} times.");
+            //Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly {TestData.Cultures.Count} times.");
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly 0 times.");
             Assert.IsNotNull(info);
 
             ValidateSportEventCacheItem(item, true);
@@ -154,7 +155,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             }).GetAwaiter().GetResult();
 
             Assert.AreEqual(TestData.Cultures.Count * 3, _dataRouterManager.GetCallCount(DateSchedule), $"{DateSchedule} should be called exactly {TestData.Cultures.Count * 3} times.");
-            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly {TestData.Cultures.Count} times.");
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly 0 times.");
             Assert.AreEqual("sr:tournament:1030", tourId.ToString());
             Assert.IsNotNull(fixture);
 
