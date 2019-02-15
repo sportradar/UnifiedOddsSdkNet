@@ -6053,6 +6053,10 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST {
         
         private bool climber_rankingFieldSpecified;
         
+        private int gridField;
+        
+        private bool gridFieldSpecified;
+        
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
         public string id {
@@ -6270,6 +6274,28 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST {
             }
             set {
                 this.climber_rankingFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public int grid {
+            get {
+                return this.gridField;
+            }
+            set {
+                this.gridField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool gridSpecified {
+            get {
+                return this.gridFieldSpecified;
+            }
+            set {
+                this.gridFieldSpecified = value;
             }
         }
     }

@@ -17,6 +17,7 @@
                     <xs:attribute name="sprint_ranking" type="xs:int" use="optional" />
                     <xs:attribute name="climber" type="xs:double" use="optional" />
                     <xs:attribute name="climber_ranking" type="xs:int" use="optional" />
+                    <xs:attribute name="grid" type="xs:int" use="optional" />
                 </xs:complexType>
             </xs:element>
         </xs:sequence>
