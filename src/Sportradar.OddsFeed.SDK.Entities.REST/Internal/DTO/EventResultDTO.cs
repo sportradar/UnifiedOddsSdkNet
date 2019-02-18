@@ -125,6 +125,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public decimal AwayScore { get; }
 
         /// <summary>
+        /// Gets the grid
+        /// </summary>
+        /// <value>The grid</value>
+        public int? Grid { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EventResultDTO"/> class
         /// </summary>
         /// <param name="result">The result</param>
@@ -158,6 +164,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             ClimberDecimal = stageResultCompetitor.climberSpecified ? (decimal)stageResultCompetitor.climber : (decimal?) null;
             Climber = ClimberDecimal.HasValue && ClimberDecimal.Value % 1 == 0 ? (int?) ClimberDecimal.Value : null;
             ClimberRanking = stageResultCompetitor.climber_rankingSpecified ? stageResultCompetitor.climber_ranking : (int?) null;
+            Grid = stageResultCompetitor.gridSpecified ? stageResultCompetitor.grid : (int?) null;
         }
     }
 }

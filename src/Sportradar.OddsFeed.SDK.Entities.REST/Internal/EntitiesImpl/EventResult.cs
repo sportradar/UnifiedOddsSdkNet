@@ -14,11 +14,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// Class EventResult
     /// </summary>
     /// <seealso cref="IEventResult" />
-    public class EventResult : IEventResult
+    public class EventResult : IEventResultV1
     {
-        /// <summary>
-        /// The match statuses cache
-        /// </summary>
         private readonly ILocalizedNamedValueCache _matchStatusesCache;
         private readonly int _matchStatusCode;
 
@@ -166,6 +163,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             _matchStatusCode = dto.MatchStatus;
             HomeScore = dto.HomeScore;
             AwayScore = dto.AwayScore;
+            Grid = dto.Grid;
         }
+
+        /// <summary>
+        /// Gets the grid
+        /// </summary>
+        /// <value>The grid</value>
+        public int? Grid { get; }
     }
 }
