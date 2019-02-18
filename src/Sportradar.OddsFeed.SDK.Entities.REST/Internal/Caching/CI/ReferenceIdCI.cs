@@ -27,6 +27,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         private int _rotationNumber;
 
         /// <summary>
+        /// The AAMS id for this instance if provided among reference ids, null otherwise
+        /// </summary>
+        private int? _aamsId;
+
+        /// <summary>
         /// Gets the Betradar id for this instance if provided among reference ids
         /// </summary>
         /// <returns>If exists among reference ids, result is greater then 0</returns>
@@ -51,6 +56,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public IReadOnlyDictionary<string, string> ReferenceIds { get; private set; }
 
         /// <summary>
+        /// Returns the AAMS id for this instance if provided among reference ids, null otherwise
+        /// </summary>
+        /// <returns>The AAMS id for this instance if provided among reference ids, null otherwise</returns>
+        public int? AamsId => _aamsId;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceIdCI"/> class
         /// </summary>
         public ReferenceIdCI(IDictionary<string, string> referenceIds)
@@ -58,6 +69,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _betradarId = 0;
             _betfairId = 0;
             _rotationNumber = 0;
+            _aamsId = null;
             if (referenceIds == null)
             {
                 return;
@@ -95,6 +107,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             if (referenceIds.TryGetValue("rotation_number", out val))
             {
                 int.TryParse(val, out _rotationNumber);
+            }
+            if (referenceIds.TryGetValue("aams", out val))
+            {
+                int i;
+                _aamsId = int.TryParse(val, out i)
+                              ? (int?)i
+                              : null;
             }
 
             if (checkDic)

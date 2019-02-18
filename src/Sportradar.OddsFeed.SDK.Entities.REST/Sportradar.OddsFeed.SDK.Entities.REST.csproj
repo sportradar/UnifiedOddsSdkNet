@@ -140,6 +140,7 @@
     <Compile Include="Internal\Mapping\SportCategoriesMapper.cs" />
     <Compile Include="Internal\Mapping\SportCategoriesMapperFactory.cs" />
     <Compile Include="IPitcher.cs" />
+    <Compile Include="IReferenceV1.cs" />
     <Compile Include="IScheduledStartTimeChange.cs" />
     <Compile Include="ICoverageInfo.cs" />
     <Compile Include="IDraw.cs" />

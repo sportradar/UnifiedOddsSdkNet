@@ -10,7 +10,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// <summary>
     /// A implementation of <see cref="IReference" /> used to return results to user
     /// </summary>
-    internal class Reference : EntityPrinter, IReference
+    internal class Reference : EntityPrinter, IReferenceV1
     {
         /// <summary>
         /// Gets the Betradar id for this instance if provided amount reference ids
@@ -35,6 +35,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public IReadOnlyDictionary<string, string> References { get; }
 
         /// <summary>
+        /// Returns the AAMS id for this instance if provided among reference ids, null otherwise
+        /// </summary>
+        /// <returns>The AAMS id for this instance if provided among reference ids, null otherwise</returns>
+        public int? AamsId { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Reference"/> class
         /// </summary>
         /// <param name="referenceCI">The reference ci</param>
@@ -49,6 +55,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             BetradarId = referenceCI.BetradarId;
             BetfairId = referenceCI.BetfairId;
             RotationNumber = referenceCI.RotationNumber;
+            AamsId = referenceCI.AamsId;
         }
 
         /// <summary>
