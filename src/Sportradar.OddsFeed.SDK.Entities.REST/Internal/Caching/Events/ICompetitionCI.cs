@@ -70,6 +70,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         Task<IDictionary<URN, ReferenceIdCI>> GetCompetitorsReferencesAsync();
 
         /// <summary>
+        /// The sport event status cache item
+        /// </summary>
+        SportEventStatusCI SportEventStatus { get; set; }
+
+        /// <summary>
+        /// Gets the event status asynchronous
+        /// </summary>
+        /// <returns>Get the event status</returns>
+        EventStatus? EventStatus { get; set; }
+
+        /// <summary>
         /// Merges the fixture
         /// </summary>
         /// <param name="fixtureDTO">The fixture dto</param>

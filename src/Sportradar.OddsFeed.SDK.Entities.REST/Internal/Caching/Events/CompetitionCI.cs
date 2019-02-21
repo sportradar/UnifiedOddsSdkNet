@@ -23,9 +23,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
     public class CompetitionCI : SportEventCI, ICompetitionCI
     {
         /// <summary>
-        /// The sport event status
+        /// The sport event status cache item
         /// </summary>
-        private SportEventStatusCI _sportEventStatus;
+        public SportEventStatusCI SportEventStatus { get; set; }
+        /// <summary>
+        /// Gets the event status asynchronous
+        /// </summary>
+        /// <returns>Get the event status</returns>
+        public EventStatus? EventStatus { get; set; }
         /// <summary>
         /// The booking status
         /// </summary>
@@ -119,7 +124,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         public async Task<SportEventStatusCI> GetSportEventStatusAsync()
         {
             await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
-            return _sportEventStatus;
+            return SportEventStatus;
         }
 
         /// <summary>
@@ -257,7 +262,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
 
             if (eventSummary.Status != null)
             {
-                _sportEventStatus = new SportEventStatusCI(eventSummary.Status);
+                SportEventStatus = new SportEventStatusCI(eventSummary.Status);
+                EventStatus = SportEventStatus.Status;
             }
 
             if (eventSummary.Venue != null)

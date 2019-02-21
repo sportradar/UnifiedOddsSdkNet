@@ -439,6 +439,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     }
                     break;
                 case DtoType.SportEventStatus:
+                    var statusDTO = item as SportEventStatusDTO;
+                    if (statusDTO != null)
+                    {
+                        AddSportEventStatus(id, statusDTO);
+                        saved = true;
+                    }
+                    else
+                    {
+                        LogSavingDtoConflict(id, typeof(SportEventStatusDTO), item.GetType());
+                    }
                     break;
                 case DtoType.SportEventSummary:
                     var tourInfo = item as TournamentInfoDTO;
@@ -587,6 +597,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                         comp?.Book();
                     }
                     break;
+                case DtoType.SportCategories:
+                    break;
                 default:
                     ExecutionLog.Warn($"Trying to add unchecked dto type:{dtoType} for id: {id}.");
                     break;
@@ -615,7 +627,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                                      DtoType.Lottery,
                                      DtoType.LotteryDraw,
                                      DtoType.LotteryList,
-                                     DtoType.BookingStatus
+                                     DtoType.BookingStatus,
+                                     DtoType.SportEventStatus
                                  };
         }
 
@@ -1019,6 +1032,29 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
 
             var matchCI = cacheItem as MatchCI;
             matchCI?.MergeTimeline(item, culture, true);
+        }
+
+        private void AddSportEventStatus(URN id, SportEventStatusDTO item)
+        {
+            lock (_addLock)
+            {
+                try
+                {
+                    var cacheItem = _sportEventCacheItemFactory.Get(Cache.Get(id.ToString()));
+                    if (cacheItem != null)
+                    {
+                        var competitionCI = cacheItem as CompetitionCI;
+                        if (competitionCI != null)
+                        {
+                            competitionCI.EventStatus = item.Status;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ExecutionLog.Error($"Error adding sportEventStatus for id={id}.", ex);
+                }
+            }
         }
 
         private void AddNewCacheItem(SportEventCI item)

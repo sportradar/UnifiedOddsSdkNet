@@ -127,9 +127,11 @@
     <Compile Include="IBookmakerDetails.cs" />
     <Compile Include="ICategorySummary.cs" />
     <Compile Include="ICategory.cs" />
+    <Compile Include="ICompetitionV1.cs" />
     <Compile Include="ICompetitionStatistics.cs" />
     <Compile Include="ICoverageInfoV1.cs" />
     <Compile Include="IEventResultV1.cs" />
+    <Compile Include="IMatchV1.cs" />
     <Compile Include="IMatchStatusV1.cs" />
     <Compile Include="Internal\Caching\CI\PitcherCI.cs" />
     <Compile Include="Internal\DTO\SportCategoriesDTO.cs" />
@@ -457,6 +459,7 @@
     <Compile Include="ISoccerEvent.cs" />
     <Compile Include="ISoccerStatistics.cs" />
     <Compile Include="ISoccerStatus.cs" />
+    <Compile Include="IStageV1.cs" />
     <Compile Include="IStage.cs" />
     <Compile Include="ITeamStatistics.cs" />
     <Compile Include="ICurrentSeasonInfo.cs" />

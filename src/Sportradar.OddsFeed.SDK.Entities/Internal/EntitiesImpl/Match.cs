@@ -24,7 +24,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
     /// </summary>
     /// <seealso cref="ICompetition" />
     /// <seealso cref="IMatch" />
-    internal class Match : Competition, IMatch
+    internal class Match : Competition, IMatchV1
     {
         /// <summary>
         /// A <see cref="ILog"/> instance used for execution logging

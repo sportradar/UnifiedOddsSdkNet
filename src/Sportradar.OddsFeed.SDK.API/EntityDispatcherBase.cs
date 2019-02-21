@@ -47,7 +47,7 @@ namespace Sportradar.OddsFeed.SDK.API
         {
             if (handler == null)
             {
-                Log.Warn($"Cannot dispatch message because no event listeners are attached to associated event. Dropping message[{message}]");
+                Log.Warn($"Cannot dispatch message {message.GetType().Name} because no event listeners are attached to associated event handler. Dropping message[{message}]");
                 return;
             }
 
@@ -79,7 +79,7 @@ namespace Sportradar.OddsFeed.SDK.API
                 var args = eventArgs == null
                                ? string.Empty
                                : eventArgs.GetType().Name;
-                Log.Warn($"Cannot dispatch message {messageName} because no listeners are attached to associated event. EventArgs: {args}.");
+                Log.Warn($"Cannot dispatch message {messageName} because no listeners are attached to associated event handler. EventArgs: {args}.");
                 return;
             }
 
