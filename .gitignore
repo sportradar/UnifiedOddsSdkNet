@@ -6,7 +6,7 @@ libs/
 # *.nupkg
 *.pdb
 *.trx
-*.dll
+src/**/*.dll
 *.zip
 *DotSettings.user
 *.pyc
