@@ -2,6 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
@@ -45,7 +46,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <summary>
         /// A <see cref="IDictionary{CultureInfo, String}"/> containing names in different languages
         /// </summary>
-        private readonly IDictionary<CultureInfo, string> _names = new Dictionary<CultureInfo, string>();
+        private readonly IDictionary<CultureInfo, string> _names = new ConcurrentDictionary<CultureInfo, string>();
 
         /// <summary>
         /// Gets the <see cref="IReadOnlyDictionary{TKey,TValue}" /> containing additional market information
