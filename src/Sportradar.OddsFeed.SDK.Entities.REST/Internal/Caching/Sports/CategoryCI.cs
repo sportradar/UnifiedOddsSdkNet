@@ -40,7 +40,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the provided data</param>
         /// <param name="sportId">The id of the parent sport</param>
         public CategoryCI(CategoryDTO data, CultureInfo culture, URN sportId)
-            :base(data.Id, data.Name, culture)
+            : base(data.Id, data.Name, culture)
         {
             Contract.Requires(sportId != null);
 
