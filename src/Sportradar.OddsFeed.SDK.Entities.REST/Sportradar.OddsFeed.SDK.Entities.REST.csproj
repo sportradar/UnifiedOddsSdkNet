@@ -459,6 +459,7 @@
     <Compile Include="ISoccerEvent.cs" />
     <Compile Include="ISoccerStatistics.cs" />
     <Compile Include="ISoccerStatus.cs" />
+    <Compile Include="ISportEventConditionsV1.cs" />
     <Compile Include="IStageV1.cs" />
     <Compile Include="IStage.cs" />
     <Compile Include="ITeamStatistics.cs" />
