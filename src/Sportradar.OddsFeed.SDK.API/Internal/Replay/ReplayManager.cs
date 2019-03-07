@@ -14,11 +14,11 @@ using Sportradar.OddsFeed.SDK.Messages;
 namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
 {
     /// <summary>
-    /// Implementation of the <see cref="IReplayManager"/> for interaction with xReplay Server for doing integration tests against played matches that are older than 48 hours
+    /// Implementation of the <see cref="IReplayManagerV1"/> for interaction with xReplay Server for doing integration tests against played matches that are older than 48 hours
     /// </summary>
-    /// <seealso cref="IReplayManager" />
+    /// <seealso cref="IReplayManagerV1" />
     [Log(LoggerType.ClientInteraction)]
-    public class ReplayManager : MarshalByRefObject, IReplayManager
+    public class ReplayManager : MarshalByRefObject, IReplayManagerV1
     {
         private readonly IDataRestful _dataRestful;
 
@@ -134,6 +134,21 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
         /// <remarks>Start replay the event from replay queue. Events are played in the order they were played in reality, e.g. if there are some events that were played simultaneously in reality, they will be played in parallel as well here on replay server. If not specified, default values speed = 10 and max_delay = 10000 are used. This means that messages will be sent 10x faster than in reality, and that if there was some delay between messages that was longer than 10 seconds it will be reduced to exactly 10 seconds/10 000 ms (this is helpful especially in pre-match odds where delay can be even a few hours or more). If player is already in play, nothing will happen</remarks>
         public IReplayResponse StartReplay(int speed = 10, int maxDelay = 10000, int? producerId = null, bool? rewriteTimestamps = null)
         {
+            return StartReplay(speed, maxDelay, producerId, rewriteTimestamps, null);
+        }
+
+        /// <summary>
+        /// Start replay the event from replay queue. Events are played in the order they were played in reality
+        /// </summary>
+        /// <param name="speed">The speed factor of the replay</param>
+        /// <param name="maxDelay">The maximum delay between messages in milliseconds</param>
+        /// <param name="producerId">The id of the producer from which we want to get messages, or null for messages from all producers</param>
+        /// <param name="rewriteTimestamps">Should the timestamp in messages be rewritten with current time</param>
+        /// <param name="runParallel">Should the events in queue replay independently</param>
+        /// <remarks>Start replay the event from replay queue. Events are played in the order they were played in reality, e.g. if there are some events that were played simultaneously in reality, they will be played in parallel as well here on replay server. If not specified, default values speed = 10 and max_delay = 10000 are used. This means that messages will be sent 10x faster than in reality, and that if there was some delay between messages that was longer than 10 seconds it will be reduced to exactly 10 seconds/10 000 ms (this is helpful especially in pre-match odds where delay can be even a few hours or more). If player is already in play, nothing will happen</remarks>
+        /// <returns>Returns an <see cref="IReplayResponse"/></returns>
+        public IReplayResponse StartReplay(int speed, int maxDelay, int? producerId, bool? rewriteTimestamps, bool? runParallel)
+        {
             //speed = CheckBoundaries(speed, 1, 1000);
             //maxDelay = CheckBoundaries(maxDelay, 100, 1000000);
 
@@ -151,8 +166,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
             {
                 paramRewriteTimestamps = $"&use_replay_timestamp={rewriteTimestamps}";
             }
+            var paramRunParallel = string.Empty;
+            if (runParallel != null)
+            {
+                paramRunParallel = $"&run_parallel={runParallel}";
+            }
 
-            var uri = new Uri($"{_apiHost}/play?speed={speed}&max_delay={maxDelay}{BuildNodeIdQuery("&")}{paramProducerId}{paramRewriteTimestamps}");
+            var uri = new Uri($"{_apiHost}/play?speed={speed}&max_delay={maxDelay}{BuildNodeIdQuery("&")}{paramProducerId}{paramRewriteTimestamps}{paramRunParallel}");
 
             var response = _dataRestful.PostDataAsync(uri).Result;
 
