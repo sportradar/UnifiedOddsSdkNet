@@ -911,7 +911,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             container.RegisterInstance<IDataRestful>(LogProxyFactory.Create<HttpDataRestful>(argsRest, m => m.Name.Contains("Async"), LoggerType.RestTraffic),
                 new ContainerControlledLifetimeManager());
 
-            container.RegisterType<IReplayManager, ReplayManager>(
+            container.RegisterType<IReplayManagerV1, ReplayManager>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     config.ReplayApiBaseUrl,
@@ -924,7 +924,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 container.Resolve<IDataRestful>(),
                 config.NodeId
             };
-            container.RegisterInstance<IReplayManager>(LogProxyFactory.Create<ReplayManager>(args, m => m.Name.Contains("e"), LoggerType.ClientInteraction),
+            container.RegisterInstance<IReplayManagerV1>(LogProxyFactory.Create<ReplayManager>(args, m => m.Name.Contains("e"), LoggerType.ClientInteraction),
                 new ContainerControlledLifetimeManager());
         }
 
