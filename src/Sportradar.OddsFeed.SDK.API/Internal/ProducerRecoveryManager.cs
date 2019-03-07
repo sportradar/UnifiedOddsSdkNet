@@ -445,7 +445,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                         _recoveryOperation.Interrupt(SdkInfo.FromEpochTime(_timestampTracker.SystemAliveTimestamp));
                     }
 
-                    // Check whether the recover is running and has timed-out
+                    // Check whether the recovery is running and has timed-out
                     if (Status == ProducerRecoveryStatus.Started && _recoveryOperation.HasTimedOut())
                     {
                         Debug.Assert(_recoveryOperation.IsRunning);

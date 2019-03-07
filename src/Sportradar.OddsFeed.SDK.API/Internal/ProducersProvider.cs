@@ -74,7 +74,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                                                                         : ReplaceProducerApiUrl(producer.api_url),
                                                                     producer.active,
                                                                     _config.InactivitySeconds,
-                                                                    _config.MaxRecoveryTime,
+                                                                    producer.stateful_recovery_window_in_minutes,
                                                                     producer.scope)).Cast<IProducer>().ToList();
         }
 

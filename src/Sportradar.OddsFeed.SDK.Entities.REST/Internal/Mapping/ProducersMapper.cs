@@ -21,7 +21,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping
         private readonly producers _data;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProducersMapper"/> class.
+        /// Initializes a new instance of the <see cref="ProducersMapper"/> class
         /// </summary>
         /// <param name="data">The <see cref="producers"/> instance containing data about available producers.</param>
         protected ProducersMapper(producers data)

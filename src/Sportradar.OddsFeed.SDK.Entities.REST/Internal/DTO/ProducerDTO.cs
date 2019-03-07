@@ -44,6 +44,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal IEnumerable<string> ScopeNames { get; }
 
         /// <summary>
+        /// Gets the stateful recovery window in minutes
+        /// </summary>
+        /// <value>The stateful recovery window in minutes</value>
+        internal int StatefulRecoveryWindow { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ProducerDTO"/> class
         /// </summary>
         /// <param name="producer">A <see cref="producer"/> containing deserialized response from 'available producers' endpoint</param>
@@ -59,6 +65,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             ScopeNames = string.IsNullOrEmpty(producer.scope)
                 ? null
                 : producer.scope.Split(new[] {"|"}, StringSplitOptions.RemoveEmptyEntries);
-       }
+            StatefulRecoveryWindow = producer.stateful_recovery_window_in_minutes;
+        }
     }
 }

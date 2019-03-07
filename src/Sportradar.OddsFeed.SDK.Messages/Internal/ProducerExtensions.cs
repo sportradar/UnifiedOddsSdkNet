@@ -31,7 +31,8 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal
         public static TimeSpan MaxAfterAge(this IProducer producer)
         {
             Contract.Ensures(Contract.Result<TimeSpan>() > TimeSpan.Zero);
-            return TimeSpan.FromDays(3);
+
+            return TimeSpan.FromMinutes(producer.MaxRecoveryTime);
         }
     }
 }

@@ -148,7 +148,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         }
 
         /// <summary>
-        /// Sets the disabled.
+        /// Sets the disabled
         /// </summary>
         /// <param name="disabled">if set to <c>true</c> [disabled]</param>
         internal void SetDisabled(bool disabled)

@@ -73,7 +73,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <returns>A <see cref="string"/> containing the id of the current instance.</returns>
         protected override string PrintI()
         {
-            return $"Attendace={Attendance}";
+            return $"Attendance={Attendance}";
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             var pitcherStr = Pitchers == null
                 ? string.Empty
                 : string.Join(",", Pitchers.Select(s=>s.Id));
-            return $"Attendace={Attendance}, EventMode={EventMode}, Referee={refereeStr}, WeatherInfo={weatherStr}, Pitchers=[{pitcherStr}]";
+            return $"Attendance={Attendance}, EventMode={EventMode}, Referee={refereeStr}, WeatherInfo={weatherStr}, Pitchers=[{pitcherStr}]";
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             var pitcherStr = Pitchers == null
                 ? string.Empty
                 : string.Join(",", Pitchers.Select(s => s.Id));
-            return $"Attendace={Attendance}, EventMode={EventMode}, Referee={refereeStr}, WeatherInfo={weatherStr}, Pitchers=[{pitcherStr}]";
+            return $"Attendance={Attendance}, EventMode={EventMode}, Referee={refereeStr}, WeatherInfo={weatherStr}, Pitchers=[{pitcherStr}]";
         }
 
         /// <summary>
