@@ -164,7 +164,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// </summary>
         /// <param name="eventSummary">The event summary</param>
         /// <param name="culture">The culture</param>
-        /// <param name="useLock">Should the lock mechanism be used during merge</param>
         private void ActualMerge(DrawDTO eventSummary, CultureInfo culture)
         {
             base.Merge(eventSummary, culture, false);

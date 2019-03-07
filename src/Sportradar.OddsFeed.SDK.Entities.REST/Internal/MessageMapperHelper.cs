@@ -2,6 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
@@ -129,16 +130,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             {
                 throw new ArgumentException("T must be an enum");
             }
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentException($"Empty value is not a member of enum {type.Name}", nameof(value));
+            }
+            var trimmedValue = value.Replace(" ", string.Empty).Trim();
             var enumValues = Enum.GetValues(type);
             foreach (int v in enumValues)
             {
                 var enumChoice = (T)(object)v;
-                if (string.Equals(enumChoice.ToString(CultureInfo.InvariantCulture), value, StringComparison.InvariantCultureIgnoreCase))
+                if (string.Equals(enumChoice.ToString(CultureInfo.InvariantCulture), value, StringComparison.InvariantCultureIgnoreCase)
+                    || string.Equals(enumChoice.ToString(CultureInfo.InvariantCulture), trimmedValue, StringComparison.InvariantCultureIgnoreCase))
                 {
                     return enumChoice;
                 }
             }
-            throw new ArgumentException($"Value:{value} is not a member of enum{type.Name}", nameof(value));
+            throw new ArgumentException($"Value:{value} is not a member of enum {type.Name}", nameof(value));
         }
 
         /// <summary>
@@ -155,16 +162,43 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             {
                 throw new ArgumentException("T must be an enum");
             }
+            if (string.IsNullOrEmpty(value))
+            {
+                return defaultValue;
+            }
+            var trimmedValue = value.Replace(" ", string.Empty).Trim();
             var enumValues = Enum.GetValues(type);
             foreach (int v in enumValues)
             {
                 var enumChoice = (T)(object)v;
-                if (string.Equals(enumChoice.ToString(CultureInfo.InvariantCulture), value, StringComparison.InvariantCultureIgnoreCase))
+                if (string.Equals(enumChoice.ToString(CultureInfo.InvariantCulture), value, StringComparison.InvariantCultureIgnoreCase)
+                    || string.Equals(enumChoice.ToString(CultureInfo.InvariantCulture), trimmedValue, StringComparison.InvariantCultureIgnoreCase))
                 {
                     return enumChoice;
                 }
             }
             return defaultValue;
+        }
+
+        /// <summary>
+        /// Converts the provided string <code>value</code> (enum value name) to the member of the specified enum
+        /// </summary>
+        /// <typeparam name="T">The type of enum to which to convert the <code>value</code></typeparam>
+        /// <param name="value">The value name to be converted</param>
+        /// <param name="defaultValue">A <see cref="T"/> member to be returned if <code>value</code> is not member of enum</param>
+        /// <param name="predefinedPairs">The predefined pairs of string value to enum</param>
+        /// <returns>The member of the specified enum</returns>
+        public static T GetEnumValue<T>(string value, T defaultValue, IDictionary<string, T> predefinedPairs) where T : struct, IConvertible
+        {
+            if (predefinedPairs != null)
+            {
+                if (predefinedPairs.ContainsKey(value))
+                {
+                    return predefinedPairs[value];
+                }
+            }
+
+            return GetEnumValue(value, defaultValue);
         }
     }
 }

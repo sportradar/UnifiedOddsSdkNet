@@ -61,6 +61,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Enums
         /// <summary>
         /// Indicates that the associated sport event is interrupted. Interruption is expected to be just a few minutes. Longer interruptions may lead to a match being suspended, or possibly postponed.
         /// </summary>
-        Interrupted = 10
+        Interrupted = 10,
+
+        /// <summary>
+        /// The match is about to start
+        /// </summary>
+        MatchAboutToStart = 11
     }
 }
