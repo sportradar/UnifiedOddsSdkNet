@@ -283,11 +283,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="id">A <see cref="URN"/> specifying the id of the sport to get</param>
         /// <param name="cultures">A <see cref="IEnumerable{CultrureInfo}"/> specifying the languages to which the sport must be translated</param>
         /// <returns>A <see cref="SportData"/> representing the requested sport translated into requested languages. </returns>
-        private SportData GetSportFromCache(URN id, IEnumerable<CultureInfo> cultures)
+        private async Task<SportData> GetSportFromCacheAsync(URN id, IEnumerable<CultureInfo> cultures)
         {
             var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
 
-            FetchSportCategoriesIfNeeded(id, cultureList);
+            await FetchSportCategoriesIfNeededAsync(id, cultureList);
 
             List<CategoryData> categories = null;
 
@@ -338,13 +338,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// </summary>
         /// <param name="id">A <see cref="URN"/> specifying the id of the sport</param>
         /// <param name="cultures">A <see cref="IEnumerable{CultrureInfo}"/> specifying the languages to which the categories must be translated</param>
-        private void FetchSportCategoriesIfNeeded(URN id, IList<CultureInfo> cultures)
+        private async Task FetchSportCategoriesIfNeededAsync(URN id, IList<CultureInfo> cultures)
         {
             SportCI cachedSport;
             if (!Sports.TryGetValue(id, out cachedSport))
                 return;
 
-            cachedSport.LoadCategories(cultures);
+            await cachedSport.LoadCategoriesAsync(cultures);
         }
 
         /// <summary>
@@ -395,12 +395,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 // we have all available data - return the requested info
                 if (!missingCultures.Any())
                 {
-                    var sports = Sports.Keys.Select(sportId => GetSportFromCache(sportId, cultureList)).ToList();
-                    return sports;
+                    var sports = Sports.Keys.Select(async sportId => await GetSportFromCacheAsync(sportId, cultureList)).ToList();
+                    return await Task.WhenAll(sports);
                 }
 
                 await FetchAndMergeAll(missingCultures, false).ConfigureAwait(false);
-                return Sports.Keys.Select(sportId => GetSportFromCache(sportId, cultureList)).ToList();
+                return await Task.WhenAll(Sports.Keys.Select(async sportId => await GetSportFromCacheAsync(sportId, cultureList)).ToList());
             }
             catch (Exception ex)
             {
@@ -424,7 +424,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             Metric.Context("CACHE").Meter("SportDataCache->GetSportAsync", Unit.Calls).Mark();
 
             var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
-            var sport = GetSportFromCache(id, cultureList);
+            var sport = await GetSportFromCacheAsync(id, cultureList);
             if (sport != null)
             {
                 return sport;
@@ -442,7 +442,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 {
                     await FetchAndMergeAll(missingCultures, false).ConfigureAwait(false);
                 }
-                return GetSportFromCache(id, cultureList);
+                return await GetSportFromCacheAsync(id, cultureList);
             }
             catch (Exception ex)
             {
