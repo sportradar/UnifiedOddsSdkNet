@@ -69,6 +69,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                 Competitors = new ReadOnlyCollection<TeamCompetitorDTO>(sportEvent.competitors.Select(c => new TeamCompetitorDTO(c)).ToList());
                 HomeAwayCompetitors = RestMapperHelper.FillHomeAwayCompetitors(sportEvent.competitors);
             }
+
+            Conditions = sportEvent.sport_event_conditions == null
+                             ? null
+                             : new SportEventConditionsDTO(sportEvent.sport_event_conditions);
+
+            Venue = sportEvent.sport_event_conditions?.venue == null
+                        ? null
+                        : new VenueDTO(sportEvent.sport_event_conditions.venue);
+
+            if (Venue == null && sportEvent.venue != null)
+            {
+                Venue = new VenueDTO(sportEvent.venue);
+            }
         }
 
         /// <summary>
@@ -80,22 +93,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         {
             Contract.Requires(matchSummary != null);
 
-            Conditions = matchSummary.sport_event_conditions == null
-                ? null
-                : new SportEventConditionsDTO(matchSummary.sport_event_conditions);
-
             Status = matchSummary.sport_event_status == null
                 ? null
                 : new SportEventStatusDTO(matchSummary.sport_event_status, matchSummary.statistics, HomeAwayCompetitors);
-
-            Venue = matchSummary.sport_event_conditions?.venue == null
-                ? null
-                : new VenueDTO(matchSummary.sport_event_conditions.venue);
-
-            if (Venue == null && matchSummary.venue != null)
-            {
-                Venue = new VenueDTO(matchSummary.venue);
-            }
         }
 
         /// <summary>
@@ -107,22 +107,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         {
             Contract.Requires(stageSummary != null);
 
-            Conditions = stageSummary.sport_event.sport_event_conditions == null
-                ? null
-                : new SportEventConditionsDTO(stageSummary.sport_event.sport_event_conditions);
-
             Status = stageSummary.sport_event_status == null
                 ? null
                 : new SportEventStatusDTO(stageSummary.sport_event_status);
-
-            Venue = stageSummary.sport_event.sport_event_conditions?.venue == null
-                ? null
-                : new VenueDTO(stageSummary.sport_event.sport_event_conditions.venue);
-
-            if (Venue == null && stageSummary.sport_event.venue != null)
-            {
-                Venue = new VenueDTO(stageSummary.sport_event.venue);
-            }
         }
     }
 }

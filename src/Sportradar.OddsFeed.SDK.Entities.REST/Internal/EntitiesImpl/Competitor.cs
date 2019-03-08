@@ -24,7 +24,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     [DataContract]
     internal class Competitor : Player, ICompetitor
     {
-        private CompetitorCI _competitorCI = null;
+        private readonly CompetitorCI _competitorCI = null;
         private readonly URN _competitorId;
         private readonly IProfileCache _profileCache;
         private readonly List<CultureInfo> _cultures;
@@ -238,7 +238,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 associatedPlayers = string.Join(", ", AssociatedPlayers.Select(s => s.Id + ": " + s.GetName(_cultures.First())));
                 associatedPlayers = $", AssociatedPlayers=[{associatedPlayers}]";
             }
-            var reference = References == null ? string.Empty : References.ToString("c");
+            var reference = _referenceId == null
+                                ? string.Empty
+                                : _referenceId.ReferenceIds.Aggregate(string.Empty, (current, item) => current = $"{current}, {item.Key}={item.Value}").Substring(2);
             return $"{base.PrintC()}, Reference={reference}, Abbreviations=[{abbreviations}]{associatedPlayers}";
         }
 
