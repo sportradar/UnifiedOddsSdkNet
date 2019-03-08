@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -35,7 +37,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports
         /// <summary>
         /// Lock object used for loading categories
         /// </summary>
-        private readonly object _loadedCategoriesLock = new object();
+        private readonly SemaphoreSlim _loadedCategoriesSemaphore = new SemaphoreSlim(1);
 
         /// <summary>
         /// The <see cref="IDataRouterManager"/> used to obtain categories
@@ -74,17 +76,23 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports
             }
         }
 
-        public void LoadCategories(IEnumerable<CultureInfo> cultures)
+        public async Task LoadCategoriesAsync(IEnumerable<CultureInfo> cultures)
         {
             var wantedCultures = cultures as List<CultureInfo> ?? cultures.ToList();
-            lock (_loadedCategoriesLock)
+            try
             {
+                await _loadedCategoriesSemaphore.WaitAsync();
                 wantedCultures = LanguageHelper.GetMissingCultures(wantedCultures, _loadedCategories).ToList();
                 if (!wantedCultures.Any())
                     return;
 
-                wantedCultures.ForEach(culture => DataRouterManager.GetSportCategoriesAsync(Id, culture).Wait());
+                foreach (var culture in wantedCultures)
+                    await DataRouterManager.GetSportCategoriesAsync(Id, culture);
                 _loadedCategories.AddRange(wantedCultures);
+            }
+            finally
+            {
+                _loadedCategoriesSemaphore.Release();
             }
         }
     }
