@@ -64,7 +64,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <returns>A <see cref="string" /> containing the id of the current instance</returns>
         protected override string PrintI()
         {
-            return $"BetradarId={BetradarId}, Betfairid={BetfairId}, RotationNumber={RotationNumber}";
+            return $"BetradarId={BetradarId}, BetfairId={BetfairId}, RotationNumber={RotationNumber}";
         }
 
         /// <summary>
