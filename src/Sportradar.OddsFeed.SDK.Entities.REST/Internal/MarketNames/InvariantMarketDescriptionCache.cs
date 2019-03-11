@@ -457,6 +457,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                     break;
                 case DtoType.CompetitorProfile:
                     break;
+                case DtoType.SimpleTeamProfile:
+                    break;
                 case DtoType.Fixture:
                     break;
                 case DtoType.MarketDescription:

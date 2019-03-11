@@ -742,6 +742,24 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="REST XMLs\Profiles\en.simpleteam.1.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="REST XMLs\Profiles\de.simpleteam.1.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="REST XMLs\Profiles\hu.simpleteam.1.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="REST XMLs\Profiles\de.simpleteam.2.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="REST XMLs\Profiles\en.simpleteam.2.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="REST XMLs\Profiles\hu.simpleteam.2.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="REST XMLs\sport_categories.de.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

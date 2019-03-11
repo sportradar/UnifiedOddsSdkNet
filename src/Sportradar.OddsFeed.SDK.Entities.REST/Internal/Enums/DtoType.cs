@@ -107,6 +107,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums
         /// <summary>
         /// The sport categories
         /// </summary>
-        SportCategories
+        SportCategories,
+        /// <summary>
+        /// The simple team profile
+        /// </summary>
+        SimpleTeamProfile
     }
 }

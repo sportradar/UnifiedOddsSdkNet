@@ -286,6 +286,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     break;
                 case DtoType.CompetitorProfile:
                     break;
+                case DtoType.SimpleTeamProfile:
+                    break;
                 case DtoType.Fixture:
                     var fixtureDTO = item as FixtureDTO;
                     if (fixtureDTO != null)

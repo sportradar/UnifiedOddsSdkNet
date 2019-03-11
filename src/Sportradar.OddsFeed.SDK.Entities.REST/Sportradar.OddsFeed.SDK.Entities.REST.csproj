@@ -134,11 +134,14 @@
     <Compile Include="IMatchV1.cs" />
     <Compile Include="IMatchStatusV1.cs" />
     <Compile Include="Internal\Caching\CI\PitcherCI.cs" />
+    <Compile Include="Internal\DTO\SimpleTeamProfileDTO.cs" />
     <Compile Include="Internal\DTO\SportCategoriesDTO.cs" />
     <Compile Include="Internal\DTO\PitcherDTO.cs" />
     <Compile Include="Internal\DTO\PlayerCompetitorDTO.cs" />
     <Compile Include="Internal\EntitiesImpl\ScheduledStartTimeChange.cs" />
     <Compile Include="Internal\EntitiesImpl\Pitcher.cs" />
+    <Compile Include="Internal\Mapping\SimpleTeamProfileMapper.cs" />
+    <Compile Include="Internal\Mapping\SimpleTeamProfileMapperFactory.cs" />
     <Compile Include="Internal\Mapping\SportCategoriesMapper.cs" />
     <Compile Include="Internal\Mapping\SportCategoriesMapperFactory.cs" />
     <Compile Include="IPitcher.cs" />

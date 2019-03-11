@@ -129,6 +129,10 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST
     public partial class competitorProfileEndpoint : RestMessage
     {
     }
+	
+    public partial class simpleTeamProfileEndpoint : RestMessage
+    {
+    }
 
     [OverrideXmlNamespace(RootElementName = "draw_summary", IgnoreNamespace = false)]
     public partial class draw_summary : RestMessage

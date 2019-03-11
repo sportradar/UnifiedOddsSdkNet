@@ -80,22 +80,11 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             };
         }
 
-        public static competitorProfileEndpoint GetSimpleTeamCompetitorProfileEndpoint(int id = 0, int playerCount = 0, IDictionary<string, string> referenceIds = null)
+        public static simpleTeamProfileEndpoint GetSimpleTeamCompetitorProfileEndpoint(int id = 0, IDictionary<string, string> referenceIds = null)
         {
-            if (playerCount == 0)
+            return new simpleTeamProfileEndpoint
             {
-                playerCount = SR.I(20);
-            }
-
-            var players = new List<playerExtended>();
-            for (var j = 0; j < playerCount; j++)
-            {
-                players.Add(GetPlayerExtended());
-            }
-
-            return new competitorProfileEndpoint
-            {
-                competitor = new teamExtended
+                competitor = new team
                 {
                     id = id == 0 ? SR.Urn("simpleteam", 100000).ToString() : SR.Urn(id, "simpleteam").ToString(),
                     name = "my name",
@@ -107,7 +96,6 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                 },
                 generated_at = DateTime.Today,
                 generated_atSpecified = true,
-                players = players.ToArray()
             };
         }
 

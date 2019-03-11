@@ -195,11 +195,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                     return cachedItem;
                 }
 
-                if (competitorId.Type.Equals(SdkInfo.SimpleTeamIdentifier, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return cachedItem;
-                }
-
                 var cultureTasks = missingLanguages.ToDictionary(c => c, c => _dataRouterManager.GetCompetitorAsync(competitorId, c, null));
 
                 await Task.WhenAll(cultureTasks.Values).ConfigureAwait(false);
@@ -255,6 +250,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                                      DtoType.MatchTimeline,
                                      DtoType.Competitor,
                                      DtoType.CompetitorProfile,
+                                     DtoType.SimpleTeamProfile,
                                      DtoType.PlayerProfile,
                                      DtoType.SportEventSummary,
                                      DtoType.TournamentInfo,
@@ -395,6 +391,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                     else
                     {
                         LogSavingDtoConflict(id, typeof(CompetitorProfileDTO), item.GetType());
+                    }
+                    break;
+                case DtoType.SimpleTeamProfile:
+                    var simpleTeamProfile = item as SimpleTeamProfileDTO;
+                    if (simpleTeamProfile != null)
+                    {
+                        AddCompetitorProfile(id, simpleTeamProfile, culture, true);
+                        saved = true;
+                    }
+                    else
+                    {
+                        LogSavingDtoConflict(id, typeof(SimpleTeamProfileDTO), item.GetType());
                     }
                     break;
                 case DtoType.MarketDescription:
@@ -596,6 +604,40 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             }
         }
 
+        private void AddCompetitorProfile(URN id, SimpleTeamProfileDTO item, CultureInfo culture, bool useSemaphore)
+        {
+            if (_cache.Contains(id.ToString()))
+            {
+                try
+                {
+                    var ci = (CompetitorCI)_cache.Get(id.ToString());
+                    if (useSemaphore)
+                    {
+                        _semaphoreCacheMerge.Wait();
+                    }
+                    ci.Merge(item, culture);
+                }
+                catch (Exception ex)
+                {
+                    ExecutionLog.Error($"Error adding competitor for id={id}, dto type={item?.GetType().Name} and lang={culture.TwoLetterISOLanguageName}.", ex);
+                }
+                finally
+                {
+                    if (useSemaphore)
+                    {
+                        if (!_isDisposed)
+                        {
+                            _semaphoreCacheMerge.Release();
+                        }
+                    }
+                }
+            }
+            else
+            {
+                _cache.Add(id.ToString(), new CompetitorCI(item, culture, _dataRouterManager), GetCorrectCacheItemPolicy(id));
+            }
+        }
+
         private void AddPlayerProfile(URN id, PlayerProfileDTO item, CultureInfo culture, bool useSemaphore)
         {
             if (_cache.Contains(id.ToString()))
@@ -636,9 +678,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             {
                 try
                 {
-                    if (id.Type.Equals("competitor", StringComparison.InvariantCultureIgnoreCase))
+                    if (id.Type.Equals(SdkInfo.PlayerProfileIdentifier, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        var ci = (CompetitorCI)_cache.Get(id.ToString());
+                        var ci = (PlayerProfileCI)_cache.Get(id.ToString());
                         if (useSemaphore)
                         {
                             _semaphoreCacheMerge.Wait();
@@ -648,7 +690,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                     }
                     else
                     {
-                        var ci = (PlayerProfileCI) _cache.Get(id.ToString());
+                        var ci = (CompetitorCI)_cache.Get(id.ToString());
                         if (useSemaphore)
                         {
                             _semaphoreCacheMerge.Wait();
@@ -674,13 +716,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             }
             else
             {
-                if (id.Type.Equals("competitor", StringComparison.InvariantCultureIgnoreCase))
+                if (id.Type.Equals(SdkInfo.PlayerProfileIdentifier, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    _cache.Add(id.ToString(), new CompetitorCI(item, culture, _dataRouterManager), GetCorrectCacheItemPolicy(id));
+                    _cache.Add(id.ToString(), new PlayerProfileCI(item, culture, _dataRouterManager), GetCorrectCacheItemPolicy(id));
                 }
                 else
                 {
-                    _cache.Add(id.ToString(), new PlayerProfileCI(item, culture, _dataRouterManager), GetCorrectCacheItemPolicy(id));
+                    _cache.Add(id.ToString(), new CompetitorCI(item, culture, _dataRouterManager), GetCorrectCacheItemPolicy(id));
                 }
             }
         }

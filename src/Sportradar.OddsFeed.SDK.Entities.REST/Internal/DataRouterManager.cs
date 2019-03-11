@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Common.Logging;
 using Metrics;
 using Sportradar.OddsFeed.SDK.Common;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -62,6 +63,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// The competitor provider
         /// </summary>
         private readonly IDataProvider<CompetitorProfileDTO> _competitorProvider;
+        /// <summary>
+        /// The simple team profile provider
+        /// </summary>
+        private IDataProvider<SimpleTeamProfileDTO> _simpleTeamProvider;
         /// <summary>
         /// The tournament seasons provider
         /// </summary>
@@ -132,6 +137,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="sportEventsForTournamentProvider">The sport events for tournament provider</param>
         /// <param name="playerProfileProvider">The player profile provider</param>
         /// <param name="competitorProvider">The competitor provider</param>
+        /// <param name="simpleTeamProvider">The simple team provider</param>
         /// <param name="tournamentSeasonsProvider">The tournament seasons provider</param>
         /// <param name="ongoingSportEventProvider">The ongoing sport event provider</param>
         /// <param name="sportCategoriesProvider">The sport categories provider</param>
@@ -153,6 +159,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                                  IDataProvider<EntityList<SportEventSummaryDTO>> sportEventsForTournamentProvider,
                                  IDataProvider<PlayerProfileDTO> playerProfileProvider,
                                  IDataProvider<CompetitorProfileDTO> competitorProvider,
+                                 IDataProvider<SimpleTeamProfileDTO> simpleTeamProvider,
                                  IDataProvider<TournamentSeasonsDTO> tournamentSeasonsProvider,
                                  IDataProvider<MatchTimelineDTO> ongoingSportEventProvider,
                                  IDataProvider<SportCategoriesDTO> sportCategoriesProvider,
@@ -173,6 +180,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Contract.Requires(sportEventsForTournamentProvider != null);
             Contract.Requires(playerProfileProvider != null);
             Contract.Requires(competitorProvider != null);
+            Contract.Requires(simpleTeamProvider != null);
             Contract.Requires(tournamentSeasonsProvider != null);
             Contract.Requires(ongoingSportEventProvider != null);
             Contract.Requires(sportCategoriesProvider != null);
@@ -196,6 +204,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             _sportEventsForTournamentProvider = sportEventsForTournamentProvider;
             _playerProfileProvider = playerProfileProvider;
             _competitorProvider = competitorProvider;
+            _simpleTeamProvider = simpleTeamProvider;
             _tournamentSeasonsProvider = tournamentSeasonsProvider;
             _ongoingSportEventProvider = ongoingSportEventProvider;
             _sportCategoriesProvider = sportCategoriesProvider;
@@ -223,6 +232,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Contract.Invariant(_sportEventsForTournamentProvider != null);
             Contract.Invariant(_playerProfileProvider != null);
             Contract.Invariant(_competitorProvider != null);
+            Contract.Invariant(_simpleTeamProvider != null);
             Contract.Invariant(_tournamentSeasonsProvider != null);
             Contract.Invariant(_ongoingSportEventProvider != null);
             Contract.Invariant(_sportCategoriesProvider != null);
@@ -639,11 +649,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             {
                 WriteLog($"Executing GetCompetitorAsync for id={id} and culture={culture.TwoLetterISOLanguageName}.", true);
 
-                CompetitorProfileDTO result = null;
+                CompetitorProfileDTO competitorResult = null;
+                SimpleTeamProfileDTO simpleTeamResult = null;
                 int restCallTime;
                 try
                 {
-                    result = await _competitorProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
+                    if (id.Type.Equals(SdkInfo.SimpleTeamIdentifier, StringComparison.InvariantCultureIgnoreCase))
+                        simpleTeamResult = await _simpleTeamProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
+                    else
+                        competitorResult = await _competitorProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
                     restCallTime = (int)t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)
@@ -657,9 +671,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                     }
                 }
 
-                if (result != null && result.Competitor.Id.Equals(id))
+                if (competitorResult != null && competitorResult.Competitor.Id.Equals(id))
                 {
-                    _cacheManager.SaveDto(id, result, culture, DtoType.CompetitorProfile, requester);
+                    _cacheManager.SaveDto(id, competitorResult, culture, DtoType.CompetitorProfile, requester);
+                }
+                if (simpleTeamResult != null && simpleTeamResult.Competitor.Id.Equals(id))
+                {
+                    _cacheManager.SaveDto(id, simpleTeamResult, culture, DtoType.SimpleTeamProfile, requester);
                 }
                 WriteLog($"Executing GetCompetitorAsync for id={id} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }

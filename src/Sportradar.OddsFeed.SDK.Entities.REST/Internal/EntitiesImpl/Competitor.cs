@@ -24,8 +24,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     [DataContract]
     internal class Competitor : Player, ICompetitor
     {
-        private CompetitorCI _competitorCI = null;
-        private readonly URN _competitorId;
+        private CompetitorCI _competitorCI;
         private readonly IProfileCache _profileCache;
         private readonly List<CultureInfo> _cultures;
         private readonly ISportEntityFactory _sportEntityFactory;
@@ -143,7 +142,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             }
 
             _competitorCI = ci;
-            _competitorId = ci.Id;
             _profileCache = profileCache;
             _cultures = cultures.ToList();
             _sportEntityFactory = sportEntityFactory;
@@ -177,7 +175,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             }
 
             _competitorCI = ci;
-            _competitorId = ci.Id;
             _profileCache = profileCache;
             _cultures = cultures.ToList();
             _sportEntityFactory = sportEntityFactory;
@@ -264,16 +261,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         {
             lock (_lock)
             {
-                if (_competitionCI != null)
+                if (_competitionCI != null || _competitorCI != null)
                 {
                     var task = Task.Run(async () =>
                                         {
-                                            var competitorsReferences = await _competitionCI.GetCompetitorsReferencesAsync();
+                                            var competitorsReferences = _competitionCI != null ? await _competitionCI.GetCompetitorsReferencesAsync() : null;
 
                                             if (competitorsReferences != null && competitorsReferences.Any())
                                             {
                                                 ReferenceIdCI q;
-                                                if (competitorsReferences.TryGetValue(_competitorId, out q))
+                                                if (competitorsReferences.TryGetValue(_competitorCI.Id, out q))
                                                 {
                                                     _referenceId = q;
                                                 }
@@ -304,7 +301,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                                             if (competitorsQualifiers != null && competitorsQualifiers.Any())
                                             {
                                                 string qualifier;
-                                                if (competitorsQualifiers.TryGetValue(_competitorId, out qualifier))
+                                                if (competitorsQualifiers.TryGetValue(_competitorCI.Id, out qualifier))
                                                 {
                                                     TeamQualifier = qualifier;
                                                 }
@@ -318,7 +315,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         private CompetitorCI GetCompetitor()
         {
             return _profileCache != null
-                ? _profileCache.GetCompetitorProfileAsync(_competitorId, _cultures).Result
+                ? _profileCache.GetCompetitorProfileAsync(_competitorCI.Id, _cultures).Result
                 : _competitorCI;
         }
     }

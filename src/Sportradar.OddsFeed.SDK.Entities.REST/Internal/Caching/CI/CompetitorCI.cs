@@ -111,6 +111,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 {
                     FetchProfileIfNeeded(_primaryCulture);
                 }
+
                 return _countryCode;
             }
         }
@@ -233,7 +234,34 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="competitor">A <see cref="CompetitorProfileDTO"/> containing information about the competitor</param>
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the passed <code>dto</code></param>
         /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to fetch <see cref="CompetitorProfileDTO"/></param>
-        internal CompetitorCI(CompetitorProfileDTO competitor, CultureInfo culture, IDataRouterManager dataRouterManager = null)
+        internal CompetitorCI(CompetitorProfileDTO competitor, CultureInfo culture,
+            IDataRouterManager dataRouterManager = null)
+            : base(competitor.Competitor)
+        {
+            Contract.Requires(competitor != null);
+            Contract.Requires(culture != null);
+
+            _fetchedCultures = new List<CultureInfo>();
+            _primaryCulture = culture;
+
+            _dataRouterManager = dataRouterManager;
+
+            Names = new Dictionary<CultureInfo, string>();
+            _countryNames = new Dictionary<CultureInfo, string>();
+            _abbreviations = new Dictionary<CultureInfo, string>();
+            _associatedPlayerIds = new List<URN>();
+            _jerseys = new List<JerseyCI>();
+            Merge(competitor, culture);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CompetitorCI"/> class
+        /// </summary>
+        /// <param name="competitor">A <see cref="SimpleTeamProfileDTO"/> containing information about the competitor</param>
+        /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the passed <code>dto</code></param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to fetch <see cref="SimpleTeamProfileDTO"/></param>
+        internal CompetitorCI(SimpleTeamProfileDTO competitor, CultureInfo culture,
+            IDataRouterManager dataRouterManager = null)
             : base(competitor.Competitor)
         {
             Contract.Requires(competitor != null);
@@ -258,7 +286,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="playerCompetitor">A <see cref="PlayerCompetitorDTO"/> containing information about the competitor</param>
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the passed <code>dto</code></param>
         /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to fetch <see cref="CompetitorDTO"/></param>
-        internal CompetitorCI(PlayerCompetitorDTO playerCompetitor, CultureInfo culture, IDataRouterManager dataRouterManager)
+        internal CompetitorCI(PlayerCompetitorDTO playerCompetitor, CultureInfo culture,
+            IDataRouterManager dataRouterManager)
             : base(playerCompetitor)
         {
             Contract.Requires(playerCompetitor != null);
@@ -332,19 +361,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _abbreviations[culture] = string.IsNullOrEmpty(competitorProfile.Competitor.Abbreviation)
                 ? SdkInfo.GetAbbreviationFromName(competitorProfile.Competitor.Name)
                 : competitorProfile.Competitor.Abbreviation;
-            _referenceId = UpdateReferenceIds(competitorProfile.Competitor.Id, competitorProfile.Competitor.ReferenceIds);
+            _referenceId =
+                UpdateReferenceIds(competitorProfile.Competitor.Id, competitorProfile.Competitor.ReferenceIds);
             _countryCode = competitorProfile.Competitor.CountryCode;
 
             if (competitorProfile.Players != null && competitorProfile.Players.Any())
             {
                 _associatedPlayerIds.Clear();
-                _associatedPlayerIds.AddRange(competitorProfile.Players.Select(s=>s.Id));
+                _associatedPlayerIds.AddRange(competitorProfile.Players.Select(s => s.Id));
             }
+
             if (competitorProfile.Jerseys != null && competitorProfile.Jerseys.Any())
             {
                 _jerseys.Clear();
                 _jerseys.AddRange(competitorProfile.Jerseys.Select(s => new JerseyCI(s)));
             }
+
             if (competitorProfile.Manager != null)
             {
                 if (_manager == null)
@@ -356,6 +388,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                     _manager.Merge(competitorProfile.Manager, culture);
                 }
             }
+
             if (competitorProfile.Venue != null)
             {
                 if (_venue == null)
@@ -368,7 +401,29 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 }
             }
 
-            ((List<CultureInfo>)_fetchedCultures).Add(culture);
+            ((List<CultureInfo>) _fetchedCultures).Add(culture);
+        }
+
+        /// <summary>
+        /// Merges the information from the provided <see cref="SimpleTeamProfileDTO"/> into the current instance
+        /// </summary>
+        /// <param name="simpleTeamProfile">A <see cref="SimpleTeamProfileDTO"/> containing information about the competitor</param>
+        /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the passed <code>dto</code></param>
+        internal void Merge(SimpleTeamProfileDTO simpleTeamProfile, CultureInfo culture)
+        {
+            Contract.Requires(simpleTeamProfile != null);
+            Contract.Requires(simpleTeamProfile.Competitor != null);
+
+            _isVirtual = simpleTeamProfile.Competitor.IsVirtual;
+            Names[culture] = simpleTeamProfile.Competitor.Name;
+            _countryNames[culture] = simpleTeamProfile.Competitor.CountryName;
+            _abbreviations[culture] = string.IsNullOrEmpty(simpleTeamProfile.Competitor.Abbreviation)
+                ? SdkInfo.GetAbbreviationFromName(simpleTeamProfile.Competitor.Name)
+                : simpleTeamProfile.Competitor.Abbreviation;
+            _referenceId =
+                UpdateReferenceIds(simpleTeamProfile.Competitor.Id, simpleTeamProfile.Competitor.ReferenceIds);
+            _countryCode = simpleTeamProfile.Competitor.CountryCode;
+            ((List<CultureInfo>) _fetchedCultures).Add(culture);
         }
 
         /// <summary>
@@ -395,15 +450,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 {
                     referenceIds = new Dictionary<string, string> {{"betradar", id.Id.ToString()}};
                 }
+
                 if (!referenceIds.ContainsKey("betradar"))
                 {
                     referenceIds = new Dictionary<string, string>(referenceIds) {{"betradar", id.Id.ToString()}};
                 }
             }
+
             if (_referenceId == null)
             {
                 return new ReferenceIdCI(referenceIds);
             }
+
             _referenceId.Merge(referenceIds, true);
             return _referenceId;
         }

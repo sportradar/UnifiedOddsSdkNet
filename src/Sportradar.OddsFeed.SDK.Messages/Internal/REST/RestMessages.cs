@@ -6912,6 +6912,54 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://schemas.sportradar.com/sportsapi/v1/unified")]
+    [System.Xml.Serialization.XmlRootAttribute("simpleteam_profile", Namespace="http://schemas.sportradar.com/sportsapi/v1/unified", IsNullable=false)]
+    public partial class simpleTeamProfileEndpoint {
+        
+        private team competitorField;
+        
+        private System.DateTime generated_atField;
+        
+        private bool generated_atFieldSpecified;
+        
+        /// <remarks/>
+        public team competitor {
+            get {
+                return this.competitorField;
+            }
+            set {
+                this.competitorField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public System.DateTime generated_at {
+            get {
+                return this.generated_atField;
+            }
+            set {
+                this.generated_atField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool generated_atSpecified {
+            get {
+                return this.generated_atFieldSpecified;
+            }
+            set {
+                this.generated_atFieldSpecified = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="http://schemas.sportradar.com/sportsapi/v1/unified")]
     [System.Xml.Serialization.XmlRootAttribute(Namespace="http://schemas.sportradar.com/sportsapi/v1/unified", IsNullable=false)]
     public partial class draw_summary {

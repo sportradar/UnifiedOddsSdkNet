@@ -403,6 +403,17 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                         new ResolvedParameter<IDeserializer<competitorProfileEndpoint>>(),
                         new ResolvedParameter<ISingleTypeMapperFactory<competitorProfileEndpoint, CompetitorProfileDTO>>()));
 
+            // simple team profile provider
+            container.RegisterType<IDeserializer<simpleTeamProfileEndpoint>, Deserializer<simpleTeamProfileEndpoint>>(new ContainerControlledLifetimeManager());
+            container.RegisterType<ISingleTypeMapperFactory<simpleTeamProfileEndpoint, SimpleTeamProfileDTO>, SimpleTeamProfileMapperFactory>(new ContainerControlledLifetimeManager());
+            container.RegisterType<IDataProvider<SimpleTeamProfileDTO>, DataProvider<simpleTeamProfileEndpoint, SimpleTeamProfileDTO>>(
+                new ContainerControlledLifetimeManager(),
+                new InjectionConstructor(
+                    config.ApiBaseUri + "/v1/sports/{1}/competitors/{0}/profile.xml",
+                    new ResolvedParameter<IDataFetcher>(),
+                    new ResolvedParameter<IDeserializer<simpleTeamProfileEndpoint>>(),
+                    new ResolvedParameter<ISingleTypeMapperFactory<simpleTeamProfileEndpoint, SimpleTeamProfileDTO>>()));
+
             // provider for seasons for a tournament
             container.RegisterType<IDeserializer<tournamentSeasons>, Deserializer<tournamentSeasons>>(new ContainerControlledLifetimeManager());
             container.RegisterType<ISingleTypeMapperFactory<tournamentSeasons, TournamentSeasonsDTO>, TournamentSeasonsMapperFactory>(new ContainerControlledLifetimeManager());
@@ -531,6 +542,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<IDataProvider<EntityList<SportEventSummaryDTO>>>("tournamentScheduleProvider"),
                     new ResolvedParameter<IDataProvider<PlayerProfileDTO>>(),
                     new ResolvedParameter<IDataProvider<CompetitorProfileDTO>>(),
+                    new ResolvedParameter<IDataProvider<SimpleTeamProfileDTO>>(),
                     new ResolvedParameter<IDataProvider<TournamentSeasonsDTO>>(),
                     new ResolvedParameter<IDataProvider<MatchTimelineDTO>>(),
                     new ResolvedParameter<IDataProvider<SportCategoriesDTO>>(),

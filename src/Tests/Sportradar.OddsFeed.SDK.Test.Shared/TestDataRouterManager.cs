@@ -37,6 +37,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         private const string TournamentExtraInfoXml = "tournament_info_extra.xml";
         private const string PlayerProfileXml = "{culture}.player.1.xml";
         private const string CompetitorProfileXml = "{culture}.competitor.1.xml";
+        private const string SimpleTeamProfileXml = "{culture}.simpleteam.1.xml";
 
         private readonly ICacheManager _cacheManager;
         private readonly IDeserializer<RestMessage> _restDeserializer = new Deserializer<RestMessage>();
@@ -292,6 +293,13 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         public Task GetCompetitorAsync(URN id, CultureInfo culture, ISportEventCI requester)
         {
             RecordCall("GetCompetitorAsync");
+            return SdkInfo.SimpleTeamIdentifier.Equals(id?.Type, StringComparison.InvariantCultureIgnoreCase) ? 
+                GetSimpleTeamProfileAsync(id, culture, requester) : 
+                GetCompetitorProfileAsync(id, culture, requester);
+        }
+
+        private Task GetCompetitorProfileAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        {
             var filePath = GetFile($"{culture.TwoLetterISOLanguageName}.competitor.{id?.Id ?? 1}.xml", culture);
             if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
             {
@@ -308,6 +316,26 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
             return Task.FromResult(true);
         }
+
+        private Task GetSimpleTeamProfileAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        {
+            var filePath = GetFile($"{culture.TwoLetterISOLanguageName}.simpleteam.{id?.Id ?? 1}.xml", culture);
+            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
+            {
+                filePath = GetFile(SimpleTeamProfileXml, culture);
+            }
+            var restDeserializer = new Deserializer<simpleTeamProfileEndpoint>();
+            var mapper = new SimpleTeamProfileMapperFactory();
+            var stream = FileHelper.OpenFile(filePath);
+            var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
+            if (result != null)
+            {
+                _cacheManager.SaveDto(id, result, culture, DtoType.SimpleTeamProfile, requester);
+            }
+
+            return Task.FromResult(true);
+        }
+
 
         public Task<IEnumerable<URN>> GetSeasonsForTournamentAsync(URN id, CultureInfo culture, ISportEventCI requester)
         {
