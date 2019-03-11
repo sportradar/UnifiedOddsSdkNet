@@ -93,9 +93,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         {
             Contract.Requires(matchSummary != null);
 
+            Conditions = matchSummary.sport_event_conditions == null
+                ? Conditions
+                : new SportEventConditionsDTO(matchSummary.sport_event_conditions);
+
             Status = matchSummary.sport_event_status == null
                 ? null
                 : new SportEventStatusDTO(matchSummary.sport_event_status, matchSummary.statistics, HomeAwayCompetitors);
+
+            Venue = matchSummary.sport_event_conditions?.venue == null
+                ? Venue
+                : new VenueDTO(matchSummary.sport_event_conditions.venue);
+
+            if (Venue == null && matchSummary.venue != null)
+            {
+                Venue = new VenueDTO(matchSummary.venue);
+            }
         }
 
         /// <summary>
