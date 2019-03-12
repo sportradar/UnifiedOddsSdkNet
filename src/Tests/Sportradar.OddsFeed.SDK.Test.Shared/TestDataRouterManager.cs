@@ -112,7 +112,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             return value;
         }
 
-        public Task GetSportEventSummaryAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        public async Task GetSportEventSummaryAsync(URN id, CultureInfo culture, ISportEventCI requester)
         {
             RecordCall("GetSportEventSummaryAsync");
             var strId = id?.ToString().Replace(":", "_") ?? string.Empty;
@@ -124,20 +124,18 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
             if (string.IsNullOrEmpty(filePath))
             {
-                return Task.FromResult(false);
+                return;
             }
             var mapper = new SportEventSummaryMapperFactory();
             var stream = FileHelper.OpenFile(filePath);
             var result = mapper.CreateMapper(_restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(id, result, culture, DtoType.SportEventSummary, requester);
+                await _cacheManager.SaveDtoAsync(id, result, culture, DtoType.SportEventSummary, requester).ConfigureAwait(false);
             }
-
-            return Task.FromResult(true);
         }
 
-        public Task GetSportEventFixtureAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        public async Task GetSportEventFixtureAsync(URN id, CultureInfo culture, ISportEventCI requester)
         {
             RecordCall("GetSportEventFixtureAsync");
             var filePath = GetFile(FixtureXml, culture);
@@ -147,13 +145,11 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(id, result, culture, DtoType.Fixture, requester);
+                await _cacheManager.SaveDtoAsync(id, result, culture, DtoType.Fixture, requester).ConfigureAwait(false);
             }
-
-            return Task.FromResult(true);
         }
 
-        public Task GetAllTournamentsForAllSportAsync(CultureInfo culture)
+        public async Task GetAllTournamentsForAllSportAsync(CultureInfo culture)
         {
             RecordCall("GetAllTournamentsForAllSportAsync");
             var filePath = GetFile(TournamentScheduleXml, culture);
@@ -163,13 +159,11 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(URN.Parse($"sr:sports:{result.Items.Count()}"), result, culture, DtoType.SportList, null);
+                await _cacheManager.SaveDtoAsync(URN.Parse($"sr:sports:{result.Items.Count()}"), result, culture, DtoType.SportList, null).ConfigureAwait(false);
             }
-
-            return Task.FromResult(true);
         }
 
-        public Task GetSportCategoriesAsync(URN id, CultureInfo culture)
+        public async Task GetSportCategoriesAsync(URN id, CultureInfo culture)
         {
             RecordCall("GetSportCategoriesAsync");
             var filePath = GetFile(SportCategoriesXml, culture);
@@ -181,14 +175,12 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             {
                 foreach (var category in result.Categories)
                 {
-                    _cacheManager.SaveDto(id, category, culture, DtoType.Category, null);
+                    await _cacheManager.SaveDtoAsync(id, category, culture, DtoType.Category, null).ConfigureAwait(false);
                 }
             }
-
-            return Task.FromResult(true);
         }
 
-        public Task GetAllSportsAsync(CultureInfo culture)
+        public async Task GetAllSportsAsync(CultureInfo culture)
         {
             RecordCall("GetAllSportsAsync");
             var filePath = GetFile(SportsXml, culture);
@@ -198,13 +190,11 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(URN.Parse($"sr:sports:{result.Items.Count()}"), result, culture, DtoType.SportList, null);
+                await _cacheManager.SaveDtoAsync(URN.Parse($"sr:sports:{result.Items.Count()}"), result, culture, DtoType.SportList, null).ConfigureAwait(false);
             }
-
-            return Task.FromResult(true);
         }
 
-        public Task<IEnumerable<Tuple<URN, URN>>> GetLiveSportEventsAsync(CultureInfo culture)
+        public async Task<IEnumerable<Tuple<URN, URN>>> GetLiveSportEventsAsync(CultureInfo culture)
         {
             RecordCall("GetLiveSportEventsAsync");
             var filePath = GetFile("live_events.xml", culture);
@@ -214,19 +204,19 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(URN.Parse($"sr:sport_events:{result.Items.Count()}"), result, culture, DtoType.SportEventSummaryList, null);
+                await _cacheManager.SaveDtoAsync(URN.Parse($"sr:sport_events:{result.Items.Count()}"), result, culture, DtoType.SportEventSummaryList, null).ConfigureAwait(false);
                 var urns = new List<Tuple<URN, URN>>();
                 foreach (var item in result.Items)
                 {
                     urns.Add(new Tuple<URN, URN>(item.Id, item.SportId));
                 }
-                return Task.FromResult(urns.AsEnumerable());
+                return urns.AsEnumerable();
             }
 
-            return Task.FromResult(null as IEnumerable<Tuple<URN, URN>>);
+            return null;
         }
 
-        public Task<IEnumerable<Tuple<URN, URN>>> GetSportEventsForDateAsync(DateTime date, CultureInfo culture)
+        public async Task<IEnumerable<Tuple<URN, URN>>> GetSportEventsForDateAsync(DateTime date, CultureInfo culture)
         {
             RecordCall("GetSportEventsForDateAsync");
             var filePath = GetFile(ScheduleXml, culture);
@@ -236,19 +226,19 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(URN.Parse($"sr:sport_events:{result.Items.Count()}"), result, culture, DtoType.SportEventSummaryList, null);
+                await _cacheManager.SaveDtoAsync(URN.Parse($"sr:sport_events:{result.Items.Count()}"), result, culture, DtoType.SportEventSummaryList, null).ConfigureAwait(false);
                 var urns = new List<Tuple<URN, URN>>();
                 foreach (var item in result.Items)
                 {
                     urns.Add(new Tuple<URN, URN>(item.Id, item.SportId));
                 }
-                return Task.FromResult(urns.AsEnumerable());
+                return urns.AsEnumerable();
             }
 
-            return Task.FromResult(null as IEnumerable<Tuple<URN, URN>>);
+            return null;
         }
 
-        public Task<IEnumerable<Tuple<URN, URN>>> GetSportEventsForTournamentAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        public async Task<IEnumerable<Tuple<URN, URN>>> GetSportEventsForTournamentAsync(URN id, CultureInfo culture, ISportEventCI requester)
         {
             RecordCall("GetSportEventsForTournamentAsync");
             var filePath = GetFile(TourScheduleXml, culture);
@@ -258,19 +248,19 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(URN.Parse($"sr:sport_events:{result.Items.Count()}"), result, culture, DtoType.SportEventSummaryList, requester);
+                await _cacheManager.SaveDtoAsync(URN.Parse($"sr:sport_events:{result.Items.Count()}"), result, culture, DtoType.SportEventSummaryList, requester).ConfigureAwait(false);
                 var urns = new List<Tuple<URN, URN>>();
                 foreach (var item in result.Items)
                 {
                     urns.Add(new Tuple<URN, URN>(item.Id, item.SportId));
                 }
-                return Task.FromResult(urns.AsEnumerable());
+                return urns.AsEnumerable();
             }
 
-            return Task.FromResult(null as IEnumerable<Tuple<URN, URN>>);
+            return null;
         }
 
-        public Task GetPlayerProfileAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        public async Task GetPlayerProfileAsync(URN id, CultureInfo culture, ISportEventCI requester)
         {
             RecordCall("GetPlayerProfileAsync");
             var filePath = GetFile($"{culture.TwoLetterISOLanguageName}.player.{id?.Id ?? 1}.xml", culture);
@@ -284,21 +274,21 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(id, result, culture, DtoType.PlayerProfile, requester);
+                await _cacheManager.SaveDtoAsync(id, result, culture, DtoType.PlayerProfile, requester).ConfigureAwait(false);
             }
 
-            return Task.FromResult(true);
+
         }
 
         public Task GetCompetitorAsync(URN id, CultureInfo culture, ISportEventCI requester)
         {
             RecordCall("GetCompetitorAsync");
-            return SdkInfo.SimpleTeamIdentifier.Equals(id?.Type, StringComparison.InvariantCultureIgnoreCase) ? 
-                GetSimpleTeamProfileAsync(id, culture, requester) : 
+            return SdkInfo.SimpleTeamIdentifier.Equals(id?.Type, StringComparison.InvariantCultureIgnoreCase) ?
+                GetSimpleTeamProfileAsync(id, culture, requester) :
                 GetCompetitorProfileAsync(id, culture, requester);
         }
 
-        private Task GetCompetitorProfileAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        private async Task GetCompetitorProfileAsync(URN id, CultureInfo culture, ISportEventCI requester)
         {
             var filePath = GetFile($"{culture.TwoLetterISOLanguageName}.competitor.{id?.Id ?? 1}.xml", culture);
             if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
@@ -311,13 +301,11 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(id, result, culture, DtoType.CompetitorProfile, requester);
+                await _cacheManager.SaveDtoAsync(id, result, culture, DtoType.CompetitorProfile, requester).ConfigureAwait(false);
             }
-
-            return Task.FromResult(true);
         }
 
-        private Task GetSimpleTeamProfileAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        private async Task GetSimpleTeamProfileAsync(URN id, CultureInfo culture, ISportEventCI requester)
         {
             var filePath = GetFile($"{culture.TwoLetterISOLanguageName}.simpleteam.{id?.Id ?? 1}.xml", culture);
             if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
@@ -330,14 +318,12 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(id, result, culture, DtoType.SimpleTeamProfile, requester);
+                await _cacheManager.SaveDtoAsync(id, result, culture, DtoType.SimpleTeamProfile, requester).ConfigureAwait(false);
             }
-
-            return Task.FromResult(true);
         }
 
 
-        public Task<IEnumerable<URN>> GetSeasonsForTournamentAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        public async Task<IEnumerable<URN>> GetSeasonsForTournamentAsync(URN id, CultureInfo culture, ISportEventCI requester)
         {
             RecordCall("GetSeasonsForTournamentAsync");
             var filePath = GetFile("tournament_seasons.{culture}.xml", culture);
@@ -347,19 +333,19 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(id, result, culture, DtoType.TournamentSeasons, requester);
+                await _cacheManager.SaveDtoAsync(id, result, culture, DtoType.TournamentSeasons, requester).ConfigureAwait(false);
                 var urns = new List<URN>();
                 foreach (var item in result.Seasons)
                 {
                     urns.Add(item.Id);
                 }
-                return Task.FromResult(urns.AsEnumerable());
+                return urns.AsEnumerable();
             }
 
-            return Task.FromResult(null as IEnumerable<URN>);
+            return null;
         }
 
-        public Task GetInformationAboutOngoingEventAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        public async Task GetInformationAboutOngoingEventAsync(URN id, CultureInfo culture, ISportEventCI requester)
         {
             RecordCall("GetInformationAboutOngoingEventAsync");
             var filePath = GetFile("match_timeline.{culture}.xml", culture);
@@ -369,13 +355,11 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(id, result, culture, DtoType.MatchTimeline, requester);
+                await _cacheManager.SaveDtoAsync(id, result, culture, DtoType.MatchTimeline, requester).ConfigureAwait(false);
             }
-
-            return Task.FromResult(true);
         }
 
-        public Task GetMarketDescriptionsAsync(CultureInfo culture)
+        public async Task GetMarketDescriptionsAsync(CultureInfo culture)
         {
             RecordCall("GetMarketDescriptionsAsync");
             var filePath = GetFile("invariant_market_descriptions.{culture}.xml", culture);
@@ -385,13 +369,11 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(URN.Parse("sr:markets:" + result.Items?.Count()), result, culture, DtoType.MarketDescriptionList, null);
+                await _cacheManager.SaveDtoAsync(URN.Parse("sr:markets:" + result.Items?.Count()), result, culture, DtoType.MarketDescriptionList, null).ConfigureAwait(false);
             }
-
-            return Task.FromResult(true);
         }
 
-        public Task GetVariantMarketDescriptionAsync(int id, string variant, CultureInfo culture)
+        public async Task GetVariantMarketDescriptionAsync(int id, string variant, CultureInfo culture)
         {
             RecordCall("GetVariantMarketDescriptionAsync");
             var filePath = GetFile("variant_market_description.{culture}.xml", culture);
@@ -401,13 +383,11 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(URN.Parse("sr:variant:" + result.Id), result, culture, DtoType.MarketDescription, null);
+                await _cacheManager.SaveDtoAsync(URN.Parse("sr:variant:" + result.Id), result, culture, DtoType.MarketDescription, null).ConfigureAwait(false);
             }
-
-            return Task.FromResult(true);
         }
 
-        public Task GetVariantDescriptionsAsync(CultureInfo culture)
+        public async Task GetVariantDescriptionsAsync(CultureInfo culture)
         {
             RecordCall("GetVariantDescriptionsAsync");
             var filePath = GetFile("variant_market_descriptions.{culture}.xml", culture);
@@ -417,13 +397,11 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(URN.Parse("sr:variants:" + result.Items?.Count()), result, culture, DtoType.VariantDescriptionList, null);
+                await _cacheManager.SaveDtoAsync(URN.Parse("sr:variants:" + result.Items?.Count()), result, culture, DtoType.VariantDescriptionList, null).ConfigureAwait(false);
             }
-
-            return Task.FromResult(true);
         }
 
-        public Task GetDrawSummaryAsync(URN drawId, CultureInfo culture, ISportEventCI requester)
+        public async Task GetDrawSummaryAsync(URN drawId, CultureInfo culture, ISportEventCI requester)
         {
             RecordCall("GetDrawSummaryAsync");
             var filePath = GetFile("draw_summary.{culture}.xml", culture);
@@ -433,13 +411,11 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(result.Id, result, culture, DtoType.LotteryDraw, requester);
+                await _cacheManager.SaveDtoAsync(result.Id, result, culture, DtoType.LotteryDraw, requester).ConfigureAwait(false);
             }
-
-            return Task.FromResult(true);
         }
 
-        public Task GetDrawFixtureAsync(URN drawId, CultureInfo culture, ISportEventCI requester)
+        public async Task GetDrawFixtureAsync(URN drawId, CultureInfo culture, ISportEventCI requester)
         {
             RecordCall("GetDrawFixtureAsync");
             var filePath = GetFile("draw_fixture.{culture}.xml", culture);
@@ -449,13 +425,11 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(result.Id, result, culture, DtoType.LotteryDraw, requester);
+                await _cacheManager.SaveDtoAsync(result.Id, result, culture, DtoType.LotteryDraw, requester).ConfigureAwait(false);
             }
-
-            return Task.FromResult(true);
         }
 
-        public Task GetLotteryScheduleAsync(URN lotteryId, CultureInfo culture, ISportEventCI requester)
+        public async Task GetLotteryScheduleAsync(URN lotteryId, CultureInfo culture, ISportEventCI requester)
         {
             RecordCall("GetLotteryScheduleAsync");
             var filePath = GetFile("lottery_schedule.{culture}.xml", culture);
@@ -465,13 +439,11 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(result.Id, result, culture, DtoType.Lottery, requester);
+                await _cacheManager.SaveDtoAsync(result.Id, result, culture, DtoType.Lottery, requester).ConfigureAwait(false);
             }
-
-            return Task.FromResult(true);
         }
 
-        public Task<IEnumerable<URN>> GetAllLotteriesAsync(CultureInfo culture)
+        public async Task<IEnumerable<URN>> GetAllLotteriesAsync(CultureInfo culture)
         {
             RecordCall("GetAllLotteriesAsync");
             var filePath = GetFile("lotteries.{culture}.xml", culture);
@@ -481,16 +453,16 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
             if (result != null)
             {
-                _cacheManager.SaveDto(URN.Parse($"sr:lotteries:{result.Items.Count()}"), result, culture, DtoType.LotteryList, null);
+                await _cacheManager.SaveDtoAsync(URN.Parse($"sr:lotteries:{result.Items.Count()}"), result, culture, DtoType.LotteryList, null).ConfigureAwait(false);
                 var urns = new List<URN>();
                 foreach (var item in result.Items)
                 {
                     urns.Add(item.Id);
                 }
-                return Task.FromResult(urns.AsEnumerable());
+                return urns.AsEnumerable();
             }
 
-            return Task.FromResult(null as IEnumerable<URN>);
+            return null;
         }
     }
 }

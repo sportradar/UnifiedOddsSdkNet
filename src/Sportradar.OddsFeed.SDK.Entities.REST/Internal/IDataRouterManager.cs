@@ -45,7 +45,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="id">The id of the sport to be fetched</param>
         /// <param name="culture">The language to be fetched</param>
         Task GetSportCategoriesAsync(URN id, CultureInfo culture);
-        
+
         /// <summary>
         /// Gets all available sports endpoint
         /// </summary>

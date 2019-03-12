@@ -65,15 +65,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <returns><c>true</c> if is added/updated, <c>false</c> otherwise</returns>
         public void SaveDto(URN id, object item, CultureInfo culture, DtoType dtoType, ISportEventCI requester)
         {
+            SaveDtoAsync(id, item, culture, dtoType, requester).Wait();
+        }
+
+        /// <summary>
+        /// Adds the item to the all registered caches
+        /// </summary>
+        /// <param name="id">The identifier of the item</param>
+        /// <param name="item">The item to be add</param>
+        /// <param name="culture">The culture of the data-transfer-object</param>
+        /// <param name="dtoType">Type of the dto item</param>
+        /// <param name="requester">The cache item which invoked request</param>
+        /// <returns><c>true</c> if is added/updated, <c>false</c> otherwise</returns>
+        public async Task SaveDtoAsync(URN id, object item, CultureInfo culture, DtoType dtoType, ISportEventCI requester)
+        {
             Contract.Requires(id != null);
             Contract.Requires(item != null);
             Contract.Requires(culture != null);
 
             //ExecLog.Debug($"Dispatching {id} of type:{dtoType} and lang:[{culture.TwoLetterISOLanguageName}].");
-            if (_caches == null || !_caches.Any())
-            {
-                return;
-            }
 
             var appropriateCaches = _caches.Where(s => s.Value.RegisteredDtoTypes.Contains(dtoType)).ToList();
             //ExecLog.Debug($"Dispatching {id} of type:{dtoType} and lang:[{culture.TwoLetterISOLanguageName}] to {appropriateCaches.Count}/{_caches.Count} caches.");
@@ -84,11 +94,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             }
 
             var tasks = appropriateCaches.Select(c => c.Value.CacheAddDtoAsync(id, item, culture, dtoType, requester)).ToArray();
-            if (tasks != null)
+            if (!tasks.Any())
             {
                 try
                 {
-                    Task.WaitAll(tasks);
+                    await Task.WhenAll(tasks).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {

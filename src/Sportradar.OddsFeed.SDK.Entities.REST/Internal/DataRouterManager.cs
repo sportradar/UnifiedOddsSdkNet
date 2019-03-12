@@ -17,7 +17,6 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -280,7 +279,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (result != null)
                 {
-                    _cacheManager.SaveDto(id, result, culture, DtoType.SportEventSummary, requester);
+                    await _cacheManager.SaveDtoAsync(id, result, culture, DtoType.SportEventSummary, requester).ConfigureAwait(false);
                 }
                 WriteLog($"Executing GetSportEventSummaryAsync for id={id} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }
@@ -321,7 +320,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (result != null)
                 {
-                    _cacheManager.SaveDto(id, result, culture, DtoType.Fixture, requester);
+                    await _cacheManager.SaveDtoAsync(id, result, culture, DtoType.Fixture, requester).ConfigureAwait(false);
                 }
                 WriteLog($"Executing GetSportEventFixtureAsync for id={id} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }
@@ -360,7 +359,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (result != null && result.Items.Any())
                 {
-                    _cacheManager.SaveDto(URN.Parse($"sr:sports:{result.Items.Count()}"), result, culture, DtoType.SportList, null);
+                    await _cacheManager.SaveDtoAsync(URN.Parse($"sr:sports:{result.Items.Count()}"), result, culture, DtoType.SportList, null).ConfigureAwait(false);
                 }
                 WriteLog($"Executing GetAllTournamentsForAllSportAsync for culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }
@@ -399,7 +398,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (result?.Categories != null)
                 {
-                    _cacheManager.SaveDto(id, result, culture, DtoType.SportCategories, null);
+                    await _cacheManager.SaveDtoAsync(id, result, culture, DtoType.SportCategories, null).ConfigureAwait(false);
                 }
                 WriteLog($"Executing GetSportCategoriesAsync for id={id} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }
@@ -438,7 +437,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (result != null && result.Items.Any())
                 {
-                    _cacheManager.SaveDto(URN.Parse($"sr:sports:{result.Items.Count()}"), result, culture, DtoType.SportList, null);
+                    await _cacheManager.SaveDtoAsync(URN.Parse($"sr:sports:{result.Items.Count()}"), result, culture, DtoType.SportList, null).ConfigureAwait(false);
                 }
                 WriteLog($"Executing GetAllSportsAsync for culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }
@@ -477,7 +476,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (result != null && result.Items.Any())
                 {
-                    _cacheManager.SaveDto(URN.Parse($"sr:sportevents:{result.Items.Count()}"), result, culture, DtoType.SportEventSummaryList, null);
+                    await _cacheManager.SaveDtoAsync(URN.Parse($"sr:sportevents:{result.Items.Count()}"), result, culture, DtoType.SportEventSummaryList, null).ConfigureAwait(false);
                     var urns = new List<Tuple<URN, URN>>();
                     foreach (var item in result.Items)
                     {
@@ -525,7 +524,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (result != null && result.Items.Any())
                 {
-                    _cacheManager.SaveDto(URN.Parse($"sr:sportevents:{result.Items.Count()}"), result, culture, DtoType.SportEventSummaryList, null);
+                    await _cacheManager.SaveDtoAsync(URN.Parse($"sr:sportevents:{result.Items.Count()}"), result, culture, DtoType.SportEventSummaryList, null).ConfigureAwait(false);
                     var urns = new List<Tuple<URN, URN>>();
                     foreach (var item in result.Items)
                     {
@@ -580,7 +579,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (result != null && result.Items.Any())
                 {
-                    _cacheManager.SaveDto(URN.Parse($"sr:sportevents:{result.Items.Count()}"), result, culture, DtoType.SportEventSummaryList, requester);
+                    await _cacheManager.SaveDtoAsync(URN.Parse($"sr:sportevents:{result.Items.Count()}"), result, culture, DtoType.SportEventSummaryList, requester).ConfigureAwait(false);
                     var urns = new List<Tuple<URN, URN>>();
                     foreach (var item in result.Items)
                     {
@@ -628,7 +627,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (result != null && result.Id.Equals(id))
                 {
-                    _cacheManager.SaveDto(id, result, culture, DtoType.PlayerProfile, requester);
+                    await _cacheManager.SaveDtoAsync(id, result, culture, DtoType.PlayerProfile, requester).ConfigureAwait(false);
                 }
                 WriteLog($"Executing GetPlayerProfileAsync for id={id} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }
@@ -673,11 +672,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (competitorResult != null && competitorResult.Competitor.Id.Equals(id))
                 {
-                    _cacheManager.SaveDto(id, competitorResult, culture, DtoType.CompetitorProfile, requester);
+                    await _cacheManager.SaveDtoAsync(id, competitorResult, culture, DtoType.CompetitorProfile, requester).ConfigureAwait(false);
                 }
                 if (simpleTeamResult != null && simpleTeamResult.Competitor.Id.Equals(id))
                 {
-                    _cacheManager.SaveDto(id, simpleTeamResult, culture, DtoType.SimpleTeamProfile, requester);
+                    await _cacheManager.SaveDtoAsync(id, simpleTeamResult, culture, DtoType.SimpleTeamProfile, requester).ConfigureAwait(false);
                 }
                 WriteLog($"Executing GetCompetitorAsync for id={id} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }
@@ -729,7 +728,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (result?.Tournament != null)
                 {
-                    _cacheManager.SaveDto(result.Tournament.Id, result, culture, DtoType.TournamentSeasons, requester);
+                    await _cacheManager.SaveDtoAsync(result.Tournament.Id, result, culture, DtoType.TournamentSeasons, requester).ConfigureAwait(false);
                     if (result.Seasons != null)
                     {
                         var urns = new List<URN>();
@@ -791,7 +790,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (result != null)
                 {
-                    _cacheManager.SaveDto(result.SportEvent.Id, result, culture, DtoType.MatchTimeline, requester);
+                    await _cacheManager.SaveDtoAsync(result.SportEvent.Id, result, culture, DtoType.MatchTimeline, requester).ConfigureAwait(false);
                 }
                 WriteLog($"Executing GetInformationAboutOngoingEventAsync for id={id} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }
@@ -830,7 +829,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (result != null)
                 {
-                    _cacheManager.SaveDto(URN.Parse("sr:markets:" + result.Items?.Count()), result, culture, DtoType.MarketDescriptionList, null);
+                    await _cacheManager.SaveDtoAsync(URN.Parse("sr:markets:" + result.Items?.Count()), result, culture, DtoType.MarketDescriptionList, null).ConfigureAwait(false);
                 }
                 WriteLog($"Executing GetMarketDescriptionsAsync for culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }
@@ -872,7 +871,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (result != null)
                 {
-                    _cacheManager.SaveDto(URN.Parse("sr:variant:" + result.Id), result, culture, DtoType.MarketDescription, null);
+                    await _cacheManager.SaveDtoAsync(URN.Parse("sr:variant:" + result.Id), result, culture, DtoType.MarketDescription, null).ConfigureAwait(false);
                 }
                 WriteLog($"Executing GetVariantMarketDescriptionAsync for id={id}, variant={variant} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }
@@ -912,7 +911,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (result != null)
                 {
-                    _cacheManager.SaveDto(URN.Parse("sr:variants:" + result.Items?.Count()), result, culture, DtoType.VariantDescriptionList, null);
+                    await _cacheManager.SaveDtoAsync(URN.Parse("sr:variants:" + result.Items?.Count()), result, culture, DtoType.VariantDescriptionList, null).ConfigureAwait(false);
                 }
                 WriteLog($"Executing GetVariantDescriptionsAsync for culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }
@@ -960,7 +959,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (result != null)
                 {
-                    _cacheManager.SaveDto(result.Id, result, culture, DtoType.LotteryDraw, requester);
+                    await _cacheManager.SaveDtoAsync(result.Id, result, culture, DtoType.LotteryDraw, requester).ConfigureAwait(false);
                 }
                 WriteLog($"Executing GetDrawSummaryAsync for id={drawId} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }
@@ -1008,7 +1007,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (result != null)
                 {
-                    _cacheManager.SaveDto(result.Id, result, culture, DtoType.LotteryDraw, requester);
+                    await _cacheManager.SaveDtoAsync(result.Id, result, culture, DtoType.LotteryDraw, requester).ConfigureAwait(false);
                 }
                 WriteLog($"Executing GetDrawFixtureAsync for id={drawId} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }
@@ -1056,7 +1055,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (result != null)
                 {
-                    _cacheManager.SaveDto(result.Id, result, culture, DtoType.Lottery, null);
+                    await _cacheManager.SaveDtoAsync(result.Id, result, culture, DtoType.Lottery, null).ConfigureAwait(false);
                 }
                 WriteLog($"Executing GetLotteryScheduleAsync for id={lotteryId} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }
@@ -1102,7 +1101,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 if (result?.Items != null)
                 {
-                    _cacheManager.SaveDto(URN.Parse($"sr:lotteries:{result.Items.Count()}"), result, culture, DtoType.LotteryList, null);
+                    await _cacheManager.SaveDtoAsync(URN.Parse($"sr:lotteries:{result.Items.Count()}"), result, culture, DtoType.LotteryList, null).ConfigureAwait(false);
                     var urns = new List<URN>();
                     foreach (var item in result.Items)
                     {
