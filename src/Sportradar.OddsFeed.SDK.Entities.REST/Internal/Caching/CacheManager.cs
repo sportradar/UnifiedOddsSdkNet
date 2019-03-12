@@ -83,6 +83,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             Contract.Requires(item != null);
             Contract.Requires(culture != null);
 
+            if (_caches == null || !_caches.Any())
+            {
+                return;
+            }
+
             //ExecLog.Debug($"Dispatching {id} of type:{dtoType} and lang:[{culture.TwoLetterISOLanguageName}].");
 
             var appropriateCaches = _caches.Where(s => s.Value.RegisteredDtoTypes.Contains(dtoType)).ToList();
@@ -91,10 +96,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             if (!appropriateCaches.Any())
             {
                 ExecLog.Warn($"No cache with registered type:{dtoType} and lang:[{culture.TwoLetterISOLanguageName}] to save data.");
+                return;
             }
 
             var tasks = appropriateCaches.Select(c => c.Value.CacheAddDtoAsync(id, item, culture, dtoType, requester)).ToArray();
-            if (!tasks.Any())
+            if (tasks.Any())
             {
                 try
                 {

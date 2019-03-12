@@ -58,7 +58,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             _timer.FireOnce(TimeSpan.Zero);
 
             var i = 0;
-            while (_memoryCache.GetCount() == 0 && i < 100)
+            while (_dataRouterManager.GetCallCount(DateSchedule) != (TestData.Cultures.Count * 3) && i < 100)
             {
                 System.Threading.Thread.Sleep(100);
                 i++;

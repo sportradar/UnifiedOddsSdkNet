@@ -276,8 +276,6 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             {
                 await _cacheManager.SaveDtoAsync(id, result, culture, DtoType.PlayerProfile, requester).ConfigureAwait(false);
             }
-
-
         }
 
         public Task GetCompetitorAsync(URN id, CultureInfo culture, ISportEventCI requester)
