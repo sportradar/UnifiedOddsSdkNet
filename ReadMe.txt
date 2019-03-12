@@ -25,6 +25,22 @@ The package contains:
 For more information please contact support@sportradar.com or visit https://iodocs.betradar.com/unifiedsdk/index.html
 
 CHANGE LOG:
+2019-03-12  1.17.0.0
+Added property Grid to the EventResult interface - IEventResult extended with IEventResultV1
+Added property AamsId to the Reference - IReference extended with IReferenceV1
+ICompetitionStatus.Status deprecated
+Instead added GetEventStatusAsync to ICompetition - extended with ICompetitionV1
+IMatch extended with IMatchV1, IStage extended with IStageV1
+Added Pitchers to the ISportEventConditionsV1 interface
+Added enum option EventStatus.MatchAboutToStart
+Added support for simpleteam competitors and related API calls
+Take recovery max window length for each producer from api (all producers)
+Added runParallel argument on StartReplay method on ReplayManager
+Improved speed of data distribution among caches (data received from api)
+Fix: IMarket names dictionary changed to ConcurrentDictionary
+Fix: how PeriodScore data is saved and exposed
+Fix: if the venue data is obtained from date schedule is cached so no summary request is needed
+
 2019-02-14  1.16.0.0
 Exposed Timestamps on IMessage
 Added RecoveryInfo (info about last recovery) to the Producer - extended with IProducerV1

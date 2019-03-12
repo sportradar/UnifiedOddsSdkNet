@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Sportradar.OddsFeed.SDK</id>
-    <version>1.16.0.0</version>
+    <version>1.17.0.0</version>
     <title>Odds Feed SDK</title>
     <authors>Sportradar AG</authors>
     <owners>Sportradar AG</owners>
