@@ -6649,6 +6649,10 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST {
         
         private bool statusFieldSpecified;
         
+        private int display_idField;
+        
+        private bool display_idFieldSpecified;
+        
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
         public string id {
@@ -6701,6 +6705,28 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST {
             }
             set {
                 this.statusFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public int display_id {
+            get {
+                return this.display_idField;
+            }
+            set {
+                this.display_idField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool display_idSpecified {
+            get {
+                return this.display_idFieldSpecified;
+            }
+            set {
+                this.display_idFieldSpecified = value;
             }
         }
     }
@@ -6841,6 +6867,10 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST {
         
         private bool statusFieldSpecified;
         
+        private int display_idField;
+        
+        private bool display_idFieldSpecified;
+        
         /// <remarks/>
         public lottery lottery {
             get {
@@ -6903,6 +6933,28 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST {
             }
             set {
                 this.statusFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public int display_id {
+            get {
+                return this.display_idField;
+            }
+            set {
+                this.display_idField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool display_idSpecified {
+            get {
+                return this.display_idFieldSpecified;
+            }
+            set {
+                this.display_idFieldSpecified = value;
             }
         }
     }

@@ -24,7 +24,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
     /// </summary>
     /// <seealso cref="SportEvent" />
     /// <seealso cref="IDraw" />
-    internal class Draw : SportEvent, IDraw
+    internal class Draw : SportEvent, IDrawV1
     {
         /// <summary>
         /// A <see cref="ILog"/> instance used for execution logging
@@ -104,9 +104,26 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                 ? await drawCI.GetResultsAsync(Cultures).ConfigureAwait(false)
                 : await new Func<IEnumerable<CultureInfo>, Task<IEnumerable<DrawResultCI>>>(drawCI.GetResultsAsync).SafeInvokeAsync(Cultures, ExecutionLog, "DrawResults").ConfigureAwait(false);
 
-            return item == null
-                ? null
-                : item.Select(s => new DrawResult(s));
+            return item?.Select(s => new DrawResult(s));
+        }
+
+        /// <summary>
+        /// Asynchronously gets a <see cref="int"/> representing display id
+        /// </summary>
+        /// <returns>The display id</returns>
+        public async Task<int?> GetDisplayIdAsync()
+        {
+            var drawCI = (DrawCI)SportEventCache.GetEventCacheItem(Id);
+            if (drawCI == null)
+            {
+                ExecutionLog.Debug($"Missing data. No draw cache item for id={Id}.");
+                return null;
+            }
+            var item = ExceptionStrategy == ExceptionHandlingStrategy.THROW
+                           ? await drawCI.GetDisplayIdAsync().ConfigureAwait(false)
+                           : await new Func<Task<int?>>(drawCI.GetDisplayIdAsync).SafeInvokeAsync(ExecutionLog, "DisplayId").ConfigureAwait(false);
+
+            return item;
         }
     }
 }

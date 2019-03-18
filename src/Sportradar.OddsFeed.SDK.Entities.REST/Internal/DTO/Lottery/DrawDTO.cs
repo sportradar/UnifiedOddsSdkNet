@@ -3,6 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
@@ -37,10 +38,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery
         /// <value>The results</value>
         public IEnumerable<DrawResultDTO> Results { get; }
 
+        /// <summary>
+        /// Gets the display identifier
+        /// </summary>
+        /// <value>The display identifier</value>
+        public int? DisplayId { get; }
+
         internal DrawDTO(draw_summary item)
             : base(new sportEvent
             {
-                id = item.draw_fixture == null ? "wns:draw:1" : item.draw_fixture.id,
+                id = item.draw_fixture == null
+                         ? "wns:draw:1"
+                         : item.draw_fixture.id,
                 name = string.Empty,
                 scheduledSpecified = item.draw_fixture?.draw_dateSpecified ?? false,
                 scheduled = item.draw_fixture?.draw_date ?? DateTime.MinValue,
@@ -54,19 +63,23 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery
         {
             Contract.Requires(item != null);
 
+            DisplayId = null;
+
             if (item.draw_fixture != null)
             {
-                //Id = URN.Parse(item.draw_fixture.id);
-                if (item.draw_fixture.lottery != null)
+                if (item.draw_fixture.id != null)
                 {
                     Lottery = new LotteryDTO(item.draw_fixture.lottery);
                 }
                 Status = RestMapperHelper.MapDrawStatus(item.draw_fixture.status, item.draw_fixture.statusSpecified);
-                //Scheduled = item.draw_fixture.draw_dateSpecified
-                //    ? (DateTime?) item.draw_fixture.draw_date
-                //    : null;
+
+                DisplayId = item.draw_fixture.display_idSpecified
+                                    ? item.draw_fixture.display_id
+                                    : (int?) null;
             }
+
             ResultsChronological = false;
+
             if (item.draw_result?.draws != null)
             {
                 ResultsChronological = item.draw_result.draws.chronologicalSpecified && item.draw_result.draws.chronological;
@@ -96,15 +109,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery
         {
             Contract.Requires(item != null);
 
-            //Id = URN.Parse(item.id);
+            Debug.Assert(item != null, nameof(item) + " != null");
+
             if (item.lottery != null)
             {
                 Lottery = new LotteryDTO(item.lottery);
             }
             Status = RestMapperHelper.MapDrawStatus(item.status, item.statusSpecified);
-            //Scheduled = item.draw_dateSpecified
-            //    ? (DateTime?)item.draw_date
-            //    : null;
+
+            DisplayId = item.display_idSpecified
+                            ? item.display_id
+                            : (int?) null;
         }
 
         internal DrawDTO(draw_event item)
@@ -118,17 +133,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery
         {
             Contract.Requires(item != null);
 
-            //if (!string.IsNullOrEmpty(item.id))
-            //{
-            //    Id = URN.Parse(item.id);
-            //}
             if (item != null)
             {
                 Status = RestMapperHelper.MapDrawStatus(item.status, item.statusSpecified);
+
+                DisplayId = item.display_idSpecified
+                            ? item.display_id
+                            : (int?) null;
             }
-            //Scheduled = item.scheduledSpecified
-            //    ? (DateTime?)item.scheduled
-            //    : null;
         }
     }
 }

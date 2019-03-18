@@ -45,6 +45,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         private IEnumerable<DrawResultCI> _results;
 
         /// <summary>
+        /// The display identifier
+        /// </summary>
+        private int? _displayId;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DrawCI"/> class
         /// </summary>
         /// <param name="id">A <see cref="URN" /> specifying the id of the sport event associated with the current instance</param>
@@ -139,6 +144,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         }
 
         /// <summary>
+        /// Gets the display identifier
+        /// </summary>
+        /// <value>The display identifier</value>
+        public async Task<int?> GetDisplayIdAsync()
+        {
+            if (LoadedSummaries.Any())
+            {
+                return _displayId;
+            }
+            await FetchMissingSummary(new[] {DefaultCulture}).ConfigureAwait(false);
+            return _displayId;
+        }
+
+        /// <summary>
         /// Merges the specified event summary
         /// </summary>
         /// <param name="eventSummary">The event summary</param>
@@ -185,6 +204,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 {
                     MergeDrawResults(eventSummary.Results, culture);
                 }
+            }
+
+            if (eventSummary.DisplayId != null)
+            {
+                _displayId = eventSummary.DisplayId;
             }
         }
 

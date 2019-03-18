@@ -130,6 +130,7 @@
     <Compile Include="ICompetitionV1.cs" />
     <Compile Include="ICompetitionStatistics.cs" />
     <Compile Include="ICoverageInfoV1.cs" />
+    <Compile Include="IDrawV1.cs" />
     <Compile Include="IEventResultV1.cs" />
     <Compile Include="IMatchV1.cs" />
     <Compile Include="IMatchStatusV1.cs" />
