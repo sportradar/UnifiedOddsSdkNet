@@ -24,7 +24,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     [DataContract]
     internal class Competitor : Player, ICompetitor
     {
-        private readonly CompetitorCI _competitorCI = null;
+        private readonly CompetitorCI _competitorCI;
         private readonly IProfileCache _profileCache;
         private readonly List<CultureInfo> _cultures;
         private readonly ISportEntityFactory _sportEntityFactory;

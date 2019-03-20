@@ -464,7 +464,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             container.RegisterType<IDataProvider<MarketDescriptionDTO>, DataProvider<market_descriptions, MarketDescriptionDTO>>(
                     new ContainerControlledLifetimeManager(),
                     new InjectionConstructor(
-                        config.ApiBaseUri + "/v1/descriptions/{1}/markets/{0}/variants/{2}",
+                        config.ApiBaseUri + "/v1/descriptions/{1}/markets/{0}/variants/{2}?include_mappings=true",
                         new ResolvedParameter<IDataFetcher>(),
                         new ResolvedParameter<IDeserializer<market_descriptions>>(),
                         new ResolvedParameter<ISingleTypeMapperFactory<market_descriptions, MarketDescriptionDTO>>()));

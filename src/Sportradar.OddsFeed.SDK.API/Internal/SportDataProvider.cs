@@ -166,7 +166,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             Log.Info($"Invoked GetLiveSportEventsAsync: [Cultures={s}].");
 
-            var ids = await _sportEventCache.GetEventIdsAsync((DateTime?)null);
+            var ids = await _sportEventCache.GetEventIdsAsync((DateTime?)null).ConfigureAwait(false);
             return ids.Select(item => _sportEntityFactory.BuildSportEvent<ICompetition>(
                 item.Item1,
                 item.Item2,
@@ -188,7 +188,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             Log.Info($"Invoked GetSportEventsByDateAsync: [Date={date}, Cultures={s}].");
 
-            var ids = await _sportEventCache.GetEventIdsAsync(date);
+            var ids = await _sportEventCache.GetEventIdsAsync(date).ConfigureAwait(false);
             return ids.Select(item => _sportEntityFactory.BuildSportEvent<ICompetition>(
                 item.Item1,
                 item.Item2,
@@ -257,7 +257,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>A <see cref="Task{T}"/> representing the async operation</returns>
         public async Task<ICompetitionStatus> GetSportEventStatusAsync(URN id)
         {
-            var sportEventStatusCI = await _sportEventStatusCache.GetSportEventStatusAsync(id);
+            var sportEventStatusCI = await _sportEventStatusCache.GetSportEventStatusAsync(id).ConfigureAwait(false);
             if (sportEventStatusCI == null)
             {
                 return null;
@@ -280,7 +280,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             Log.Info($"Invoked GetCompetitorAsync: [Id={id}, Cultures={s}].");
 
-            var cacheItem = await _profileCache.GetCompetitorProfileAsync(id, cs);
+            var cacheItem = await _profileCache.GetCompetitorProfileAsync(id, cs).ConfigureAwait(false);
             return cacheItem == null
                 ? null
                 : _sportEntityFactory.BuildCompetitor(cacheItem, cs, (ICompetitionCI) null);
@@ -300,7 +300,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             Log.Info($"Invoked GetPlayerProfileAsync: [Id={id}, Cultures={s}].");
 
-            var cacheItem = await _profileCache.GetPlayerProfileAsync(id, cs);
+            var cacheItem = await _profileCache.GetPlayerProfileAsync(id, cs).ConfigureAwait(false);
             return cacheItem == null
                 ? null
                 : new PlayerProfile(cacheItem, cs);

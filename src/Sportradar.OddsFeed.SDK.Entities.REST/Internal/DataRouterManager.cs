@@ -653,30 +653,36 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 int restCallTime;
                 try
                 {
-                    if (id.Type.Equals(SdkInfo.SimpleTeamIdentifier, StringComparison.InvariantCultureIgnoreCase))
+                    if (id.Type.Equals(SdkInfo.SimpleTeamIdentifier, StringComparison.InvariantCultureIgnoreCase)
+                        || id.ToString().StartsWith(SdkInfo.OutcometextVariantValue, StringComparison.InvariantCultureIgnoreCase))
                         simpleTeamResult = await _simpleTeamProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
                     else
                         competitorResult = await _competitorProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
-                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)
                 {
-                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
-                    _executionLog.Error($"Error getting competitor profile for id={id} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
+                    _executionLog.Error($"Error getting competitor profile for id={id} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}",
+                                        e.InnerException ?? e);
                     if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
                     {
                         throw;
                     }
                 }
 
+                if (simpleTeamResult != null)
+                {
+                    await _cacheManager.SaveDtoAsync(id, simpleTeamResult, culture, DtoType.SimpleTeamProfile, requester).ConfigureAwait(false);
+                    if (!simpleTeamResult.Competitor.Id.Equals(id))
+                    {
+                        await _cacheManager.SaveDtoAsync(simpleTeamResult.Competitor.Id, simpleTeamResult, culture, DtoType.SimpleTeamProfile, requester).ConfigureAwait(false);
+                    }
+                }
                 if (competitorResult != null && competitorResult.Competitor.Id.Equals(id))
                 {
                     await _cacheManager.SaveDtoAsync(id, competitorResult, culture, DtoType.CompetitorProfile, requester).ConfigureAwait(false);
-                }
-                if (simpleTeamResult != null && simpleTeamResult.Competitor.Id.Equals(id))
-                {
-                    await _cacheManager.SaveDtoAsync(id, simpleTeamResult, culture, DtoType.SimpleTeamProfile, requester).ConfigureAwait(false);
                 }
                 WriteLog($"Executing GetCompetitorAsync for id={id} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }
