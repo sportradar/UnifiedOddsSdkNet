@@ -2,6 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
@@ -32,12 +33,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <summary>
         /// A <see cref="IDictionary{TKey,TValue}"/> containing names in different languages
         /// </summary>
-        private readonly IDictionary<CultureInfo, string> _names = new Dictionary<CultureInfo, string>();
+        private readonly IDictionary<CultureInfo, string> _names = new ConcurrentDictionary<CultureInfo, string>();
 
         /// <summary>
         /// Gets the value uniquely identifying the current <see cref="Outcome" /> instance
         /// </summary>
         public string Id { get; }
+
+        private readonly object _lock = new object();
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="Outcome" /> class
@@ -66,13 +69,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         public async Task<string> GetNameAsync(CultureInfo culture)
         {
             string name;
-            if (_names.TryGetValue(culture, out name))
+            lock (_lock)
             {
-                return name;
+                if (_names.TryGetValue(culture, out name))
+                {
+                    return name;
+                }
             }
 
             name = await _nameProvider.GetOutcomeNameAsync(Id, culture).ConfigureAwait(false);
-            _names.Add(culture, name);
+
+            lock (_lock)
+            {
+                if (_names.ContainsKey(culture))
+                {
+                    _names.Remove(culture);
+                }
+                _names.Add(culture, name);
+            }
+
             return name;
         }
 

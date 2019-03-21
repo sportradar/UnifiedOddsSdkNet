@@ -58,6 +58,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// </summary>
         public IMarketDefinition MarketDefinition { get; }
 
+        private readonly object _lock = new object();
+
         /// <summary>
         ///     Initializes a new instance of the <see cref="Market" /> class
         /// </summary>
@@ -112,13 +114,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         public async Task<string> GetNameAsync(CultureInfo culture)
         {
             string name;
-            if (_names.TryGetValue(culture, out name))
+            lock (_lock)
             {
-                return name;
+                if (_names.TryGetValue(culture, out name))
+                {
+                    return name;
+                }
             }
 
             name = await _nameProvider.GetMarketNameAsync(culture).ConfigureAwait(false);
-            _names.Add(culture, name);
+
+            lock (_lock)
+            {
+                if (_names.ContainsKey(culture))
+                {
+                    _names.Remove(culture);
+                }
+                _names.Add(culture, name);
+            }
+
             return name;
         }
 
