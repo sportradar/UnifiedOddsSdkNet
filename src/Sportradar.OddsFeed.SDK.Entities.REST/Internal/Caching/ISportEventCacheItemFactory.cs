@@ -2,6 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Globalization;
+using System.Runtime.Caching;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -42,5 +43,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="cacheItem">A <see cref="SportEventCI"/> instance from the cache</param>
         /// <returns>A new instance of <see cref="SportEventCI"/> instance</returns>
         SportEventCI Get(object cacheItem);
+
+        /// <summary>
+        /// Gets a <see cref="ObjectCache"/> used to cache fixture timestamps
+        /// </summary>
+        /// <returns>A <see cref="ObjectCache"/> used to cache fixture timestamps</returns>
+        ObjectCache GetFixtureTimestampCache();
     }
 }

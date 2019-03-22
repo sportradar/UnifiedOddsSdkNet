@@ -48,7 +48,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             _cacheManager = new CacheManager();
             _dataRouterManager = new TestDataRouterManager(_cacheManager);
 
-            var sportEventCacheItemFactory = new SportEventCacheItemFactory(_dataRouterManager, new SemaphorePool(5), TestData.Culture);
+            var sportEventCacheItemFactory = new SportEventCacheItemFactory(_dataRouterManager, new SemaphorePool(5), TestData.Culture, new MemoryCache("FixtureTimestampCache"));
             var profileCache = new ProfileCache(_profileCache, _dataRouterManager, _cacheManager);
             SportEventCache = new SportEventCache(_eventMemoryCache, _dataRouterManager, sportEventCacheItemFactory, _timer, TestData.Cultures3, _cacheManager);
             SportDataCache = new SportDataCache(_dataRouterManager, _timer, TestData.Cultures3, SportEventCache, _cacheManager);

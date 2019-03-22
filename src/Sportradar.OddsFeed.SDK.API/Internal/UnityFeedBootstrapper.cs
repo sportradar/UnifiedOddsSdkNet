@@ -325,9 +325,21 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             container.RegisterType<IDeserializer<fixturesEndpoint>, Deserializer<fixturesEndpoint>>(new ContainerControlledLifetimeManager());
             container.RegisterType<ISingleTypeMapperFactory<fixturesEndpoint, FixtureDTO>, FixtureMapperFactory>(new ContainerControlledLifetimeManager());
             container.RegisterType<IDataProvider<FixtureDTO>, DataProvider<fixturesEndpoint, FixtureDTO>>(
+                "fixtureEndpointDataProvider",
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     config.ApiBaseUri + "/v1/sports/{1}/sport_events/{0}/fixture.xml",
+                    new ResolvedParameter<IDataFetcher>(),
+                    new ResolvedParameter<IDeserializer<fixturesEndpoint>>(),
+                    new ResolvedParameter<ISingleTypeMapperFactory<fixturesEndpoint, FixtureDTO>>()));
+
+            container.RegisterType<IDeserializer<fixturesEndpoint>, Deserializer<fixturesEndpoint>>(new ContainerControlledLifetimeManager());
+            container.RegisterType<ISingleTypeMapperFactory<fixturesEndpoint, FixtureDTO>, FixtureMapperFactory>(new ContainerControlledLifetimeManager());
+            container.RegisterType<IDataProvider<FixtureDTO>, DataProvider<fixturesEndpoint, FixtureDTO>>(
+                "fixtureChangeFixtureEndpointDataProvider",
+                new ContainerControlledLifetimeManager(),
+                new InjectionConstructor(
+                    config.ApiBaseUri + "/v1/sports/{1}/sport_events/{0}/fixture_change_fixture.xml",
                     new ResolvedParameter<IDataFetcher>(),
                     new ResolvedParameter<IDeserializer<fixturesEndpoint>>(),
                     new ResolvedParameter<ISingleTypeMapperFactory<fixturesEndpoint, FixtureDTO>>()));
@@ -535,7 +547,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<IProducerManager>(),
                     new ResolvedParameter<ExceptionHandlingStrategy>(),
                     new ResolvedParameter<IDataProvider<SportEventSummaryDTO>>("sportEventSummaryProvider"),
-                    new ResolvedParameter<IDataProvider<FixtureDTO>>(),
+                    new ResolvedParameter<IDataProvider<FixtureDTO>>("fixtureEndpointDataProvider"),
+                    new ResolvedParameter<IDataProvider<FixtureDTO>>("fixtureChangeFixtureEndpointDataProvider"),
                     new ResolvedParameter<IDataProvider<EntityList<SportDTO>>>("allTournamentsProvider"),
                     new ResolvedParameter<IDataProvider<EntityList<SportDTO>>>("allSportsProvider"),
                     new ResolvedParameter<IDataProvider<EntityList<SportEventSummaryDTO>>>("dateScheduleProvider"),
@@ -643,6 +656,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new MemoryCache("sportEventCache"),
                 new ContainerControlledLifetimeManager());
 
+            container.RegisterInstance(
+                "SportEventCache_FixtureTimestampCache",
+                new MemoryCache("sportEventFixtureTimestampCache"),
+                new ContainerControlledLifetimeManager());
+
             container.RegisterType<ITimer, SdkTimer>(
                 "SportEventCacheTimer",
                 new HierarchicalLifetimeManager(),
@@ -656,7 +674,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new InjectionConstructor(
                     new ResolvedParameter<IDataRouterManager>(),
                     new ResolvedParameter<ISemaphorePool>(),
-                    cultures.First()));
+                    cultures.First(),
+                    new ResolvedParameter<MemoryCache>("SportEventCache_FixtureTimestampCache")));
 
             container.RegisterType<IDeserializer<scheduleEndpoint>, Deserializer<scheduleEndpoint>>(new ContainerControlledLifetimeManager());
             container.RegisterType<ISingleTypeMapperFactory<scheduleEndpoint, EntityList<SportEventSummaryDTO>>, SportEventsScheduleMapperFactory>(new ContainerControlledLifetimeManager());

@@ -3,6 +3,7 @@
 */
 using System.Diagnostics.Contracts;
 using System.Globalization;
+using System.Runtime.Caching;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -33,20 +34,28 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         private readonly CultureInfo _defaultCulture;
 
         /// <summary>
+        /// A <see cref="ObjectCache"/> which will be used to cache the sport events fixture timestamps
+        /// </summary>
+        private readonly ObjectCache _fixtureTimestampCache;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SportEventCacheItemFactory"/> class.
         /// </summary>
         /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to obtain summary and fixture</param>
         /// <param name="semaphorePool">A <see cref="ISemaphorePool"/> instance to be used by instances constructed by this factory</param>
         /// <param name="defaultCulture">A <see cref="CultureInfo"/> specifying the default culture of the built cache items</param>
-        public SportEventCacheItemFactory(IDataRouterManager dataRouterManager, ISemaphorePool semaphorePool, CultureInfo defaultCulture)
+        /// <param name="fixtureTimestampCache">The in-memory cache of sport events fixture timestamps</param>
+        public SportEventCacheItemFactory(IDataRouterManager dataRouterManager, ISemaphorePool semaphorePool, CultureInfo defaultCulture, ObjectCache fixtureTimestampCache)
         {
             Contract.Requires(dataRouterManager != null);
             Contract.Requires(semaphorePool != null);
             Contract.Requires(defaultCulture != null);
+            Contract.Requires(fixtureTimestampCache != null);
 
             _dataRouterManager = dataRouterManager;
             _semaphorePool = semaphorePool;
             _defaultCulture = defaultCulture;
+            _fixtureTimestampCache = fixtureTimestampCache;
         }
 
         /// <summary>
@@ -57,6 +66,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             Contract.Invariant(_dataRouterManager != null);
             Contract.Invariant(_defaultCulture != null);
+            Contract.Invariant(_fixtureTimestampCache != null);
         }
 
         /// <summary>
@@ -68,27 +78,27 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             if (eventId.TypeGroup == ResourceTypeGroup.STAGE)
             {
-                return new StageCI(eventId, _dataRouterManager, _semaphorePool, _defaultCulture);
+                return new StageCI(eventId, _dataRouterManager, _semaphorePool, _defaultCulture, _fixtureTimestampCache);
             }
             if (eventId.TypeGroup == ResourceTypeGroup.MATCH)
             {
-                return new MatchCI(eventId, _dataRouterManager, _semaphorePool, _defaultCulture);
+                return new MatchCI(eventId, _dataRouterManager, _semaphorePool, _defaultCulture, _fixtureTimestampCache);
             }
             if (eventId.TypeGroup == ResourceTypeGroup.SEASON
                 || eventId.TypeGroup == ResourceTypeGroup.BASIC_TOURNAMENT
                 || eventId.TypeGroup == ResourceTypeGroup.TOURNAMENT)
             {
-                return new TournamentInfoCI(eventId, _dataRouterManager, _semaphorePool, _defaultCulture);
+                return new TournamentInfoCI(eventId, _dataRouterManager, _semaphorePool, _defaultCulture, _fixtureTimestampCache);
             }
             if (eventId.TypeGroup == ResourceTypeGroup.DRAW)
             {
-                return new DrawCI(eventId, _dataRouterManager, _semaphorePool, _defaultCulture);
+                return new DrawCI(eventId, _dataRouterManager, _semaphorePool, _defaultCulture, _fixtureTimestampCache);
             }
             if (eventId.TypeGroup == ResourceTypeGroup.LOTTERY)
             {
-                return new LotteryCI(eventId, _dataRouterManager, _semaphorePool, _defaultCulture);
+                return new LotteryCI(eventId, _dataRouterManager, _semaphorePool, _defaultCulture, _fixtureTimestampCache);
             }
-            return new SportEventCI(eventId, _dataRouterManager, _semaphorePool, _defaultCulture);
+            return new SportEventCI(eventId, _dataRouterManager, _semaphorePool, _defaultCulture, _fixtureTimestampCache);
         }
 
         /// <summary>
@@ -104,12 +114,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 var item = eventSummary as StageDTO;
                 if (item != null)
                 {
-                    return new StageCI(item, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture);
+                    return new StageCI(item, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture, _fixtureTimestampCache);
                 }
                 var tour = eventSummary as TournamentInfoDTO;
                 if (tour != null)
                 {
-                    return new StageCI(tour, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture);
+                    return new StageCI(tour, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture, _fixtureTimestampCache);
                 }
             }
             if (eventSummary.Id.TypeGroup == ResourceTypeGroup.MATCH)
@@ -117,7 +127,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 var item = eventSummary as MatchDTO;
                 if (item != null)
                 {
-                    return new MatchCI(item, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture);
+                    return new MatchCI(item, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture, _fixtureTimestampCache);
                 }
             }
             if (eventSummary.Id.TypeGroup == ResourceTypeGroup.SEASON
@@ -127,7 +137,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 var item = eventSummary as TournamentInfoDTO;
                 if (item != null)
                 {
-                    return new TournamentInfoCI(item, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture);
+                    return new TournamentInfoCI(item, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture, _fixtureTimestampCache);
                 }
             }
             if (eventSummary.Id.TypeGroup == ResourceTypeGroup.DRAW)
@@ -135,7 +145,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 var item = eventSummary as DrawDTO;
                 if (item != null)
                 {
-                    return new DrawCI(item, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture);
+                    return new DrawCI(item, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture, _fixtureTimestampCache);
                 }
             }
             if (eventSummary.Id.TypeGroup == ResourceTypeGroup.LOTTERY)
@@ -143,10 +153,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 var item = eventSummary as LotteryDTO;
                 if (item != null)
                 {
-                    return new LotteryCI(item, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture);
+                    return new LotteryCI(item, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture, _fixtureTimestampCache);
                 }
             }
-            return new SportEventCI(eventSummary, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture);
+            return new SportEventCI(eventSummary, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture, _fixtureTimestampCache);
         }
 
         /// <summary>
@@ -159,17 +169,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             if (fixture.Id.TypeGroup == ResourceTypeGroup.STAGE)
             {
-                return new StageCI(fixture, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture);
+                return new StageCI(fixture, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture, _fixtureTimestampCache);
             }
             if (fixture.Id.TypeGroup == ResourceTypeGroup.MATCH)
             {
-                return new MatchCI(fixture, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture);
+                return new MatchCI(fixture, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture, _fixtureTimestampCache);
             }
             if (fixture.Id.TypeGroup == ResourceTypeGroup.SEASON
                 || fixture.Id.TypeGroup == ResourceTypeGroup.BASIC_TOURNAMENT
                 || fixture.Id.TypeGroup == ResourceTypeGroup.TOURNAMENT)
             {
-                return new TournamentInfoCI(fixture, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture);
+                return new TournamentInfoCI(fixture, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture, _fixtureTimestampCache);
             }
             if (fixture.Id.TypeGroup == ResourceTypeGroup.DRAW
                 || fixture.Id.TypeGroup == ResourceTypeGroup.LOTTERY)
@@ -177,7 +187,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 // should not be any fixture
                 var a = 1;
             }
-            return new SportEventCI(fixture, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture);
+            return new SportEventCI(fixture, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture, _fixtureTimestampCache);
         }
 
         /// <summary>
@@ -213,6 +223,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 return lottery;
             }
             return (SportEventCI) cacheItem;
+        }
+
+        /// <summary>
+        /// Gets a <see cref="ObjectCache"/> used to cache fixture timestamps
+        /// </summary>
+        /// <returns>A <see cref="ObjectCache"/> used to cache fixture timestamps</returns>
+        public ObjectCache GetFixtureTimestampCache()
+        {
+            return _fixtureTimestampCache;
         }
     }
 }

@@ -39,6 +39,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// </summary>
         private readonly IDataProvider<FixtureDTO> _sportEventFixtureProvider;
         /// <summary>
+        /// The sport event fixture provider without cache
+        /// </summary>
+        private readonly IDataProvider<FixtureDTO> _sportEventFixtureChangeFixtureProvider;
+        /// <summary>
         /// All tournaments for all sports provider
         /// </summary>
         private readonly IDataProvider<EntityList<SportDTO>> _allTournamentsForAllSportsProvider;
@@ -130,6 +134,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="exceptionHandlingStrategy">An <see cref="Common.ExceptionHandlingStrategy"/> used to handle exception when fetching data</param>
         /// <param name="sportEventSummaryProvider">The sport event summary provider</param>
         /// <param name="sportEventFixtureProvider">The sport event fixture provider</param>
+        /// <param name="sportEventFixtureChangeFixtureProvider">The sport event fixture provider without cache</param>
         /// <param name="allTournamentsForAllSportsProvider">All tournaments for all sports provider</param>
         /// <param name="allSportsProvider">All sports provider</param>
         /// <param name="sportEventsForDateProvider">The sport events for date provider</param>
@@ -152,6 +157,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                                  ExceptionHandlingStrategy exceptionHandlingStrategy,
                                  IDataProvider<SportEventSummaryDTO> sportEventSummaryProvider,
                                  IDataProvider<FixtureDTO> sportEventFixtureProvider,
+                                 IDataProvider<FixtureDTO> sportEventFixtureChangeFixtureProvider,
                                  IDataProvider<EntityList<SportDTO>> allTournamentsForAllSportsProvider,
                                  IDataProvider<EntityList<SportDTO>> allSportsProvider,
                                  IDataProvider<EntityList<SportEventSummaryDTO>> sportEventsForDateProvider,
@@ -173,6 +179,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Contract.Requires(cacheManager != null);
             Contract.Requires(sportEventSummaryProvider != null);
             Contract.Requires(sportEventFixtureProvider != null);
+            Contract.Requires(sportEventFixtureChangeFixtureProvider != null);
             Contract.Requires(allTournamentsForAllSportsProvider != null);
             Contract.Requires(allSportsProvider != null);
             Contract.Requires(sportEventsForDateProvider != null);
@@ -197,6 +204,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             ExceptionHandlingStrategy = exceptionHandlingStrategy;
             _sportEventSummaryProvider = sportEventSummaryProvider;
             _sportEventFixtureProvider = sportEventFixtureProvider;
+            _sportEventFixtureChangeFixtureProvider = sportEventFixtureChangeFixtureProvider;
             _allTournamentsForAllSportsProvider = allTournamentsForAllSportsProvider;
             _allSportsProvider = allSportsProvider;
             _sportEventsForDateProvider = sportEventsForDateProvider;
@@ -225,6 +233,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Contract.Invariant(_cacheManager != null);
             Contract.Invariant(_sportEventSummaryProvider != null);
             Contract.Invariant(_sportEventFixtureProvider != null);
+            Contract.Invariant(_sportEventFixtureChangeFixtureProvider != null);
             Contract.Invariant(_allTournamentsForAllSportsProvider != null);
             Contract.Invariant(_allSportsProvider != null);
             Contract.Invariant(_sportEventsForDateProvider != null);
@@ -290,21 +299,23 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// </summary>
         /// <param name="id">The id of the sport event to be fetched</param>
         /// <param name="culture">The language to be fetched</param>
+        /// <param name="useCachedProvider">Should the cached provider be used</param>
         /// <param name="requester">The cache item which invoked request</param>
         /// <returns>Task</returns>
-        public async Task GetSportEventFixtureAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        public async Task GetSportEventFixtureAsync(URN id, CultureInfo culture, bool useCachedProvider, ISportEventCI requester)
         {
             Metric.Context("DataRouterManager").Meter("GetSportEventFixtureAsync", Unit.Calls);
             var timer = Metric.Context("DataRouterManager").Timer("GetSportEventFixtureAsync", Unit.Requests);
             using (var t = timer.NewContext($"{id} [{culture.TwoLetterISOLanguageName}]"))
             {
-                WriteLog($"Executing GetSportEventFixtureAsync for id={id} and culture={culture.TwoLetterISOLanguageName}.", true);
+                WriteLog($"Executing {(useCachedProvider ? "cached" : "non-cached")} GetSportEventFixtureAsync for id={id} and culture={culture.TwoLetterISOLanguageName}.", true);
 
                 FixtureDTO result = null;
                 int restCallTime;
                 try
                 {
-                    result = await _sportEventFixtureProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
+                    var provider = useCachedProvider ? _sportEventFixtureProvider : _sportEventFixtureChangeFixtureProvider;
+                    result = await provider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
                     restCallTime = (int)t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)

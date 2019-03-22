@@ -7,6 +7,8 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.Caching;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Logging;
@@ -80,26 +82,35 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         internal readonly List<CultureInfo> LoadedSummaries = new List<CultureInfo>();
 
         /// <summary>
+        /// A <see cref="ObjectCache"/> used to cache the sport events fixture timestamps
+        /// </summary>
+        protected readonly ObjectCache FixtureTimestampCache;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SportEventCI" /> class
         /// </summary>
         /// <param name="id">A <see cref="URN" /> specifying the id of the sport event associated with the current instance</param>
         /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to obtain summary and fixture</param>
         /// <param name="semaphorePool">A <see cref="ISemaphorePool" /> instance used to obtain sync objects</param>
         /// <param name="defaultCulture">A <see cref="CultureInfo" /> specifying the language used when fetching info which is not translatable (e.g. Scheduled, ..)</param>
+        /// <param name="fixtureTimestampCache">A <see cref="ObjectCache"/> used to cache the sport events fixture timestamps</param>
         public SportEventCI(URN id,
                             IDataRouterManager dataRouterManager,
                             ISemaphorePool semaphorePool,
-                            CultureInfo defaultCulture)
+                            CultureInfo defaultCulture,
+                            ObjectCache fixtureTimestampCache)
         {
             Contract.Requires(id != null);
             Contract.Requires(dataRouterManager != null);
             Contract.Requires(defaultCulture != null);
             Contract.Requires(semaphorePool != null);
+            Contract.Requires(fixtureTimestampCache != null);
 
             Id = id;
             DataRouterManager = dataRouterManager;
             SemaphorePool = semaphorePool;
             DefaultCulture = defaultCulture;
+            FixtureTimestampCache = fixtureTimestampCache;
         }
 
         /// <summary>
@@ -110,12 +121,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <param name="semaphorePool">A <see cref="ISemaphorePool" /> instance used to obtain sync objects</param>
         /// <param name="currentCulture">A <see cref="CultureInfo" /> of the <see cref="SportEventSummaryDTO" /> instance</param>
         /// <param name="defaultCulture">A <see cref="CultureInfo" /> specifying the language used when fetching info which is not translatable (e.g. Scheduled, ..)</param>
+        /// <param name="fixtureTimestampCache">A <see cref="ObjectCache"/> used to cache the sport events fixture timestamps</param>
         public SportEventCI(SportEventSummaryDTO eventSummary,
                             IDataRouterManager dataRouterManager,
                             ISemaphorePool semaphorePool,
                             CultureInfo currentCulture,
-                            CultureInfo defaultCulture)
-            : this(eventSummary.Id, dataRouterManager, semaphorePool, defaultCulture)
+                            CultureInfo defaultCulture,
+                            ObjectCache fixtureTimestampCache)
+            : this(eventSummary.Id, dataRouterManager, semaphorePool, defaultCulture, fixtureTimestampCache)
         {
             Contract.Requires(eventSummary != null);
             Contract.Requires(currentCulture != null);
@@ -341,7 +354,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 }
                 else
                 {
-                    fetchTasks = missingCultures.ToDictionary(missingCulture => missingCulture, missingCulture => DataRouterManager.GetSportEventFixtureAsync(Id, missingCulture, this));
+                    fetchTasks = missingCultures.ToDictionary(missingCulture => missingCulture, missingCulture => DataRouterManager.GetSportEventFixtureAsync(Id, missingCulture, !FixtureTimestampCache.Contains(Id.ToString()), this));
                 }
                 await Task.WhenAll(fetchTasks.Values).ConfigureAwait(false);
                 LoadedFixtures.AddRange(missingCultures);

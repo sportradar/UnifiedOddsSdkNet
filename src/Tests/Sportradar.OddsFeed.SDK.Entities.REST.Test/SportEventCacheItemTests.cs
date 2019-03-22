@@ -35,7 +35,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             _dataRouterManager = new TestDataRouterManager(_cacheManager);
 
             _timer = new TestTimer(false);
-            _sportEventCache = new SportEventCache(_memoryCache, _dataRouterManager, new SportEventCacheItemFactory(_dataRouterManager, new SemaphorePool(5), TestData.Cultures.First()), _timer, TestData.Cultures, _cacheManager);
+            _sportEventCache = new SportEventCache(_memoryCache, _dataRouterManager, new SportEventCacheItemFactory(_dataRouterManager, new SemaphorePool(5), TestData.Cultures.First(), new MemoryCache("FixtureTimestampCache")), _timer, TestData.Cultures, _cacheManager);
         }
 
         [TestMethod]

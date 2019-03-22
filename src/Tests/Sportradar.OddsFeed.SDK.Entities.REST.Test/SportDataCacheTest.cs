@@ -55,7 +55,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             _memoryCache = new MemoryCache("cache");
 
             _timer = new TestTimer(false);
-            _sportEventCache = new SportEventCache(_memoryCache, _dataRouterManager, new SportEventCacheItemFactory(_dataRouterManager, new SemaphorePool(5), _cultureEn), _timer, TestData.Cultures, _cacheManager);
+            _sportEventCache = new SportEventCache(_memoryCache, _dataRouterManager, new SportEventCacheItemFactory(_dataRouterManager, new SemaphorePool(5), _cultureEn, new MemoryCache("FixtureTimestampCache")), _timer, TestData.Cultures, _cacheManager);
             _sportDataCache = new SportDataCache(_dataRouterManager, _timer, TestData.Cultures, _sportEventCache, _cacheManager);
         }
 
@@ -74,7 +74,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             var callType = string.Empty;
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(callType));
             _dataRouterManager.GetSportEventSummaryAsync(EventId, _cultureEn, null);
-            _dataRouterManager.GetSportEventFixtureAsync(EventId, _cultureEn, null);
+            _dataRouterManager.GetSportEventFixtureAsync(EventId, _cultureEn, true, null);
             _dataRouterManager.GetAllTournamentsForAllSportAsync(_cultureEn);
             _dataRouterManager.GetAllSportsAsync(_cultureEn);
             _dataRouterManager.GetLiveSportEventsAsync(_cultureEn);

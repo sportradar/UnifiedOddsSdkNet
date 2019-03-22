@@ -135,7 +135,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             }
         }
 
-        public async Task GetSportEventFixtureAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        public async Task GetSportEventFixtureAsync(URN id, CultureInfo culture, bool useCachedProvider, ISportEventCI requester)
         {
             RecordCall("GetSportEventFixtureAsync");
             var filePath = GetFile(FixtureXml, culture);

@@ -125,6 +125,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             if (fixtureChange != null)
             {
                 RemoveCacheItem(fixtureChange.EventURN, removeEvent: true, removeSportEventStatus: true);
+                _sportEventCache.AddFixtureTimestamp(fixtureChange.EventURN);
 
                 if (fixtureChange.EventURN.TypeGroup == ResourceTypeGroup.TOURNAMENT)
                 {

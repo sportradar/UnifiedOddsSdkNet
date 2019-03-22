@@ -308,6 +308,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             return schedule;
         }
 
+        /// <summary>
+        /// Adds fixture timestamp to cache so that the next fixture calls for the event goes through non-cached fixture provider
+        /// </summary>
+        /// <param name="id">A <see cref="URN"/> representing the event</param>
+        public void AddFixtureTimestamp(URN id)
+        {
+            var cache = _sportEventCacheItemFactory.GetFixtureTimestampCache();
+            cache.Set(id.ToString(), id, DateTimeOffset.Now.AddMinutes(2));
+        }
+
         private void CacheItemRemovedCallback(CacheEntryRemovedArguments arguments)
         {
             if (arguments?.CacheItem == null)

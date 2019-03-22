@@ -34,5 +34,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="date">The date for which to retrieve the schedule, or a null reference to get currently live events</param>
         /// <returns>A <see cref="Task{T}"/> representing an asynchronous operation</returns>
         Task<IEnumerable<Tuple<URN, URN>>> GetEventIdsAsync(DateTime? date);
+
+        /// <summary>
+        /// Adds fixture timestamp to cache so that the next fixture calls for the event goes through non-cached fixture provider
+        /// </summary>
+        /// <param name="id">A <see cref="URN"/> representing the event</param>
+        void AddFixtureTimestamp(URN id);
     }
 }

@@ -30,8 +30,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// </summary>
         /// <param name="id">The id of the sport event to be fetched</param>
         /// <param name="culture">The language to be fetched</param>
+        /// <param name="useCachedProvider">Should the cached provider be used</param>
         /// <param name="requester">The cache item which invoked request</param>
-        Task GetSportEventFixtureAsync(URN id, CultureInfo culture, ISportEventCI requester);
+        Task GetSportEventFixtureAsync(URN id, CultureInfo culture, bool useCachedProvider, ISportEventCI requester);
 
         /// <summary>
         /// Gets all tournaments for sport endpoint
