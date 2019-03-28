@@ -107,6 +107,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomBet\ICalculation.cs" />
+    <Compile Include="CustomBet\ISelection.cs" />
+    <Compile Include="CustomBet\IMarket.cs" />
+    <Compile Include="CustomBet\IAvailableSelections.cs" />
     <Compile Include="Enums\CoveredFrom.cs" />
     <Compile Include="Enums\DrawStatus.cs" />
     <Compile Include="Enums\PlayerHand.cs" />
@@ -135,16 +139,29 @@
     <Compile Include="IMatchV1.cs" />
     <Compile Include="IMatchStatusV1.cs" />
     <Compile Include="Internal\Caching\CI\PitcherCI.cs" />
+    <Compile Include="Internal\CalculateProbabilityProvider.cs" />
+    <Compile Include="Internal\DTO\CustomBet\CalculationDTO.cs" />
+    <Compile Include="Internal\DTO\CustomBet\AvailableSelectionsDTO.cs" />
+    <Compile Include="Internal\DTO\CustomBet\MarketDTO.cs" />
     <Compile Include="Internal\DTO\SimpleTeamProfileDTO.cs" />
     <Compile Include="Internal\DTO\SportCategoriesDTO.cs" />
     <Compile Include="Internal\DTO\PitcherDTO.cs" />
     <Compile Include="Internal\DTO\PlayerCompetitorDTO.cs" />
+    <Compile Include="Internal\EntitiesImpl\CustomBet\Calculation.cs" />
+    <Compile Include="Internal\EntitiesImpl\CustomBet\Selection.cs" />
+    <Compile Include="Internal\EntitiesImpl\CustomBet\AvailableSelections.cs" />
+    <Compile Include="Internal\EntitiesImpl\CustomBet\Market.cs" />
     <Compile Include="Internal\EntitiesImpl\ScheduledStartTimeChange.cs" />
     <Compile Include="Internal\EntitiesImpl\Pitcher.cs" />
+    <Compile Include="Internal\ICalculateProbabilityProvider.cs" />
+    <Compile Include="Internal\Mapping\CalculationMapper.cs" />
+    <Compile Include="Internal\Mapping\AvailableSelectionsMapper.cs" />
+    <Compile Include="Internal\Mapping\CalculationMapperFactory.cs" />
     <Compile Include="Internal\Mapping\SimpleTeamProfileMapper.cs" />
     <Compile Include="Internal\Mapping\SimpleTeamProfileMapperFactory.cs" />
     <Compile Include="Internal\Mapping\SportCategoriesMapper.cs" />
     <Compile Include="Internal\Mapping\SportCategoriesMapperFactory.cs" />
+    <Compile Include="Internal\Mapping\AvailableSelectionsMapperFactory.cs" />
     <Compile Include="IPitcher.cs" />
     <Compile Include="IReferenceV1.cs" />
     <Compile Include="IScheduledStartTimeChange.cs" />

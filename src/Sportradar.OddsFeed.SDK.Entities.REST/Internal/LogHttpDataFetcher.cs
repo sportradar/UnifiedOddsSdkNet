@@ -178,8 +178,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             RestLog.Info($"Id:{dataId} Posting url: {uri.AbsoluteUri}");
             if (content != null)
             {
-                var s = await content.ReadAsStringAsync().ConfigureAwait(false);
-                RestLog.Info($"Id:{dataId} Content: {s}");
+                //var s = await content.ReadAsStringAsync().ConfigureAwait(false);
+                //RestLog.Info($"Id:{dataId} Content: {s}");
             }
 
             var watch = new Stopwatch();

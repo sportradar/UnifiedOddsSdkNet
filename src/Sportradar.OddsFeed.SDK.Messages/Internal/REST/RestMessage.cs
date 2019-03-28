@@ -215,4 +215,12 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST
     public partial class restSportEventStatus
     {
     }
+
+    public partial class AvailableSelectionsType : RestMessage
+    {
+    }
+
+    public partial class CalculationResponseType : RestMessage
+    {
+    }
 }

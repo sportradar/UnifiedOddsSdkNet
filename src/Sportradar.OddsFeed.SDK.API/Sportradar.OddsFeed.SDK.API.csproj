@@ -120,8 +120,12 @@
   <ItemGroup>
     <Compile Include="Contracts\ConfigurationBuilderContract.cs" />
     <Compile Include="Contracts\OddsFeedV1Contract.cs" />
+    <Compile Include="Internal\SelectionBuilder.cs" />
+    <Compile Include="ISelectionBuilder.cs" />
+    <Compile Include="ICustomBetManager.cs" />
     <Compile Include="IConfigurationBuilder.cs" />
     <Compile Include="IBookingManager.cs" />
+    <Compile Include="Internal\CustomBetManager.cs" />
     <Compile Include="Internal\BookingManager.cs" />
     <Compile Include="Internal\ConfigurationSectionProvider.cs" />
     <Compile Include="Internal\Config\ConfigurationBuilder.cs" />
@@ -143,6 +147,7 @@
     <Compile Include="Internal\RecoveryResult.cs" />
     <Compile Include="Internal\RecoveryStatusChangeReason.cs" />
     <Compile Include="Internal\TimestampTracker.cs" />
+    <Compile Include="IOddsFeedV2.cs" />
     <Compile Include="IOddsFeedV1.cs" />
     <Compile Include="IReplayManagerV1.cs" />
     <Compile Include="IReplayScenario.cs" />
