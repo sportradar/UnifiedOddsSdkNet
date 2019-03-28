@@ -24,7 +24,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
     {
         private static readonly IDeserializer<FeedMessage> Deserializer = new Deserializer<FeedMessage>();
 
-        protected static readonly IFeedMessageMapper Mapper;
+        internal static readonly IFeedMessageMapper Mapper;
 
         static MapEntityTestBase()
         {

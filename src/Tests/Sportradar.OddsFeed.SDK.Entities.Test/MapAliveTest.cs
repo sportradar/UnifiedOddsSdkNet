@@ -2,6 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
 using Sportradar.OddsFeed.SDK.Test.Shared;
 

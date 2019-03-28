@@ -13,7 +13,7 @@ namespace Sportradar.OddsFeed.SDK.API.EventArguments
     /// <summary>
     /// Event arguments for the alive event
     /// </summary>
-    public class AliveEventArgs : EventArgs
+    internal class AliveEventArgs : EventArgs
     {
         /// <summary>
         /// A <see cref="IFeedMessageMapper"/> used to map feed message to the one dispatched to the user

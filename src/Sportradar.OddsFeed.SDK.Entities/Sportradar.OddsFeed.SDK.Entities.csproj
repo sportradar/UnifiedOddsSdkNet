@@ -175,7 +175,7 @@
     <Compile Include="MessageInterest.cs" />
     <Compile Include="Internal\IMessageReceiver.cs" />
     <Compile Include="Internal\FeedMessageMapper.cs" />
-    <Compile Include="IAlive.cs" />
+    <Compile Include="Internal\IAlive.cs" />
     <Compile Include="IBetCancel.cs" />
     <Compile Include="IBetSettlement.cs" />
     <Compile Include="IBetStop.cs" />

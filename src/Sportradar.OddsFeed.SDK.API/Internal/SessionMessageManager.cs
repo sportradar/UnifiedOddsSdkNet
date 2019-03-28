@@ -22,7 +22,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
     /// Stashes or releases stateful messages based on direction from FeedRecoveryManager
     /// </summary>
     /// <seealso cref="ISessionMessageManager" />
-    public class SessionMessageManager : MessageProcessorBase, IFeedMessageProcessor, ISessionMessageManager
+    internal class SessionMessageManager : MessageProcessorBase, IFeedMessageProcessor, ISessionMessageManager
     {
         /// <summary>
         /// The <see cref="ILog"/> used for execution logging
