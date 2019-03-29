@@ -84,7 +84,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
             }
             if (_apiHost != null && (_apiHost.ToLower().StartsWith("http://") || _apiHost.ToLower().StartsWith("https://")))
             {
-                throw new InvalidOperationException($"apiHost must not contain protocol specification. Value={_messagingHost}");
+                throw new InvalidOperationException($"apiHost must not contain protocol specification. Value={_apiHost}");
             }
         }
 
