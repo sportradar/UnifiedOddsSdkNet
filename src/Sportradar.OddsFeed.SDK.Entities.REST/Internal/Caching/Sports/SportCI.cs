@@ -81,13 +81,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports
             var wantedCultures = cultures as List<CultureInfo> ?? cultures.ToList();
             try
             {
-                await _loadedCategoriesSemaphore.WaitAsync();
+                await _loadedCategoriesSemaphore.WaitAsync().ConfigureAwait(false);
                 wantedCultures = LanguageHelper.GetMissingCultures(wantedCultures, _loadedCategories).ToList();
                 if (!wantedCultures.Any())
                     return;
 
                 foreach (var culture in wantedCultures)
-                    await DataRouterManager.GetSportCategoriesAsync(Id, culture);
+                    await DataRouterManager.GetSportCategoriesAsync(Id, culture).ConfigureAwait(false);
                 _loadedCategories.AddRange(wantedCultures);
             }
             finally

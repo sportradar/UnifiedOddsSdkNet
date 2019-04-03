@@ -48,7 +48,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <exception cref="NameExpressionException">Error occurred while evaluating name expression</exception>
         public async Task<string> BuildNameAsync(CultureInfo culture)
         {
-            var value = await _operand.GetIntValue();
+            var value = await _operand.GetIntValue().ConfigureAwait(false);
             return value.ToOrdinalWords(culture);
         }
     }

@@ -107,7 +107,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             SportEventStatusCI ci = null;
             try
             {
-                await _fetchSemaphore.WaitAsync();
+                await _fetchSemaphore.WaitAsync().ConfigureAwait(false);
 
                 // get from cache
                 var item = _sportEventStatusCache.Get(eventId.ToString());

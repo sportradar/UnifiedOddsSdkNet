@@ -125,7 +125,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         private async void OnTimerElapsed(object sender, EventArgs e)
         {
 
-            if (!await _semaphore.WaitAsyncSafe())
+            if (!await _semaphore.WaitAsyncSafe().ConfigureAwait(false))
             {
                 return;
             }
@@ -287,7 +287,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
 
-            await FetchSportCategoriesIfNeededAsync(id, cultureList);
+            await FetchSportCategoriesIfNeededAsync(id, cultureList).ConfigureAwait(false);
 
             List<CategoryData> categories = null;
 
@@ -344,7 +344,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             if (!Sports.TryGetValue(id, out cachedSport))
                 return;
 
-            await cachedSport.LoadCategoriesAsync(cultures);
+            await cachedSport.LoadCategoriesAsync(cultures).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -384,7 +384,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
 
             //Just lock - don't even check if all the required data is available
-            if (!await _semaphore.WaitAsyncSafe())
+            if (!await _semaphore.WaitAsyncSafe().ConfigureAwait(false))
             {
                 return null;
             }
@@ -395,12 +395,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 // we have all available data - return the requested info
                 if (!missingCultures.Any())
                 {
-                    var sports = Sports.Keys.Select(async sportId => await GetSportFromCacheAsync(sportId, cultureList)).ToList();
-                    return await Task.WhenAll(sports);
+                    var sports = Sports.Keys.Select(async sportId => await GetSportFromCacheAsync(sportId, cultureList).ConfigureAwait(false)).ToList();
+                    return await Task.WhenAll(sports).ConfigureAwait(false);
                 }
 
                 await FetchAndMergeAll(missingCultures, false).ConfigureAwait(false);
-                return await Task.WhenAll(Sports.Keys.Select(async sportId => await GetSportFromCacheAsync(sportId, cultureList)).ToList());
+                return await Task.WhenAll(Sports.Keys.Select(async sportId => await GetSportFromCacheAsync(sportId, cultureList).ConfigureAwait(false)).ToList());
             }
             catch (Exception ex)
             {
@@ -424,13 +424,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             Metric.Context("CACHE").Meter("SportDataCache->GetSportAsync", Unit.Calls).Mark();
 
             var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
-            var sport = await GetSportFromCacheAsync(id, cultureList);
+            var sport = await GetSportFromCacheAsync(id, cultureList).ConfigureAwait(false);
             if (sport != null)
             {
                 return sport;
             }
 
-            if (!await _semaphore.WaitAsyncSafe())
+            if (!await _semaphore.WaitAsyncSafe().ConfigureAwait(false))
             {
                 return null;
             }
@@ -442,7 +442,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 {
                     await FetchAndMergeAll(missingCultures, false).ConfigureAwait(false);
                 }
-                return await GetSportFromCacheAsync(id, cultureList);
+                return await GetSportFromCacheAsync(id, cultureList).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -465,7 +465,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             Metric.Context("CACHE").Meter("SportDataCache->GetCategoryAsync", Unit.Calls).Mark();
 
-            if (!await _semaphore.WaitAsyncSafe())
+            if (!await _semaphore.WaitAsyncSafe().ConfigureAwait(false))
             {
                 return null;
             }
@@ -515,7 +515,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
 
             var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
 
-            if (!await _semaphore.WaitAsyncSafe())
+            if (!await _semaphore.WaitAsyncSafe().ConfigureAwait(false))
             {
                 return null;
             }

@@ -57,17 +57,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <exception cref="NameExpressionException">Error occurred while evaluating name expression</exception>
         public async Task<string> BuildNameAsync(CultureInfo culture)
         {
-            var urnString = await _operand.GetStringValue();
+            var urnString = await _operand.GetStringValue().ConfigureAwait(false);
             var urn = URN.Parse(urnString);
             string name = null;
             if (urn.Type == "player")
             {
-                var profile = await _profileCache.GetPlayerProfileAsync(urn, new[] {culture});
+                var profile = await _profileCache.GetPlayerProfileAsync(urn, new[] {culture}).ConfigureAwait(false);
                 name = profile?.GetName(culture);
             }
             else if (urn.Type == "competitor")
             {
-                var profile = await _profileCache.GetCompetitorProfileAsync(urn, new[] {culture});
+                var profile = await _profileCache.GetCompetitorProfileAsync(urn, new[] {culture}).ConfigureAwait(false);
                 name = profile?.GetName(culture);
             }
             return name;

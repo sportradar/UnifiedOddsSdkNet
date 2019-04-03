@@ -267,7 +267,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 {
                     var task = Task.Run(async () =>
                                         {
-                                            var competitorsReferences = _competitionCI != null ? await _competitionCI.GetCompetitorsReferencesAsync() : null;
+                                            var competitorsReferences = _competitionCI != null ? await _competitionCI.GetCompetitorsReferencesAsync().ConfigureAwait(false) : null;
 
                                             if (competitorsReferences != null && competitorsReferences.Any())
                                             {
@@ -298,7 +298,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 {
                     var task = Task.Run(async () =>
                                         {
-                                            var competitorsQualifiers = await _competitionCI.GetCompetitorsQualifiersAsync();
+                                            var competitorsQualifiers = await _competitionCI.GetCompetitorsQualifiersAsync().ConfigureAwait(false);
 
                                             if (competitorsQualifiers != null && competitorsQualifiers.Any())
                                             {

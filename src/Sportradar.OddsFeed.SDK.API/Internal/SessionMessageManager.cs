@@ -90,7 +90,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             await Task.Run(() =>
             {
                 ReleaseMessagesFromStashedItem(stashedItem);
-            });
+            }).ConfigureAwait(false);
         }
 
         private void ReleaseMessagesFromStashedItem(StashedItem stashedItem)

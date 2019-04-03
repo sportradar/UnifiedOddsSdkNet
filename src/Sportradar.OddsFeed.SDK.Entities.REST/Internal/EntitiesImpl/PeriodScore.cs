@@ -98,7 +98,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         {
             return _matchStatusCode == null || _matchStatusesCache == null
                 ? null
-                : await _matchStatusesCache?.GetAsync(_matchStatusCode.Value, new List<CultureInfo> { culture });
+                : await _matchStatusesCache.GetAsync(_matchStatusCode.Value, new List<CultureInfo> { culture }).ConfigureAwait(false);
         }
 
         /// <summary>

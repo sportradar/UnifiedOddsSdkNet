@@ -76,11 +76,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         private async Task<ICashOutProbabilities<T>> GetProbabilitiesInternalAsync<T>(string param, CultureInfo culture = null) where T : ISportEvent
         {
             var data = _exceptionStrategy == ExceptionHandlingStrategy.THROW
-                ? await _dataProvider.GetDataAsync(param)
+                ? await _dataProvider.GetDataAsync(param).ConfigureAwait(false)
                 : await new Func<string, Task<cashout>>(_dataProvider.GetDataAsync).SafeInvokeAsync(
                     param,
                     ExecutionLog,
-                    "Error occurred while fetching probabilities for " + param);
+                    "Error occurred while fetching probabilities for " + param).ConfigureAwait(false);
 
             return data == null
                 ? null

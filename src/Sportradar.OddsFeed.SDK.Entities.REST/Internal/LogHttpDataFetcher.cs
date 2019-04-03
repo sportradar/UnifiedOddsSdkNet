@@ -188,7 +188,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             HttpResponseMessage response;
             try
             {
-                response = await base.PostDataAsync(uri, content);
+                response = await base.PostDataAsync(uri, content).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

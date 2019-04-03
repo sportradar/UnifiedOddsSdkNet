@@ -226,7 +226,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 }
 
                 //WriteLog($"Prefetching invariant market description for id={id} and langs: [{string.Join(",", cultureList.Select(s => s.TwoLetterISOLanguageName))}].");
-                await _semaphore.WaitAsync();
+                await _semaphore.WaitAsync().ConfigureAwait(false);
 
                 description = GetItemFromCache(id);
                 var missingLanguages = LanguageHelper.GetMissingCultures(cultureList, description?.FetchedLanguages).ToList();

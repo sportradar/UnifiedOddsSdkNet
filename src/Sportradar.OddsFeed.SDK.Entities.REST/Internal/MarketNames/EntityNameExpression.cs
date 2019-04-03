@@ -83,20 +83,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             {
                 if (_sportEvent is IMatch || _sportEvent is ISoccerEvent)
                 {
-                    var homeCompetitor = await GetHomeCompetitor(culture);
-                    var awayCompetitor = await GetAwayCompetitor(culture);
+                    var homeCompetitor = await GetHomeCompetitor(culture).ConfigureAwait(false);
+                    var awayCompetitor = await GetAwayCompetitor(culture).ConfigureAwait(false);
                     return $"{homeCompetitor} vs {awayCompetitor}";
                 }
 
-                return await _sportEvent.GetNameAsync(culture);
+                return await _sportEvent.GetNameAsync(culture).ConfigureAwait(false);
             }
 
             switch (Array.IndexOf(SupportedOperands, _propertyName))
             {
                 case 0:
-                    return await GetHomeCompetitor(culture);
+                    return await GetHomeCompetitor(culture).ConfigureAwait(false);
                 case 1:
-                    return await GetAwayCompetitor(culture);
+                    return await GetAwayCompetitor(culture).ConfigureAwait(false);
                 default:
                     throw new NameExpressionException($"Operand {_propertyName} is not supported. Supported operands are: {string.Join(", ", SupportedOperands)}", null);
             }
