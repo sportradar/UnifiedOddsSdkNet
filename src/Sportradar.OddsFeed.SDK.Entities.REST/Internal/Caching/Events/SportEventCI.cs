@@ -154,7 +154,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return Names;
             }
-            await FetchMissingSummary(cultureInfos).ConfigureAwait(false);
+            await FetchMissingSummary(cultureInfos, false).ConfigureAwait(false);
             return new ReadOnlyDictionary<CultureInfo, string>(Names);
         }
 
@@ -172,7 +172,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _sportId;
             }
-            await FetchMissingSummary(new List<CultureInfo> { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new List<CultureInfo> { DefaultCulture }, false).ConfigureAwait(false);
             return _sportId;
         }
 
@@ -192,7 +192,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _scheduled;
             }
-            await FetchMissingSummary(new List<CultureInfo> { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new List<CultureInfo> { DefaultCulture }, false).ConfigureAwait(false);
             return _scheduled;
         }
 
@@ -214,7 +214,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _scheduledEnd;
             }
-            await FetchMissingSummary(new List<CultureInfo> { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new List<CultureInfo> { DefaultCulture }, false).ConfigureAwait(false);
             return _scheduledEnd;
         }
 
@@ -232,8 +232,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// Fetches sport event detail info for those of the specified languages which are not yet fetched
         /// </summary>
         /// <param name="cultures">A <see cref="IEnumerable{CultureInfo}" /> specifying the required languages</param>
+        /// <param name="forceFetch">Should the cached data be ignored</param>
         /// <returns>A <see cref="Task" /> representing the async operation</returns>
-        protected async Task FetchMissingSummary(IEnumerable<CultureInfo> cultures)
+        protected async Task FetchMissingSummary(IEnumerable<CultureInfo> cultures, bool forceFetch)
         {
             Contract.Requires(cultures != null);
             Contract.Requires(cultures.Any());
@@ -241,7 +242,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             // to improve performance check if anything is missing without acquiring a lock
             var cultureInfos = cultures as IList<CultureInfo> ?? cultures.ToList();
             var missingCultures = LanguageHelper.GetMissingCultures(cultureInfos, LoadedSummaries).ToList();
-            if (!missingCultures.Any())
+            if (!missingCultures.Any() && !forceFetch)
             {
                 return;
             }
@@ -255,7 +256,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 await semaphore.WaitAsync().ConfigureAwait(false);
 
                 // make sure there is still some data missing and was not fetched while waiting to acquire the lock
-                missingCultures = LanguageHelper.GetMissingCultures(cultureInfos, LoadedSummaries).ToList();
+                missingCultures = forceFetch ? cultureInfos.ToList() : LanguageHelper.GetMissingCultures(cultureInfos, LoadedSummaries).ToList();
                 if (!missingCultures.Any())
                 {
                     return;
@@ -277,7 +278,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 }
                 await Task.WhenAll(fetchTasks.Values).ConfigureAwait(false);
 
-                LoadedSummaries.AddRange(missingCultures);
+                foreach (var culture in missingCultures)
+                {
+                    if (!LoadedSummaries.Contains(culture))
+                        LoadedSummaries.Add(culture);
+                }
             }
             catch (CommunicationException ce)
             {

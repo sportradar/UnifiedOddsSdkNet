@@ -215,7 +215,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             Task.WaitAll(task);
 
-            Assert.AreEqual(1, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly 1 times.");
+            Assert.AreEqual(3, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly 1 times.");
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventFixture), $"{SportEventFixture} should be called exactly 0 times.");
         }
 

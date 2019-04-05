@@ -130,7 +130,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <returns>A <see cref="Task{T}" /> representing an async operation</returns>
         public async Task<SportEventStatusCI> GetSportEventStatusAsync()
         {
-            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new[] { DefaultCulture }, true).ConfigureAwait(false);
             return SportEventStatus;
         }
 
@@ -160,7 +160,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _venue;
             }
-            await FetchMissingSummary(cultureInfos).ConfigureAwait(false);
+            await FetchMissingSummary(cultureInfos, false).ConfigureAwait(false);
             return _venue;
         }
 
@@ -176,7 +176,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _conditions;
             }
-            await FetchMissingSummary(cultureInfos).ConfigureAwait(false);
+            await FetchMissingSummary(cultureInfos, false).ConfigureAwait(false);
             return _conditions;
         }
 
@@ -194,7 +194,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return Competitors;
             }
-            await FetchMissingSummary(wantedCultures).ConfigureAwait(false);
+            await FetchMissingSummary(wantedCultures, false).ConfigureAwait(false);
             return Competitors;
         }
         /// <summary>
@@ -232,7 +232,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         {
             if (!LoadedSummaries.Any())
             {
-                await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+                await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             }
             return _competitorsQualifiers;
         }

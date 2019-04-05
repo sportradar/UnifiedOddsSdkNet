@@ -127,7 +127,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _categoryId;
             }
-            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             return _categoryId;
         }
 
@@ -143,7 +143,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 return _parentStage;
             }
             ////the requested data does not contain translatable values - fetch just for default language
-            await FetchMissingSummary(cultures).ConfigureAwait(false);
+            await FetchMissingSummary(cultures, false).ConfigureAwait(false);
             return _parentStage;
         }
 
@@ -159,7 +159,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 return _childStages;
             }
             ////the requested data does not contain translatable values - fetch just for default language
-            await FetchMissingSummary(cultures).ConfigureAwait(false);
+            await FetchMissingSummary(cultures, false).ConfigureAwait(false);
             return _childStages;
         }
 
@@ -169,7 +169,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <returns>A <see cref="Task{URN}" /> representing the asynchronous operation</returns>
         public async Task<StageType> GetTypeAsync()
         {
-            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             return _stageType;
         }
 
