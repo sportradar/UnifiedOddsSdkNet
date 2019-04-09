@@ -9,6 +9,15 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2019-04-08  1.18.0.0
+Added GetDisplayIdAsync to the IDrawV1
+Added support for non-cached fixture endpoint
+Improved fetching logic for the summary endpoint
+Made IAlive interface internal
+Fix: handling pre:outcometext and simpleteam ids in cache
+Fix: IMarket.GetNameAsync - removed concurrency issue
+Fix: added missing ConfigureAwait(false) to async functions
+
 2019-03-12  1.17.0.0
 Added property Grid to the EventResult interface - IEventResult extended with IEventResultV1
 Added property AamsId to the Reference - IReference extended with IReferenceV1
