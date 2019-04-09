@@ -276,12 +276,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
 
             ValidateMessageProducer(message);
 
-            if (!ValidateMessage(message))
+            if (!ValidateMessage(message) || markets == null)
             {
                 return ValidationResult.FAILURE;
             }
 
-            if (markets == null || !markets.Any())
+            if (!markets.Any())
             {
                 return ValidationResult.SUCCESS;
             }
