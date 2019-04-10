@@ -26,14 +26,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// Gets the list of translated names
         /// </summary>
         /// <value>The list of translated names</value>
-        public IReadOnlyDictionary<CultureInfo, string> Names { get; }
+        public virtual IReadOnlyDictionary<CultureInfo, string> Names { get; }
 
         /// <summary>
         /// Gets the name
         /// </summary>
         /// <param name="culture">The culture</param>
         /// <returns>System.String</returns>
-        public string GetName(CultureInfo culture)
+        public virtual string GetName(CultureInfo culture)
         {
             return Names == null || !Names.ContainsKey(culture)
                 ? null
