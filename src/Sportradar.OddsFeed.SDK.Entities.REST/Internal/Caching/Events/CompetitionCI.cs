@@ -269,7 +269,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
 
             if (eventSummary.Status != null)
             {
-                SportEventStatus = new SportEventStatusCI(eventSummary.Status);
+                SportEventStatus = new SportEventStatusCI(null, eventSummary.Status);
                 EventStatus = SportEventStatus.Status;
             }
 

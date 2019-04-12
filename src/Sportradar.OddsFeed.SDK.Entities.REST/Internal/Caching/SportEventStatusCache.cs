@@ -162,20 +162,28 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
 
             lock (_addLock)
             {
-                if (string.IsNullOrEmpty(source) || source.Equals("OddsChange", StringComparison.InvariantCultureIgnoreCase) || !_sportEventStatusCache.Contains(eventId.ToString()))
+                if (string.IsNullOrEmpty(source) ||
+                    source.Equals("OddsChange", StringComparison.InvariantCultureIgnoreCase) ||
+                    source.Equals("SportEventSummary", StringComparison.InvariantCultureIgnoreCase) ||
+                    !_sportEventStatusCache.Contains(eventId.ToString()))
                 {
                     if (!string.IsNullOrEmpty(source))
                     {
                         source = $" from {source}";
                     }
                     ExecutionLog.Debug($"Received SES for {eventId}{source} with EventStatus:{sportEventStatus.Status}");
-                    _sportEventStatusCache.Set(
+                    var cacheItem = _sportEventStatusCache.AddOrGetExisting(
                         eventId.ToString(),
                         sportEventStatus,
                         new CacheItemPolicy
                         {
                             AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(_cacheItemExpireTime.TotalSeconds)
-                        });
+                        }) as SportEventStatusCI;
+                    if (cacheItem != null)
+                    {
+                        cacheItem.FeedDTO = sportEventStatus.FeedDTO ?? cacheItem.FeedDTO;
+                        cacheItem.SapiDTO = sportEventStatus.SapiDTO ?? cacheItem.SapiDTO;
+                    }
                 }
                 else
                 {
@@ -294,7 +302,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     {
                         if (fixtureDTO.Status != null)
                         {
-                            AddSportEventStatus(id, new SportEventStatusCI(fixtureDTO.Status), "Fixture");
+                            AddSportEventStatus(id, new SportEventStatusCI(fixtureDTO.Status, null), "Fixture");
                         }
                         saved = true;
                     }
@@ -311,7 +319,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     {
                         if (matchDTO.Status != null)
                         {
-                            AddSportEventStatus(id, new SportEventStatusCI(matchDTO.Status), "Match");
+                            AddSportEventStatus(id, new SportEventStatusCI(null, matchDTO.Status), "Match");
                         }
                         saved = true;
                     }
@@ -326,7 +334,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     {
                         if (matchTimelineDTO.SportEventStatus != null)
                         {
-                            AddSportEventStatus(id, new SportEventStatusCI(matchTimelineDTO.SportEventStatus), "MatchTimeline");
+                            AddSportEventStatus(id, new SportEventStatusCI(null, matchTimelineDTO.SportEventStatus), "MatchTimeline");
                         }
                         saved = true;
                     }
@@ -343,7 +351,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     {
                         if (stageDTO.Status != null)
                         {
-                            AddSportEventStatus(id, new SportEventStatusCI(stageDTO.Status), "Stage");
+                            AddSportEventStatus(id, new SportEventStatusCI(null, stageDTO.Status), "Stage");
                         }
                         saved = true;
                     }
@@ -360,7 +368,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     var sportEventStatusDTO = item as SportEventStatusDTO;
                     if (sportEventStatusDTO != null)
                     {
-                        AddSportEventStatus(id, new SportEventStatusCI(sportEventStatusDTO), "OddsChange");
+                        AddSportEventStatus(id, new SportEventStatusCI(sportEventStatusDTO, null), "OddsChange");
                         saved = true;
                     }
                     else
@@ -374,7 +382,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     {
                         if (competitionDTO.Status != null)
                         {
-                            AddSportEventStatus(id, new SportEventStatusCI(competitionDTO.Status), "SportEventSummary");
+                            AddSportEventStatus(id, new SportEventStatusCI(null, competitionDTO.Status), "SportEventSummary");
                         }
                         saved = true;
                     }
@@ -388,7 +396,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                             var compDTO = s as CompetitionDTO;
                             if (compDTO?.Status != null)
                             {
-                                AddSportEventStatus(id, new SportEventStatusCI(compDTO.Status), "SportEventSummaryList");
+                                AddSportEventStatus(id, new SportEventStatusCI(null, compDTO.Status), "SportEventSummaryList");
                             }
                         }
                         saved = true;
