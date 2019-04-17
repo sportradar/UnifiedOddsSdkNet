@@ -16,9 +16,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
     /// </summary>
     public class MarketMappingDTO
     {
-        private readonly int _typeId;
-        private readonly int _subTypeId;
-
         [Obsolete("Changed with ProducerIds property")]
         internal int ProducerId { get; }
 
@@ -26,9 +23,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         internal URN SportId { get; }
 
-        internal int MarketTypeId => _typeId;
+        internal int MarketTypeId { get; }
 
-        internal int? MarketSubTypeId => _subTypeId;
+        internal int? MarketSubTypeId { get; }
 
         internal string SovTemplate { get; }
 
@@ -52,10 +49,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             SportId = mapping.sport_id == "all" ? null : URN.Parse(mapping.sport_id);
             OrgMarketId = null;
             var marketId = mapping.market_id.Split(':'); // legacy
-            int.TryParse(marketId[0], out _typeId);
+            int typeId;
+            int.TryParse(marketId[0], out typeId);
+            MarketTypeId = typeId;
             if (marketId.Length == 2)
             {
-                int.TryParse(marketId[1], out _subTypeId);
+                int subTypeId;
+                MarketSubTypeId = int.TryParse(marketId[1], out subTypeId) ? subTypeId : (int?) null;
             }
             SovTemplate = mapping.sov_template;
             ValidFor = mapping.valid_for;
@@ -82,10 +82,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             var marketId = string.IsNullOrEmpty(mapping.product_market_id)
                                ? mapping.market_id.Split(':')
                                : mapping.product_market_id.Split(':');
-            int.TryParse(marketId[0], out _typeId);
+            int typeId;
+            int.TryParse(marketId[0], out typeId);
+            MarketTypeId = typeId;
             if (marketId.Length == 2)
             {
-                int.TryParse(marketId[1], out _subTypeId);
+                int subTypeId;
+                MarketSubTypeId = int.TryParse(marketId[1], out subTypeId) ? subTypeId : (int?) null;
             }
             SovTemplate = mapping.sov_template;
             ValidFor = mapping.valid_for;

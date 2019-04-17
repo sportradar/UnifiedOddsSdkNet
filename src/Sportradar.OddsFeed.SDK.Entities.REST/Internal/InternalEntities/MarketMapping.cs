@@ -76,13 +76,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
             ProducerId = cacheItem.ProducerId;
             ProducerIds = cacheItem.ProducerIds;
             SportId = cacheItem.SportId;
+            MarketTypeId = cacheItem.MarketTypeId;
+            MarketSubTypeId = cacheItem.MarketSubTypeId;
             MarketId = string.IsNullOrEmpty(cacheItem.OrgMarketId)
                            ? MarketSubTypeId == null
                                  ? MarketTypeId.ToString()
                                  : $"{MarketTypeId}:{MarketSubTypeId}"
                            : cacheItem.OrgMarketId;
-            MarketTypeId = cacheItem.MarketTypeId;
-            MarketSubTypeId = cacheItem.MarketSubTypeId;
             SovTemplate = cacheItem.SovTemplate;
             ValidFor = cacheItem.ValidFor;
             OutcomeMappings = cacheItem.OutcomeMappings?.Select(o => new OutcomeMapping(o));
