@@ -2,6 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Diagnostics.Contracts;
+using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
@@ -18,6 +19,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal string Name { get; }
 
         internal string Group { get; }
+
+        internal URN GroupId { get; }
 
         internal string OtherMatchId { get; }
 
@@ -42,6 +45,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                 : null;
             Name = round.name;
             Group = round.group;
+            URN groupId;
+            GroupId = URN.TryParse(round.group_id ?? " ", out groupId) ? groupId : null;
             OtherMatchId = round.other_match_id;
             CupRoundMatches = round.cup_round_matchesSpecified
                 ? (int?)round.cup_round_matches

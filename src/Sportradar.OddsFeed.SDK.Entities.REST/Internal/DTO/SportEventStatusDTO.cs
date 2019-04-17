@@ -385,7 +385,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RoundDTO"/> class.
+        /// Initializes a new instance of the <see cref="SportEventStatusDTO"/> class.
         /// </summary>
         /// <param name="record">A <see cref="restSportEventStatus" /> instance containing status data about the associated sport event</param>
         public SportEventStatusDTO(stageSportEventStatus record)

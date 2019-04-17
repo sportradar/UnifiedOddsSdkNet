@@ -6,6 +6,7 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
+using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
 {
@@ -13,7 +14,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// Provides basic tournament round information
     /// </summary>
     /// <seealso cref="IRound" />
-    internal class Round : EntityPrinter, IRound
+    internal class Round : EntityPrinter, IRoundV1
     {
         /// <summary>
         /// Gets the type of the round
@@ -34,6 +35,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// Gets the name of the group associated with the current round.
         /// </summary>
         public string GroupName { get; }
+
+        /// <summary>
+        /// Gets the id of the group associated with the current round.
+        /// </summary>
+        public URN GroupId { get; }
 
         /// <summary>
         /// Gets the id of the other match
@@ -74,6 +80,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             Type = ci.Type;
             Number = ci.Number;
             GroupName = ci.Group;
+            GroupId = ci.GroupId;
             OtherMatchId = ci.OtherMatchId;
             CupRoundMatches = ci.CupRoundMatches;
             CupRoundMatchNumber = ci.CupRoundMatchNumber;
