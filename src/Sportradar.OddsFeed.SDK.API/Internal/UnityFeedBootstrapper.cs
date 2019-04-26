@@ -158,6 +158,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<IDataPoster>(),
                     new ResolvedParameter<ICacheManager>()));
 
+            container.RegisterType<IMarketDescriptionManager, MarketDescriptionManager>(
+                new ContainerControlledLifetimeManager(),
+                new InjectionConstructor(
+                    config,
+                    new ResolvedParameter<IMarketCacheProvider>(),
+                    new ResolvedParameter<IMarketDescriptionCache>("InvariantMarketDescriptionsCache")));
+
             container.RegisterType<IFeedMessageMapper, FeedMessageMapper>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(

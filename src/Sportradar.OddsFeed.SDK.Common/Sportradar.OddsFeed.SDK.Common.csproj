@@ -102,6 +102,7 @@
     <Compile Include="Contracts\HealthStatusProviderContract.cs" />
     <Compile Include="Contracts\SemaphorePoolContract.cs" />
     <Compile Include="Contracts\TimerContract.cs" />
+    <Compile Include="Exceptions\ObjectNotFoundException.cs" />
     <Compile Include="Exceptions\CacheItemNotFoundException.cs" />
     <Compile Include="Exceptions\CommunicationException.cs" />
     <Compile Include="Exceptions\DeserializationException.cs" />
