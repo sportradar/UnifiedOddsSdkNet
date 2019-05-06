@@ -28,7 +28,7 @@ namespace Sportradar.OddsFeed.SDK.API
     /// <summary>
     /// A <see cref="IOddsFeed"/> implementation acting as an entry point to the odds feed SDK
     /// </summary>
-    public class Feed : EntityDispatcherBase, IOddsFeedV1, IGlobalEventDispatcher
+    public class Feed : EntityDispatcherBase, IOddsFeedV2, IGlobalEventDispatcher
     {
         /// <summary>
         /// A <see cref="ILog"/> instance used for execution logging
@@ -122,6 +122,11 @@ namespace Sportradar.OddsFeed.SDK.API
         public IBookmakerDetails BookmakerDetails { get; }
 
         /// <summary>
+        /// Gets a <see cref="IMarketDescriptionManager"/> instance used to get info about available markets, and to get translations for markets and outcomes including outrights
+        /// </summary>
+        public IMarketDescriptionManager MarketDescriptionManager { get; }
+
+        /// <summary>
         /// A <see cref="IFeedRecoveryManager"/> for managing recoveries and producer statuses in sessions
         /// </summary>
         private readonly IFeedRecoveryManager _feedRecoveryManager;
@@ -161,6 +166,7 @@ namespace Sportradar.OddsFeed.SDK.API
             _connectionValidator = UnityContainer.Resolve<ConnectionValidator>();
             InternalConfig = UnityContainer.Resolve<IOddsFeedConfigurationInternal>();
             BookingManager = UnityContainer.Resolve<IBookingManager>();
+            MarketDescriptionManager = UnityContainer.Resolve<IMarketDescriptionManager>();
             BookmakerDetails = InternalConfig.BookmakerDetails;
             try
             {
