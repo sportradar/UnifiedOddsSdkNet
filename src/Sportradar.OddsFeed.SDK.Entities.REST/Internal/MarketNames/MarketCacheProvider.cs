@@ -12,6 +12,7 @@ using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities;
+using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 {
@@ -39,7 +40,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         private readonly IVariantDescriptionCache _variantDescriptionCache;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MarketCacheProvider"/> class.
+        /// Initializes a new instance of the <see cref="MarketCacheProvider"/> class
         /// </summary>
         /// <param name="invariantMarketsCache">A <see cref="IMarketDescriptionCache"/> used to cache market descriptors for invariant markets</param>
         /// <param name="variantMarketsCache">A <see cref="IMarketDescriptionCache"/> used to cache market descriptors for variant markets</param>

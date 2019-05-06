@@ -411,7 +411,7 @@
     <Compile Include="Internal\EntitiesImpl\WeatherInfo.cs" />
     <Compile Include="Internal\EventArguments\TournamentReceivedEventArgs.cs" />
     <Compile Include="Internal\InternalEntities\IMarketDescription.cs" />
-    <Compile Include="Internal\InternalEntities\IMarketMappingData.cs" />
+    <Compile Include="MarketMapping\IMarketMappingData.cs" />
     <Compile Include="Internal\InternalEntities\IOutcomeDescription.cs" />
     <Compile Include="Internal\InternalEntities\IOutcomeMappingData.cs" />
     <Compile Include="Internal\InternalEntities\ISpecifier.cs" />

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
 {

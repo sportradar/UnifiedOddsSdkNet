@@ -103,6 +103,9 @@
     <Compile Include="BetSettlementCertainty.cs" />
     <Compile Include="CashoutStatus.cs" />
     <Compile Include="IMarketCancel.cs" />
+    <Compile Include="Internal\EntitiesImpl\OutcomeDefinition.cs" />
+    <Compile Include="IOutcomeV1.cs" />
+    <Compile Include="IOutcomeDefinition.cs" />
     <Compile Include="IMessageV1.cs" />
     <Compile Include="IMessageTimestamp.cs" />
     <Compile Include="Internal\EntitiesImpl\Draw.cs" />

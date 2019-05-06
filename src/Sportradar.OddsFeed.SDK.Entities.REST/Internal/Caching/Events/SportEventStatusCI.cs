@@ -3,9 +3,7 @@
 */
 
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;

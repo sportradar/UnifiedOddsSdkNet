@@ -8,7 +8,7 @@ namespace Sportradar.OddsFeed.SDK.Entities
     /// <summary>
     /// Represent settlement information for an outcome(market selection)
     /// </summary>
-    public interface IOutcomeSettlement : IOutcome
+    public interface IOutcomeSettlement : IOutcomeV1
     {
         /// <summary>
         /// Gets a dead-heat factor for the current <see cref="IOutcomeSettlement"/> instance
