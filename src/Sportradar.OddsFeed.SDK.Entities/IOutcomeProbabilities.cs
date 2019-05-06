@@ -7,7 +7,7 @@ namespace Sportradar.OddsFeed.SDK.Entities
     /// Represents a selection with probabilities information
     /// </summary>
     /// <seealso cref="IOutcome" />
-    public interface IOutcomeProbabilities : IOutcomeV1
+    public interface IOutcomeProbabilities : IOutcome
     {
         /// <summary>
         /// Gets a value indicating whether the current <see cref="IOutcomeOdds"/> is active - i.e. should bets on it be accepted

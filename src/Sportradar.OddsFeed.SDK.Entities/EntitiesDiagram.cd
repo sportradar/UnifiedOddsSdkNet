@@ -1,16 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.IMarket">
-    <Position X="3" Y="5.75" Width="1.5" />
+    <Position X="3" Y="5.75" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>gAACAAAAAAAAAAIAAAAAAAAAAAAAAEAAAAAQAAAAAAA=</HashCode>
+      <HashCode>gAACAAAAACAAAAIAAAAAIAAAAAAAAEAAAAAQAAAAAAA=</HashCode>
       <FileName>IMarket.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="MarketDefinition" />
+    </ShowAsAssociation>
   </Interface>
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.IOutcome">
     <Position X="1.75" Y="0.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAEAAAAAA=</HashCode>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAEAAQAAA=</HashCode>
       <FileName>IOutcome.cs</FileName>
     </TypeIdentifier>
   </Interface>
@@ -29,30 +32,26 @@
     </TypeIdentifier>
   </Interface>
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.IOutcomeSettlement">
-    <Position X="4.25" Y="3.25" Width="2" />
+    <Position X="4.5" Y="3.25" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAgAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAQAAAA=</HashCode>
       <FileName>IOutcomeSettlement.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.IMarketWithOdds">
-    <Position X="2.75" Y="8.5" Width="1.75" />
+    <Position X="2.75" Y="8.75" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAgAEAAAAAAAAAAAAAAAAAAAQAAAAAAIAAAAAAAA=</HashCode>
+      <HashCode>AAAAAgAEAAAAAAAAAAAAAAAAAAAQAAAAAAIAAAEAAAA=</HashCode>
       <FileName>IMarketWithOdds.cs</FileName>
     </TypeIdentifier>
-  </Interface>
-  <Interface Name="Sportradar.OddsFeed.SDK.Entities.IAlive">
-    <Position X="8.25" Y="2.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>IAlive.cs</FileName>
-    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="MarketMetadata" />
+    </ShowAsAssociation>
   </Interface>
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.IEventMessage&lt;T&gt;">
     <Position X="10.5" Y="2.25" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAEAQAAAAAAAAAAgAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>IEventMessage.cs</FileName>
     </TypeIdentifier>
   </Interface>
@@ -87,7 +86,7 @@
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.IBetSettlement&lt;T&gt;">
     <Position X="15.25" Y="6.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAA=</HashCode>
       <FileName>IBetSettlement.cs</FileName>
     </TypeIdentifier>
   </Interface>
@@ -122,7 +121,7 @@
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.IMarketWithSettlement">
     <Position X="4.75" Y="8.5" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAEAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAA=</HashCode>
       <FileName>IMarketWithSettlement.cs</FileName>
     </TypeIdentifier>
   </Interface>
@@ -150,11 +149,14 @@
     </TypeIdentifier>
   </Interface>
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.IMarketWithProbabilities">
-    <Position X="0.5" Y="8.5" Width="1.75" />
+    <Position X="0.5" Y="9.5" Width="1.75" />
     <TypeIdentifier>
       <HashCode>EAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>IMarketWithProbabilities.cs</FileName>
     </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="OutcomeProbabilities" />
+    </ShowAsCollectionAssociation>
   </Interface>
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.ICashOutProbabilities&lt;T&gt;">
     <Position X="9.75" Y="6.25" Width="1.75" />
@@ -168,6 +170,48 @@
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>IProducerStatusChange.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Sportradar.OddsFeed.SDK.Entities.IOutcomeV1">
+    <Position X="4.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IOutcomeV1.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Sportradar.OddsFeed.SDK.Entities.IMarketCancel">
+    <Position X="5.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IMarketCancel.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Sportradar.OddsFeed.SDK.Entities.IMarketDefinition">
+    <Position X="0.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAAAAAgAAAAAAAAABBAAAQEAAAAAAAAAAA=</HashCode>
+      <FileName>IMarketDefinition.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Sportradar.OddsFeed.SDK.Entities.IMarketMetadata">
+    <Position X="5" Y="10" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAA=</HashCode>
+      <FileName>IMarketMetadata.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Sportradar.OddsFeed.SDK.Entities.IOutcomeOddsV1">
+    <Position X="2.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IOutcomeOddsV1.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Sportradar.OddsFeed.SDK.Entities.IPlayerOutcomeOdds">
+    <Position X="7" Y="2" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IPlayerOutcomeOdds.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Font Name="Segoe UI" Size="9" />
