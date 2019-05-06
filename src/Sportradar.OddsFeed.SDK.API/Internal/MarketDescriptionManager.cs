@@ -11,6 +11,7 @@ using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
+using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
 using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
@@ -37,11 +38,17 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         public MarketDescriptionManager(IOddsFeedConfigurationInternal config, IMarketCacheProvider marketCacheProvider, IMarketDescriptionCache invariantMarketDescriptionCache)
         {
             if (config == null)
+            {
                 throw new ArgumentNullException(nameof(config));
+            }
             if (marketCacheProvider == null)
+            {
                 throw new ArgumentNullException(nameof(marketCacheProvider));
+            }
             if (invariantMarketDescriptionCache == null)
+            {
                 throw new ArgumentNullException(nameof(invariantMarketDescriptionCache));
+            }
 
             _config = config;
             _marketCacheProvider = marketCacheProvider;
@@ -49,7 +56,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             _exceptionHandlingStrategy = config.ExceptionHandlingStrategy;
 
             if (_invariantMarketDescriptionCache == null)
+            {
                 throw new ArgumentException(nameof(invariantMarketDescriptionCache));
+            }
         }
 
         /// <summary>
