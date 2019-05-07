@@ -236,7 +236,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 if (tasks.All(a => a.IsCompleted))
                 {
                     _loadedSchedules.AddRange(missingCultures);
-                    _scheduleUrns = tasks.First().Result.Select(s=>s.Item1);
+                    if (tasks.First().Result != null)
+                    {
+                        _scheduleUrns = tasks.First().Result.Select(s => s.Item1);
+                    }
                 }
             }
 
