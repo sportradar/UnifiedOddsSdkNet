@@ -413,7 +413,6 @@
     <Compile Include="Internal\InternalEntities\IMarketDescription.cs" />
     <Compile Include="MarketMapping\IMarketMappingData.cs" />
     <Compile Include="Internal\InternalEntities\IOutcomeDescription.cs" />
-    <Compile Include="Internal\InternalEntities\IOutcomeMappingData.cs" />
     <Compile Include="Internal\InternalEntities\ISpecifier.cs" />
     <Compile Include="Internal\InternalEntities\MarketDescription.cs" />
     <Compile Include="Internal\InternalEntities\OutcomeMapping.cs" />
@@ -485,6 +484,7 @@
     <Compile Include="Internal\MarketNames\InvariantMarketDescriptionCache.cs" />
     <Compile Include="Internal\MarketNames\MarketMappingProvider.cs" />
     <Compile Include="Internal\MarketNames\OutcomeMapping.cs" />
+    <Compile Include="MarketMapping\IOutcomeMappingData.cs" />
     <Compile Include="MarketMapping\LoMarketMapping.cs" />
     <Compile Include="MarketMapping\LcooMarketMapping.cs" />
     <Compile Include="Internal\MarketNames\MarketCacheProvider.cs" />
