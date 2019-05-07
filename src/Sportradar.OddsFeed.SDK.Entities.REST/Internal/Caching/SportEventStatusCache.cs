@@ -107,15 +107,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             SportEventStatusCI ci = null;
             try
             {
-                await _fetchSemaphore.WaitAsync().ConfigureAwait(false);
-
-                // get from cache
-                var item = _sportEventStatusCache.Get(eventId.ToString());
-
-                if (item != null)
+                lock (_addLock)
                 {
-                    return (SportEventStatusCI)item;
+                    // get from cache
+                    var item = _sportEventStatusCache.Get(eventId.ToString());
+
+                    if (item != null)
+                    {
+                        return (SportEventStatusCI) item;
+                    }
                 }
+
+                await _fetchSemaphore.WaitAsync().ConfigureAwait(false);
 
                 // fetch from api
                 var cachedEvent = _sportEventCache.GetEventCacheItem(eventId) as ICompetitionCI;
@@ -205,7 +208,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// </summary>
         public HealthCheckResult StartHealthCheck()
         {
-            return _sportEventStatusCache.Any() ? HealthCheckResult.Healthy($"Cache has {_sportEventStatusCache.Count()} items.") : HealthCheckResult.Unhealthy("Cache is empty.");
+            lock (_addLock)
+            {
+                return _sportEventStatusCache.Any() ? HealthCheckResult.Healthy($"Cache has {_sportEventStatusCache.Count()} items.") : HealthCheckResult.Unhealthy("Cache is empty.");
+            }
         }
 
         /// <summary>

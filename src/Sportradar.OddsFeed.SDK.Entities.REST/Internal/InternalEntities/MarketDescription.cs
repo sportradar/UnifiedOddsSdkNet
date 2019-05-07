@@ -41,6 +41,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
 
         public IEnumerable<string> Groups { get; }
 
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public MarketDescriptionCacheItem MarketDescriptionCacheItem { get; }
 
         internal MarketDescription(MarketDescriptionCacheItem cacheItem, IEnumerable<CultureInfo> cultures)

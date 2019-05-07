@@ -466,7 +466,7 @@ namespace Sportradar.OddsFeed.SDK.API
                 throw new InvalidOperationException("The feed is already opened");
             }
 
-            SdkInfo.LogSdkVersion(Log);
+            //SdkInfo.LogSdkVersion(Log);
             Log.Info($"Feed configuration: [{InternalConfig}]");
 
             try

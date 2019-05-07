@@ -174,7 +174,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
             {
                 return string.Empty;
             }
-            string tmp = specifiers.Aggregate(string.Empty, (current, pair) => current + $"{pair.Key}={pair.Value}|");
+            var tmp = specifiers.Aggregate(string.Empty, (current, pair) => current + $"{pair.Key}={pair.Value}|");
             return tmp.Remove(tmp.Length - 1);
         }
 
