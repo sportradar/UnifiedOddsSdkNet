@@ -1,9 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Diagnostics.Contracts;
-using Sportradar.OddsFeed.SDK.API.Contracts;
-using Sportradar.OddsFeed.SDK.Entities.REST;
 
 namespace Sportradar.OddsFeed.SDK.API
 {

@@ -684,7 +684,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 {
                     return null;
                 }
-                var outcomeDescription = marketDescription.Outcomes.First(s => s.Id.Equals(outcomeId, StringComparison.InvariantCultureIgnoreCase));
+                var outcomeDescription = marketDescription.Outcomes.FirstOrDefault(s => s.Id.Equals(outcomeId, StringComparison.InvariantCultureIgnoreCase));
                 return outcomeDescription == null
                        ? null
                        : new OutcomeDefinition(marketDescription, outcomeDescription, cultureInfos);
