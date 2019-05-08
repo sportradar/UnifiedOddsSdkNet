@@ -1,12 +1,15 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
+using System.Threading;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
@@ -227,20 +230,35 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <returns>A <see cref="Task{TResult}" /> representing an async operation</returns>
         public async Task<IEnumerable<URN>> GetScheduleAsync(IEnumerable<CultureInfo> cultures)
         {
-            var missingCultures = LanguageHelper.GetMissingCultures(cultures, _loadedSchedules).ToList();
-            if (_scheduleUrns == null && missingCultures.Any())
+            var cultureInfos = cultures as IList<CultureInfo> ?? cultures.ToList();
+            var missingCultures = LanguageHelper.GetMissingCultures(cultureInfos, _loadedSchedules).ToList();
+            if (_scheduleUrns != null || !missingCultures.Any())
+                return _scheduleUrns;
+
+            var id = $"{Id}_Schedule";
+            var semaphore = await SemaphorePool.Acquire(id).ConfigureAwait(false);
+            try
             {
+                missingCultures = LanguageHelper.GetMissingCultures(cultureInfos, _loadedSchedules).ToList();
+                if (!missingCultures.Any())
+                    return _scheduleUrns;
+
                 var tasks = missingCultures.Select(s => DataRouterManager.GetSportEventsForTournamentAsync(Id, s, this)).ToList();
                 await Task.WhenAll(tasks).ConfigureAwait(false);
 
                 if (tasks.All(a => a.IsCompleted))
                 {
                     _loadedSchedules.AddRange(missingCultures);
-                    _scheduleUrns = tasks.First().Result.Select(s=>s.Item1);
+                    _scheduleUrns = tasks.First().Result.Select(s => s.Item1);
                 }
-            }
 
-            return _scheduleUrns;
+                return _scheduleUrns;
+            }
+            finally
+            {
+                semaphore.Release();
+                SemaphorePool.Release(id);
+            }
         }
 
         /// <summary>
@@ -318,9 +336,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <returns>A <see cref="Task{TResult}" /> representing an async operation</returns>
         public async Task<IEnumerable<URN>> GetSeasonsAsync(IEnumerable<CultureInfo> cultures)
         {
-            var missingCultures = LanguageHelper.GetMissingCultures(cultures, _loadedSeasons).ToList();
-            if (_seasons == null && missingCultures.Any())
+            var cultureInfos = cultures as IList<CultureInfo> ?? cultures.ToList();
+            var missingCultures = LanguageHelper.GetMissingCultures(cultureInfos, _loadedSeasons).ToList();
+            if (_seasons != null || !missingCultures.Any())
+                return _seasons;
+
+            var id = $"{Id}_Seasons";
+            var semaphore = await SemaphorePool.Acquire(id).ConfigureAwait(false);
+            try
             {
+                missingCultures = LanguageHelper.GetMissingCultures(cultureInfos, _loadedSchedules).ToList();
+                if (!missingCultures.Any())
+                    return _seasons;
+
                 var tasks = missingCultures.Select(s => DataRouterManager.GetSeasonsForTournamentAsync(Id, s, this)).ToList();
                 await Task.WhenAll(tasks).ConfigureAwait(false);
 
@@ -329,8 +357,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                     _loadedSeasons.AddRange(missingCultures);
                     _seasons = tasks.First().Result;
                 }
+
+                return _seasons;
             }
-            return _seasons;
+            finally
+            {
+                semaphore.Release();
+                SemaphorePool.Release(id);
+            }
         }
 
         /// <summary>
