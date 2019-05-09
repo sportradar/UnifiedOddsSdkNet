@@ -17,15 +17,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
     public interface ICompetitionCI : ISportEventCI
     {
         /// <summary>
-        /// Asynchronously gets <see cref="SportEventStatusCI"/> associated with the current instance
+        /// Asynchronously fetch event summary associated with the current instance (saving done in <see cref="ISportEventStatusCache"/>)
         /// </summary>
         /// <returns>A <see cref="Task{T}"/> representing an async operation</returns>
-        Task<SportEventStatusCI> GetSportEventStatusAsync();
+        Task<bool> FetchSportEventStatusAsync();
 
         /// <summary>
         /// Asynchronously gets a <see cref="BookingStatus"/> enum member providing booking status for the associated entity or a null reference if booking status is not known
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Asynchronously returns the <see cref="BookingStatus"/> if available</returns>
         Task<BookingStatus?> GetBookingStatusAsync();
 
         /// <summary>

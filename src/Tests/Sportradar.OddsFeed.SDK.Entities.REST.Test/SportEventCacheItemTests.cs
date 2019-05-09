@@ -208,9 +208,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             var task = Task.Run(async () =>
             {
-                await cacheItem.GetSportEventStatusAsync();
-                await cacheItem.GetSportEventStatusAsync();
-                await cacheItem.GetSportEventStatusAsync();
+                await cacheItem.FetchSportEventStatusAsync();
+                await cacheItem.FetchSportEventStatusAsync();
+                await cacheItem.FetchSportEventStatusAsync();
             });
 
             Task.WaitAll(task);

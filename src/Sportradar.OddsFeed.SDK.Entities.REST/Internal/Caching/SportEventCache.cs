@@ -452,15 +452,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     break;
                 case DtoType.SportEventStatus:
                     var statusDTO = item as SportEventStatusDTO;
-                    if (statusDTO != null)
-                    {
-                        AddSportEventStatus(id, statusDTO);
-                        saved = true;
-                    }
-                    else
-                    {
-                        LogSavingDtoConflict(id, typeof(SportEventStatusDTO), item.GetType());
-                    }
+                    //if (statusDTO != null)
+                    //{
+                    //    AddSportEventStatus(id, statusDTO);
+                    //    saved = true;
+                    //}
+                    //else
+                    //{
+                    //    LogSavingDtoConflict(id, typeof(SportEventStatusDTO), item.GetType());
+                    //}
                     break;
                 case DtoType.SportEventSummary:
                     var tourInfo = item as TournamentInfoDTO;
@@ -639,8 +639,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                                      DtoType.Lottery,
                                      DtoType.LotteryDraw,
                                      DtoType.LotteryList,
-                                     DtoType.BookingStatus,
-                                     DtoType.SportEventStatus
+                                     DtoType.BookingStatus
                                  };
         }
 

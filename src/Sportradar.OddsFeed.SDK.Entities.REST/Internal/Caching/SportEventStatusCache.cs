@@ -2,7 +2,6 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
@@ -52,15 +51,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <summary>
         /// A <see cref="object"/> to ensure thread safety when adding items to cache
         /// </summary>
-        private readonly object _addLock = new object();
+        private readonly object _lock = new object();
 
         /// <summary>
         /// The cache item expire time
         /// </summary>
         private readonly TimeSpan _cacheItemExpireTime;
-
-        // Used for collecting eventIds for which GetSummary was called from within this cache, to avoid deadlock
-        private readonly BlockingCollection<URN> _doNotUseSemaphoreForId = new BlockingCollection<URN>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ISportEventStatusCache"/> class
@@ -86,7 +82,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             _sportEventCache = sportEventCache;
 
             _isDisposed = false;
-            _cacheItemExpireTime = cacheItemExpireTime <= TimeSpan.Zero ? TimeSpan.FromMinutes(5) : cacheItemExpireTime;
+            _cacheItemExpireTime = cacheItemExpireTime <= TimeSpan.Zero
+                                       ? TimeSpan.FromMinutes(5)
+                                       : cacheItemExpireTime;
         }
 
         /// <summary>
@@ -102,52 +100,54 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 return null;
             }
 
-
-            //if not, create NotStarted
-            SportEventStatusCI ci = null;
-            try
+            var timer = Metric.Context("DataRouterManager").Timer("GetSportEventStatusAsync", Unit.Requests);
+            using (var t = timer.NewContext($"{eventId}"))
             {
-                lock (_addLock)
+                try
                 {
-                    // get from cache
-                    var item = _sportEventStatusCache.Get(eventId.ToString());
+                    // fetch from api
+                    await _fetchSemaphore.WaitAsync().ConfigureAwait(false);
 
-                    if (item != null)
+                    // get from cache
+                    lock (_lock) // lock needed because of adding to cache in other methods
                     {
-                        return (SportEventStatusCI) item;
+                        var item = _sportEventStatusCache.Get(eventId.ToString());
+
+                        if (item != null)
+                        {
+                            return (SportEventStatusCI) item;
+                        }
+                    }
+
+                    var cachedEvent = _sportEventCache.GetEventCacheItem(eventId) as ICompetitionCI;
+                    if (cachedEvent != null)
+                    {
+                        Metric.Context("CACHE").Meter("SportEventStatusCache->FetchSportEventStatusAsync", Unit.Calls).Mark();
+                        await cachedEvent.FetchSportEventStatusAsync().ConfigureAwait(false);
+                    }
+
+                    // get from cache
+                    lock (_lock) // lock needed because of adding to cache in other methods
+                    {
+                        var item = _sportEventStatusCache.Get(eventId.ToString());
+
+                        if (item != null)
+                        {
+                            return (SportEventStatusCI) item;
+                        }
                     }
                 }
-
-                await _fetchSemaphore.WaitAsync().ConfigureAwait(false);
-
-                // fetch from api
-                var cachedEvent = _sportEventCache.GetEventCacheItem(eventId) as ICompetitionCI;
-                _doNotUseSemaphoreForId.TryAdd(eventId);
-                var cachedStatus = cachedEvent == null
-                    ? null
-                    : await cachedEvent.GetSportEventStatusAsync().ConfigureAwait(false);
-                if (cachedStatus != null)
+                finally
                 {
-                    ci = cachedStatus;
+                    var msg = $"GetSportEventStatusAsync: {eventId} returns status in {t.Elapsed.TotalMilliseconds} ms.";
+                    if (!_isDisposed)
+                    {
+                        _fetchSemaphore.Release();
+                    }
                 }
-                Metric.Context("CACHE").Meter("SportEventStatusCache->GetSportEventStatusAsync", Unit.Calls).Mark();
-            }
-            finally
-            {
-                if (!_isDisposed)
-                {
-                    _fetchSemaphore.Release();
-                }
-                URN takenEventId;
-                _doNotUseSemaphoreForId.TryTake(out takenEventId);
             }
 
-            if (ci == null)
-            {
-                ci = ((SportEventStatusMapperBase)_mapperFactory).CreateNotStarted();
-            }
-
-            return ci;
+            return ((SportEventStatusMapperBase) _mapperFactory).CreateNotStarted();
         }
 
         /// <summary>
@@ -163,29 +163,29 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 return;
             }
 
-            lock (_addLock)
+            lock (_lock)
             {
-                if (string.IsNullOrEmpty(source) ||
-                    source.Equals("OddsChange", StringComparison.InvariantCultureIgnoreCase) ||
-                    source.Equals("SportEventSummary", StringComparison.InvariantCultureIgnoreCase) ||
-                    !_sportEventStatusCache.Contains(eventId.ToString()))
+                if (string.IsNullOrEmpty(source)
+                 || source.Equals("OddsChange", StringComparison.InvariantCultureIgnoreCase)
+                 || source.Equals("SportEventSummary", StringComparison.InvariantCultureIgnoreCase)
+                 || !_sportEventStatusCache.Contains(eventId.ToString()))
                 {
                     if (!string.IsNullOrEmpty(source))
                     {
                         source = $" from {source}";
                     }
                     ExecutionLog.Debug($"Received SES for {eventId}{source} with EventStatus:{sportEventStatus.Status}");
-                    var cacheItem = _sportEventStatusCache.AddOrGetExisting(
-                        eventId.ToString(),
-                        sportEventStatus,
-                        new CacheItemPolicy
-                        {
-                            AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(_cacheItemExpireTime.TotalSeconds)
-                        }) as SportEventStatusCI;
+                    var cacheItem = _sportEventStatusCache.AddOrGetExisting(eventId.ToString(),
+                                                                            sportEventStatus,
+                                                                            new CacheItemPolicy
+                                                                            {
+                                                                                AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(_cacheItemExpireTime.TotalSeconds)
+                                                                            })
+                                        as SportEventStatusCI;
                     if (cacheItem != null)
                     {
-                        cacheItem.FeedDTO = sportEventStatus.FeedDTO ?? cacheItem.FeedDTO;
-                        cacheItem.SapiDTO = sportEventStatus.SapiDTO ?? cacheItem.SapiDTO;
+                        cacheItem.SetFeedStatus(sportEventStatus.FeedStatusDTO);
+                        cacheItem.SetSapiStatus(sportEventStatus.SapiStatusDTO);
                     }
                 }
                 else
@@ -208,7 +208,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// </summary>
         public HealthCheckResult StartHealthCheck()
         {
-            lock (_addLock)
+            lock (_lock)
             {
                 return _sportEventStatusCache.Any() ? HealthCheckResult.Healthy($"Cache has {_sportEventStatusCache.Count()} items.") : HealthCheckResult.Unhealthy("Cache is empty.");
             }
@@ -245,7 +245,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
 
             if (cacheItemType == CacheItemType.All || cacheItemType == CacheItemType.SportEventStatus)
             {
-                lock (_addLock)
+                lock (_lock)
                 {
                     _sportEventStatusCache.Remove(id.ToString());
                 }
@@ -267,7 +267,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             var result = false;
             if (cacheItemType == CacheItemType.All || cacheItemType == CacheItemType.SportEventStatus)
             {
-                lock (_addLock)
+                lock (_lock)
                 {
                     result = _sportEventStatusCache.Contains(id.ToString());
                 }
@@ -308,7 +308,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     {
                         if (fixtureDTO.Status != null)
                         {
-                            AddSportEventStatus(id, new SportEventStatusCI(fixtureDTO.Status, null), "Fixture");
+                            AddSportEventStatus(id, new SportEventStatusCI(null, fixtureDTO.Status), "Fixture");
                         }
                         saved = true;
                     }

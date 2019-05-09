@@ -812,6 +812,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                         LogSavingDtoConflict(id, typeof(SportCategoriesDTO), item.GetType());
                     }
                     break;
+                case DtoType.BookingStatus:
+                    break;
                 default:
                     ExecutionLog.Warn($"Trying to add unchecked dto type: {dtoType} for id: {id}.");
                     break;

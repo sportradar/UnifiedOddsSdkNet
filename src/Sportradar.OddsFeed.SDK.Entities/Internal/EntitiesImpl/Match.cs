@@ -66,7 +66,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         public new async Task<IMatchStatus> GetStatusAsync()
         {
             var item = await base.GetStatusAsync().ConfigureAwait(false);
-            return item == null ? null : new MatchStatus(((CompetitionStatus)item).SportEventStatusCI, MatchStatusCache);
+            return item == null ? null : new MatchStatus(((CompetitionStatus) item).SportEventStatusCI, MatchStatusCache);
         }
 
         /// <summary>

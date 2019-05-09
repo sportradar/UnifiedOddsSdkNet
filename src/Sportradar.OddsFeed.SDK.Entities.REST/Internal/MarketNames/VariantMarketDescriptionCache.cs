@@ -441,6 +441,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                     break;
                 case DtoType.LotteryList:
                     break;
+                case DtoType.BookingStatus:
+                    break;
+                case DtoType.SportCategories:
+                    break;
                 default:
                     ExecutionLog.Warn($"Trying to add unchecked dto type: {dtoType} for id: {id}.");
                     break;

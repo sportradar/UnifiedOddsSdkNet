@@ -211,7 +211,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <param name="e">The <see cref="ProducerStatusChangeEventArgs"/> instance containing the event data</param>
         private void MarkProducerAsDown(object sender, ProducerStatusChangeEventArgs e)
         {
-            ((IGlobalEventDispatcher)this).DispatchProducerDown(e.GetProducerStatusChange());
+            ((IGlobalEventDispatcher) this).DispatchProducerDown(e.GetProducerStatusChange());
         }
 
         /// <summary>

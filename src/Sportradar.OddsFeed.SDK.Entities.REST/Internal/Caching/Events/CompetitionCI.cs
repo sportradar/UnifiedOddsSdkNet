@@ -124,20 +124,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             Merge(eventSummary, currentCulture, true);
         }
 
+
         /// <summary>
-        /// Get sport event status as an asynchronous operation
+        /// Asynchronously fetch event summary associated with the current instance (saving done in <see cref="ISportEventStatusCache"/>)
         /// </summary>
-        /// <returns>A <see cref="Task{T}" /> representing an async operation</returns>
-        public async Task<SportEventStatusCI> GetSportEventStatusAsync()
+        /// <returns>A <see cref="Task{T}"/> representing an async operation</returns>
+        public async Task<bool> FetchSportEventStatusAsync()
         {
             await FetchMissingSummary(new[] { DefaultCulture }, true).ConfigureAwait(false);
-            return SportEventStatus;
+            return true;
         }
 
         /// <summary>
-        /// Get booking status as an asynchronous operation
+        /// Asynchronously gets a <see cref="BookingStatus"/> enum member providing booking status for the associated entity or a null reference if booking status is not known
         /// </summary>
-        /// <returns>Task&lt;System.Nullable&lt;BookingStatus&gt;&gt;</returns>
+        /// <returns>Asynchronously returns the <see cref="BookingStatus"/> if available</returns>
         public async Task<BookingStatus?> GetBookingStatusAsync()
         {
             if (LoadedFixtures.Any() || Id.TypeGroup == ResourceTypeGroup.STAGE || _bookingStatus != null)
