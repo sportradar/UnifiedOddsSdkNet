@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Common.Logging;
+using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities;
@@ -58,6 +59,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// Occurs when status of the associated manager has changed
         /// </summary>
         public event EventHandler<TrackerStatusChangeEventArgs> StatusChanged;
+
+        /// <summary>
+        /// Occurs when a requested event recovery completes
+        /// </summary>
+        public event EventHandler<EventRecoveryCompletedEventArgs> EventRecoveryCompleted;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProducerRecoveryManager"/> class
@@ -125,6 +131,14 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>A <see cref="ProducerRecoveryStatus"/> specifying the new status of the manager or null reference if no change is needed</returns>
         private ProducerRecoveryStatus? ProcessSnapshotCompleteMessage(snapshot_complete snapshotCompleted, MessageInterest interest)
         {
+            URN eventId;
+            if (_producer.EventRecoveries.TryRemove(snapshotCompleted.request_id, out eventId))
+            {
+                ExecutionLog.Info($"Recovery with requestId={snapshotCompleted.request_id} for producer={Producer.Id}, eventId={eventId} completed.");
+                EventRecoveryCompleted?.Invoke(this, new EventRecoveryCompletedEventArgs(snapshotCompleted.request_id, eventId));
+                return null;
+            }
+
             //The snapshot message not for us
             if (!_recoveryOperation.IsRunning || !_recoveryOperation.RequestId.HasValue || _recoveryOperation.RequestId.Value != snapshotCompleted.RequestId)
             {

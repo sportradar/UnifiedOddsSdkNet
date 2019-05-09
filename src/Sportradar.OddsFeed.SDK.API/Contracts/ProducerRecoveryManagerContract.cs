@@ -3,6 +3,7 @@
 */
 using System;
 using System.Diagnostics.Contracts;
+using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.API.Internal;
 using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -33,6 +34,8 @@ namespace Sportradar.OddsFeed.SDK.API.Contracts
         }
 
         public event EventHandler<TrackerStatusChangeEventArgs> StatusChanged;
+
+        public event EventHandler<EventRecoveryCompletedEventArgs> EventRecoveryCompleted;
 
         public void CheckStatus()
         {

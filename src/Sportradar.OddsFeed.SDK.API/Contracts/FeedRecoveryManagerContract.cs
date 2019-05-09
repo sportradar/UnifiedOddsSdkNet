@@ -23,6 +23,8 @@ namespace Sportradar.OddsFeed.SDK.API.Contracts
 
         public event EventHandler<FeedCloseEventArgs> CloseFeed;
 
+        public event EventHandler<EventRecoveryCompletedEventArgs> EventRecoveryCompleted;
+
         public void Close() => Contract.Ensures(!IsOpened);
 
         public ISessionMessageManager CreateSessionMessageManager()

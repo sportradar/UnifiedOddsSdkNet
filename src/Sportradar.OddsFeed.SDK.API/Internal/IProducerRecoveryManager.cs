@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics.Contracts;
 using Sportradar.OddsFeed.SDK.API.Contracts;
+using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
@@ -31,6 +32,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// Occurs when status of the associated manager has changed
         /// </summary>
         event EventHandler<TrackerStatusChangeEventArgs> StatusChanged;
+
+        /// <summary>
+        /// Occurs when a requested event recovery completes
+        /// </summary>
+        event EventHandler<EventRecoveryCompletedEventArgs> EventRecoveryCompleted;
 
         /// <summary>
         /// Checks the status of the current recovery manager

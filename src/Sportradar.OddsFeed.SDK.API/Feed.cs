@@ -28,7 +28,7 @@ namespace Sportradar.OddsFeed.SDK.API
     /// <summary>
     /// A <see cref="IOddsFeed"/> implementation acting as an entry point to the odds feed SDK
     /// </summary>
-    public class Feed : EntityDispatcherBase, IOddsFeedV2, IGlobalEventDispatcher
+    public class Feed : EntityDispatcherBase, IOddsFeedV3, IGlobalEventDispatcher
     {
         /// <summary>
         /// A <see cref="ILog"/> instance used for execution logging
@@ -75,6 +75,11 @@ namespace Sportradar.OddsFeed.SDK.API
         /// Occurs when feed is closed
         /// </summary>
         public event EventHandler<FeedCloseEventArgs> Closed;
+
+        /// <summary>
+        /// Occurs when a requested event recovery completes
+        /// </summary>
+        public event EventHandler<EventRecoveryCompletedEventArgs> EventRecoveryCompleted;
 
         /// <summary>
         /// Raised when the current <see cref="IOddsFeed" /> instance determines that the <see cref="IProducer" /> associated with
@@ -308,6 +313,16 @@ namespace Sportradar.OddsFeed.SDK.API
         void IGlobalEventDispatcher.DispatchDisconnected()
         {
             Dispatch(Disconnected, new EventArgs(), "Disconnected");
+        }
+
+        /// <summary>
+        /// Dispatches the information that the requested event recovery completed
+        /// <param name="requestId">The identifier of the recovery request</param>
+        /// <param name="eventId">The associated event identifier</param>
+        /// </summary>
+        void IGlobalEventDispatcher.DispatchEventRecoveryCompleted(long requestId, URN eventId)
+        {
+            Dispatch(EventRecoveryCompleted, new EventRecoveryCompletedEventArgs(requestId, eventId), "EventRecoveryCompleted");
         }
 
         /// <summary>

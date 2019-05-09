@@ -87,6 +87,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         public event EventHandler<FeedCloseEventArgs> CloseFeed;
 
         /// <summary>
+        /// Occurs when a requested event recovery completes
+        /// </summary>
+        public event EventHandler<EventRecoveryCompletedEventArgs> EventRecoveryCompleted;
+
+        /// <summary>
         /// The <see cref="IProducerManager"/> with all available <see cref="IProducer"/>
         /// </summary>
         private readonly IProducerManager _producerManager;
@@ -219,6 +224,16 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         }
 
         /// <summary>
+        /// Handles the event recovery completion of a specific recovery manager
+        /// </summary>
+        /// <param name="sender">An <see cref="object"/> representation of a <see cref="IProducerRecoveryManager"/> instance whose status has changed.</param>
+        /// <param name="e">The <see cref="EventRecoveryCompletedEventArgs"/>Additional information about the event.</param>
+        private void OnRecoveryTrackerEventRecoveryCompleted(object sender, EventRecoveryCompletedEventArgs e)
+        {
+            EventRecoveryCompleted?.Invoke(this, e);
+        }
+
+        /// <summary>
         /// Opens the current instance
         /// </summary>
         /// <param name="interests">The interests for which to open trackers</param>
@@ -258,6 +273,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             foreach (var recoveryTracker in trackers)
             {
                 recoveryTracker.StatusChanged += OnRecoveryTrackerStatusChanged;
+                recoveryTracker.EventRecoveryCompleted += OnRecoveryTrackerEventRecoveryCompleted;
             }
 
             _producerRecoveryManagers = trackers.ToDictionary(t => t.Producer, t => t);
@@ -293,6 +309,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             foreach (var recoveryTracker in _producerRecoveryManagers)
             {
                 recoveryTracker.Value.StatusChanged -= OnRecoveryTrackerStatusChanged;
+                recoveryTracker.Value.EventRecoveryCompleted -= OnRecoveryTrackerEventRecoveryCompleted;
             }
 
             foreach (var sessionMessageManager in _sessionMessageManagers)
