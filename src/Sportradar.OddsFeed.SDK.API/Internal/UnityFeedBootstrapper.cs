@@ -994,7 +994,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             container.RegisterType<IDataProvider<AvailableSelectionsDTO>, DataProvider<AvailableSelectionsType, AvailableSelectionsDTO>>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
-                    config.ApiBaseUri + "/v1/custombet/{1}/available_selections",
+                    config.ApiBaseUri + "/v1/custombet/{0}/available_selections",
                     new ResolvedParameter<IDataFetcher>(),
                     new ResolvedParameter<IDeserializer<AvailableSelectionsType>>(),
                     new ResolvedParameter<ISingleTypeMapperFactory<AvailableSelectionsType, AvailableSelectionsDTO>>()));
@@ -1004,7 +1004,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             container.RegisterType<ICalculateProbabilityProvider, CalculateProbabilityProvider>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
-                    config.ApiBaseUri + "/v1/custombet/{1}/available_selections",
+                    config.ApiBaseUri + "/v1/custombet/calculate",
                     new ResolvedParameter<IDataPoster>(),
                     new XmlSerializer(typeof(SelectionsType)),
                     new ResolvedParameter<IDeserializer<CalculationResponseType>>(),
