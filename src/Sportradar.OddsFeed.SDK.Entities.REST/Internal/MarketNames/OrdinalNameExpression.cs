@@ -10,7 +10,7 @@ using Sportradar.OddsFeed.SDK.Common.Exceptions;
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 {
     /// <summary>
-    /// A <see cref="INameExpression"/> implementation supporting ! based expressions (e.g. {!reply_nr})
+    /// A <see cref="INameExpression"/> implementation supporting '!' based expressions (e.g. {!reply_nr})
     /// </summary>
     internal class OrdinalNameExpression : INameExpression
     {
@@ -20,7 +20,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         private readonly IOperand _operand;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OrdinalNameExpression"/> class.
+        /// Initializes a new instance of the <see cref="OrdinalNameExpression"/> class
         /// </summary>
         /// <param name="operand">A <see cref="IOperand"/> representing part of the name expression</param>
         internal OrdinalNameExpression(IOperand operand)
@@ -39,7 +39,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             Contract.Invariant(_operand != null);
         }
 
-
         /// <summary>
         /// Asynchronously builds a name of the associated instance
         /// </summary>
@@ -49,7 +48,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         public async Task<string> BuildNameAsync(CultureInfo culture)
         {
             var value = await _operand.GetIntValue().ConfigureAwait(false);
-            return value.ToOrdinalWords(culture);
+            return value.Ordinalize();
         }
     }
 }

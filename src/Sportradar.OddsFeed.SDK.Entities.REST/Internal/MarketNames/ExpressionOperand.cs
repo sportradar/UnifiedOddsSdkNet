@@ -19,12 +19,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
     public class ExpressionOperand : SpecifierBasedOperator, IOperand
     {
         /// <summary>
-        /// A <see cref="IReadOnlyDictionary{TKey,TValue}"/> containing market specifiers.
+        /// A <see cref="IReadOnlyDictionary{TKey,TValue}"/> containing market specifiers
         /// </summary>
         private readonly IReadOnlyDictionary<string, string> _specifiers;
 
         /// <summary>
-        /// The <see cref="string"/> representation of the operand - i.e. name of the specifier.
+        /// The <see cref="string"/> representation of the operand - i.e. name of the specifier
         /// </summary>
         private readonly string _operandString;
 
@@ -41,8 +41,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleOperand"/> class.
         /// </summary>
-        /// <param name="specifiers">A <see cref="IReadOnlyDictionary{String,String}"/> containing market specifiers.</param>
-        /// <param name="operandString">The <see cref="string"/> representation of the operand - i.e. name of the specifier.</param>
+        /// <param name="specifiers">A <see cref="IReadOnlyDictionary{String,String}"/> containing market specifiers</param>
+        /// <param name="operandString">The <see cref="string"/> representation of the operand - i.e. name of the specifier</param>
         /// <param name="operation">A <see cref="SimpleMathOperation"/> specifying the operation</param>
         /// <param name="staticValue">The value to be added to the value of the specifier</param>
         public ExpressionOperand(IReadOnlyDictionary<string, string> specifiers, string operandString, SimpleMathOperation operation, int staticValue)
@@ -70,7 +70,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <summary>
         /// Gets the value of the operand as a <see cref="int" />
         /// </summary>
-        /// <returns>A <see cref="Task{Int32}" /> containing the value of the operand as a <see cref="int" />.</returns>
+        /// <returns>A <see cref="Task{Int32}" /> containing the value of the operand as a <see cref="int" /></returns>
         /// <exception cref="System.InvalidOperationException">
         /// Static int value was not provided to the constructor
         /// or
@@ -102,7 +102,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <summary>
         /// Gets the value of the operand as a <see cref="decimal" />
         /// </summary>
-        /// <returns>A <see cref="Task{Int32}" /> containing the value of the operand as a <see cref="int" />.</returns>
+        /// <returns>A <see cref="Task{Int32}" /> containing the value of the operand as a <see cref="int" /></returns>
         /// <exception cref="System.InvalidOperationException">
         /// Static decimal value was not provided to the constructor
         /// or
@@ -133,7 +133,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <summary>
         /// Gets the value of the operand as a <see cref="string" />
         /// </summary>
-        /// <returns>A <see cref="Task{String}" /> containing the value of the operand as a <see cref="string" />.</returns>
+        /// <returns>A <see cref="Task{String}" /> containing the value of the operand as a <see cref="string" /></returns>
         /// <exception cref="System.NotSupportedException"></exception>
         public Task<string> GetStringValue()
         {

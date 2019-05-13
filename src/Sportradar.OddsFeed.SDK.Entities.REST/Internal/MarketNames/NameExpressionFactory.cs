@@ -119,25 +119,37 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             switch (Array.IndexOf(NameExpressionHelper.DefinedOperators, @operator))
             {
                 case 0: //+
+                {
                     EnsureSpecifiersNotNullOrEmpty(specifiers);
                     Contract.Assume(specifiers != null && specifiers.Any());
                     return new PlusNameExpression(_operandFactory.BuildOperand(specifiers, operand));
+                }
                 case 1: //-
+                {
                     EnsureSpecifiersNotNullOrEmpty(specifiers);
                     Contract.Assume(specifiers != null && specifiers.Any());
                     return new MinusNameExpression(_operandFactory.BuildOperand(specifiers, operand));
+                }
                 case 2: //$
+                {
                     return BuildEntityNameExpression(operand, sportEvent);
+                }
                 case 3: //!
+                {
                     EnsureSpecifiersNotNullOrEmpty(specifiers);
                     Contract.Assume(specifiers != null && specifiers.Any());
                     return new OrdinalNameExpression(_operandFactory.BuildOperand(specifiers, operand));
+                }
                 case 4: //%
+                {
                     EnsureSpecifiersNotNullOrEmpty(specifiers);
                     Contract.Assert(specifiers != null && specifiers.Any());
                     return new PlayerProfileExpression(_profileCache, _operandFactory.BuildOperand(specifiers, operand));
+                }
                 default:
+                {
                     throw new ArgumentException($"Operator {@operator} is not supported. Supported operators are: {string.Join(",", NameExpressionHelper.DefinedOperators)}", nameof(@operator));
+                }
             }
         }
     }
