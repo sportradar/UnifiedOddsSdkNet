@@ -122,9 +122,13 @@
     <Compile Include="Contracts\OddsFeedV1Contract.cs" />
     <Compile Include="EventArguments\EventRecoveryCompletedEventArgs.cs" />
     <Compile Include="IMarketDescriptionManager.cs" />
+    <Compile Include="Internal\SelectionBuilder.cs" />
+    <Compile Include="ISelectionBuilder.cs" />
+    <Compile Include="ICustomBetManager.cs" />
     <Compile Include="IConfigurationBuilder.cs" />
     <Compile Include="IBookingManager.cs" />
     <Compile Include="Internal\MarketDescriptionManager.cs" />
+    <Compile Include="Internal\CustomBetManager.cs" />
     <Compile Include="Internal\BookingManager.cs" />
     <Compile Include="Internal\ConfigurationSectionProvider.cs" />
     <Compile Include="Internal\Config\ConfigurationBuilder.cs" />

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
@@ -161,5 +162,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="culture">The culture to be fetched</param>
         /// <returns>The list of ids of the seasons for specified tournament</returns>
         Task<IEnumerable<URN>> GetAllLotteriesAsync(CultureInfo culture);
+
+        /// <summary>
+        /// Gets the available selections for event
+        /// </summary>
+        /// <param name="id">The id of the event</param>
+        /// <returns>The available selections for event</returns>
+        Task<IAvailableSelections> GetAvailableSelectionsAsync(URN id);
+
+        /// <summary>
+        /// Gets the probability calculation for the specified selections
+        /// </summary>
+        /// <param name="selections">The <see cref="IEnumerable{ISelection}"/> containing selections for which the probability should be calculated</param>
+        /// <returns>The probability calculation for the specified selections</returns>
+        Task<ICalculation> CalculateProbability(IEnumerable<ISelection> selections);
     }
 }

@@ -11,10 +11,13 @@ using Common.Logging;
 using Metrics;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -110,6 +113,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// The lotter list provider
         /// </summary>
         private readonly IDataProvider<EntityList<LotteryDTO>> _lotteryListProvider;
+        /// <summary>
+        /// The available selections provider
+        /// </summary>
+        private readonly IDataProvider<AvailableSelectionsDTO> _availableSelectionsProvider;
+
+        /// <summary>
+        /// The calculate probability provider
+        /// </summary>
+        private readonly ICalculateProbabilityProvider _calculateProbabilityProvider;
 
         /// <summary>
         /// The cache manager
@@ -127,11 +139,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         internal readonly ExceptionHandlingStrategy ExceptionHandlingStrategy;
 
         /// <summary>
+        /// The exception handling strategy
+        /// </summary>
+        private readonly CultureInfo _defaultLocale;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DataRouterManager"/> class
         /// </summary>
         /// <param name="cacheManager">A <see cref="ICacheManager"/> used to interact among caches</param>
         /// <param name="producerManager">A <see cref="IProducerManager"/> used to get WNS producer</param>
         /// <param name="exceptionHandlingStrategy">An <see cref="Common.ExceptionHandlingStrategy"/> used to handle exception when fetching data</param>
+        /// <param name="defaultLocale">An <see cref="CultureInfo"/> representing the default locale</param>
         /// <param name="sportEventSummaryProvider">The sport event summary provider</param>
         /// <param name="sportEventFixtureProvider">The sport event fixture provider</param>
         /// <param name="sportEventFixtureChangeFixtureProvider">The sport event fixture provider without cache</param>
@@ -152,9 +170,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="drawFixtureProvider">Lottery draw fixture provider</param>
         /// <param name="lotteryScheduleProvider">Lottery schedule provider (single lottery with schedule)</param>
         /// <param name="lotteryListProvider">Lottery list provider</param>
+        /// <param name="availableSelectionsProvider">Available selections provider</param>
         public DataRouterManager(ICacheManager cacheManager,
                                  IProducerManager producerManager,
                                  ExceptionHandlingStrategy exceptionHandlingStrategy,
+                                 CultureInfo defaultLocale,
                                  IDataProvider<SportEventSummaryDTO> sportEventSummaryProvider,
                                  IDataProvider<FixtureDTO> sportEventFixtureProvider,
                                  IDataProvider<FixtureDTO> sportEventFixtureChangeFixtureProvider,
@@ -174,7 +194,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                                  IDataProvider<DrawDTO> drawSummaryProvider,
                                  IDataProvider<DrawDTO> drawFixtureProvider,
                                  IDataProvider<LotteryDTO> lotteryScheduleProvider,
-                                 IDataProvider<EntityList<LotteryDTO>> lotteryListProvider)
+                                 IDataProvider<EntityList<LotteryDTO>> lotteryListProvider,
+                                 IDataProvider<AvailableSelectionsDTO> availableSelectionsProvider,
+                                 ICalculateProbabilityProvider calculateProbabilityProvider)
         {
             Contract.Requires(cacheManager != null);
             Contract.Requires(sportEventSummaryProvider != null);
@@ -197,11 +219,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Contract.Requires(drawFixtureProvider != null);
             Contract.Requires(lotteryScheduleProvider != null);
             Contract.Requires(lotteryListProvider != null);
+            Contract.Requires(availableSelectionsProvider != null);
+            Contract.Requires(calculateProbabilityProvider != null);
 
             _cacheManager = cacheManager;
             var wnsProducer = producerManager.Get(7);
             _isWnsAvailable = wnsProducer.IsAvailable && !wnsProducer.IsDisabled;
             ExceptionHandlingStrategy = exceptionHandlingStrategy;
+            _defaultLocale = defaultLocale;
             _sportEventSummaryProvider = sportEventSummaryProvider;
             _sportEventFixtureProvider = sportEventFixtureProvider;
             _sportEventFixtureChangeFixtureProvider = sportEventFixtureChangeFixtureProvider;
@@ -222,6 +247,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             _lotteryDrawFixtureProvider = drawFixtureProvider;
             _lotteryScheduleProvider = lotteryScheduleProvider;
             _lotteryListProvider = lotteryListProvider;
+            _availableSelectionsProvider = availableSelectionsProvider;
+            _calculateProbabilityProvider = calculateProbabilityProvider;
         }
 
         /// <summary>
@@ -251,6 +278,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Contract.Invariant(_lotteryDrawFixtureProvider != null);
             Contract.Invariant(_lotteryScheduleProvider != null);
             Contract.Invariant(_lotteryListProvider != null);
+            Contract.Invariant(_availableSelectionsProvider != null);
         }
 
         /// <summary>
@@ -1130,6 +1158,72 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 WriteLog($"Executing GetAllLotteriesAsync for culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms. {SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)} No data.");
             }
             return null;
+        }
+
+        public async Task<IAvailableSelections> GetAvailableSelectionsAsync(URN id)
+        {
+            Metric.Context("DataRouterManager").Meter("GetAvailableSelectionsAsync", Unit.Calls);
+            var timer = Metric.Context("DataRouterManager").Timer("GetAvailableSelectionsAsync", Unit.Requests);
+            using (var t = timer.NewContext($"{id}"))
+            {
+                WriteLog($"Executing GetAvailableSelectionsAsync for id={id}.", true);
+
+                AvailableSelectionsDTO result = null;
+                int restCallTime;
+                try
+                {
+                    result = await _availableSelectionsProvider.GetDataAsync(id.ToString()).ConfigureAwait(false);
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                }
+                catch (Exception e)
+                {
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    var message = e.InnerException?.Message ?? e.Message;
+                    _executionLog.Error($"Error getting available selections for id={id}. Message={message}", e.InnerException ?? e);
+                    if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                    {
+                        throw;
+                    }
+                }
+
+                if (result != null)
+                {
+                    await _cacheManager.SaveDtoAsync(id, result, _defaultLocale, DtoType.AvailableSelections, null).ConfigureAwait(false);
+                }
+                WriteLog($"Executing GetAvailableSelectionsAsync for id={id} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
+                return new AvailableSelections(result);
+            }
+        }
+
+        public async Task<ICalculation> CalculateProbability(IEnumerable<ISelection> selections)
+        {
+            Metric.Context("DataRouterManager").Meter("CalculateProbability", Unit.Calls);
+            var timer = Metric.Context("DataRouterManager").Timer("CalculateProbability", Unit.Requests);
+            using (var t = timer.NewContext())
+            {
+                WriteLog($"Executing CalculateProbability.", true);
+
+                CalculationDTO result = null;
+                int restCallTime;
+                try
+                {
+                    result = await _calculateProbabilityProvider.GetDataAsync(selections).ConfigureAwait(false);
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                }
+                catch (Exception e)
+                {
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    var message = e.InnerException?.Message ?? e.Message;
+                    _executionLog.Error($"Error calculating probabilities. Message={message}", e.InnerException ?? e);
+                    if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                    {
+                        throw;
+                    }
+                }
+
+                WriteLog($"Executing CalculateProbability took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
+                return new Calculation(result);
+            }
         }
 
         private void WriteLog(string text, bool useDebug = false)
