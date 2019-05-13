@@ -21,7 +21,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             var expression = new OrdinalNameExpression(_operandFactory.BuildOperand(new ReadOnlyDictionary<string, string>(specifiers), "reply_nr"));
 
             var result = expression.BuildNameAsync(new CultureInfo("en")).Result;
-            Assert.AreEqual("first", result, "The result is not correct");
+            Assert.AreEqual("1st", result, "The result is not correct");
         }
     }
 }

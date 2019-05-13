@@ -366,7 +366,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             // the low below adds an additional sport sr:sport:999
             foreach (var culture in TestData.Cultures)
             {
-                _dataRouterManager.GetSportEventSummaryAsync(TournamentIdExtra, culture, null);
+                _dataRouterManager.GetSportEventSummaryAsync(TournamentIdExtra, culture, null).ConfigureAwait(false);
             }
             var data01 = _sportDataCache.GetSportForTournamentAsync(TournamentIdExtra, TestData.Cultures).Result;
             Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(callType), $"{callType} should be called exactly {TestData.Cultures.Count} times.");
