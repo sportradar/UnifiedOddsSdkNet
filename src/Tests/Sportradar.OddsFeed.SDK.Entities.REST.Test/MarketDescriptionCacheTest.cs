@@ -114,7 +114,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
         private static void ValidateMapping(mappingsMapping msg, MarketMappingCacheItem ci)
         {
-            var ciMarketId = ci.MarketSubTypeId == 0 ? ci.MarketTypeId.ToString() : $"{ci.MarketTypeId}:{ci.MarketSubTypeId}";
+            var ciMarketId = ci.MarketSubTypeId == null ? ci.MarketTypeId.ToString() : $"{ci.MarketTypeId}:{ci.MarketSubTypeId}";
             Assert.AreEqual(msg.market_id, ciMarketId);
             Assert.AreEqual(msg.product_id, ci.ProducerId);
             if (!string.IsNullOrEmpty(msg.product_ids))

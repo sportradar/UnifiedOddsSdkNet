@@ -177,7 +177,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 return null;
             }
 
-            await _semaphore.WaitAsync();
+            await _semaphore.WaitAsync().ConfigureAwait(false);
 
             try
             {
@@ -440,6 +440,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 case DtoType.LotteryDraw:
                     break;
                 case DtoType.LotteryList:
+                    break;
+                case DtoType.BookingStatus:
+                    break;
+                case DtoType.SportCategories:
                     break;
                 default:
                     ExecutionLog.Warn($"Trying to add unchecked dto type: {dtoType} for id: {id}.");

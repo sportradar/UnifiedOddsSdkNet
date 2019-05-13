@@ -116,7 +116,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _season;
             }
-            await FetchMissingSummary(wantedCultures).ConfigureAwait(false);
+            await FetchMissingSummary(wantedCultures, false).ConfigureAwait(false);
             return _season;
         }
 
@@ -132,7 +132,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _tournamentRound;
             }
-            await FetchMissingSummary(cultureInfos).ConfigureAwait(false);
+            await FetchMissingSummary(cultureInfos, false).ConfigureAwait(false);
             return _tournamentRound;
         }
 
@@ -146,7 +146,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _tournamentId;
             }
-            await FetchMissingSummary(new List<CultureInfo> { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new List<CultureInfo> { DefaultCulture }, false).ConfigureAwait(false);
             return _tournamentId;
         }
 

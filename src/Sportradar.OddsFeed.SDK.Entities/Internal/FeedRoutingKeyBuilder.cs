@@ -15,6 +15,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
     public static class FeedRoutingKeyBuilder
     {
         //  hi.-.live.odds_change.5.sr:match.12329150.nodeId (.producerId)
+        // Note: there is a dot in event_id
         /// <summary>
         /// Validates input list of message interests and returns list of routing keys combination per interest
         /// </summary>
@@ -140,6 +141,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             {
                 keys = VirtualSportMessages().ToList();
             }
+            else if (interest.IsEventSpecific)
+            {
+                keys = SpecificEventsOnly(interest.Events).ToList();
+            }
 
             if (keys.Any())
             {
@@ -153,10 +158,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                     }
                 }
                 keys = tmpKeys;
-            }
-            if (interest.IsEventSpecific)
-            {
-                keys = SpecificEventsOnly(interest.Events).ToList();
             }
 
             if (!keys.Any())
@@ -272,7 +273,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             Contract.Requires(eventIds.Any());
 
             //channels using this routing key will also receive 'system' messages so they have to be manually removed in the receiver
-            return eventIds.Select(u => $"#.{u.ToString()}");
+            return eventIds.Select(u => $"#.{u.Prefix}:{u.Type}.{u.Id}");
         }
     }
 }

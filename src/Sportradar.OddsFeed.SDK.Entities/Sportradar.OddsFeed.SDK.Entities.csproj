@@ -103,6 +103,9 @@
     <Compile Include="BetSettlementCertainty.cs" />
     <Compile Include="CashoutStatus.cs" />
     <Compile Include="IMarketCancel.cs" />
+    <Compile Include="Internal\EntitiesImpl\OutcomeDefinition.cs" />
+    <Compile Include="IOutcomeV1.cs" />
+    <Compile Include="IOutcomeDefinition.cs" />
     <Compile Include="IMessageV1.cs" />
     <Compile Include="IMessageTimestamp.cs" />
     <Compile Include="Internal\EntitiesImpl\Draw.cs" />
@@ -175,7 +178,7 @@
     <Compile Include="MessageInterest.cs" />
     <Compile Include="Internal\IMessageReceiver.cs" />
     <Compile Include="Internal\FeedMessageMapper.cs" />
-    <Compile Include="IAlive.cs" />
+    <Compile Include="Internal\IAlive.cs" />
     <Compile Include="IBetCancel.cs" />
     <Compile Include="IBetSettlement.cs" />
     <Compile Include="IBetStop.cs" />

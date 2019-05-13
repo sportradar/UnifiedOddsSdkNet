@@ -6,6 +6,7 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
+using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 {
@@ -33,6 +34,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// Gets the name of the group associated with the current round.
         /// </summary>
         public string Group { get; private set; }
+
+        /// <summary>
+        /// Gets the id of the group associated with the current round.
+        /// </summary>
+        public URN GroupId { get; private set; }
 
         /// <summary>
         /// Gets the id of the other match
@@ -87,6 +93,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 
             Type = dto.Type;
             Group = dto.Group;
+            GroupId = dto.GroupId;
             OtherMatchId = dto.OtherMatchId;
             Number = dto.Number;
             CupRoundMatches = dto.CupRoundMatches;

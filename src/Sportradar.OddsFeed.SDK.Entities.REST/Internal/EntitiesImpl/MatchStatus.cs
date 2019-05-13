@@ -65,7 +65,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         {
             return SportEventStatusCI == null || SportEventStatusCI.MatchStatusId < 0  || _matchStatusesCache == null
                 ? null
-                : await _matchStatusesCache?.GetAsync(SportEventStatusCI.MatchStatusId, new List<CultureInfo> {culture});
+                : await _matchStatusesCache.GetAsync(SportEventStatusCI.MatchStatusId, new List<CultureInfo> {culture}).ConfigureAwait(false);
         }
 
         /// <summary>

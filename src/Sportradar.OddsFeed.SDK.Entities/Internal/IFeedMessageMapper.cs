@@ -15,7 +15,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
     /// Defines a contract implemented by classes used to map (convert) feed message to those used by the SDK
     /// </summary>
     [ContractClass(typeof(FeedMessageMapperContract))]
-    public interface IFeedMessageMapper
+    internal interface IFeedMessageMapper
     {
         /// <summary>
         /// Maps (converts) the provided <see cref="snapshot_complete"/> instance to the <see cref="ISnapshotCompleted"/> instance

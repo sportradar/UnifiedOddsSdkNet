@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
+using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
 {

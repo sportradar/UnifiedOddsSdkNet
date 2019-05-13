@@ -164,6 +164,7 @@
     <Compile Include="Internal\Mapping\AvailableSelectionsMapperFactory.cs" />
     <Compile Include="IPitcher.cs" />
     <Compile Include="IReferenceV1.cs" />
+    <Compile Include="IRoundV1.cs" />
     <Compile Include="IScheduledStartTimeChange.cs" />
     <Compile Include="ICoverageInfo.cs" />
     <Compile Include="IDraw.cs" />
@@ -427,9 +428,8 @@
     <Compile Include="Internal\EntitiesImpl\WeatherInfo.cs" />
     <Compile Include="Internal\EventArguments\TournamentReceivedEventArgs.cs" />
     <Compile Include="Internal\InternalEntities\IMarketDescription.cs" />
-    <Compile Include="Internal\InternalEntities\IMarketMappingData.cs" />
+    <Compile Include="MarketMapping\IMarketMappingData.cs" />
     <Compile Include="Internal\InternalEntities\IOutcomeDescription.cs" />
-    <Compile Include="Internal\InternalEntities\IOutcomeMappingData.cs" />
     <Compile Include="Internal\InternalEntities\ISpecifier.cs" />
     <Compile Include="Internal\InternalEntities\MarketDescription.cs" />
     <Compile Include="Internal\InternalEntities\OutcomeMapping.cs" />
@@ -501,6 +501,7 @@
     <Compile Include="Internal\MarketNames\InvariantMarketDescriptionCache.cs" />
     <Compile Include="Internal\MarketNames\MarketMappingProvider.cs" />
     <Compile Include="Internal\MarketNames\OutcomeMapping.cs" />
+    <Compile Include="MarketMapping\IOutcomeMappingData.cs" />
     <Compile Include="MarketMapping\LoMarketMapping.cs" />
     <Compile Include="MarketMapping\LcooMarketMapping.cs" />
     <Compile Include="Internal\MarketNames\MarketCacheProvider.cs" />

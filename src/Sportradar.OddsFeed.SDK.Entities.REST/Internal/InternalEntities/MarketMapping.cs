@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
+using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
 using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
@@ -76,13 +77,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
             ProducerId = cacheItem.ProducerId;
             ProducerIds = cacheItem.ProducerIds;
             SportId = cacheItem.SportId;
+            MarketTypeId = cacheItem.MarketTypeId;
+            MarketSubTypeId = cacheItem.MarketSubTypeId;
             MarketId = string.IsNullOrEmpty(cacheItem.OrgMarketId)
                            ? MarketSubTypeId == null
                                  ? MarketTypeId.ToString()
                                  : $"{MarketTypeId}:{MarketSubTypeId}"
                            : cacheItem.OrgMarketId;
-            MarketTypeId = cacheItem.MarketTypeId;
-            MarketSubTypeId = cacheItem.MarketSubTypeId;
             SovTemplate = cacheItem.SovTemplate;
             ValidFor = cacheItem.ValidFor;
             OutcomeMappings = cacheItem.OutcomeMappings?.Select(o => new OutcomeMapping(o));

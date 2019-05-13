@@ -251,10 +251,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             var categorySummary = categoryCI == null ? null : new CategorySummary(categoryCI.Id, categoryCI.Names, categoryCI.CountryCode);
 
             var currentSeasonCI = tournamentInfoBasicCI.CurrentSeason == null
-                ? null
-                : Id.Equals(tournamentInfoBasicCI.CurrentSeason.Id)
-                    ? seasonCI
-                    : (TournamentInfoCI)SportEventCache.GetEventCacheItem(tournamentInfoBasicCI.CurrentSeason.Id);
+                                      ? null
+                                      : Id.Equals(tournamentInfoBasicCI.CurrentSeason.Id)
+                                          ? seasonCI
+                                          : (TournamentInfoCI) SportEventCache.GetEventCacheItem(tournamentInfoBasicCI.CurrentSeason.Id);
 
             // there is no current season - return empty TournamentInfo
             if (currentSeasonCI == null)

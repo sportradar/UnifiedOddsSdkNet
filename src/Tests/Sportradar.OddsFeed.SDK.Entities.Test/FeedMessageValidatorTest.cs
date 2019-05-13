@@ -173,7 +173,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
 
             betCancel = GetMessage<bet_cancel>("bet_cancel.xml");
             betCancel.market = null;
-            Assert.AreEqual(ValidationResult.SUCCESS, _validator.Validate(betCancel), "Validation of null markets should succeed");
+            Assert.AreEqual(ValidationResult.FAILURE, _validator.Validate(betCancel), "Validation of null markets should fail");
 
             betCancel = GetMessage<bet_cancel>("bet_cancel.xml");
             betCancel.market.First().specifiers = null;
@@ -210,7 +210,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
 
             rollbackCancel = GetMessage<rollback_bet_cancel>("rollback_bet_cancel.xml");
             rollbackCancel.market = null;
-            Assert.AreEqual(ValidationResult.SUCCESS, _validator.Validate(rollbackCancel), "Validation of null markets should succeed");
+            Assert.AreEqual(ValidationResult.FAILURE, _validator.Validate(rollbackCancel), "Validation of null markets should fail");
 
             rollbackCancel = GetMessage<rollback_bet_cancel>("rollback_bet_cancel.xml");
             rollbackCancel.market.First().specifiers = null;
@@ -284,7 +284,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
 
             rollback = GetMessage<rollback_bet_settlement>("rollback_bet_settlement.xml");
             rollback.market = null;
-            Assert.AreEqual(ValidationResult.SUCCESS, _validator.Validate(rollback), "Validation of null markets should succeed");
+            Assert.AreEqual(ValidationResult.FAILURE, _validator.Validate(rollback), "Validation of null markets should fail");
 
             rollback = GetMessage<rollback_bet_settlement>("rollback_bet_settlement.xml");
             rollback.market.First().specifiers = null;

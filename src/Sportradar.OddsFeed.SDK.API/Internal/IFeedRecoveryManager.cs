@@ -44,6 +44,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         event EventHandler<FeedCloseEventArgs> CloseFeed;
 
         /// <summary>
+        /// Occurs when a requested event recovery completes
+        /// </summary>
+        event EventHandler<EventRecoveryCompletedEventArgs> EventRecoveryCompleted;
+
+        /// <summary>
         /// Gets a value indicating whether the current instance is opened
         /// </summary>
         bool IsOpened { get; }

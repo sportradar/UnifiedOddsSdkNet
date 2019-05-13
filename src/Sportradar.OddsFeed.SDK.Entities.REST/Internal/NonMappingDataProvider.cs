@@ -110,7 +110,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         public async Task<T> GetDataAsync(string languageCode)
         {
             var uri = GetRequestUri(languageCode);
-            return await GetDataAsyncInternal(uri);
+            return await GetDataAsyncInternal(uri).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         public async Task<T> GetDataAsync(params string[] identifiers)
         {
             var uri = GetRequestUri(identifiers);
-            return await GetDataAsyncInternal(uri);
+            return await GetDataAsyncInternal(uri).ConfigureAwait(false);
         }
 
         /// <summary>

@@ -92,7 +92,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             var responseMessage = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
             try
             {
-                responseMessage = await _client.GetAsync(uri);
+                responseMessage = await _client.GetAsync(uri).ConfigureAwait(false);
                 RecordSuccess();
                 if (!responseMessage.IsSuccessStatusCode)
                 {
@@ -127,7 +127,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                     }
                     ResponseHeaders = responseHeaders;
                 }
-                return await responseMessage.Content.ReadAsStreamAsync();
+                return await responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -217,7 +217,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             var responseMessage = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
             try
             {
-                responseMessage = await _client.PostAsync(uri, content ?? new StringContent(string.Empty));
+                responseMessage = await _client.PostAsync(uri, content ?? new StringContent(string.Empty)).ConfigureAwait(false);
                 RecordSuccess();
 
                 if (_saveResponseHeaders)

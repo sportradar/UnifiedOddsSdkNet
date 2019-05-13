@@ -2,6 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -107,6 +108,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <value>The recovery info about last recovery attempt</value>
         public IRecoveryInfo RecoveryInfo { get; internal set; }
 
+        internal ConcurrentDictionary<long, URN> EventRecoveries { get; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Producer"/> class
         /// </summary>
@@ -145,6 +148,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             Scope = scope.Split('|');
 
             IgnoreRecovery = false;
+            EventRecoveries = new ConcurrentDictionary<long, URN>();
         }
 
         /// <summary>

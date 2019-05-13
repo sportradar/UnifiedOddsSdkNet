@@ -20,7 +20,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         private readonly IOperand _operand;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CardinalNameExpression"/> class.
+        /// Initializes a new instance of the <see cref="CardinalNameExpression"/> class
         /// </summary>
         /// <param name="operand">A <see cref="IOperand"/> representing part of the name expression</param>
         internal CardinalNameExpression(IOperand operand)

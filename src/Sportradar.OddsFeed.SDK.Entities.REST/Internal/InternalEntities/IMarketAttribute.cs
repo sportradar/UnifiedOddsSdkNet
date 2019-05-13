@@ -9,12 +9,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
     public interface IMarketAttribute
     {
         /// <summary>
-        /// Gets the attribute name.
+        /// Gets the attribute name
         /// </summary>
         string Name { get; }
 
         /// <summary>
-        /// Gets the attribute description.
+        /// Gets the attribute description
         /// </summary>
         string Description { get; }
     }

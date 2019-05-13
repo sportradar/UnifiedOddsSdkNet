@@ -129,7 +129,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             IEnumerable<CultureInfo> cultures,
             ISportEntityFactory sportEntityFactory,
             ICompetitionCI rootCompetitionCI)
-            : base(ci.Id, cultures.Where(c => ci.GetName(c) != null).ToDictionary(c => c, ci.GetName))
+            : base(ci.Id, new Dictionary<CultureInfo, string>())
         {
             //Contract.Requires(ci != null);
             Contract.Requires(cultures != null && cultures.Any());
@@ -162,7 +162,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                           IEnumerable<CultureInfo> cultures,
                           ISportEntityFactory sportEntityFactory,
                           IDictionary<URN, ReferenceIdCI> competitorsReferences)
-            : base(ci.Id, cultures.Where(c => ci.GetName(c) != null).ToDictionary(c => c, ci.GetName))
+            : base(ci.Id, new Dictionary<CultureInfo, string>())
         {
             //Contract.Requires(ci != null);
             Contract.Requires(cultures != null && cultures.Any());
@@ -267,7 +267,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 {
                     var task = Task.Run(async () =>
                                         {
-                                            var competitorsReferences = _competitionCI != null ? await _competitionCI.GetCompetitorsReferencesAsync() : null;
+                                            var competitorsReferences = _competitionCI != null ? await _competitionCI.GetCompetitorsReferencesAsync().ConfigureAwait(false) : null;
 
                                             if (competitorsReferences != null && competitorsReferences.Any())
                                             {
@@ -298,7 +298,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 {
                     var task = Task.Run(async () =>
                                         {
-                                            var competitorsQualifiers = await _competitionCI.GetCompetitorsQualifiersAsync();
+                                            var competitorsQualifiers = await _competitionCI.GetCompetitorsQualifiersAsync().ConfigureAwait(false);
 
                                             if (competitorsQualifiers != null && competitorsQualifiers.Any())
                                             {
@@ -319,6 +319,27 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             return _profileCache != null
                 ? _profileCache.GetCompetitorProfileAsync(_competitorCI.Id, _cultures).Result
                 : _competitorCI;
+        }
+
+        private IReadOnlyDictionary<CultureInfo, string> _names;
+
+        public override IReadOnlyDictionary<CultureInfo, string> Names
+        {
+            get
+            {
+                if (_names != null)
+                    return _names;
+                lock (_lock)
+                {
+                    _names = _cultures.Where(c => _competitorCI.GetName(c) != null).ToDictionary(c => c, _competitorCI.GetName);
+                    return _names;
+                }
+            }
+        }
+
+        public override string GetName(CultureInfo culture)
+        {
+            return _names != null ? base.GetName(culture) : _competitorCI.GetName(culture);
         }
     }
 }

@@ -72,7 +72,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <summary>
         /// The simple team profile provider
         /// </summary>
-        private IDataProvider<SimpleTeamProfileDTO> _simpleTeamProvider;
+        private readonly IDataProvider<SimpleTeamProfileDTO> _simpleTeamProvider;
         /// <summary>
         /// The tournament seasons provider
         /// </summary>

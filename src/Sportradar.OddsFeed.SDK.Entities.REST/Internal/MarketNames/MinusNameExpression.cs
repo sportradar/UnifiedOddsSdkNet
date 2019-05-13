@@ -48,7 +48,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <exception cref="NameExpressionException">The specified specifier does not exist or it's value is not string representation of decimal</exception>
         public async Task<string> BuildNameAsync(CultureInfo culture)
         {
-            var value = await _operand.GetDecimalValue();
+            var value = await _operand.GetDecimalValue().ConfigureAwait(false);
             var result = SdkInfo.DecimalToStringWithSign(value * -1);
             return result;
         }

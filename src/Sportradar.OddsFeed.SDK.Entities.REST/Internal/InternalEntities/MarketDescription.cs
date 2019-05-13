@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
+using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
 {
@@ -40,12 +41,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
 
         public IEnumerable<string> Groups { get; }
 
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
+        public MarketDescriptionCacheItem MarketDescriptionCacheItem { get; }
+
         internal MarketDescription(MarketDescriptionCacheItem cacheItem, IEnumerable<CultureInfo> cultures)
         {
             Contract.Requires(cacheItem != null);
             Contract.Requires(cultures != null && cultures.Any());
 
             var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
+
+            MarketDescriptionCacheItem = cacheItem;
 
             Id = cacheItem.Id;
             _names = new ReadOnlyDictionary<CultureInfo, string>(cultureList.ToDictionary(c => c, cacheItem.GetName));

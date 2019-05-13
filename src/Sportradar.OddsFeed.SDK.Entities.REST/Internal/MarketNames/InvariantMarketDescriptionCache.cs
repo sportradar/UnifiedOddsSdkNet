@@ -226,7 +226,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 }
 
                 //WriteLog($"Prefetching invariant market description for id={id} and langs: [{string.Join(",", cultureList.Select(s => s.TwoLetterISOLanguageName))}].");
-                await _semaphore.WaitAsync();
+                await _semaphore.WaitAsync().ConfigureAwait(false);
 
                 description = GetItemFromCache(id);
                 var missingLanguages = LanguageHelper.GetMissingCultures(cultureList, description?.FetchedLanguages).ToList();
@@ -338,6 +338,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             return cacheItem == null
                 ? null
                 : new MarketDescription(cacheItem, cultureList);
+        }
+
+        public async Task<IEnumerable<IMarketDescription>> GetAllInvariantMarketDescriptionsAsync(IEnumerable<CultureInfo> cultures)
+        {
+            var cultureList = cultures as List<CultureInfo> ?? cultures.ToList();
+            await GetMarketInternalAsync(1, cultureList).ConfigureAwait(false);
+            return _cache
+                .ToList()
+                .Select(c => new MarketDescription(c.Value as MarketDescriptionCacheItem, cultureList))
+                .ToList();
         }
 
         /// <summary>
@@ -512,6 +522,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 case DtoType.LotteryList:
                     break;
                 case DtoType.BookingStatus:
+                    break;
+                case DtoType.SportCategories:
                     break;
                 default:
                     ExecutionLog.Warn($"Trying to add unchecked dto type: {dtoType} for id: {id}.");

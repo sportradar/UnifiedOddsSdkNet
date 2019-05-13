@@ -4,6 +4,7 @@
 using System.Diagnostics.Contracts;
 using Sportradar.OddsFeed.SDK.API.Internal;
 using Sportradar.OddsFeed.SDK.Entities;
+using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.API.Contracts
 {
@@ -13,6 +14,11 @@ namespace Sportradar.OddsFeed.SDK.API.Contracts
         public void DispatchDisconnected()
         {
 
+        }
+
+        public void DispatchEventRecoveryCompleted(long requestId, URN eventId)
+        {
+            Contract.Requires(eventId != null);
         }
 
         public void DispatchProducerDown(IProducerStatusChange producerStatusChange)

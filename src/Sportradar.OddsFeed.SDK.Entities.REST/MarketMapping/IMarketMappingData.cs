@@ -1,11 +1,12 @@
 /*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
 using System;
 using System.Collections.Generic;
 using Sportradar.OddsFeed.SDK.Messages;
 
-namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
+namespace Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping
 {
     /// <summary>
     /// Represents mapping information used to map markets and outright to the sport / producer to which they belong

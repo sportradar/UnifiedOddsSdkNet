@@ -67,7 +67,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
             try
             {
                 Log.Info($"PutDataAsync url: {uri.AbsoluteUri}");
-                responseMessage = await _client.PutAsync(uri, content ?? new StringContent(string.Empty));
+                responseMessage = await _client.PutAsync(uri, content ?? new StringContent(string.Empty)).ConfigureAwait(false);
                 RecordSuccess();
                 return responseMessage;
             }
@@ -95,7 +95,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
             try
             {
                 Log.Info($"DeleteDataAsync url: {uri.AbsoluteUri}");
-                responseMessage = await _client.DeleteAsync(uri);
+                responseMessage = await _client.DeleteAsync(uri).ConfigureAwait(false);
                 RecordSuccess();
                 return responseMessage;
             }

@@ -48,7 +48,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
 
             try
             {
-                await method.Invoke();
+                await method.Invoke().ConfigureAwait(false);
             }
             catch (Exception ex)
             {

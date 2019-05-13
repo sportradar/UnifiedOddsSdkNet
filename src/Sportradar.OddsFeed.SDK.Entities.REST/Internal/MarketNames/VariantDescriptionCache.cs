@@ -148,7 +148,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             }
             try
             {
-                await GetVariantDescriptionInternalAsync("0", languagesToFetch);
+                await GetVariantDescriptionInternalAsync("0", languagesToFetch).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -215,7 +215,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             }
             try
             {
-                await _semaphore.WaitAsync();
+                await _semaphore.WaitAsync().ConfigureAwait(false);
 
                 description = GetItemFromCache(id);
                 var missingLanguages = LanguageHelper.GetMissingCultures(cultureList, description?.FetchedLanguages).ToList();
@@ -488,6 +488,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 case DtoType.LotteryDraw:
                     break;
                 case DtoType.LotteryList:
+                    break;
+                case DtoType.BookingStatus:
+                    break;
+                case DtoType.SportCategories:
                     break;
                 default:
                     ExecutionLog.Warn($"Trying to add unchecked dto type: {dtoType} for id: {id}.");

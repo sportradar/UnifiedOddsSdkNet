@@ -64,7 +64,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
             Contract.Requires(semaphore != null);
             try
             {
-                await semaphore.WaitAsync();
+                await semaphore.WaitAsync().ConfigureAwait(false);
                 return true;
             }
             catch (ObjectDisposedException)

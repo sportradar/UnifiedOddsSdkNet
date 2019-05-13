@@ -133,7 +133,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
 
             Metric.Context("CACHE").Meter("ProfileCache->GetPlayerProfileAsync", Unit.Calls);
 
-            await _semaphore.WaitAsync();
+            await _semaphore.WaitAsync().ConfigureAwait(false);
 
             PlayerProfileCI cachedItem;
             try
@@ -183,7 +183,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
 
             Metric.Context("CACHE").Meter("ProfileCache->GetCompetitorProfileAsync", Unit.Calls);
 
-            await _semaphore.WaitAsync();
+            await _semaphore.WaitAsync().ConfigureAwait(false);
 
             CompetitorCI cachedItem;
             try
@@ -449,6 +449,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                 case DtoType.LotteryList:
                     break;
                 case DtoType.BookingStatus:
+                    break;
+                case DtoType.SportCategories:
                     break;
                 default:
                     ExecutionLog.Warn($"Trying to add unchecked dto type: {dtoType} for id: {id}.");

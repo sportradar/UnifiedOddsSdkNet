@@ -92,7 +92,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _categoryId;
             }
-            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             return _categoryId;
         }
 
@@ -106,7 +106,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _bonusInfo;
             }
-            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             return _bonusInfo;
         }
 
@@ -120,7 +120,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _drawInfo;
             }
-            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             return _drawInfo;
         }
 
@@ -134,7 +134,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _scheduledDraws;
             }
-            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             return _scheduledDraws;
         }
 

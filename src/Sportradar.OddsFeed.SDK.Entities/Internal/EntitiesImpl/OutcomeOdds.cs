@@ -18,7 +18,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         public double Odds { get; }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="OutcomeOdds" /> class
+        /// Initializes a new instance of the <see cref="OutcomeOdds" /> class
         /// </summary>
         /// <param name="id">the value uniquely identifying the current <see cref="OutcomeOdds" /> instance</param>
         /// <param name="active">A value indicating whether the current <see cref="OutcomeOdds" /> is active - i.e. should bets on it be accepted </param>
@@ -27,14 +27,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <param name="nameProvider">A <see cref="INameProvider"/> used to generate the outcome name(s)</param>
         /// <param name="mappingProvider">A <see cref="IMarketMappingProvider"/> instance used for providing mapping ids of markets and outcomes</param>
         /// <param name="cultures">A <see cref="IEnumerable{CultureInfo}"/> specifying languages the current instance supports</param>
+        /// <param name="outcomeDefinition">The associated <see cref="IOutcomeDefinition"/></param>
         internal OutcomeOdds(string id,
                              bool? active,
                              double odds,
                              double? probabilities,
                              INameProvider nameProvider,
                              IMarketMappingProvider mappingProvider,
-                             IEnumerable<CultureInfo> cultures)
-            : base(id, active, probabilities, nameProvider, mappingProvider, cultures)
+                             IEnumerable<CultureInfo> cultures,
+                             IOutcomeDefinition outcomeDefinition)
+            : base(id, active, probabilities, nameProvider, mappingProvider, cultures, outcomeDefinition)
         {
             Odds = odds;
         }

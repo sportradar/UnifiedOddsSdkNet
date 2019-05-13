@@ -43,6 +43,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <param name="match">A <see cref="IMatch"/> representing the the match associated with the outcome / market</param>
         /// <param name="teamFlag">A value indicating whether the player is associated with home or away team - 1 : HomeTeam, 2 : AwayTeam</param>
         /// <param name="cultures">A <see cref="IEnumerable{CultureInfo}"/> specifying languages the current instance supports</param>
+        /// <param name="outcomeDefinition">The associated <see cref="IOutcomeDefinition"/></param>
         internal PlayerOutcomeOdds(string id,
                                    bool? active,
                                    double odds,
@@ -51,8 +52,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                                    IMarketMappingProvider mappingProvider,
                                    IMatch match,
                                    int teamFlag,
-                                   IEnumerable<CultureInfo> cultures)
-            : base(id, active, odds, probabilities, nameProvider, mappingProvider, cultures)
+                                   IEnumerable<CultureInfo> cultures,
+                                   IOutcomeDefinition outcomeDefinition)
+            : base(id, active, odds, probabilities, nameProvider, mappingProvider, cultures, outcomeDefinition)
         {
             Contract.Requires(match != null);
             Contract.Requires(teamFlag >= 1 && teamFlag <= 2);

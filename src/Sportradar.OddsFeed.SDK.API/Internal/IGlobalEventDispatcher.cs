@@ -4,6 +4,7 @@
 using System.Diagnostics.Contracts;
 using Sportradar.OddsFeed.SDK.API.Contracts;
 using Sportradar.OddsFeed.SDK.Entities;
+using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -29,5 +30,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// Dispatches the information that the connection to the feed was lost
         /// </summary>
         void DispatchDisconnected();
+
+        /// <summary>
+        /// Dispatches the information that the requested event recovery completed
+        /// <param name="requestId">The identifier of the recovery request</param>
+        /// <param name="eventId">The associated event identifier</param>
+        /// </summary>
+        void DispatchEventRecoveryCompleted(long requestId, URN eventId);
     }
 }
