@@ -25,7 +25,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
     /// Provides access to sport related data (sports, tournaments, sport events, ...)
     /// </summary>
     [Log(LoggerType.ClientInteraction)]
-    internal class SportDataProvider : ISportDataProvider
+    internal class SportDataProvider : ISportDataProviderV1
     {
         private static readonly ILog Log = SdkLoggerFactory.GetLoggerForClientInteraction(typeof(SportDataProvider));
 
@@ -248,6 +248,18 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 _exceptionStrategy);
             Log.Info($"GetCompetition returned: {result?.Id}.");
             return result;
+        }
+
+        /// <summary>
+        /// Gets a <see cref="ICompetition"/> representing the specified sport event in language specified by <code>culture</code> or a null reference if the sport event with
+        /// specified <code>id</code> does not exist
+        /// </summary>
+        /// <param name="id">A <see cref="URN"/> specifying the sport event to retrieve</param>
+        /// <param name="culture">A <see cref="CultureInfo"/> specifying the language or a null reference to use the languages specified in the configuration</param>
+        /// <returns>A <see cref="ICompetition"/> representing the specified sport event or a null reference if the requested sport event does not exist</returns>
+        public ICompetition GetCompetition(URN id, CultureInfo culture = null)
+        {
+            return GetCompetition(id, null, culture);
         }
 
         /// <summary>

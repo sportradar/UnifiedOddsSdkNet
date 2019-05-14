@@ -13,5 +13,10 @@ namespace Sportradar.OddsFeed.SDK.API
         /// Gets a <see cref="IMarketDescriptionManager"/> instance used to get info about available markets, and to get translations for markets and outcomes including outrights
         /// </summary>
         IMarketDescriptionManager MarketDescriptionManager { get; }
+        
+        /// <summary>
+        /// Gets a <see cref="ICustomBetManager"/> instance used to perform various custom bet operations
+        /// </summary>
+        ICustomBetManager CustomBetManager { get; }
     }
 }

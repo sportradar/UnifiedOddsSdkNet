@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.Caching;
+using System.Xml.Serialization;
 using Common.Logging;
 using Metrics;
 using Microsoft.Practices.Unity;
@@ -26,6 +27,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping.Lottery;
@@ -225,6 +227,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             RegisterFeedRecoveryManager(container, config);
             RegisterCashOutProbabilitiesProvider(container, config);
             RegisterReplayManager(container, config);
+            RegisterCustomBetManager(container, config);
         }
 
         public static void RegisterAdditionalTypes(this IUnityContainer container)
@@ -554,6 +557,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<ICacheManager>(),
                     new ResolvedParameter<IProducerManager>(),
                     new ResolvedParameter<ExceptionHandlingStrategy>(),
+                    config.DefaultLocale,
                     new ResolvedParameter<IDataProvider<SportEventSummaryDTO>>("sportEventSummaryProvider"),
                     new ResolvedParameter<IDataProvider<FixtureDTO>>("fixtureEndpointDataProvider"),
                     new ResolvedParameter<IDataProvider<FixtureDTO>>("fixtureChangeFixtureEndpointDataProvider"),
@@ -573,7 +577,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<IDataProvider<DrawDTO>>("drawSummaryProvider"),
                     new ResolvedParameter<IDataProvider<DrawDTO>>("drawFixtureProvider"),
                     new ResolvedParameter<IDataProvider<LotteryDTO>>("lotteryScheduleProvider"),
-                    new ResolvedParameter<IDataProvider<EntityList<LotteryDTO>>>("lotteryListProvider")));
+                    new ResolvedParameter<IDataProvider<EntityList<LotteryDTO>>>("lotteryListProvider"),
+                    new ResolvedParameter<IDataProvider<AvailableSelectionsDTO>>(),
+                    new ResolvedParameter<ICalculateProbabilityProvider>()));
         }
 
         private static void RegisterSessionTypes(IUnityContainer container)
@@ -973,6 +979,39 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<IFeedMessageMapper>(),
                     new ResolvedParameter<IFeedMessageValidator>(),
                     new ResolvedParameter<IMessageDataExtractor>()));
+        }
+
+        private static void RegisterCustomBetManager(IUnityContainer container, IOddsFeedConfigurationInternal config)
+        {
+            container.RegisterType<ISelectionBuilder, SelectionBuilder>(new ContainerControlledLifetimeManager());
+            
+
+            container.RegisterType<IDeserializer<AvailableSelectionsType>, Deserializer<AvailableSelectionsType>>(new ContainerControlledLifetimeManager());
+            container.RegisterType<ISingleTypeMapperFactory<AvailableSelectionsType, AvailableSelectionsDTO>, AvailableSelectionsMapperFactory>(new ContainerControlledLifetimeManager());
+            container.RegisterType<IDataProvider<AvailableSelectionsDTO>, DataProvider<AvailableSelectionsType, AvailableSelectionsDTO>>(
+                new ContainerControlledLifetimeManager(),
+                new InjectionConstructor(
+                    config.ApiBaseUri + "/v1/custombet/{0}/available_selections",
+                    new ResolvedParameter<IDataFetcher>(),
+                    new ResolvedParameter<IDeserializer<AvailableSelectionsType>>(),
+                    new ResolvedParameter<ISingleTypeMapperFactory<AvailableSelectionsType, AvailableSelectionsDTO>>()));
+
+            container.RegisterType<IDeserializer<CalculationResponseType>, Deserializer<CalculationResponseType>>(new ContainerControlledLifetimeManager());
+            container.RegisterType<ISingleTypeMapperFactory<CalculationResponseType, CalculationDTO>, CalculationMapperFactory>(new ContainerControlledLifetimeManager());
+            container.RegisterType<ICalculateProbabilityProvider, CalculateProbabilityProvider>(
+                new ContainerControlledLifetimeManager(),
+                new InjectionConstructor(
+                    config.ApiBaseUri + "/v1/custombet/calculate",
+                    new ResolvedParameter<IDataPoster>(),
+                    new XmlSerializer(typeof(SelectionsType)),
+                    new ResolvedParameter<IDeserializer<CalculationResponseType>>(),
+                    new ResolvedParameter<ISingleTypeMapperFactory<CalculationResponseType, CalculationDTO>>()));
+
+            container.RegisterType<ICustomBetManager, CustomBetManager>(
+                new ContainerControlledLifetimeManager(),
+                new InjectionConstructor(
+                    new ResolvedParameter<IDataRouterManager>(),
+                    new ResolvedParameter<ISelectionBuilder>()));
         }
     }
 }
