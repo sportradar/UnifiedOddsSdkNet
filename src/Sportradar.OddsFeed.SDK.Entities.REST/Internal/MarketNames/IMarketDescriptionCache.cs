@@ -26,5 +26,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <returns>A <see cref="Task{T}" /> representing the async retrieval operation</returns>
         /// <exception cref="CacheItemNotFoundException">The requested key was not found in the cache and could not be loaded</exception>
         Task<IMarketDescription> GetMarketDescriptionAsync(int marketId, string variant, IEnumerable<CultureInfo> cultures);
+
+        /// <summary>
+        /// Asynchronously loads the list of market descriptions from the Sports API
+        /// </summary>
+        /// <returns>Returns true if the action succeeded</returns>
+        Task<bool> LoadMarketDescriptionsAsync();
     }
 }

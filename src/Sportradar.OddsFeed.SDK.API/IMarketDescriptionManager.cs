@@ -38,5 +38,12 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <param name="producer">The <see cref="IProducer"/> for which you need the mapping</param>
         /// <returns>A <see cref="IEnumerable{IMarketMappingData}"/> of available mappings for the provided marketId/producer combination</returns>
         Task<IEnumerable<IMarketMappingData>> GetMarketMappingAsync(int marketId, IReadOnlyDictionary<string, string> specifiers, IProducer producer);
+
+        /// <summary>
+        /// Asynchronously loads the invariant and variant list of market descriptions from the Sports API
+        /// </summary>
+        /// <remarks>To be used when manually changed market data via betradar control</remarks>
+        /// <returns>Returns true if the action succeeded</returns>
+        Task<bool> LoadMarketDescriptionsAsync();
     }
 }

@@ -238,12 +238,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 }
             }
 
-            //if (message.RequestIdUsage == PropertyUsage.REQUIRED && message.RequestId < 1 ||
-            //    message.RequestIdUsage == PropertyUsage.OPTIONAL && message.RequestId.HasValue && message.RequestId.Value < 0)
-            //{
-            //    LogFailure(message, "request_id", message.RequestId);
-            //    result = false;
-            //}
             return result;
         }
 

@@ -54,16 +54,14 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         [TestMethod]
         public void MarketDescriptionManagerInitTest()
         {
-            var marketDescriptionManager = new MarketDescriptionManager(TestConfigurationInternal.GetConfig(),
-                _marketCacheProvider, _invariantMarketDescriptionCache);
+            var marketDescriptionManager = new MarketDescriptionManager(TestConfigurationInternal.GetConfig(), _marketCacheProvider, _invariantMarketDescriptionCache, _variantDescriptionCache);
             Assert.IsNotNull(marketDescriptionManager);
         }
 
         [TestMethod]
         public void MarketDescriptionManagerGetMarketDescriptionsTest()
         {
-            var marketDescriptionManager = new MarketDescriptionManager(TestConfigurationInternal.GetConfig(),
-                _marketCacheProvider, _invariantMarketDescriptionCache);
+            var marketDescriptionManager = new MarketDescriptionManager(TestConfigurationInternal.GetConfig(), _marketCacheProvider, _invariantMarketDescriptionCache, _variantDescriptionCache);
             var marketDescriptions = marketDescriptionManager.GetMarketDescriptionsAsync().Result.ToList();
             Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestCalls["GetVariantDescriptionsAsync"]);
             Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestCalls["GetMarketDescriptionsAsync"]);
@@ -74,8 +72,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         [TestMethod]
         public void MarketDescriptionManagerGetMarketMappingTest()
         {
-            var marketDescriptionManager = new MarketDescriptionManager(TestConfigurationInternal.GetConfig(),
-                _marketCacheProvider, _invariantMarketDescriptionCache);
+            var marketDescriptionManager = new MarketDescriptionManager(TestConfigurationInternal.GetConfig(), _marketCacheProvider, _invariantMarketDescriptionCache, _variantDescriptionCache);
             var marketMapping = marketDescriptionManager.GetMarketMappingAsync(115, _producersProvider.GetProducers().First()).Result.ToList();
             Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestCalls["GetVariantDescriptionsAsync"]);
             Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestCalls["GetMarketDescriptionsAsync"]);

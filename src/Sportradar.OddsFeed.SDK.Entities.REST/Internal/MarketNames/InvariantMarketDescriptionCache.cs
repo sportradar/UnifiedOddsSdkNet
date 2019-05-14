@@ -150,6 +150,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             }
             try
             {
+                _fetchedLanguages.Clear();
+                ExecutionLog.Debug($"Loading invariant market descriptions for [{string.Join(",", languagesToFetch.Select(l => l.TwoLetterISOLanguageName))}] (timer).");
                 await GetMarketInternalAsync(0, languagesToFetch).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -267,12 +269,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 }
             }
 
-            //WriteLog($"GetItemFromCache invariant market description for id={id} and langs:[{string.Join(",", cultureList.Select(s => s.TwoLetterISOLanguageName))}].");
             description = GetItemFromCache(id);
-            //var fetchedLanguages = description == null
-            //    ? _cache.Count().ToString()
-            //    : string.Join(",", description.FetchedLanguages.Select(s => s.TwoLetterISOLanguageName));
-            //WriteLog($"GetItemFromCache invariant market description for id={id} and langs:[{fetchedLanguages}] COMPLETED.");
 
             return description != null && !LanguageHelper.GetMissingCultures(cultureList, description.FetchedLanguages).Any()
                 ? description
@@ -311,7 +308,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         }
 
         /// <summary>
-        /// Gets the market descriptor.
+        /// Gets the market descriptor
         /// </summary>
         /// <param name="marketId">The market identifier</param>
         /// <param name="variant">A <see cref="string"/> specifying market variant or a null reference if market is invariant</param>
@@ -338,6 +335,26 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             return cacheItem == null
                 ? null
                 : new MarketDescription(cacheItem, cultureList);
+        }
+
+        /// <summary>
+        /// Asynchronously loads the list of market descriptions from the Sports API
+        /// </summary>
+        /// <returns>Returns true if the action succeeded</returns>
+        public async Task<bool> LoadMarketDescriptionsAsync()
+        {
+            try
+            {
+                ExecutionLog.Debug($"Loading invariant market descriptions for [{string.Join(",", _prefetchLanguages.Select(l => l.TwoLetterISOLanguageName))}] (user request).");
+                _fetchedLanguages.Clear();
+                await GetMarketInternalAsync(0, _prefetchLanguages).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                ExecutionLog.Warn($"An error occurred while fetching market descriptions. The exception:{ex.Message}");
+                return false;
+            }
+            return true;
         }
 
         public async Task<IEnumerable<IMarketDescription>> GetAllInvariantMarketDescriptionsAsync(IEnumerable<CultureInfo> cultures)
@@ -374,7 +391,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             RegisteredDtoTypes = new List<DtoType>
                                  {
                                      DtoType.MarketDescriptionList
-
                                  };
         }
 

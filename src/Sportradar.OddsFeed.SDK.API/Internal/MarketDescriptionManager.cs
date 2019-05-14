@@ -27,6 +27,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         private readonly IOddsFeedConfigurationInternal _config;
         private readonly IMarketCacheProvider _marketCacheProvider;
         private readonly InvariantMarketDescriptionCache _invariantMarketDescriptionCache;
+        private readonly IVariantDescriptionCache _variantDescriptionCache;
         private readonly ExceptionHandlingStrategy _exceptionHandlingStrategy;
 
         /// <summary>
@@ -35,7 +36,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="config">The <see cref="IOddsFeedConfigurationInternal"/> representing feed configuration</param>
         /// <param name="marketCacheProvider">A <see cref="IMarketCacheProvider"/> used to get market descriptions</param>
         /// <param name="invariantMarketDescriptionCache">A <see cref="IMarketDescriptionCache"/> used to get invariant market descriptions</param>
-        public MarketDescriptionManager(IOddsFeedConfigurationInternal config, IMarketCacheProvider marketCacheProvider, IMarketDescriptionCache invariantMarketDescriptionCache)
+        /// <param name="variantDescriptionCache">A <see cref="IVariantDescriptionCache"/> used to reload variant market descriptions</param>
+        public MarketDescriptionManager(IOddsFeedConfigurationInternal config,
+                                        IMarketCacheProvider marketCacheProvider,
+                                        IMarketDescriptionCache invariantMarketDescriptionCache,
+                                        IVariantDescriptionCache variantDescriptionCache)
         {
             if (config == null)
             {
@@ -53,6 +58,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             _config = config;
             _marketCacheProvider = marketCacheProvider;
             _invariantMarketDescriptionCache = invariantMarketDescriptionCache as InvariantMarketDescriptionCache;
+            _variantDescriptionCache = variantDescriptionCache;
             _exceptionHandlingStrategy = config.ExceptionHandlingStrategy;
 
             if (_invariantMarketDescriptionCache == null)
@@ -70,7 +76,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             try
             {
                 if (culture == null)
+                {
                     culture = _config.DefaultLocale;
+                }
                 return await _invariantMarketDescriptionCache.GetAllInvariantMarketDescriptionsAsync(new[] {culture}).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -112,7 +120,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             }
             catch (Exception ex)
             {
-                var specifiersMessage = specifiers != null ? $", specifiers: {string.Join("; ", specifiers)}" : "";
+                var specifiersMessage = specifiers != null
+                                            ? $", specifiers: {string.Join("; ", specifiers)}"
+                                            : string.Empty;
                 if (_exceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
                 {
                     throw new ObjectNotFoundException($"Market mappings for {marketId} could not be provided{specifiersMessage}", ex);
@@ -123,6 +133,24 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             }
 
             return marketDescriptor.Mappings?.Where(m => m.ProducerIds.Contains(producer.Id)).ToList() ?? Enumerable.Empty<IMarketMappingData>();
+        }
+
+        /// <summary>
+        /// Asynchronously loads the invariant and variant list of market descriptions from the Sports API
+        /// </summary>
+        /// <remarks>To be used when manually changed market data via betradar control</remarks>
+        /// <returns>Returns true if the action succeeded</returns>
+        public async Task<bool> LoadMarketDescriptionsAsync()
+        {
+            var tasks = new List<Task<bool>>
+                        {
+                            _variantDescriptionCache.LoadMarketDescriptionsAsync(),
+                            _invariantMarketDescriptionCache.LoadMarketDescriptionsAsync()
+                        };
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            return tasks.All(a=>a.Result);
         }
     }
 }

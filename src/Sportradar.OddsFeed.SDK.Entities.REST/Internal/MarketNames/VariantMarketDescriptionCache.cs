@@ -271,6 +271,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         }
 
         /// <summary>
+        /// Asynchronously loads the list of market descriptions from the Sports API
+        /// </summary>
+        /// <returns>Returns true if the action succeeded</returns>
+        public Task<bool> LoadMarketDescriptionsAsync()
+        {
+            return Task.FromResult(true);
+        }
+
+        /// <summary>
         /// Registers the health check which will be periodically triggered
         /// </summary>
         public void RegisterHealthCheck()

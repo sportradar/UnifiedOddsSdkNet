@@ -148,6 +148,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             }
             try
             {
+                _fetchedLanguages.Clear();
+                ExecutionLog.Debug($"Loading variant market descriptions for [{string.Join(",", languagesToFetch.Select(l => l.TwoLetterISOLanguageName))}] (timer).");
                 await GetVariantDescriptionInternalAsync("0", languagesToFetch).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -233,8 +235,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
                 var cultureTaskDictionary = missingLanguages.ToDictionary(l => l, l => _dataRouterManager.GetVariantDescriptionsAsync(l));
                 await Task.WhenAll(cultureTaskDictionary.Values).ConfigureAwait(false);
-
-                missingLanguages.ForEach(s => _fetchedLanguages.Add(s));
             }
             catch (Exception ex)
             {
@@ -317,6 +317,26 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             return cacheItem == null
                 ? null
                 : new VariantDescription(cacheItem, cultureList);
+        }
+
+        /// <summary>
+        /// Asynchronously loads the list of market descriptions from the Sports API
+        /// </summary>
+        /// <returns>Returns true if the action succeeded</returns>
+        public async Task<bool> LoadMarketDescriptionsAsync()
+        {
+            try
+            {
+                ExecutionLog.Debug($"Loading variant market descriptions for [{string.Join(", ", _prefetchLanguages.Select(l => l.TwoLetterISOLanguageName))}] (user request).");
+                _fetchedLanguages.Clear();
+                await GetVariantDescriptionInternalAsync("0", _prefetchLanguages).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                ExecutionLog.Warn($"An error occurred while fetching market descriptions. The exception:{ex.Message}");
+                return false;
+            }
+            return true;
         }
 
         /// <summary>

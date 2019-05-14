@@ -163,7 +163,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new InjectionConstructor(
                     config,
                     new ResolvedParameter<IMarketCacheProvider>(),
-                    new ResolvedParameter<IMarketDescriptionCache>("InvariantMarketDescriptionsCache")));
+                    new ResolvedParameter<IMarketDescriptionCache>("InvariantMarketDescriptionsCache"),
+                    new ResolvedParameter<IVariantDescriptionCache>("VariantDescriptionsCache")));
 
             container.RegisterType<IFeedMessageMapper, FeedMessageMapper>(
                 new ContainerControlledLifetimeManager(),
@@ -727,12 +728,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new ContainerControlledLifetimeManager());
 
             // Timer for invariant markets
-            container.RegisterType<ITimer, SdkTimer>(
-                "InvariantMarketCacheTimer",
-                new HierarchicalLifetimeManager(),
-                new InjectionConstructor(
-                    TimeSpan.FromSeconds(5),
-                    TimeSpan.FromHours(6)));
+            container.RegisterType<ITimer, SdkTimer>("InvariantMarketCacheTimer",
+                                                     new HierarchicalLifetimeManager(),
+                                                     new InjectionConstructor(TimeSpan.FromSeconds(5),
+                                                                              TimeSpan.FromHours(6)));
 
             container.RegisterType<IMappingValidatorFactory, MappingValidatorFactory>(new ContainerControlledLifetimeManager());
 
@@ -771,12 +770,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new ContainerControlledLifetimeManager());
 
             // Timer for variant descriptions
-            container.RegisterType<ITimer, SdkTimer>(
-                "VariantDescriptionsCacheTimer",
-                new HierarchicalLifetimeManager(),
-                new InjectionConstructor(
-                    TimeSpan.FromSeconds(5),
-                    TimeSpan.FromHours(6)));
+            container.RegisterType<ITimer, SdkTimer>("VariantDescriptionsCacheTimer",
+                                                     new HierarchicalLifetimeManager(),
+                                                     new InjectionConstructor(TimeSpan.FromSeconds(5),
+                                                                              TimeSpan.FromHours(6)));
 
             container.RegisterType<IMappingValidatorFactory, MappingValidatorFactory>(new ContainerControlledLifetimeManager());
 

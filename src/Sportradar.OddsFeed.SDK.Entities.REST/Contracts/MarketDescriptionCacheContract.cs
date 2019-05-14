@@ -21,5 +21,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Contracts
 
             return Contract.Result<Task<IMarketDescription>>();
         }
+
+        /// <summary>
+        /// Asynchronously loads the list of market descriptions from the Sports API
+        /// </summary>
+        /// <returns>Returns true if the action succeeded</returns>
+        public Task<bool> LoadMarketDescriptionsAsync()
+        {
+            return Contract.Result<Task<bool>>();
+        }
     }
 }
