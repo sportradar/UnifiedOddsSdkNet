@@ -64,7 +64,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         {
             const string callType = "GetSportEventSummaryAsync";
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(callType));
-            _dataRouterManager.GetSportEventSummaryAsync(TournamentIdExtra, _cultureEn, null);
+            _dataRouterManager.GetSportEventSummaryAsync(TournamentIdExtra, _cultureEn, null).ConfigureAwait(false);
             Assert.AreEqual(1, _dataRouterManager.GetCallCount(callType), $"{callType} should be called exactly 1 time.");
         }
 
@@ -73,24 +73,24 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         {
             var callType = string.Empty;
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(callType));
-            _dataRouterManager.GetSportEventSummaryAsync(EventId, _cultureEn, null);
-            _dataRouterManager.GetSportEventFixtureAsync(EventId, _cultureEn, true, null);
-            _dataRouterManager.GetAllTournamentsForAllSportAsync(_cultureEn);
-            _dataRouterManager.GetAllSportsAsync(_cultureEn);
-            _dataRouterManager.GetLiveSportEventsAsync(_cultureEn);
-            _dataRouterManager.GetSportEventsForDateAsync(DateTime.Now, _cultureEn);
-            _dataRouterManager.GetSportEventsForTournamentAsync(TournamentIdExtra, _cultureEn, null);
-            _dataRouterManager.GetPlayerProfileAsync(PlayerId, _cultureEn, null);
-            _dataRouterManager.GetCompetitorAsync(CompetitorId, _cultureEn, null);
-            _dataRouterManager.GetSeasonsForTournamentAsync(TournamentIdExtra, _cultureEn, null);
-            _dataRouterManager.GetInformationAboutOngoingEventAsync(EventId, _cultureEn, null);
-            _dataRouterManager.GetMarketDescriptionsAsync(_cultureEn);
-            _dataRouterManager.GetVariantDescriptionsAsync(_cultureEn);
-            _dataRouterManager.GetVariantMarketDescriptionAsync(1, "variant", _cultureEn);
-            _dataRouterManager.GetDrawSummaryAsync(DrawId, _cultureEn, null);
-            _dataRouterManager.GetDrawFixtureAsync(DrawId, _cultureEn, null);
-            _dataRouterManager.GetLotteryScheduleAsync(LotteryId, _cultureEn, null);
-            _dataRouterManager.GetAllLotteriesAsync(_cultureEn);
+            _dataRouterManager.GetSportEventSummaryAsync(EventId, _cultureEn, null).ConfigureAwait(false);
+            _dataRouterManager.GetSportEventFixtureAsync(EventId, _cultureEn, true, null).ConfigureAwait(false);
+            _dataRouterManager.GetAllTournamentsForAllSportAsync(_cultureEn).ConfigureAwait(false);
+            _dataRouterManager.GetAllSportsAsync(_cultureEn).ConfigureAwait(false);
+            _dataRouterManager.GetLiveSportEventsAsync(_cultureEn).ConfigureAwait(false);
+            _dataRouterManager.GetSportEventsForDateAsync(DateTime.Now, _cultureEn).ConfigureAwait(false);
+            _dataRouterManager.GetSportEventsForTournamentAsync(TournamentIdExtra, _cultureEn, null).ConfigureAwait(false);
+            _dataRouterManager.GetPlayerProfileAsync(PlayerId, _cultureEn, null).ConfigureAwait(false);
+            _dataRouterManager.GetCompetitorAsync(CompetitorId, _cultureEn, null).ConfigureAwait(false);
+            _dataRouterManager.GetSeasonsForTournamentAsync(TournamentIdExtra, _cultureEn, null).ConfigureAwait(false);
+            _dataRouterManager.GetInformationAboutOngoingEventAsync(EventId, _cultureEn, null).ConfigureAwait(false);
+            _dataRouterManager.GetMarketDescriptionsAsync(_cultureEn).ConfigureAwait(false);
+            _dataRouterManager.GetVariantDescriptionsAsync(_cultureEn).ConfigureAwait(false);
+            _dataRouterManager.GetVariantMarketDescriptionAsync(1, "variant", _cultureEn).ConfigureAwait(false);
+            _dataRouterManager.GetDrawSummaryAsync(DrawId, _cultureEn, null).ConfigureAwait(false);
+            _dataRouterManager.GetDrawFixtureAsync(DrawId, _cultureEn, null).ConfigureAwait(false);
+            _dataRouterManager.GetLotteryScheduleAsync(LotteryId, _cultureEn, null).ConfigureAwait(false);
+            _dataRouterManager.GetAllLotteriesAsync(_cultureEn).ConfigureAwait(false);
             Assert.AreEqual(18, _dataRouterManager.GetCallCount(callType), "DataRouterManager should be called exactly 18 times.");
         }
 
@@ -157,11 +157,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                     dateEvents = await _sportEventCache.GetEventIdsAsync(DateTime.Now);
                 }).GetAwaiter().GetResult();
 
+                Assert.IsNotNull(sports, "Retrieved sports cannot be null");
+                // ReSharper disable once PossibleMultipleEnumeration
                 foreach (var s in sports)
                 {
                     BaseSportDataValidation(s);
                 }
-                Assert.IsNotNull(sports, "Retrieved sports cannot be null");
                 Assert.IsNotNull(sport, "sport cannot be a null reference");
                 Assert.IsNotNull(tournament, "tournament cannot be a null reference");
                 Assert.IsNotNull(tournamentEvents, "tournamentEvents cannot be a null reference");

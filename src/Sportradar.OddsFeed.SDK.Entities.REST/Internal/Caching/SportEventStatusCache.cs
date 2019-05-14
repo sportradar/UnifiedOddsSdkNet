@@ -101,6 +101,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             }
 
             var timer = Metric.Context("DataRouterManager").Timer("GetSportEventStatusAsync", Unit.Requests);
+            // ReSharper disable once UnusedVariable
             using (var t = timer.NewContext($"{eventId}"))
             {
                 try
@@ -139,7 +140,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 }
                 finally
                 {
-                    var msg = $"GetSportEventStatusAsync: {eventId} returns status in {t.Elapsed.TotalMilliseconds} ms.";
+                    //var msg = $"GetSportEventStatusAsync: {eventId} returns status in {t.Elapsed.TotalMilliseconds} ms.";
                     if (!_isDisposed)
                     {
                         _fetchSemaphore.Release();
