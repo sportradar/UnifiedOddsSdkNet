@@ -240,6 +240,7 @@
     <Compile Include="IReplayResponse.cs" />
     <Compile Include="IReplayStatus.cs" />
     <Compile Include="ISpecificEntityDispatcher.cs" />
+    <Compile Include="ISportDataProviderV1.cs" />
     <Compile Include="ISportDataProvider.cs" />
     <Compile Include="Feed.cs" />
     <Compile Include="Internal\IGlobalEventDispatcher.cs" />
