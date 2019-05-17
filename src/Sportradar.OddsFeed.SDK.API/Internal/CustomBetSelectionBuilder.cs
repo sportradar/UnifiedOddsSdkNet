@@ -9,34 +9,34 @@ using Sportradar.OddsFeed.SDK.Messages;
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
     /// <summary>
-    /// The run-time implementation of the <see cref="ISelectionBuilder"/> interface
+    /// The run-time implementation of the <see cref="ICustomBetSelectionBuilder"/> interface
     /// </summary>
-    internal class SelectionBuilder : ISelectionBuilder
+    internal class CustomBetSelectionBuilder : ICustomBetSelectionBuilder
     {
         private URN _eventId;
         private int _marketId;
         private string _specifiers;
         private string _outcomeId;
 
-        public ISelectionBuilder SetEventId(URN eventId)
+        public ICustomBetSelectionBuilder SetEventId(URN eventId)
         {
             _eventId = eventId;
             return this;
         }
 
-        public ISelectionBuilder SetMarketId(int marketId)
+        public ICustomBetSelectionBuilder SetMarketId(int marketId)
         {
             _marketId = marketId;
             return this;
         }
 
-        public ISelectionBuilder SetSpecifiers(string specifiers)
+        public ICustomBetSelectionBuilder SetSpecifiers(string specifiers)
         {
             _specifiers = specifiers;
             return this;
         }
 
-        public ISelectionBuilder SetOutcomeId(string outcomeId)
+        public ICustomBetSelectionBuilder SetOutcomeId(string outcomeId)
         {
             _outcomeId = outcomeId;
             return this;

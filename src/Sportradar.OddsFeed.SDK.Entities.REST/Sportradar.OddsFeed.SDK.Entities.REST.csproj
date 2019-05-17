@@ -129,6 +129,7 @@
     <Compile Include="IBasicTournament.cs" />
     <Compile Include="IBonusInfo.cs" />
     <Compile Include="IBookmakerDetails.cs" />
+    <Compile Include="IFixtureChange.cs" />
     <Compile Include="ICategorySummary.cs" />
     <Compile Include="ICategory.cs" />
     <Compile Include="ICompetitionV1.cs" />
@@ -144,6 +145,7 @@
     <Compile Include="Internal\DTO\CustomBet\AvailableSelectionsDTO.cs" />
     <Compile Include="Internal\DTO\CustomBet\MarketDTO.cs" />
     <Compile Include="Internal\DTO\SimpleTeamProfileDTO.cs" />
+    <Compile Include="Internal\DTO\FixtureChangeDTO.cs" />
     <Compile Include="Internal\DTO\SportCategoriesDTO.cs" />
     <Compile Include="Internal\DTO\PitcherDTO.cs" />
     <Compile Include="Internal\DTO\PlayerCompetitorDTO.cs" />
@@ -151,6 +153,7 @@
     <Compile Include="Internal\EntitiesImpl\CustomBet\Selection.cs" />
     <Compile Include="Internal\EntitiesImpl\CustomBet\AvailableSelections.cs" />
     <Compile Include="Internal\EntitiesImpl\CustomBet\Market.cs" />
+    <Compile Include="Internal\EntitiesImpl\FixtureChange.cs" />
     <Compile Include="Internal\EntitiesImpl\ScheduledStartTimeChange.cs" />
     <Compile Include="Internal\EntitiesImpl\Pitcher.cs" />
     <Compile Include="Internal\ICalculateProbabilityProvider.cs" />
@@ -159,7 +162,9 @@
     <Compile Include="Internal\Mapping\CalculationMapperFactory.cs" />
     <Compile Include="Internal\Mapping\SimpleTeamProfileMapper.cs" />
     <Compile Include="Internal\Mapping\SimpleTeamProfileMapperFactory.cs" />
+    <Compile Include="Internal\Mapping\FixtureChangesMapper.cs" />
     <Compile Include="Internal\Mapping\SportCategoriesMapper.cs" />
+    <Compile Include="Internal\Mapping\FixtureChangesMapperFactory.cs" />
     <Compile Include="Internal\Mapping\SportCategoriesMapperFactory.cs" />
     <Compile Include="Internal\Mapping\AvailableSelectionsMapperFactory.cs" />
     <Compile Include="IPitcher.cs" />

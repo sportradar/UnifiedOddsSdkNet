@@ -17,6 +17,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -124,6 +125,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         private readonly ICalculateProbabilityProvider _calculateProbabilityProvider;
 
         /// <summary>
+        /// The fixture changes provider
+        /// </summary>
+        private readonly IDataProvider<IEnumerable<FixtureChangeDTO>> _fixtureChangesProvider;
+
+        /// <summary>
         /// The cache manager
         /// </summary>
         private readonly ICacheManager _cacheManager;
@@ -171,6 +177,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="lotteryScheduleProvider">Lottery schedule provider (single lottery with schedule)</param>
         /// <param name="lotteryListProvider">Lottery list provider</param>
         /// <param name="availableSelectionsProvider">Available selections provider</param>
+        /// <param name="calculateProbabilityProvider">The probability calculation provider</param>
+        /// <param name="fixtureChangesProvider">Fixture changes provider</param>
         public DataRouterManager(ICacheManager cacheManager,
                                  IProducerManager producerManager,
                                  ExceptionHandlingStrategy exceptionHandlingStrategy,
@@ -196,7 +204,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                                  IDataProvider<LotteryDTO> lotteryScheduleProvider,
                                  IDataProvider<EntityList<LotteryDTO>> lotteryListProvider,
                                  IDataProvider<AvailableSelectionsDTO> availableSelectionsProvider,
-                                 ICalculateProbabilityProvider calculateProbabilityProvider)
+                                 ICalculateProbabilityProvider calculateProbabilityProvider,
+                                 IDataProvider<IEnumerable<FixtureChangeDTO>> fixtureChangesProvider)
         {
             Contract.Requires(cacheManager != null);
             Contract.Requires(sportEventSummaryProvider != null);
@@ -221,6 +230,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Contract.Requires(lotteryListProvider != null);
             Contract.Requires(availableSelectionsProvider != null);
             Contract.Requires(calculateProbabilityProvider != null);
+            Contract.Requires(fixtureChangesProvider != null);
 
             _cacheManager = cacheManager;
             var wnsProducer = producerManager.Get(7);
@@ -249,6 +259,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             _lotteryListProvider = lotteryListProvider;
             _availableSelectionsProvider = availableSelectionsProvider;
             _calculateProbabilityProvider = calculateProbabilityProvider;
+            _fixtureChangesProvider = fixtureChangesProvider;
         }
 
         /// <summary>
@@ -279,6 +290,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Contract.Invariant(_lotteryScheduleProvider != null);
             Contract.Invariant(_lotteryListProvider != null);
             Contract.Invariant(_availableSelectionsProvider != null);
+            Contract.Invariant(_calculateProbabilityProvider != null);
+            Contract.Invariant(_fixtureChangesProvider != null);
         }
 
         /// <summary>
@@ -1223,6 +1236,37 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                 WriteLog($"Executing CalculateProbability took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
                 return new Calculation(result);
+            }
+        }
+
+        public async Task<IEnumerable<IFixtureChange>> GetFixtureChangesAsync(CultureInfo culture)
+        {
+            Metric.Context("DataRouterManager").Meter("GetFixtureChangesAsync", Unit.Calls);
+            var timer = Metric.Context("DataRouterManager").Timer("GetFixtureChangesAsync", Unit.Requests);
+            using (var t = timer.NewContext())
+            {
+                WriteLog($"Executing GetFixtureChangesAsync.", true);
+
+                IEnumerable<FixtureChangeDTO> result = null;
+                int restCallTime;
+                try
+                {
+                    result = await _fixtureChangesProvider.GetDataAsync(culture.TwoLetterISOLanguageName).ConfigureAwait(false);
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                }
+                catch (Exception e)
+                {
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    var message = e.InnerException?.Message ?? e.Message;
+                    _executionLog.Error($"Error getting fixture changes. Message={message}", e.InnerException ?? e);
+                    if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                    {
+                        throw;
+                    }
+                }
+
+                WriteLog($"Executing GetFixtureChangesAsync took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
+                return result?.Select(f => new FixtureChange(f)).ToList();
             }
         }
 

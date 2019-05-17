@@ -22,22 +22,22 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         private readonly ILog _executionLog = SdkLoggerFactory.GetLoggerForExecution(typeof(BookingManager));
 
         private readonly IDataRouterManager _dataRouterManager;
-        private readonly ISelectionBuilder _selectionBuilder;
+        private readonly ICustomBetSelectionBuilder _customBetSelectionBuilder;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CustomBetManager"/> class
         /// </summary>
         /// <param name="dataRouterManager">A <see cref="IDataRouterManager"/> used to make custom bet API requests</param>
-        /// <param name="selectionBuilder">A <see cref="ISelectionBuilder"/> used to build selections</param>
-        public CustomBetManager(IDataRouterManager dataRouterManager, ISelectionBuilder selectionBuilder)
+        /// <param name="customBetSelectionBuilder">A <see cref="ICustomBetSelectionBuilder"/> used to build selections</param>
+        public CustomBetManager(IDataRouterManager dataRouterManager, ICustomBetSelectionBuilder customBetSelectionBuilder)
         {
             if (dataRouterManager == null)
                 throw new ArgumentNullException(nameof(dataRouterManager));
-            if (selectionBuilder == null)
-                throw new ArgumentNullException(nameof(selectionBuilder));
+            if (customBetSelectionBuilder == null)
+                throw new ArgumentNullException(nameof(customBetSelectionBuilder));
 
             _dataRouterManager = dataRouterManager;
-            SelectionBuilder = selectionBuilder;
+            CustomBetSelectionBuilder = customBetSelectionBuilder;
         }
 
         public async Task<IAvailableSelections> GetAvailableSelectionsAsync(URN eventId)
@@ -84,6 +84,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             }
         }
 
-        public ISelectionBuilder SelectionBuilder { get; }
+        public ICustomBetSelectionBuilder CustomBetSelectionBuilder { get; }
     }
 }

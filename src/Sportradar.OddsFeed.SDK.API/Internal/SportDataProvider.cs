@@ -70,6 +70,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         private readonly ILocalizedNamedValueCache _matchStatusCache;
 
         /// <summary>
+        /// The data router manager
+        /// </summary>
+        private readonly IDataRouterManager _dataRouterManager;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SportDataProvider"/> class
         /// </summary>
         /// <param name="sportEntityFactory">A <see cref="ISportEntityFactory"/> used to construct <see cref="ITournament"/> instances</param>
@@ -87,7 +92,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                                  IEnumerable<CultureInfo> defaultCultures,
                                  ExceptionHandlingStrategy exceptionStrategy,
                                  ICacheManager cacheManager,
-                                 ILocalizedNamedValueCache matchStatusCache)
+                                 ILocalizedNamedValueCache matchStatusCache,
+                                 IDataRouterManager dataRouterManager)
         {
             Contract.Requires(sportEntityFactory != null);
             Contract.Requires(sportEventCache != null);
@@ -96,6 +102,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             Contract.Requires(defaultCultures.Any());
             Contract.Requires(cacheManager != null);
             Contract.Requires(matchStatusCache != null);
+            Contract.Requires(dataRouterManager != null);
 
             _sportEntityFactory = sportEntityFactory;
             _sportEventCache = sportEventCache;
@@ -105,6 +112,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             _exceptionStrategy = exceptionStrategy;
             _cacheManager = cacheManager;
             _matchStatusCache = matchStatusCache;
+            _dataRouterManager = dataRouterManager;
         }
 
         /// <summary>
@@ -117,7 +125,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             Contract.Invariant(_sportEventCache != null);
             Contract.Invariant(_defaultCultures != null);
             Contract.Invariant(_defaultCultures.Any());
-            Contract.Invariant(_cacheManager != null);
+            Contract.Invariant(_matchStatusCache != null);
+            Contract.Invariant(_dataRouterManager != null);
         }
 
         /// <summary>
@@ -260,6 +269,23 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         public ICompetition GetCompetition(URN id, CultureInfo culture = null)
         {
             return GetCompetition(id, null, culture);
+        }
+
+        /// <summary>
+        /// Gets the list of all fixtures that have changed in the last 24 hours
+        /// </summary>
+        /// <param name="culture">A <see cref="CultureInfo"/> specifying the language or a null reference to use the languages specified in the configuration</param>
+        /// <returns>A list of all fixtures that have changed in the last 24 hours</returns>
+        public async Task<IEnumerable<IFixtureChange>> GetFixtureChangesAsync(CultureInfo culture = null)
+        {
+            culture = culture ?? _defaultCultures.First();
+
+            Log.Info($"Invoked GetFixtureChangesAsync: [Cultures={culture.TwoLetterISOLanguageName}].");
+
+            var result = (await _dataRouterManager.GetFixtureChangesAsync(culture).ConfigureAwait(false))?.ToList();
+
+            Log.Info($"GetFixtureChangesAsync returned {result?.Count} results.");
+            return result;
         }
 
         /// <summary>

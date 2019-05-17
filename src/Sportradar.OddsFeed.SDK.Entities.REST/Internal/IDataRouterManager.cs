@@ -176,5 +176,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="selections">The <see cref="IEnumerable{ISelection}"/> containing selections for which the probability should be calculated</param>
         /// <returns>The probability calculation for the specified selections</returns>
         Task<ICalculation> CalculateProbability(IEnumerable<ISelection> selections);
+
+        /// <summary>
+        /// Gets the list of all fixtures that have changed in the last 24 hours
+        /// </summary>
+        /// <param name="culture">The culture to be fetched</param>
+        /// <returns>The list of all fixtures that have changed in the last 24 hours</returns>
+        Task<IEnumerable<IFixtureChange>> GetFixtureChangesAsync(CultureInfo culture);
     }
 }

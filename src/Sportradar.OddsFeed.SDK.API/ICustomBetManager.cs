@@ -30,9 +30,9 @@ namespace Sportradar.OddsFeed.SDK.API
         Task<ICalculation> CalculateProbabilityAsync(IEnumerable<ISelection> selections);
 
         /// <summary>
-        /// Returns an <see cref="ISelectionBuilder"/> instance used to build selections
+        /// Returns an <see cref="ICustomBetSelectionBuilder"/> instance used to build selections
         /// </summary>
-        /// <returns>An <see cref="ISelectionBuilder"/> instance used to build selections</returns>
-        ISelectionBuilder SelectionBuilder { get; }
+        /// <returns>An <see cref="ICustomBetSelectionBuilder"/> instance used to build selections</returns>
+        ICustomBetSelectionBuilder CustomBetSelectionBuilder { get; }
     }
 }

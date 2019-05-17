@@ -223,4 +223,8 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST
     public partial class CalculationResponseType : RestMessage
     {
     }
+
+    public partial class fixtureChangesEndpoint : RestMessage
+    {
+    }
 }

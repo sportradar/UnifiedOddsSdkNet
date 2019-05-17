@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Entities.REST.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
@@ -464,12 +465,17 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             return null;
         }
 
-        Task<IAvailableSelections> IDataRouterManager.GetAvailableSelectionsAsync(URN id)
+        public async Task<IAvailableSelections> GetAvailableSelectionsAsync(URN id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ICalculation> CalculateProbability(IEnumerable<ISelection> selections)
+        public async Task<ICalculation> CalculateProbability(IEnumerable<ISelection> selections)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<IFixtureChange>> GetFixtureChangesAsync(CultureInfo culture)
         {
             throw new NotImplementedException();
         }

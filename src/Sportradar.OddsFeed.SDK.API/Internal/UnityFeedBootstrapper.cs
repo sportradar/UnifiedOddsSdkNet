@@ -151,7 +151,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     config.Locales,
                     new ResolvedParameter<ExceptionHandlingStrategy>(),
                     new ResolvedParameter<ICacheManager>(),
-                    new ResolvedParameter<ILocalizedNamedValueCache>("MatchStatusCache")));
+                    new ResolvedParameter<ILocalizedNamedValueCache>("MatchStatusCache"),
+                    new ResolvedParameter<IDataRouterManager>()));
 
             container.RegisterType<IBookingManager, BookingManager>(
                 new ContainerControlledLifetimeManager(),
@@ -470,6 +471,17 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<IDeserializer<sportCategoriesEndpoint>>(),
                     new ResolvedParameter<ISingleTypeMapperFactory<sportCategoriesEndpoint, SportCategoriesDTO>>()));
 
+            // provider for getting info about sport categories
+            container.RegisterType<IDeserializer<fixtureChangesEndpoint>, Deserializer<fixtureChangesEndpoint>>(new ContainerControlledLifetimeManager());
+            container.RegisterType<ISingleTypeMapperFactory<fixtureChangesEndpoint, IEnumerable<FixtureChangeDTO>>, FixtureChangesMapperFactory>(new ContainerControlledLifetimeManager());
+            container.RegisterType<IDataProvider<IEnumerable<FixtureChangeDTO>>, DataProvider<fixtureChangesEndpoint, IEnumerable<FixtureChangeDTO>>>(
+                new ContainerControlledLifetimeManager(),
+                new InjectionConstructor(
+                    config.ApiBaseUri + "/v1/sports/{0}/fixtures/changes.xml",
+                    new ResolvedParameter<IDataFetcher>(),
+                    new ResolvedParameter<IDeserializer<fixtureChangesEndpoint>>(),
+                    new ResolvedParameter<ISingleTypeMapperFactory<fixtureChangesEndpoint, IEnumerable<FixtureChangeDTO>>>()));
+
             // invariant market descriptions provider
             container.RegisterType<IDeserializer<market_descriptions>, Deserializer<market_descriptions>>(new ContainerControlledLifetimeManager());
             container.RegisterType<ISingleTypeMapperFactory<market_descriptions, EntityList<MarketDescriptionDTO>>, MarketDescriptionsMapperFactory>(new ContainerControlledLifetimeManager());
@@ -579,7 +591,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<IDataProvider<LotteryDTO>>("lotteryScheduleProvider"),
                     new ResolvedParameter<IDataProvider<EntityList<LotteryDTO>>>("lotteryListProvider"),
                     new ResolvedParameter<IDataProvider<AvailableSelectionsDTO>>(),
-                    new ResolvedParameter<ICalculateProbabilityProvider>()));
+                    new ResolvedParameter<ICalculateProbabilityProvider>(),
+                    new ResolvedParameter<IDataProvider<IEnumerable<FixtureChangeDTO>>>()));
         }
 
         private static void RegisterSessionTypes(IUnityContainer container)
@@ -983,7 +996,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
         private static void RegisterCustomBetManager(IUnityContainer container, IOddsFeedConfigurationInternal config)
         {
-            container.RegisterType<ISelectionBuilder, SelectionBuilder>(new ContainerControlledLifetimeManager());
+            container.RegisterType<ICustomBetSelectionBuilder, CustomBetSelectionBuilder>(new ContainerControlledLifetimeManager());
             
 
             container.RegisterType<IDeserializer<AvailableSelectionsType>, Deserializer<AvailableSelectionsType>>(new ContainerControlledLifetimeManager());
@@ -1011,7 +1024,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     new ResolvedParameter<IDataRouterManager>(),
-                    new ResolvedParameter<ISelectionBuilder>()));
+                    new ResolvedParameter<ICustomBetSelectionBuilder>()));
         }
     }
 }

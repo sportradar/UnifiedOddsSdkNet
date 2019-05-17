@@ -23,5 +23,12 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language or a null reference to use the languages specified in the configuration</param>
         /// <returns>A <see cref="ICompetition"/> representing the specified sport event or a null reference if the requested sport event does not exist</returns>
         ICompetition GetCompetition(URN id, CultureInfo culture = null);
+
+        /// <summary>
+        /// Gets the list of all fixtures that have changed in the last 24 hours
+        /// </summary>
+        /// <param name="culture">A <see cref="CultureInfo"/> specifying the language or a null reference to use the languages specified in the configuration</param>
+        /// <returns>A list of all fixtures that have changed in the last 24 hours</returns>
+        Task<IEnumerable<IFixtureChange>> GetFixtureChangesAsync(CultureInfo culture = null);
     }
 }
