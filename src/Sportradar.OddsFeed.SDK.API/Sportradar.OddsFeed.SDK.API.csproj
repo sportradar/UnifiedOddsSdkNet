@@ -150,7 +150,6 @@
     <Compile Include="Internal\RecoveryResult.cs" />
     <Compile Include="Internal\RecoveryStatusChangeReason.cs" />
     <Compile Include="Internal\TimestampTracker.cs" />
-    <Compile Include="IOddsFeedV3.cs" />
     <Compile Include="IOddsFeedV2.cs" />
     <Compile Include="IOddsFeedV1.cs" />
     <Compile Include="IReplayManagerV1.cs" />
