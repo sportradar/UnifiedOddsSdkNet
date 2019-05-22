@@ -9,6 +9,18 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2019-05-22  1.20.0.0
+Added support for custom bets
+Added CustomBetManager, MarketDescriptionManager and EventRecoveryCompleted event to the IOddsFeedV2 (extends IOddsFeed)
+Added GetCompetition method without sportId parameter to the ISportDataProviderV1 (extends ISportDataProvider)
+Added GetFixtureChanges to the ISportsInfoManagerV1 interface (extends ISportsInfoManager)
+Exposed OutcomeDefinition on IOutcomeV1 (extends IOutcome)
+Exposed option to reload market descriptions
+Fix: creating session with MessageInterest.SpecificEventOnly
+Fix: exception when getting data for tournament with no schedule
+Fix: calling TournamentInfoCI.GetScheduleAsync() from multiple threads
+Fix: IMarketMappingData, IOutcomeMappingData moved from internal to public namespace
+
 2019-04-18  1.19.0.0
 Added property GroupId to the Round interface - IRound extended with IRoundV1
 Improved handling of SportEventStatus updates
