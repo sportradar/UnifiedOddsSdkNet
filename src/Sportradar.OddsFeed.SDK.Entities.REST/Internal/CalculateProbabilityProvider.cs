@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using Microsoft.Xml.Serialization.GeneratedAssembly;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.CustomBet;
@@ -37,17 +38,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// </summary>
         /// <param name="uriFormat">The url format specifying the url of the resources fetched by the fetcher</param>
         /// <param name="poster">A <see cref="IDataPoster" /> used to fetch the data</param>
-        /// <param name="serializer">A <see cref="XmlSerializer" /> used to serialize request data</param>
         /// <param name="deserializer">A <see cref="IDeserializer{CalculationResponseType}" /> used to deserialize the fetch data</param>
         /// <param name="mapperFactory">A <see cref="ISingleTypeMapperFactory{CalculationResponseType, CalculationDTO}" /> used to construct instances of <see cref="ISingleTypeMapper{CalculationDTO}" /></param>
-        public CalculateProbabilityProvider(string uriFormat, IDataPoster poster, XmlSerializer serializer, IDeserializer<CalculationResponseType> deserializer, ISingleTypeMapperFactory<CalculationResponseType, CalculationDTO> mapperFactory)
+        public CalculateProbabilityProvider(string uriFormat, IDataPoster poster, IDeserializer<CalculationResponseType> deserializer, ISingleTypeMapperFactory<CalculationResponseType, CalculationDTO> mapperFactory)
         {
             if (string.IsNullOrWhiteSpace(uriFormat))
                 throw new ArgumentOutOfRangeException(nameof(uriFormat));
             if (poster == null)
                 throw new ArgumentNullException(nameof(poster));
-            if (serializer == null)
-                throw new ArgumentNullException(nameof(serializer));
             if (deserializer == null)
                 throw new ArgumentNullException(nameof(deserializer));
             if (mapperFactory == null)
@@ -57,7 +55,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             _poster = poster;
             _deserializer = deserializer;
             _mapperFactory = mapperFactory;
-            _serializer = serializer;
+            _serializer = new XmlSerializerContract().GetSerializer(typeof(SelectionsType));
         }
 
         /// <summary>

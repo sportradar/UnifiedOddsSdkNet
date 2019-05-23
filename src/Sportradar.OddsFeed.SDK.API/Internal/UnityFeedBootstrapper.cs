@@ -1016,7 +1016,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new InjectionConstructor(
                     config.ApiBaseUri + "/v1/custombet/calculate",
                     new ResolvedParameter<IDataPoster>(),
-                    new XmlSerializer(typeof(SelectionsType)),
                     new ResolvedParameter<IDeserializer<CalculationResponseType>>(),
                     new ResolvedParameter<ISingleTypeMapperFactory<CalculationResponseType, CalculationDTO>>()));
 
