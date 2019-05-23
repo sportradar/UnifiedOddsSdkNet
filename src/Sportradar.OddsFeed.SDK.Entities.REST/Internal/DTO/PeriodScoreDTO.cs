@@ -89,21 +89,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                 }
             }
 
-            if (PeriodNumber != null && tempPeriodType == null)
+            if (MatchStatusCode != null && tempPeriodType == null)
             {
-                if (PeriodNumber == 40)
+                if (MatchStatusCode == 40)
                 {
                     // <match_status description="Overtime" id="40"/>
                     tempPeriodType = PeriodType.Overtime;
                 }
-                else if (PeriodNumber == 50 || PeriodNumber == 51 || PeriodNumber == 52)
+                else if (MatchStatusCode == 50 || MatchStatusCode == 51 || MatchStatusCode == 52)
                 {
                     // <match_status description="Penalties" id="50"/>
                     // <match_status description="Penalties" id="51"/>
                     // <match_status description="Penalties" id="52"/>
                     tempPeriodType = PeriodType.Penalties;
                 }
-                else if (PeriodNumber != 0)
+                else if (MatchStatusCode != 0)
                 {
                     tempPeriodType = PeriodType.RegularPeriod;
                 }
