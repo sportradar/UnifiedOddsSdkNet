@@ -25,6 +25,9 @@ The package contains:
 For more information please contact support@sportradar.com or visit https://iodocs.betradar.com/unifiedsdk/index.html
 
 CHANGE LOG:
+2019-05-23  1.20.1.0
+Fix: unable to initialize feed
+
 2019-05-22  1.20.0.0
 Added support for custom bets
 Added CustomBetManager, MarketDescriptionManager and EventRecoveryCompleted event to the IOddsFeedV2 (extends IOddsFeed)

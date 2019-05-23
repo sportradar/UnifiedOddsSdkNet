@@ -9,6 +9,9 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2019-05-23  1.20.1.0
+Fix: unable to initialize feed
+
 2019-05-22  1.20.0.0
 Added support for custom bets
 Added CustomBetManager, MarketDescriptionManager and EventRecoveryCompleted event to the IOddsFeedV2 (extends IOddsFeed)

@@ -51,8 +51,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Sportradar.OddsFeed.SDK, Version=1.20.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sportradar.OddsFeed.SDK.1.20.0\lib\net45\Sportradar.OddsFeed.SDK.dll</HintPath>
+    <Reference Include="Sportradar.OddsFeed.SDK, Version=1.20.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sportradar.OddsFeed.SDK.1.20.1\lib\net45\Sportradar.OddsFeed.SDK.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
