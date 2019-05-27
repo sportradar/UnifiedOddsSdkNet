@@ -293,6 +293,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 else
                 {
                     ExecutionLog.Warn($"Fetching summary for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH ERROR.");
+                    if (((DataRouterManager)DataRouterManager).ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                    {
+                        throw;
+                    }
                 }
             }
             catch (Exception ex)
@@ -374,6 +378,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 else
                 {
                     ExecutionLog.Warn($"Fetching fixtures for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH ERROR.");
+                    if (((DataRouterManager)DataRouterManager).ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                    {
+                        throw;
+                    }
                 }
             }
             catch (Exception ex)
