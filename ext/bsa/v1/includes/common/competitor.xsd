@@ -6,4 +6,9 @@
                 <xs:element name="competitor" type="team" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
+        <xs:complexType name="competitorsExtended">
+            <xs:sequence>
+                <xs:element name="competitor" type="teamExtended" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
 </xs:schema>

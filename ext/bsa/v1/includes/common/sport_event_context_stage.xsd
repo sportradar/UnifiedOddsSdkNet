@@ -3,7 +3,8 @@
     <xs:complexType name="sportEventContextStageType">
         <xs:attribute name="type" type="seasonStageType"/>
         <xs:attribute name="level" type="seasonStageLevelType"/>
-        <xs:attribute name="round" type="xs:int"/>
+        <xs:attribute name="round" type="xs:string"/>
+        <xs:attribute name="number" type="xs:int"/>
     </xs:complexType>
     <xs:simpleType name="seasonStageType">
         <xs:restriction base="xs:string">
