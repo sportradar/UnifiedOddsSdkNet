@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
+using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
 using Sportradar.OddsFeed.SDK.Messages;
 

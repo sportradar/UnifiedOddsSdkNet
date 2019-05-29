@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
+using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -21,7 +21,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
     /// </summary>
     internal class MarketDescriptionManager : IMarketDescriptionManager
     {
-        //private readonly ILog _clientLog = SdkLoggerFactory.GetLoggerForClientInteraction(typeof(BookingManager));
         private readonly ILog _executionLog = SdkLoggerFactory.GetLoggerForExecution(typeof(MarketDescriptionManager));
 
         private readonly IOddsFeedConfigurationInternal _config;

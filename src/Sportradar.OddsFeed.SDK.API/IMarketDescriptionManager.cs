@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities;
+using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
 using Sportradar.OddsFeed.SDK.Messages;
 

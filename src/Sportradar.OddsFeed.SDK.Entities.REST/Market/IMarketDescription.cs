@@ -1,12 +1,13 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
 
-namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
+namespace Sportradar.OddsFeed.SDK.Entities.REST.Market
 {
     /// <summary>
     /// Defines a contract implemented by classes representing market description
