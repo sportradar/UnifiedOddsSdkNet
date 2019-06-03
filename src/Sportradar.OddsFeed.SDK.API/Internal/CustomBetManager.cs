@@ -18,8 +18,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
     /// </summary>
     internal class CustomBetManager : ICustomBetManager
     {
-        private readonly ILog _clientLog = SdkLoggerFactory.GetLoggerForClientInteraction(typeof(BookingManager));
-        private readonly ILog _executionLog = SdkLoggerFactory.GetLoggerForExecution(typeof(BookingManager));
+        private readonly ILog _clientLog = SdkLoggerFactory.GetLoggerForClientInteraction(typeof(CustomBetManager));
+        private readonly ILog _executionLog = SdkLoggerFactory.GetLoggerForExecution(typeof(CustomBetManager));
 
         private readonly IDataRouterManager _dataRouterManager;
         private readonly ICustomBetSelectionBuilder _customBetSelectionBuilder;

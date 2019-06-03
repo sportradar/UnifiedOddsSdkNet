@@ -995,7 +995,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         private static void RegisterCustomBetManager(IUnityContainer container, IOddsFeedConfigurationInternal config)
         {
             container.RegisterType<ICustomBetSelectionBuilder, CustomBetSelectionBuilder>(new ContainerControlledLifetimeManager());
-            
 
             container.RegisterType<IDeserializer<AvailableSelectionsType>, Deserializer<AvailableSelectionsType>>(new ContainerControlledLifetimeManager());
             container.RegisterType<ISingleTypeMapperFactory<AvailableSelectionsType, AvailableSelectionsDTO>, AvailableSelectionsMapperFactory>(new ContainerControlledLifetimeManager());
