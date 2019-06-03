@@ -26,9 +26,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
     /// <summary>
     /// A <see cref="IVariantDescriptionCache" /> implementation used to store <see cref="IVariantDescription"/> for variant markets (static)
     /// </summary>
-    /// <seealso cref="System.IDisposable" />
     /// <seealso cref="IVariantDescriptionCache" />
-    internal class VariantDescriptionCache : SdkCache, IVariantDescriptionCache, IDisposable, IHealthStatusProvider
+    internal class VariantDescriptionListCache : SdkCache, IVariantDescriptionCache, IDisposable, IHealthStatusProvider
     {
         /// <summary>
         /// A <see cref="ObjectCache"/> used to store variant descriptions
@@ -89,7 +88,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <param name="timer">The <see cref="ITimer"/> instance used to periodically fetch market descriptors</param>
         /// <param name="prefetchLanguages">A <see cref="IReadOnlyCollection{CultureInfo}"/> specifying the languages for which the data should be pre-fetched</param>
         /// <param name="cacheManager">A <see cref="ICacheManager"/> used to interact among caches</param>
-        public VariantDescriptionCache(ObjectCache cache,
+        public VariantDescriptionListCache(ObjectCache cache,
                                        IDataRouterManager dataRouterManager,
                                        IMappingValidatorFactory mappingValidatorFactory,
                                        ITimer timer,
@@ -512,6 +511,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 case DtoType.BookingStatus:
                     break;
                 case DtoType.SportCategories:
+                    break;
+                case DtoType.AvailableSelections:
                     break;
                 default:
                     ExecutionLog.Warn($"Trying to add unchecked dto type: {dtoType} for id: {id}.");

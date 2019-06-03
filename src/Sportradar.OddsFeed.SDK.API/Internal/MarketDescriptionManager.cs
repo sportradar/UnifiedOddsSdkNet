@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
@@ -19,15 +21,16 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
     /// <summary>
     /// The run-time implementation of the <see cref="IMarketDescriptionManager"/> interface
     /// </summary>
-    internal class MarketDescriptionManager : IMarketDescriptionManager
+    internal class MarketDescriptionManager : IMarketDescriptionManagerV1
     {
         private readonly ILog _executionLog = SdkLoggerFactory.GetLoggerForExecution(typeof(MarketDescriptionManager));
 
         private readonly IOddsFeedConfigurationInternal _config;
         private readonly IMarketCacheProvider _marketCacheProvider;
         private readonly InvariantMarketDescriptionCache _invariantMarketDescriptionCache;
-        private readonly IVariantDescriptionCache _variantDescriptionCache;
+        private readonly IVariantDescriptionCache _variantDescriptionListCache;
         private readonly ExceptionHandlingStrategy _exceptionHandlingStrategy;
+        private readonly IMarketDescriptionCache _variantDescriptionCache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MarketDescriptionManager"/> class
@@ -35,11 +38,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="config">The <see cref="IOddsFeedConfigurationInternal"/> representing feed configuration</param>
         /// <param name="marketCacheProvider">A <see cref="IMarketCacheProvider"/> used to get market descriptions</param>
         /// <param name="invariantMarketDescriptionCache">A <see cref="IMarketDescriptionCache"/> used to get invariant market descriptions</param>
-        /// <param name="variantDescriptionCache">A <see cref="IVariantDescriptionCache"/> used to reload variant market descriptions</param>
+        /// <param name="variantDescriptionListCache">A <see cref="IVariantDescriptionCache"/> used to reload variant market descriptions</param>
+        /// <param name="variantDescriptionCache">A <see cref="IMarketDescriptionCache"/> used to access market variant cache (singles)</param>
         public MarketDescriptionManager(IOddsFeedConfigurationInternal config,
                                         IMarketCacheProvider marketCacheProvider,
                                         IMarketDescriptionCache invariantMarketDescriptionCache,
-                                        IVariantDescriptionCache variantDescriptionCache)
+                                        IVariantDescriptionCache variantDescriptionListCache,
+                                        IMarketDescriptionCache variantDescriptionCache)
         {
             if (config == null)
             {
@@ -53,12 +58,17 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             {
                 throw new ArgumentNullException(nameof(invariantMarketDescriptionCache));
             }
+            if (variantDescriptionCache == null)
+            {
+                throw new ArgumentNullException(nameof(variantDescriptionCache));
+            }
 
             _config = config;
             _marketCacheProvider = marketCacheProvider;
             _invariantMarketDescriptionCache = invariantMarketDescriptionCache as InvariantMarketDescriptionCache;
-            _variantDescriptionCache = variantDescriptionCache;
+            _variantDescriptionListCache = variantDescriptionListCache;
             _exceptionHandlingStrategy = config.ExceptionHandlingStrategy;
+            _variantDescriptionCache = variantDescriptionCache;
 
             if (_invariantMarketDescriptionCache == null)
             {
@@ -143,13 +153,24 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         {
             var tasks = new List<Task<bool>>
                         {
-                            _variantDescriptionCache.LoadMarketDescriptionsAsync(),
+                            _variantDescriptionListCache.LoadMarketDescriptionsAsync(),
                             _invariantMarketDescriptionCache.LoadMarketDescriptionsAsync()
                         };
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
 
             return tasks.All(a=>a.Result);
+        }
+
+        /// <summary>
+        /// Deletes the variant market description from cache
+        /// </summary>
+        /// <param name="marketId">The market identifier</param>
+        /// <param name="variantValue">The variant value</param>
+        public void DeleteVariantMarketDescriptionFromCache(int marketId, string variantValue)
+        {
+            var cacheId = VariantMarketDescriptionCache.GetCacheKey(marketId, variantValue);
+            ((SdkCache)_variantDescriptionCache).CacheDeleteItem(cacheId, CacheItemType.MarketDescription);
         }
     }
 }

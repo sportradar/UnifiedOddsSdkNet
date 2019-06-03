@@ -308,7 +308,7 @@
     <Compile Include="Internal\Mapping\TournamentSeasonsMapperFactory.cs" />
     <Compile Include="Internal\Mapping\TournamentSeasonsMapper.cs" />
     <Compile Include="Internal\MarketNames\IMarketCacheProvider.cs" />
-    <Compile Include="Internal\MarketNames\VariantDescriptionCache.cs" />
+    <Compile Include="Internal\MarketNames\VariantDescriptionListCache.cs" />
     <Compile Include="Internal\MarketNames\IVariantDescriptionCache.cs" />
     <Compile Include="Internal\MarketNames\VariantDescriptionCacheItem.cs" />
     <Compile Include="Internal\BookmakerDetailsProvider.cs" />
@@ -380,7 +380,6 @@
     <Compile Include="Internal\EntitiesImpl\TeamStatistics.cs" />
     <Compile Include="Internal\IMappingValidatorFactory.cs" />
     <Compile Include="Internal\IMappingValidator.cs" />
-    <Compile Include="Internal\InternalEntities\IMarketAttribute.cs" />
     <Compile Include="Internal\InternalEntities\MarketAttribute.cs" />
     <Compile Include="Internal\Mapping\DateScheduleMapperFactory.cs" />
     <Compile Include="Internal\Mapping\DateScheduleMapper.cs" />
@@ -432,10 +431,7 @@
     <Compile Include="Internal\EntitiesImpl\Venue.cs" />
     <Compile Include="Internal\EntitiesImpl\WeatherInfo.cs" />
     <Compile Include="Internal\EventArguments\TournamentReceivedEventArgs.cs" />
-    <Compile Include="Internal\InternalEntities\IMarketDescription.cs" />
     <Compile Include="MarketMapping\IMarketMappingData.cs" />
-    <Compile Include="Internal\InternalEntities\IOutcomeDescription.cs" />
-    <Compile Include="Internal\InternalEntities\ISpecifier.cs" />
     <Compile Include="Internal\InternalEntities\MarketDescription.cs" />
     <Compile Include="Internal\InternalEntities\OutcomeMapping.cs" />
     <Compile Include="Internal\InternalEntities\MarketMapping.cs" />
@@ -555,6 +551,10 @@
     <Compile Include="IVenue.cs" />
     <Compile Include="IWeatherInfo.cs" />
     <Compile Include="Enums\PeriodType.cs" />
+    <Compile Include="Market\IMarketAttribute.cs" />
+    <Compile Include="Market\IMarketDescription.cs" />
+    <Compile Include="Market\IOutcomeDescription.cs" />
+    <Compile Include="Market\ISpecifier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ICompetitor.cs" />
     <Compile Include="Enums\ReportingStatus.cs" />

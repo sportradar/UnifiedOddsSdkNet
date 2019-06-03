@@ -55,7 +55,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             _timer = new TestTimer(true);
             _variantMdCache = new VariantMarketDescriptionCache(_variantMemoryCache, _dataRouterManager, _mappingValidatorFactory, _cacheManager);
             _inVariantMdCache = new InvariantMarketDescriptionCache(_invariantMemoryCache, _dataRouterManager, _mappingValidatorFactory, _timer, TestData.Cultures, _cacheManager);
-            _variantsMdCache = new VariantDescriptionCache(_variantsMemoryCache, _dataRouterManager, _mappingValidatorFactory, _timer, TestData.Cultures, _cacheManager);
+            _variantsMdCache = new VariantDescriptionListCache(_variantsMemoryCache, _dataRouterManager, _mappingValidatorFactory, _timer, TestData.Cultures, _cacheManager);
 
             _nameProvider = new NameProvider(
                                             new MarketCacheProvider(_inVariantMdCache, _variantMdCache, _variantsMdCache),

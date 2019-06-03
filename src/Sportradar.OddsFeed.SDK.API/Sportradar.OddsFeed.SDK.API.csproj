@@ -121,6 +121,7 @@
     <Compile Include="Contracts\ConfigurationBuilderContract.cs" />
     <Compile Include="Contracts\OddsFeedV1Contract.cs" />
     <Compile Include="EventArguments\EventRecoveryCompletedEventArgs.cs" />
+    <Compile Include="IMarketDescriptionManagerV1.cs" />
     <Compile Include="IMarketDescriptionManager.cs" />
     <Compile Include="Internal\CustomBetSelectionBuilder.cs" />
     <Compile Include="ICustomBetSelectionBuilder.cs" />

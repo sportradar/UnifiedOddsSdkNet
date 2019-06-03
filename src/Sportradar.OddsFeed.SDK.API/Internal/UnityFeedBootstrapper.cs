@@ -9,7 +9,6 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.Caching;
-using System.Xml.Serialization;
 using Common.Logging;
 using Metrics;
 using Microsoft.Practices.Unity;
@@ -161,13 +160,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<IDataPoster>(),
                     new ResolvedParameter<ICacheManager>()));
 
-            container.RegisterType<IMarketDescriptionManager, MarketDescriptionManager>(
-                new ContainerControlledLifetimeManager(),
-                new InjectionConstructor(
-                    config,
-                    new ResolvedParameter<IMarketCacheProvider>(),
-                    new ResolvedParameter<IMarketDescriptionCache>("InvariantMarketDescriptionsCache"),
-                    new ResolvedParameter<IVariantDescriptionCache>("VariantDescriptionsCache")));
+            container.RegisterType<IMarketDescriptionManager, MarketDescriptionManager>(new ContainerControlledLifetimeManager(),
+                                                                                        new InjectionConstructor(config,
+                                                                                                                 new ResolvedParameter<IMarketCacheProvider>(),
+                                                                                                                 new ResolvedParameter<IMarketDescriptionCache>("InvariantMarketDescriptionsCache"),
+                                                                                                                 new ResolvedParameter<IVariantDescriptionCache>("VariantDescriptionsCache"),
+                                                                                                                 new ResolvedParameter<IMarketDescriptionCache>("VariantMarketDescriptionCache")));
 
             container.RegisterType<IFeedMessageMapper, FeedMessageMapper>(
                 new ContainerControlledLifetimeManager(),
@@ -797,7 +795,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             container.RegisterType<IMappingValidatorFactory, MappingValidatorFactory>(new ContainerControlledLifetimeManager());
 
             // Variant descriptions cache
-            container.RegisterType<IVariantDescriptionCache, VariantDescriptionCache>(
+            container.RegisterType<IVariantDescriptionCache, VariantDescriptionListCache>(
                 "VariantDescriptionsCache",
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
@@ -900,7 +898,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 container.Resolve<SportDataCache>(),
                 container.Resolve<InvariantMarketDescriptionCache>("InvariantMarketDescriptionsCache"),
                 container.Resolve<VariantMarketDescriptionCache>("VariantMarketDescriptionCache"),
-                container.Resolve<VariantDescriptionCache>("VariantDescriptionsCache"),
+                container.Resolve<VariantDescriptionListCache>("VariantDescriptionsCache"),
                 container.Resolve<ProfileCache>(),
                 container.Resolve<LocalizedNamedValueCache>("MatchStatusCache"),
                 container.Resolve<SportEventStatusCache>()

@@ -12,6 +12,7 @@ using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities;
+using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
@@ -37,25 +38,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <summary>
         /// A <see cref="IVariantDescriptionCache"/> used to cache variant descriptions
         /// </summary>
-        private readonly IVariantDescriptionCache _variantDescriptionCache;
+        private readonly IVariantDescriptionCache _variantDescriptionListCache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MarketCacheProvider"/> class
         /// </summary>
         /// <param name="invariantMarketsCache">A <see cref="IMarketDescriptionCache"/> used to cache market descriptors for invariant markets</param>
         /// <param name="variantMarketsCache">A <see cref="IMarketDescriptionCache"/> used to cache market descriptors for variant markets</param>
-        /// <param name="variantDescriptionCache">A <see cref="IVariantDescriptionCache"/> used to cache variant descriptions</param>
+        /// <param name="variantDescriptionListCache">A <see cref="IVariantDescriptionCache"/> used to cache variant descriptions</param>
         public MarketCacheProvider(IMarketDescriptionCache invariantMarketsCache,
                                    IMarketDescriptionCache variantMarketsCache,
-                                   IVariantDescriptionCache variantDescriptionCache)
+                                   IVariantDescriptionCache variantDescriptionListCache)
         {
             Contract.Requires(invariantMarketsCache != null);
             Contract.Requires(variantMarketsCache != null);
-            Contract.Requires(variantDescriptionCache != null);
+            Contract.Requires(variantDescriptionListCache != null);
 
             _invariantMarketsCache = invariantMarketsCache;
             _variantMarketsCache = variantMarketsCache;
-            _variantDescriptionCache = variantDescriptionCache;
+            _variantDescriptionListCache = variantDescriptionListCache;
         }
 
         /// <summary>
@@ -66,7 +67,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         {
             Contract.Invariant(_invariantMarketsCache != null);
             Contract.Invariant(_variantMarketsCache != null);
-            Contract.Invariant(_variantDescriptionCache != null);
+            Contract.Invariant(_variantDescriptionListCache != null);
         }
 
         /// <summary>
@@ -136,7 +137,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         {
             try
             {
-                var variantDescription = await _variantDescriptionCache.GetVariantDescriptorAsync(variantValue, locales).ConfigureAwait(false);
+                var variantDescription = await _variantDescriptionListCache.GetVariantDescriptorAsync(variantValue, locales).ConfigureAwait(false);
 
                 if (variantDescription == null)
                 {

@@ -2,6 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
@@ -61,6 +62,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
         private readonly  CacheItemPolicy _cacheItemPolicy = new CacheItemPolicy { SlidingExpiration = TimeSpan.FromHours(1) };
 
+        private readonly ConcurrentDictionary<string, DateTime> _fetchedVariants = new ConcurrentDictionary<string, DateTime>();
+
+        private DateTime _lastTimeFetchedVariantsWereCleared = DateTime.Now;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="VariantMarketDescriptionCache"/> class
         /// </summary>
@@ -100,7 +105,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <param name="id">The id of the market</param>
         /// <param name="variant">The market variant</param>
         /// <returns>a cache key generated from the provided <code>id</code> and <code>variant</code></returns>
-        private static string GetCacheKey(long id, string variant)
+        public static string GetCacheKey(long id, string variant)
         {
             Contract.Requires(!string.IsNullOrEmpty(variant));
             Contract.Ensures(!string.IsNullOrEmpty(Contract.Result<string>()));
@@ -146,8 +151,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             var missingCultures = requiredTranslations.Where(c => !item.HasTranslationsFor(c)).ToList();
 
             return missingCultures.Any()
-                ? missingCultures
-                : null;
+                       ? missingCultures
+                       : null;
         }
 
         /// <summary>
@@ -190,12 +195,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                     return description;
                 }
 
+                if (!IsFetchingAllowed(GetCacheKey(id, variant)))
+                {
+                    return description;
+                }
+
                 var cultureTaskDictionary = missingLanguages.ToDictionary(c => c, c => _dataRouterManager.GetVariantMarketDescriptionAsync(id, variant, c));
                 await Task.WhenAll(cultureTaskDictionary.Values).ConfigureAwait(false);
 
                 var cachedItem = _cache.GetCacheItem(GetCacheKey(id, variant));
 
                 description = (MarketDescriptionCacheItem) cachedItem?.Value;
+
+                _fetchedVariants[GetCacheKey(id, variant)] = DateTime.Now;
             }
             finally
             {
@@ -316,8 +328,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         {
             if (id != null)
             {
-                if (cacheItemType == CacheItemType.All
-                    || cacheItemType == CacheItemType.MarketDescription)
+                if (cacheItemType == CacheItemType.All || cacheItemType == CacheItemType.MarketDescription)
                 {
                     _cache.Remove(id.Id.ToString());
                 }
@@ -455,6 +466,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                     break;
                 case DtoType.SportCategories:
                     break;
+                case DtoType.AvailableSelections:
+                    break;
                 default:
                     ExecutionLog.Warn($"Trying to add unchecked dto type: {dtoType} for id: {id}.");
                     break;
@@ -508,6 +521,33 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                     _semaphoreCacheMerge.Release();
                 }
             }
+        }
+
+        private bool IsFetchingAllowed(string cacheId)
+        {
+            if (!_fetchedVariants.ContainsKey(cacheId))
+            {
+                return true;
+            }
+            var date = _fetchedVariants[cacheId];
+            if ((DateTime.Now - date).TotalSeconds > 30)
+            {
+                return true;
+            }
+
+            // clear records from _fetchedVariants once a min
+            if ((DateTime.Now - _lastTimeFetchedVariantsWereCleared).TotalSeconds > 60)
+            {
+                foreach (var variant in _fetchedVariants)
+                {
+                    if ((DateTime.Now - variant.Value).TotalSeconds > 30)
+                    {
+                        _fetchedVariants.TryRemove(variant.Key, out date);
+                    }
+                }
+                _lastTimeFetchedVariantsWereCleared = DateTime.Now;
+            }
+            return false;
         }
     }
 }
