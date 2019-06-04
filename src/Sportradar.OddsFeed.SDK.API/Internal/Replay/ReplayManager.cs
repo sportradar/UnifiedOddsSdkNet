@@ -27,7 +27,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
         private readonly int _nodeId;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReplayManager"/> class.
+        /// Initializes a new instance of the <see cref="ReplayManager"/> class
         /// </summary>
         /// <param name="replayApiHost">The API host of the Replay Server</param>
         /// <param name="dataRestful">The <see cref="IDataRestful"/> used to make REST requests</param>
@@ -372,19 +372,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
         private string BuildNodeIdQuery(string prefix)
         {
             return _nodeId != 0 ? prefix + "node_id=" + _nodeId : "";
-        }
-
-        private static int CheckBoundaries(int input, int min, int max)
-        {
-            if (input < min)
-            {
-                input = min;
-            }
-            else if (input > max)
-            {
-                input = max;
-            }
-            return input;
         }
     }
 }
