@@ -41,6 +41,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         private string _countryCode;
         private ManagerCI _manager;
         private VenueCI _venue;
+        private string _gender;
 
         /// <summary>
         /// Gets the name of the competitor in the specified language
@@ -194,11 +195,23 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         }
 
         /// <summary>
+        /// Gets the gender
+        /// </summary>
+        /// <value>The gender</value>
+        public string Gender
+        {
+            get
+            {
+                FetchProfileIfNeeded(_primaryCulture);
+                return _gender;
+            }
+        }
+
+        /// <summary>
         /// Gets the <see cref="IEnumerable{CultureInfo}"/> specifying the languages for which the current instance has translations
         /// </summary>
         /// <value>The fetched cultures</value>
         private readonly IEnumerable<CultureInfo> _fetchedCultures;
-
         private readonly IDataRouterManager _dataRouterManager;
         private readonly object _lock = new object();
         private readonly CultureInfo _primaryCulture;
@@ -341,6 +354,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 _associatedPlayerIds.Clear();
                 _associatedPlayerIds.AddRange(competitor.Players.Select(s => s.Id));
             }
+            _gender = competitor.Gender;
 
             //((List<CultureInfo>)_fetchedCultures).Add(culture);
         }
@@ -400,6 +414,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                     _venue.Merge(competitorProfile.Venue, culture);
                 }
             }
+            _gender = competitorProfile.Competitor.Gender;
 
             ((List<CultureInfo>) _fetchedCultures).Add(culture);
         }
@@ -423,6 +438,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _referenceId =
                 UpdateReferenceIds(simpleTeamProfile.Competitor.Id, simpleTeamProfile.Competitor.ReferenceIds);
             _countryCode = simpleTeamProfile.Competitor.CountryCode;
+            _gender = simpleTeamProfile.Competitor.Gender;
             ((List<CultureInfo>) _fetchedCultures).Add(culture);
         }
 

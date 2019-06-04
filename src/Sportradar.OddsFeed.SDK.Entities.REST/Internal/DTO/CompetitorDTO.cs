@@ -18,7 +18,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <summary>
         /// Gets the competitor's abbreviation
         /// </summary>
-        /// <value>The abbreviation.</value>
+        /// <value>The abbreviation</value>
         public string Abbreviation { get; }
 
         /// <summary>
@@ -49,6 +49,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public IEnumerable<PlayerCompetitorDTO> Players { get; }
 
         /// <summary>
+        /// Gets the gender
+        /// </summary>
+        /// <value>The gender</value>
+        public string Gender { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CompetitorDTO"/> class from the <see cref="team"/> instance
         /// </summary>
         /// <param name="record">A <see cref="team"/> containing information about a team</param>
@@ -70,6 +76,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 Players = record.players.Select(s => new PlayerCompetitorDTO(s));
             }
+            Gender = record.gender;
         }
     }
 }

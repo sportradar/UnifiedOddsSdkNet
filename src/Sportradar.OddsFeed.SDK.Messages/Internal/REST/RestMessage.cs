@@ -129,7 +129,7 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST
     public partial class competitorProfileEndpoint : RestMessage
     {
     }
-	
+    
     public partial class simpleTeamProfileEndpoint : RestMessage
     {
     }

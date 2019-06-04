@@ -22,7 +22,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// <seealso cref="Player" />
     /// <seealso cref="ICompetitor" />
     [DataContract]
-    internal class Competitor : Player, ICompetitor
+    internal class Competitor : Player, ICompetitorV1
     {
         private readonly CompetitorCI _competitorCI;
         private readonly IProfileCache _profileCache;
@@ -32,6 +32,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         private readonly CompetitionCI _competitionCI;
         private readonly object _lock = new object();
         protected string TeamQualifier;
+        private string _gender;
 
         /// <summary>
         /// Gets a <see cref="IReadOnlyDictionary{CultureInfo, String}"/> containing competitor's country name in different languages
@@ -46,8 +47,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             _cultures.Where(c => GetCompetitor().GetAbbreviation(c) != null).ToDictionary(c => c, GetCompetitor().GetAbbreviation));
 
         /// <summary>
-        /// Gets a value indicating whether the current <see cref="ICompetitor" /> is virtual - i.e.
-        /// competes in a virtual sport
+        /// Gets a value indicating whether the current <see cref="ICompetitor" /> is virtual - i.e. competes in a virtual sport
         /// </summary>
         public bool IsVirtual => GetCompetitor().IsVirtual;
 
@@ -125,10 +125,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <param name="sportEntityFactory">A <see cref="ISportEntityFactory"/> used to retrieve <see cref="IPlayerProfile"/></param>
         /// <param name="rootCompetitionCI">A root <see cref="CompetitionCI"/> to which this competitor belongs to</param>
         public Competitor(CompetitorCI ci,
-            IProfileCache profileCache,
-            IEnumerable<CultureInfo> cultures,
-            ISportEntityFactory sportEntityFactory,
-            ICompetitionCI rootCompetitionCI)
+                          IProfileCache profileCache,
+                          IEnumerable<CultureInfo> cultures,
+                          ISportEntityFactory sportEntityFactory,
+                          ICompetitionCI rootCompetitionCI)
             : base(ci.Id, new Dictionary<CultureInfo, string>())
         {
             //Contract.Requires(ci != null);
@@ -147,6 +147,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             _sportEntityFactory = sportEntityFactory;
             _competitionCI = (CompetitionCI) rootCompetitionCI;
             _referenceId = null;
+            _gender = ci.Gender;
         }
 
         /// <summary>
@@ -158,7 +159,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <param name="sportEntityFactory">A <see cref="ISportEntityFactory"/> used to retrieve <see cref="IPlayerProfile"/></param>
         /// <param name="competitorsReferences">A list of <see cref="ReferenceIdCI"/> for all competitors</param>
         public Competitor(CompetitorCI ci,
-            IProfileCache profileCache,
+                          IProfileCache profileCache,
                           IEnumerable<CultureInfo> cultures,
                           ISportEntityFactory sportEntityFactory,
                           IDictionary<URN, ReferenceIdCI> competitorsReferences)
@@ -196,6 +197,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                     _referenceId = ci.ReferenceId;
                 }
             }
+            _gender = ci.Gender;
         }
 
         /// <summary>
@@ -237,8 +239,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             }
             var reference = _referenceId == null
                                 ? string.Empty
-                                : _referenceId.ReferenceIds.Aggregate(string.Empty, (current, item) => current = $"{current}, {item.Key}={item.Value}").Substring(2);
-            return $"{base.PrintC()}, Reference={reference}, Abbreviations=[{abbreviations}]{associatedPlayers}";
+                                : _referenceId
+                                 .ReferenceIds.Aggregate(string.Empty, (current, item) => $"{current}, {item.Key}={item.Value}").Substring(2);
+            return $"{base.PrintC()}, Gender={Gender}, Reference={reference}, Abbreviations=[{abbreviations}]{associatedPlayers}";
         }
 
         /// <summary>
@@ -267,7 +270,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 {
                     var task = Task.Run(async () =>
                                         {
-                                            var competitorsReferences = _competitionCI != null ? await _competitionCI.GetCompetitorsReferencesAsync().ConfigureAwait(false) : null;
+                                            var competitorsReferences = _competitionCI != null
+                                                                            ? await _competitionCI.GetCompetitorsReferencesAsync().ConfigureAwait(false)
+                                                                            : null;
 
                                             if (competitorsReferences != null && competitorsReferences.Any())
                                             {
@@ -328,7 +333,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             get
             {
                 if (_names != null)
+                {
                     return _names;
+                }
                 lock (_lock)
                 {
                     _names = _cultures.Where(c => _competitorCI.GetName(c) != null).ToDictionary(c => c, _competitorCI.GetName);
@@ -339,7 +346,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
 
         public override string GetName(CultureInfo culture)
         {
-            return _names != null ? base.GetName(culture) : _competitorCI.GetName(culture);
+            return _names != null
+                       ? base.GetName(culture)
+                       : _competitorCI.GetName(culture);
         }
+
+        /// <summary>
+        /// Gets the gender
+        /// </summary>
+        /// <value>The gender</value>
+        public string Gender => _gender ?? GetCompetitor()?.Gender;
     }
 }
