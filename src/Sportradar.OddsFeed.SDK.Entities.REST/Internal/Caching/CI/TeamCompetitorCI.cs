@@ -18,6 +18,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public string Qualifier { get; private set; }
 
         /// <summary>
+        /// Gets the division
+        /// </summary>
+        /// <value>The division</value>
+        public int? Division { get; private set; }
+
+        /// <summary>
         /// Initializes new TeamCompetitorCI instance
         /// </summary>
         /// <param name="competitor">A <see cref="TeamCompetitorDTO"/> to be used to construct new instance</param>
@@ -59,6 +65,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 
             base.Merge(competitor, culture);
             Qualifier = competitor.Qualifier;
+            Division = competitor.Division;
         }
     }
 }

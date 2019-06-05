@@ -475,7 +475,9 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                 virtualSpecified = true,
                 qualifier = SR.S1000,
                 country_code = SR.S1000,
-                reference_ids = references.ToArray()
+                reference_ids = references.ToArray(),
+                divisionSpecified = true,
+                division = SR.I100
             };
         }
 

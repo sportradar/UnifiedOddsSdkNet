@@ -7,14 +7,14 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
-using RMF = Sportradar.OddsFeed.SDK.Test.Shared.MessageFactoryRest;
 using Sportradar.OddsFeed.SDK.Test.Shared;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
+using RMF = Sportradar.OddsFeed.SDK.Test.Shared.MessageFactoryRest;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 {
@@ -425,6 +425,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(msg.country, ci.GetCountry(culture));
             Assert.AreEqual(msg.@virtual, ci.IsVirtual);
             Assert.AreEqual(msg.qualifier, ci.Qualifier);
+            Assert.AreEqual(msg.divisionSpecified, ci.Division.HasValue);
+            Assert.AreEqual(msg.division, ci.Division);
         }
 
         private static void ValidatePlayerExtended(playerExtended msg, PlayerProfileDTO dto)

@@ -156,6 +156,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 var m = dto.Competitors.FirstOrDefault(x => x.Id.ToString() == c.id);
                 Assert.IsNotNull(m, $"Missing ITeamCompetitor with id: {c.id}.");
                 _assertHelper.AreEqual(() => m.Qualifier, c.qualifier);
+                _assertHelper.AreEqual(() => m.Division, c.division);
             }
 
             TestCompetitors(dto.Competitors.ToList(), record.sport_event.competitors, _assertHelper);

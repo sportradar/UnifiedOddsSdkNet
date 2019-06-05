@@ -16,6 +16,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public string Qualifier { get; }
 
         /// <summary>
+        /// Gets the division
+        /// </summary>
+        /// <value>The division</value>
+        public int? Division { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TeamCompetitorDTO"/> class
         /// </summary>
         /// <param name="record">A <see cref="teamCompetitor"/> containing information about the team</param>
@@ -23,6 +29,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             : base(record)
         {
             Qualifier = record.qualifier;
+            Division = record.divisionSpecified
+                           ? record.division
+                           : (int?) null;
         }
     }
 }
