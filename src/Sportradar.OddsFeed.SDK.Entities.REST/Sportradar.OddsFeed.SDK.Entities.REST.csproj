@@ -170,6 +170,7 @@
     <Compile Include="Internal\Mapping\AvailableSelectionsMapperFactory.cs" />
     <Compile Include="IPitcher.cs" />
     <Compile Include="IReferenceV1.cs" />
+    <Compile Include="IRoundV2.cs" />
     <Compile Include="IRoundV1.cs" />
     <Compile Include="IScheduledStartTimeChange.cs" />
     <Compile Include="ICoverageInfo.cs" />
@@ -433,6 +434,7 @@
     <Compile Include="Internal\EntitiesImpl\WeatherInfo.cs" />
     <Compile Include="Internal\EventArguments\TournamentReceivedEventArgs.cs" />
     <Compile Include="ITeamCompetitorV1.cs" />
+    <Compile Include="ITvChannelV1.cs" />
     <Compile Include="MarketMapping\IMarketMappingData.cs" />
     <Compile Include="Internal\InternalEntities\MarketDescription.cs" />
     <Compile Include="Internal\InternalEntities\OutcomeMapping.cs" />

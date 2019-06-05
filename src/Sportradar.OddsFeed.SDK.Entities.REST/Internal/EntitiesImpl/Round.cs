@@ -137,7 +137,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         {
             var names = string.Join(", ", Name.Keys.Select(k => $"{k}={GetName(k)}"));
             var phase = string.Join(", ", PhaseOrGroupLongName.Keys.Select(k => $"{k}={GetPhaseOrGroupLongName(k)}"));
-            return $"Name=[{names}], Type={Type}, Number={Number}, CupRoundMatches={CupRoundMatches}, CupRoundMatchNumber={CupRoundMatchNumber}, BetradarId={BetradarId}, PhaseOrGroupLongName={phase}";
+            return $"Name=[{names}], Type={Type}, Number={Number}, CupRoundMatches={CupRoundMatches}, CupRoundMatchNumber={CupRoundMatchNumber}, BetradarId={BetradarId}, PhaseOrGroupLongName={phase}, Phase={Phase}";
         }
 
         /// <summary>

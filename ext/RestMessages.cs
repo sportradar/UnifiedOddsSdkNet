@@ -351,6 +351,8 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST {
         
         private bool virtualFieldSpecified;
         
+        private string genderField;
+        
         /// <remarks/>
         [System.Xml.Serialization.XmlArrayItemAttribute("reference_id", IsNullable=false)]
         public competitorReferenceIdsReference_id[] reference_ids {
@@ -447,6 +449,17 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST {
             }
             set {
                 this.virtualFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string gender {
+            get {
+                return this.genderField;
+            }
+            set {
+                this.genderField = value;
             }
         }
     }
@@ -566,6 +579,10 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST {
         
         private string qualifierField;
         
+        private int divisionField;
+        
+        private bool divisionFieldSpecified;
+        
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
         public string qualifier {
@@ -574,6 +591,28 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST {
             }
             set {
                 this.qualifierField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public int division {
+            get {
+                return this.divisionField;
+            }
+            set {
+                this.divisionField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool divisionSpecified {
+            get {
+                return this.divisionFieldSpecified;
+            }
+            set {
+                this.divisionFieldSpecified = value;
             }
         }
     }
@@ -1698,6 +1737,8 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST {
         
         private bool start_timeFieldSpecified;
         
+        private string stream_urlField;
+        
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
         public string name {
@@ -1728,6 +1769,17 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST {
             }
             set {
                 this.start_timeFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string stream_url {
+            get {
+                return this.stream_urlField;
+            }
+            set {
+                this.stream_urlField = value;
             }
         }
     }
@@ -2399,6 +2451,8 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST {
         
         private bool betradar_idFieldSpecified;
         
+        private string phaseField;
+        
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
         public string type {
@@ -2550,6 +2604,17 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST {
             }
             set {
                 this.betradar_idFieldSpecified = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string phase {
+            get {
+                return this.phaseField;
+            }
+            set {
+                this.phaseField = value;
             }
         }
     }
@@ -3917,7 +3982,6 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(restSportEventStatus))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(commonSportEventStatus))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -4197,132 +4261,6 @@ namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST {
             }
             set {
                 this.numberFieldSpecified = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://schemas.sportradar.com/sportsapi/v1/unified")]
-    public partial class commonSportEventStatus : restSportEventStatusBase {
-        
-        private double home_scoreField;
-        
-        private bool home_scoreFieldSpecified;
-        
-        private double away_scoreField;
-        
-        private bool away_scoreFieldSpecified;
-        
-        private double aggregate_home_scoreField;
-        
-        private bool aggregate_home_scoreFieldSpecified;
-        
-        private double aggregate_away_scoreField;
-        
-        private bool aggregate_away_scoreFieldSpecified;
-        
-        private string aggregate_winner_idField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public double home_score {
-            get {
-                return this.home_scoreField;
-            }
-            set {
-                this.home_scoreField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool home_scoreSpecified {
-            get {
-                return this.home_scoreFieldSpecified;
-            }
-            set {
-                this.home_scoreFieldSpecified = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public double away_score {
-            get {
-                return this.away_scoreField;
-            }
-            set {
-                this.away_scoreField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool away_scoreSpecified {
-            get {
-                return this.away_scoreFieldSpecified;
-            }
-            set {
-                this.away_scoreFieldSpecified = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public double aggregate_home_score {
-            get {
-                return this.aggregate_home_scoreField;
-            }
-            set {
-                this.aggregate_home_scoreField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool aggregate_home_scoreSpecified {
-            get {
-                return this.aggregate_home_scoreFieldSpecified;
-            }
-            set {
-                this.aggregate_home_scoreFieldSpecified = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public double aggregate_away_score {
-            get {
-                return this.aggregate_away_scoreField;
-            }
-            set {
-                this.aggregate_away_scoreField = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool aggregate_away_scoreSpecified {
-            get {
-                return this.aggregate_away_scoreFieldSpecified;
-            }
-            set {
-                this.aggregate_away_scoreFieldSpecified = value;
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string aggregate_winner_id {
-            get {
-                return this.aggregate_winner_idField;
-            }
-            set {
-                this.aggregate_winner_idField = value;
             }
         }
     }

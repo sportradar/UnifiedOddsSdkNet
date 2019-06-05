@@ -530,10 +530,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 return true;
             }
             var date = _fetchedVariants[cacheId];
-            if ((DateTime.Now - date).TotalSeconds > 30)
-            {
-                return true;
-            }
+            var result = (DateTime.Now - date).TotalSeconds > 30;
 
             // clear records from _fetchedVariants once a min
             if ((DateTime.Now - _lastTimeFetchedVariantsWereCleared).TotalSeconds > 60)
@@ -547,7 +544,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 }
                 _lastTimeFetchedVariantsWereCleared = DateTime.Now;
             }
-            return false;
+            return result;
         }
     }
 }

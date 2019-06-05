@@ -239,8 +239,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             }
             var reference = _referenceId == null
                                 ? string.Empty
-                                : _referenceId
-                                 .ReferenceIds.Aggregate(string.Empty, (current, item) => $"{current}, {item.Key}={item.Value}").Substring(2);
+                                : _referenceId.ReferenceIds.Aggregate(string.Empty, (current, item) => current = $"{current}, {item.Key}={item.Value}").Substring(2);
             return $"{base.PrintC()}, Gender={Gender}, Reference={reference}, Abbreviations=[{abbreviations}]{associatedPlayers}";
         }
 
