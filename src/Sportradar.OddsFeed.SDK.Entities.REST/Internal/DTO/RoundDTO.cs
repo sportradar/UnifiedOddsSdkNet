@@ -32,8 +32,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         internal string PhaseOrGroupLongName { get; }
 
+        internal string Phase { get; }
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="RoundDTO"/> class.
+        /// Initializes a new instance of the <see cref="RoundDTO"/> class
         /// </summary>
         /// <param name="round">The <see cref="matchRound"/> used for creating new instance</param>
         internal RoundDTO(matchRound round)
@@ -58,6 +60,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                 ? (int?) round.betradar_id
                 : null;
             PhaseOrGroupLongName = round.group_long_name;
+            Phase = round.phase;
         }
     }
 }

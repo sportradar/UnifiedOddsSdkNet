@@ -68,6 +68,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public int? BetradarId { get; private set; }
 
         /// <summary>
+        /// Gets the phase
+        /// </summary>
+        /// <value>The phase</value>
+        public string Phase { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RoundCI"/> class
         /// </summary>
         /// <param name="dto">The <see cref="RoundDTO"/> used to create new instance</param>
@@ -76,6 +82,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         {
             Contract.Requires(dto != null);
             Contract.Requires(culture != null);
+            Contract.Ensures(_names != null);
+            Contract.Ensures(_phaseOrGroupLongName != null);
 
             _names = new Dictionary<CultureInfo, string>();
             _phaseOrGroupLongName = new Dictionary<CultureInfo, string>();
@@ -101,6 +109,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             BetradarId = dto.BetradarId;
             _names[culture] = dto.Name;
             _phaseOrGroupLongName[culture] = dto.PhaseOrGroupLongName;
+            Phase = dto.Phase;
         }
 
         /// <summary>
