@@ -129,23 +129,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <returns>Get the event status</returns>
         public async Task<EventStatus?> GetEventStatusAsync()
         {
-            var sportEventCI = (CompetitionCI)SportEventCache.GetEventCacheItem(Id);
-            if (sportEventCI == null)
-            {
-                ExecutionLog.Debug($"Missing data. No sportEvent cache item for id={Id}.");
-                return null;
-            }
-
-            if (sportEventCI.EventStatus == null)
-            {
-                var status = await GetStatusAsync().ConfigureAwait(false);
-                if (status != null)
-                {
-                    sportEventCI.EventStatus = status.Status;
-                }
-            }
-
-            return sportEventCI.EventStatus;
+            var status = await GetStatusAsync().ConfigureAwait(false);
+            return status?.Status;
         }
 
         /// <summary>

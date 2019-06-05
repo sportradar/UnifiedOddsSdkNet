@@ -14,7 +14,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl.CustomBet
     public class Selection : ISelection
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AvailableSelections"/> class
+        /// Initializes a new instance of the <see cref="Selection"/> class
         /// </summary>
         /// <param name="eventId">a <see cref="URN"/> representing the event id</param>
         /// <param name="marketId">a value representing the market id</param>

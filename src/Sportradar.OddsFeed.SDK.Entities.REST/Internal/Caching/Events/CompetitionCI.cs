@@ -24,15 +24,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
     public class CompetitionCI : SportEventCI, ICompetitionCI
     {
         /// <summary>
-        /// The sport event status cache item
-        /// </summary>
-        public SportEventStatusCI SportEventStatus { get; set; }
-        /// <summary>
-        /// Gets the event status asynchronous
-        /// </summary>
-        /// <returns>Get the event status</returns>
-        public EventStatus? EventStatus { get; set; }
-        /// <summary>
         /// The booking status
         /// </summary>
         private BookingStatus? _bookingStatus;
@@ -267,12 +258,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         private void ActualMerge(CompetitionDTO eventSummary, CultureInfo culture)
         {
             base.Merge(eventSummary, culture, false);
-
-            if (eventSummary.Status != null)
-            {
-                SportEventStatus = new SportEventStatusCI(null, eventSummary.Status);
-                EventStatus = SportEventStatus.Status;
-            }
 
             if (eventSummary.Venue != null)
             {
