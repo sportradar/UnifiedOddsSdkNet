@@ -192,7 +192,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         internal static TvChannel GetTvChannel(bool startTimeSpecified = true)
         {
-            return new TvChannel("Name " + SR.S1000, DateTime.Now);
+            return new TvChannel("Name " + SR.S1000, DateTime.Now, "Url:" + SR.S10000P);
         }
 
         public static IVenue GetVenue(int id = 0)

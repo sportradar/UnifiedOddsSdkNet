@@ -100,11 +100,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             {
                 if (TvChannels == null)
                 {
-                    TvChannels = new List<ITvChannel>(fixtureDto.TvChannels.Select(t => new TvChannel(t.Name, t.StartTime)));
+                    TvChannels = fixtureDto.TvChannels.Select(tvChannelDTO => (ITvChannel) new TvChannel(tvChannelDTO.Name, tvChannelDTO.StartTime, tvChannelDTO.StreamUrl)).ToList();
                 }
                 else
                 {
-                    TvChannels.ToList().AddRange(fixtureDto.TvChannels.Select(t => new TvChannel(t.Name, t.StartTime)));
+                    TvChannels.ToList().AddRange(fixtureDto.TvChannels.Select(t => (ITvChannel) new TvChannel(t.Name, t.StartTime, t.StreamUrl)));
                 }
             }
             if (fixtureDto.CoverageInfo != null)
@@ -157,8 +157,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <returns>A <see cref="string"/> containing details of the current instance.</returns>
         protected override string PrintF()
         {
-            string tv = TvChannels == null ? string.Empty : string.Join(", ", TvChannels.Select(k => ((TvChannel)k).ToString("f")));
-            string res = PrintC();
+            var tv = TvChannels == null ? string.Empty : string.Join(", ", TvChannels.Select(k => ((TvChannel)k).ToString("f")));
+            var res = PrintC();
             res += $", TvChannels=[{tv}], CoverageInfo=[{((CoverageInfo)CoverageInfo)?.ToString("f")}], ProductInfo=[{((ProductInfo)ProductInfo)?.ToString("f")}]";
             return res;
         }

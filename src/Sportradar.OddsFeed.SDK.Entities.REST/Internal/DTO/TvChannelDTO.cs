@@ -16,8 +16,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         internal DateTime? StartTime { get; }
 
+        internal string StreamUrl { get; }
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="TvChannelDTO"/> class.
+        /// Initializes a new instance of the <see cref="TvChannelDTO"/> class
         /// </summary>
         /// <param name="tvChannel">The <see cref="tvChannel"/> used for creating instance</param>
         internal TvChannelDTO(tvChannel tvChannel)
@@ -29,6 +31,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             StartTime = tvChannel.start_timeSpecified
                 ? (DateTime?)tvChannel.start_time
                 : null;
+            StreamUrl = tvChannel.stream_url;
         }
     }
 }
