@@ -60,7 +60,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
             var url = $"{_apiHost}/events/{eventId}{BuildNodeIdQuery("?")}";
             if (startTime != null)
             {
-                url = $"{_apiHost}/events/{eventId}?startTime={startTime}{BuildNodeIdQuery("&")}";
+                url = $"{_apiHost}/events/{eventId}?start_time={startTime}{BuildNodeIdQuery("&")}";
             }
             var uri = new Uri(url);
 
