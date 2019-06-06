@@ -342,7 +342,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             SportCI cachedSport;
             if (!Sports.TryGetValue(id, out cachedSport))
+            {
                 return;
+            }
 
             await cachedSport.LoadCategoriesAsync(cultures).ConfigureAwait(false);
         }
@@ -395,12 +397,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 // we have all available data - return the requested info
                 if (!missingCultures.Any())
                 {
-                    var sports = Sports.Keys.Select(async sportId => await GetSportFromCacheAsync(sportId, cultureList).ConfigureAwait(false)).ToList();
+                    var sports = Sports.Keys.Select(sportId =>
+                                                    {
+                                                        var sportFromCacheAsync = GetSportFromCacheAsync(sportId, cultureList);
+                                                        sportFromCacheAsync.ConfigureAwait(false);
+                                                        return sportFromCacheAsync;
+                                                    }).ToList();
                     return await Task.WhenAll(sports).ConfigureAwait(false);
                 }
 
                 await FetchAndMergeAll(missingCultures, false).ConfigureAwait(false);
-                return await Task.WhenAll(Sports.Keys.Select(async sportId => await GetSportFromCacheAsync(sportId, cultureList).ConfigureAwait(false)).ToList());
+                return await Task.WhenAll(Sports.Keys.Select(sportId =>
+                                                             {
+                                                                 var sportFromCacheAsync = GetSportFromCacheAsync(sportId, cultureList);
+                                                                 sportFromCacheAsync.ConfigureAwait(false);
+                                                                 return sportFromCacheAsync;
+                                                             }).ToList());
             }
             catch (Exception ex)
             {
@@ -814,6 +826,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     break;
                 case DtoType.BookingStatus:
                     break;
+                case DtoType.AvailableSelections:
+                    break;
                 default:
                     ExecutionLog.Warn($"Trying to add unchecked dto type: {dtoType} for id: {id}.");
                     break;
@@ -1026,6 +1040,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             }
         }
 
+        /// <summary>
+        /// Adds the category
+        /// </summary>
+        /// <param name="id">The identifier of the CategoryId or SportId !!!</param>
+        /// <param name="item">The category dto item</param>
+        /// <param name="culture">The culture</param>
         private void AddCategory(URN id, CategoryDTO item, CultureInfo culture)
         {
             //WriteLog($"Saving CategoryDTO for id:{id} and lang:[{culture.TwoLetterISOLanguageName}].");
@@ -1034,15 +1054,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             {
                 try
                 {
-                    if (Categories.ContainsKey(id))
+                    if (Categories.ContainsKey(item.Id))
                     {
                         CategoryCI ci;
-                        Categories.TryGetValue(id, out ci);
-                        ci?.Merge(new CategoryCI(item, culture, item.Tournaments?.FirstOrDefault()?.Sport.Id), culture);
+                        Categories.TryGetValue(item.Id, out ci);
+                        ci?.Merge(new CategoryCI(item, culture, item.Tournaments?.FirstOrDefault()?.Sport.Id ?? id), culture);
                     }
                     else
                     {
-                        Categories.Add(id, new CategoryCI(item, culture, item.Tournaments?.FirstOrDefault()?.Sport.Id));
+                        Categories.Add(item.Id, new CategoryCI(item, culture, item.Tournaments?.FirstOrDefault()?.Sport.Id ?? id));
                     }
                 }
                 catch (Exception e)
