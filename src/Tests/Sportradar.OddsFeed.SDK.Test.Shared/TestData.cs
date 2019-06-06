@@ -41,6 +41,14 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         public static readonly List<CultureInfo> Cultures3 = new List<CultureInfo>(new[] { new CultureInfo("en"), new CultureInfo("de"), new CultureInfo("hu") });
         public static readonly List<CultureInfo> Cultures4 = new List<CultureInfo>(new[] { new CultureInfo("en"), new CultureInfo("de"), new CultureInfo("hu") , new CultureInfo("nl") });
 
+
+        public static readonly CultureInfo CultureNl = new CultureInfo("nl");
+
+        public const int CacheSportCount = 136;
+        public const int CacheCategoryCount = 391;
+        public const int CacheCategoryCountPlus = 408;
+        public const int CacheTournamentCount = 8455;
+
         public const string SdkTestLogRepositoryName = "SdkTestLogRepositoryName";
         public const ExceptionHandlingStrategy ThrowingStrategy = ExceptionHandlingStrategy.THROW;
 
@@ -74,6 +82,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                          {
                              date = await ci.GetScheduledAsync();
                              competitors = (await ci.GetCompetitorsAsync(checkCulture)).ToList();
+                             // ReSharper disable once AssignNullToNotNullAttribute
                              comp = competitors.FirstOrDefault();
                              round = await ci.GetTournamentRoundAsync(checkCulture);
                              season = await ci.GetSeasonAsync(checkCulture);

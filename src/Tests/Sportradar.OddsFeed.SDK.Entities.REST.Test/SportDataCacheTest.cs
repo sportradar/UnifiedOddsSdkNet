@@ -360,9 +360,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             var sports = _sportDataCache.GetSportsAsync(TestData.Cultures).Result; // initial load
             Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(callType), $"{callType} should be called exactly {TestData.Cultures.Count} times.");
 
-            Assert.AreEqual(136, _sportDataCache.Sports.Count);
-            Assert.AreEqual(391, _sportDataCache.Categories.Count);
-            //Assert.AreEqual(8455, _sportDataCache.Tournaments.Count);
+            Assert.AreEqual(TestData.CacheSportCount, _sportDataCache.Sports.Count);
+            Assert.AreEqual(TestData.CacheCategoryCountPlus, _sportDataCache.Categories.Count);
+            //Assert.AreEqual(TestData.CacheTournamentCount, _sportDataCache.Tournaments.Count);
 
             // the low below adds an additional sport sr:sport:999
             foreach (var culture in TestData.Cultures)
@@ -373,9 +373,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(callType), $"{callType} should be called exactly {TestData.Cultures.Count} times.");
             Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount("GetSportEventSummaryAsync"), $"GetSportEventSummaryAsync should be called exactly {TestData.Cultures.Count} times.");
 
-            Assert.AreEqual(137, _sportDataCache.Sports.Count);
-            Assert.AreEqual(392, _sportDataCache.Categories.Count);
-            //Assert.AreEqual(8457, _sportDataCache.Tournaments.Count);
+            Assert.AreEqual(TestData.CacheSportCount + 1, _sportDataCache.Sports.Count);
+            Assert.AreEqual(TestData.CacheCategoryCountPlus + 1, _sportDataCache.Categories.Count);
+            //Assert.AreEqual(TestData.CacheTournamentCount+1, _sportDataCache.Tournaments.Count);
 
             Assert.IsNotNull(sports);
             Assert.IsNotNull(data01);

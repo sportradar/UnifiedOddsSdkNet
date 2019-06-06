@@ -42,7 +42,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports
         /// <summary>
         /// The <see cref="IDataRouterManager"/> used to obtain categories
         /// </summary>
-        private readonly IDataRouterManager DataRouterManager;
+        private readonly IDataRouterManager _dataRouterManager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SportCI"/> class.
@@ -58,7 +58,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports
                 CategoryIds = new ReadOnlyCollection<URN>(data.Categories.Select(i => i.Id).ToList());
             }
 
-            DataRouterManager = dataRouterManager;
+            _dataRouterManager = dataRouterManager;
         }
 
         /// <summary>
@@ -84,10 +84,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports
                 await _loadedCategoriesSemaphore.WaitAsync().ConfigureAwait(false);
                 wantedCultures = LanguageHelper.GetMissingCultures(wantedCultures, _loadedCategories).ToList();
                 if (!wantedCultures.Any())
+                {
                     return;
+                }
 
                 foreach (var culture in wantedCultures)
-                    await DataRouterManager.GetSportCategoriesAsync(Id, culture).ConfigureAwait(false);
+                {
+                    await _dataRouterManager.GetSportCategoriesAsync(Id, culture).ConfigureAwait(false);
+                }
                 _loadedCategories.AddRange(wantedCultures);
             }
             finally

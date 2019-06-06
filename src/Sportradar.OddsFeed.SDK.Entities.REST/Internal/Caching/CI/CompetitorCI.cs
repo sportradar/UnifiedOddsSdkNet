@@ -202,7 +202,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         {
             get
             {
-                FetchProfileIfNeeded(_primaryCulture);
+                if (string.IsNullOrEmpty(_gender))
+                {
+                    FetchProfileIfNeeded(_primaryCulture);
+                }
                 return _gender;
             }
         }

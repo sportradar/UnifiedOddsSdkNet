@@ -116,9 +116,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
 
             var sportsData = await _sportDataCache.GetSportsAsync(cultureList).ConfigureAwait(false);
-            return sportsData == null
-                ? null
-                : sportsData.Select(data => BuildSportInternal(data, cultureList, exceptionStrategy)).ToList();
+            return sportsData?.Select(data => BuildSportInternal(data, cultureList, exceptionStrategy)).ToList();
         }
 
         /// <summary>
@@ -279,9 +277,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             return new Competitor(ci, _profileCache, cultures, this, competitorsReferences);
         }
 
-        public ITeamCompetitor BuildTeamCompetitor(TeamCompetitorCI ci, IEnumerable<CultureInfo> culture, ICompetitionCI rootCompetitionCI)
+        public ITeamCompetitor BuildTeamCompetitor(TeamCompetitorCI ci, IEnumerable<CultureInfo> cultures, ICompetitionCI rootCompetitionCI)
         {
-            return new TeamCompetitor(ci, culture, this, _profileCache, rootCompetitionCI);
+            return new TeamCompetitor(ci, cultures, this, _profileCache, rootCompetitionCI);
         }
     }
 }
