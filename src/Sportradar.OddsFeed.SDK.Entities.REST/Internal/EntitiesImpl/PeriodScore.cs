@@ -1,7 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
@@ -86,7 +85,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// Gets the match status code
         /// </summary>
         /// <value>The match status code</value>
-        [Obsolete("Use GetMatchStatusAsync method instead")]
         public int? MatchStatusCode => _matchStatusCode;
 
         /// <summary>
