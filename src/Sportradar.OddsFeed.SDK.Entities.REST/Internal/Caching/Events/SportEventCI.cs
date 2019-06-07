@@ -280,7 +280,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 foreach (var culture in missingCultures)
                 {
                     if (!LoadedSummaries.Contains(culture))
+                    {
                         LoadedSummaries.Add(culture);
+                    }
                 }
             }
             catch (CommunicationException ce)

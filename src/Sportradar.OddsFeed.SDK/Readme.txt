@@ -9,6 +9,19 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2019-06-07  1.21.0.0
+Added property Gender to the ICompetitorV1
+Added property Division to the ITeamCompetitorV1
+Added property StreamUrl to the ITvChannelV1
+Added property Phase to the IRoundV2
+ICompetitionStatus.Status no more obsolete (fixed underlining issue)
+Improved caching of variant market descriptions
+Fix: caching the category without tournament failed
+Fix: event status and score update issue
+Fix: IMarketDescription interface exposed to user
+Fix: error fetching data for sport event throws exception when enabled exception handling strategy
+Fix: ReplayManager - the parameter start_time fixed
+
 2019-05-23  1.20.1.0
 Fix: unable to initialize feed
 
