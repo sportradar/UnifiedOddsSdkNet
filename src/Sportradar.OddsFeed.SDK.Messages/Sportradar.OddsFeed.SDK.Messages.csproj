@@ -81,17 +81,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Contracts\ProducerManagerContract.cs" />
-    <Compile Include="Internal\Feed\FeedMarket.cs" />
-    <Compile Include="Internal\Feed\FeedMessage.cs" />
-    <Compile Include="Internal\Feed\FeedMessages.cs" />
-    <Compile Include="Internal\Feed\PropertyUsage.cs" />
+    <Compile Include="EventArguments\RawApiDataEventArgs.cs" />
+    <Compile Include="EventArguments\RawFeedMessageEventArgs.cs" />
+    <Compile Include="Feed\FeedMarket.cs" />
+    <Compile Include="Feed\FeedMessage.cs" />
+    <Compile Include="Feed\FeedMessages.cs" />
+    <Compile Include="Feed\PropertyUsage.cs" />
     <Compile Include="Internal\OverrideXmlNamespaceAttribute.cs" />
     <Compile Include="Internal\ProducerExtensions.cs" />
-    <Compile Include="Internal\REST\MarketDescriptionMessages.cs" />
-    <Compile Include="Internal\REST\RestMessages.cs" />
-    <Compile Include="Internal\REST\RestMessage.cs" />
-    <Compile Include="Internal\REST\RESTMessageBuilder.cs" />
-    <Compile Include="Internal\REST\CashoutMessages.cs" />
+    <Compile Include="REST\MarketDescriptionMessages.cs" />
+    <Compile Include="REST\RestMessages.cs" />
+    <Compile Include="REST\RestMessage.cs" />
+    <Compile Include="Internal\RESTMessageBuilder.cs" />
+    <Compile Include="REST\CashoutMessages.cs" />
     <Compile Include="IRecoveryInfo.cs" />
     <Compile Include="IProducerV1.cs" />
     <Compile Include="IProducer.cs" />
@@ -101,15 +103,16 @@
     <Compile Include="URN.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Internal\Feed\FeedMessagesDiagram.cd" />
-    <None Include="Internal\REST\MarketDescriptionMessagesDiagram.cd" />
-    <None Include="Internal\REST\RestMessagesDiagram.cd" />
+    <None Include="Internal\FeedMessagesDiagram.cd" />
+    <None Include="Internal\MarketDescriptionMessagesDiagram.cd" />
+    <None Include="Internal\RestMessagesDiagram.cd" />
     <None Include="Internal\SportEventStatusDiagram.cd" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.6.1 Tools\sgen.exe" /f /a:Sportradar.OddsFeed.SDK.Messages.dll /o:..\..\..\..\libs</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

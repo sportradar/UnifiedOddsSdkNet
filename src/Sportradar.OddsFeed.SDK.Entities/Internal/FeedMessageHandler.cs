@@ -3,7 +3,7 @@
 */
 using System.Diagnostics.Contracts;
 using System.Runtime.Caching;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal
 {

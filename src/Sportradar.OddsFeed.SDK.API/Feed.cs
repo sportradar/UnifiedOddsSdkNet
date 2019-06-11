@@ -59,7 +59,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <summary>
         /// A <see cref="IList{IOpenable}"/> containing all user constructed sessions
         /// </summary>
-        private readonly IList<IOpenable> _sessions = new List<IOpenable>();
+        internal readonly IList<IOpenable> Sessions = new List<IOpenable>();
 
         /// <summary>
         /// The <see cref="IOddsFeedConfigurationInternal"/> representing internal sdk configuration
@@ -273,9 +273,9 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <returns>The <see cref="IEnumerable{String}"/> containing routing keys for the specified session</returns>
         private IEnumerable<string> GetSessionRoutingKeys(OddsFeedSession session)
         {
-            var interests = _sessions.Select(s => ((OddsFeedSession)s).MessageInterest);
+            var interests = Sessions.Select(s => ((OddsFeedSession)s).MessageInterest);
             var keys = FeedRoutingKeyBuilder.GenerateKeys(interests, InternalConfig.NodeId).ToList();
-            return keys[_sessions.IndexOf(session)];
+            return keys[Sessions.IndexOf(session)];
         }
 
         /// <summary>
@@ -301,7 +301,7 @@ namespace Sportradar.OddsFeed.SDK.API
             var childContainer = UnityContainer.CreateChildContainer();
             Func<OddsFeedSession, IEnumerable<string>> func = GetSessionRoutingKeys;
             var session = (OddsFeedSession) childContainer.Resolve<IOddsFeedSession>(new ParameterOverride("messageInterest", msgInterest), new ParameterOverride("getRoutingKeys", func));
-            _sessions.Add(session);
+            Sessions.Add(session);
             return session;
         }
 
@@ -441,7 +441,7 @@ namespace Sportradar.OddsFeed.SDK.API
             _feedRecoveryManager.CloseFeed -= OnCloseFeed;
             _feedRecoveryManager.Close();
 
-            foreach (var session in _sessions)
+            foreach (var session in Sessions)
             {
                 session.Close();
             }
@@ -495,7 +495,7 @@ namespace Sportradar.OddsFeed.SDK.API
             {
                 ((ProducerManager) ProducerManager).Lock();
 
-                foreach (var session in _sessions)
+                foreach (var session in Sessions)
                 {
                     session.Open();
                 }
@@ -506,7 +506,7 @@ namespace Sportradar.OddsFeed.SDK.API
                 _feedRecoveryManager.ProducerDown += MarkProducerAsDown;
                 _feedRecoveryManager.CloseFeed += OnCloseFeed;
 
-                var interests = _sessions.Select(s => ((OddsFeedSession) s).MessageInterest).ToList();
+                var interests = Sessions.Select(s => ((OddsFeedSession) s).MessageInterest).ToList();
                 _feedRecoveryManager.Open(interests);
             }
             catch (CommunicationException ex)

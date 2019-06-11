@@ -20,7 +20,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 // ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 
@@ -223,7 +223,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     try
                     {
                         cachedTournament = (TournamentInfoCI) _sportEventCache.GetEventCacheItem(tournamentId);
-                        var comps = cachedTournament.GetCompetitorsAsync(cultureList).Result;
+                        var unused = cachedTournament.GetCompetitorsAsync(cultureList).Result;
                     }
                     catch (Exception e)
                     {
@@ -239,7 +239,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 {
                     try
                     {
-                        var comps = cachedTournament.GetCompetitorsAsync(cultureList).Result;
+                        var unused = cachedTournament.GetCompetitorsAsync(cultureList).Result;
                     }
                     catch (Exception e)
                     {

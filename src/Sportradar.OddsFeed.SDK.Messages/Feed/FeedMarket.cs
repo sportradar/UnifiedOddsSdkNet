@@ -1,10 +1,11 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Sportradar.OddsFeed.SDK.Messages.Internal.Feed
+namespace Sportradar.OddsFeed.SDK.Messages.Feed
 {
     public abstract class FeedMarket
     {

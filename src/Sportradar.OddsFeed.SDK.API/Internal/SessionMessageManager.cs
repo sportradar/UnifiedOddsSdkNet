@@ -12,7 +12,7 @@ using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 // ReSharper disable UnusedMember.Local
 

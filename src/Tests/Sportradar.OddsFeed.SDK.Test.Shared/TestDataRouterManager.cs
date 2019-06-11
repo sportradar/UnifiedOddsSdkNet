@@ -18,13 +18,17 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping.Lottery;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.EventArguments;
+using Sportradar.OddsFeed.SDK.Messages.REST;
+
 // ReSharper disable UnusedMember.Local
 
 namespace Sportradar.OddsFeed.SDK.Test.Shared
 {
     public class TestDataRouterManager : IDataRouterManager
     {
+        public event EventHandler<RawApiDataEventArgs> RawApiDataReceived;
+
         private static readonly string DirPath = Directory.GetCurrentDirectory() + @"\REST XMLs\";
 
         private const string FixtureXml = "fixtures.{culture}.xml";
@@ -465,17 +469,17 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             return null;
         }
 
-        public async Task<IAvailableSelections> GetAvailableSelectionsAsync(URN id)
+        public Task<IAvailableSelections> GetAvailableSelectionsAsync(URN id)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<ICalculation> CalculateProbability(IEnumerable<ISelection> selections)
+        public Task<ICalculation> CalculateProbability(IEnumerable<ISelection> selections)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<IFixtureChange>> GetFixtureChangesAsync(CultureInfo culture)
+        public Task<IEnumerable<IFixtureChange>> GetFixtureChangesAsync(CultureInfo culture)
         {
             throw new NotImplementedException();
         }

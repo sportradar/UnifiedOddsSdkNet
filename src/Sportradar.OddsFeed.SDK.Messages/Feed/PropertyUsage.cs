@@ -3,7 +3,7 @@
 */
 
 // ReSharper disable InconsistentNaming
-namespace Sportradar.OddsFeed.SDK.Messages.Internal.Feed
+namespace Sportradar.OddsFeed.SDK.Messages.Feed
 {
     /// <summary>
     /// Enumerates property usage requirements

@@ -10,6 +10,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
 using Sportradar.OddsFeed.SDK.Messages;
+using Sportradar.OddsFeed.SDK.Messages.EventArguments;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -18,6 +19,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
     /// </summary>
     public interface IDataRouterManager
     {
+        /// <summary>
+        /// Occurs when data from Sports API arrives
+        /// </summary>
+        event EventHandler<RawApiDataEventArgs> RawApiDataReceived;
+
         /// <summary>
         /// Gets the <see cref="SportEventSummaryDTO"/> or its derived type from the summary endpoint
         /// </summary>

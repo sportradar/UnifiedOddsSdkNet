@@ -9,7 +9,8 @@ using RabbitMQ.Client.Events;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
+
 // ReSharper disable UnusedMember.Local
 // ReSharper disable UnassignedGetOnlyAutoProperty
 // ReSharper disable UnusedMember.Global

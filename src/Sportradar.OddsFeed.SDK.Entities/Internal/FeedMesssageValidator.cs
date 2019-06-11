@@ -16,7 +16,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal
 {

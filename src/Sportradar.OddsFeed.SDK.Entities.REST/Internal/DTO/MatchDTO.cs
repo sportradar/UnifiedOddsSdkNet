@@ -3,7 +3,7 @@
 */
 using System.Diagnostics.Contracts;
 using System.Linq;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 

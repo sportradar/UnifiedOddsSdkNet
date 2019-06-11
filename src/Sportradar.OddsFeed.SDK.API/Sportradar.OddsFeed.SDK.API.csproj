@@ -151,6 +151,7 @@
     <Compile Include="Internal\RecoveryResult.cs" />
     <Compile Include="Internal\RecoveryStatusChangeReason.cs" />
     <Compile Include="Internal\TimestampTracker.cs" />
+    <Compile Include="Extended\IOddsFeedExt.cs" />
     <Compile Include="IOddsFeedV2.cs" />
     <Compile Include="IOddsFeedV1.cs" />
     <Compile Include="IReplayManagerV1.cs" />
@@ -250,6 +251,7 @@
     <Compile Include="Internal\OddsFeedSessionBuilder.cs" />
     <Compile Include="MessageType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Extended\FeedExt.cs" />
     <Compile Include="ReplayFeed.cs" />
     <Compile Include="ReplayPlayerStatus.cs" />
   </ItemGroup>

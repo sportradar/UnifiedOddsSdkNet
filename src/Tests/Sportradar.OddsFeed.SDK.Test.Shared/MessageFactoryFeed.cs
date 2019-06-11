@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 using SR = Sportradar.OddsFeed.SDK.Test.Shared.StaticRandom;
 // ReSharper disable UnusedMember.Local
 

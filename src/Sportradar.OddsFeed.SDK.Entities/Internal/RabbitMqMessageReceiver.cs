@@ -15,7 +15,8 @@ using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.EventArguments;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal
 {
@@ -70,6 +71,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// Event raised when the <see cref="IMessageReceiver"/> could not deserialize the received message
         /// </summary>
         public event EventHandler<MessageDeserializationFailedEventArgs> FeedMessageDeserializationFailed;
+
+        /// <summary>
+        /// Event raised when the <see cref="IMessageReceiver" /> receives the message
+        /// </summary>
+        public event EventHandler<RawFeedMessageEventArgs> RawFeedMessageReceived;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RabbitMqMessageReceiver"/> class
@@ -137,6 +143,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 RaiseDeserializationFailed(eventArgs.Body);
                 return;
             }
+
+            // send RawFeedMessage if needed
+            try
+            {
+                //ExecutionLog.Debug($"Raw msg [{_interest}]: {feedMessage.GetType().Name} for {feedMessage.EventId}.");
+                var args = new RawFeedMessageEventArgs(eventArgs.RoutingKey, feedMessage);
+                RawFeedMessageReceived?.Invoke(this, args);
+            }
+            catch (Exception e)
+            {
+                ExecutionLog.Error($"Error dispatching raw message for {feedMessage.EventId}", e);
+            }
+            // continue normal processing
 
             if (!_producerManager.Exists(feedMessage.ProducerId))
             {

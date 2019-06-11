@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
+using Sportradar.OddsFeed.SDK.Messages.EventArguments;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -17,6 +18,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
     /// </summary>
     public class NamedValueDataProvider : IDataProvider<EntityList<NamedValueDTO>>
     {
+        /// <summary>
+        /// Event raised when the data provider receives the api message
+        /// </summary>
+        public event EventHandler<RawApiDataEventArgs> RawApiDataReceived;
+
         /// <summary>
         /// The url format specifying the url of the resources fetched by the fetcher
         /// </summary>

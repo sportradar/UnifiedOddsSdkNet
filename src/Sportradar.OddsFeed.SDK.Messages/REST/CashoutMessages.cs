@@ -17,9 +17,9 @@
 // 
 
 
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
-namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST
+namespace Sportradar.OddsFeed.SDK.Messages.REST
 {
 
 

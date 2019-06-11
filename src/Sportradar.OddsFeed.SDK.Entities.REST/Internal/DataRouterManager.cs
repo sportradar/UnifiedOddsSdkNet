@@ -21,6 +21,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
+using Sportradar.OddsFeed.SDK.Messages.EventArguments;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -30,6 +31,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
     /// <seealso cref="IDataRouterManager" />
     internal class DataRouterManager : IDataRouterManager
     {
+        /// <summary>
+        /// Occurs when data from Sports API arrives
+        /// </summary>
+        public event EventHandler<RawApiDataEventArgs> RawApiDataReceived;
+
         /// <summary>
         /// The execution log
         /// </summary>
@@ -260,6 +266,35 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             _availableSelectionsProvider = availableSelectionsProvider;
             _calculateProbabilityProvider = calculateProbabilityProvider;
             _fixtureChangesProvider = fixtureChangesProvider;
+
+            _sportEventSummaryProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _sportEventFixtureProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _sportEventFixtureChangeFixtureProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _allTournamentsForAllSportsProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _allSportsProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _sportEventsForDateProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _sportEventsForTournamentProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _playerProfileProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _competitorProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _simpleTeamProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _tournamentSeasonsProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _ongoingSportEventProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _sportCategoriesProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _invariantMarketDescriptionsProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _variantMarketDescriptionProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _variantDescriptionsProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _lotteryDrawSummaryProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _lotteryDrawFixtureProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _lotteryScheduleProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _lotteryListProvider.RawApiDataReceived += OnRawApiDataReceived;
+            //_availableSelectionsProvider.RawApiDataReceived += OnRawApiDataReceived;
+            //_calculateProbabilityProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _fixtureChangesProvider.RawApiDataReceived += OnRawApiDataReceived;
+        }
+
+        private void OnRawApiDataReceived(object sender, RawApiDataEventArgs e)
+        {
+           RawApiDataReceived?.Invoke(sender, e);
         }
 
         /// <summary>
@@ -295,7 +330,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         }
 
         /// <summary>
-        /// get sport event summary as an asynchronous operation
+        /// Get sport event summary as an asynchronous operation
         /// </summary>
         /// <param name="id">The id of the sport event to be fetched</param>
         /// <param name="culture">The language to be fetched</param>
@@ -336,7 +371,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         }
 
         /// <summary>
-        /// get sport event fixture as an asynchronous operation
+        /// Get sport event fixture as an asynchronous operation
         /// </summary>
         /// <param name="id">The id of the sport event to be fetched</param>
         /// <param name="culture">The language to be fetched</param>
@@ -355,9 +390,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 int restCallTime;
                 try
                 {
-                    var provider = useCachedProvider ? _sportEventFixtureProvider : _sportEventFixtureChangeFixtureProvider;
+                    var provider = useCachedProvider
+                                       ? _sportEventFixtureProvider
+                                       : _sportEventFixtureChangeFixtureProvider;
                     result = await provider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
-                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)
                 {
@@ -379,7 +416,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         }
 
         /// <summary>
-        /// get all tournaments for sport as an asynchronous operation.
+        /// Get all tournaments for sport as an asynchronous operation.
         /// </summary>
         /// <param name="culture">The culture to be fetched</param>
         /// <returns>Task</returns>
@@ -435,11 +472,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 try
                 {
                     result = await _sportCategoriesProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
-                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)
                 {
-                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
                     _executionLog.Error($"Error getting sport categories for id={id} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
                     if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
@@ -457,7 +494,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         }
 
         /// <summary>
-        /// get all sports as an asynchronous operation.
+        /// Get all sports as an asynchronous operation.
         /// </summary>
         /// <param name="culture">The culture to be fetched</param>
         /// <returns>Task</returns>
@@ -474,11 +511,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 try
                 {
                     result = await _allSportsProvider.GetDataAsync(culture.TwoLetterISOLanguageName).ConfigureAwait(false);
-                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)
                 {
-                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
                     _executionLog.Error($"Error getting all sports for lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
                     if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
@@ -645,7 +682,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         }
 
         /// <summary>
-        /// get player profile as an asynchronous operation.
+        /// Get player profile as an asynchronous operation.
         /// </summary>
         /// <param name="id">The id of the player</param>
         /// <param name="culture">The culture to be fetched</param>

@@ -2,8 +2,6 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
-using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.API.EventArguments

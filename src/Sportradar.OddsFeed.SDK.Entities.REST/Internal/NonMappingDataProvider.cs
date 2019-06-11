@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Messages.EventArguments;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -17,6 +18,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
     /// <seealso cref="Sportradar.OddsFeed.SDK.Entities.REST.Internal.IDataProvider{T}" />
     public class NonMappingDataProvider<T> : IDataProvider<T> where T : class
     {
+        /// <summary>
+        /// Event raised when the data provider receives the api message
+        /// </summary>
+        public event EventHandler<RawApiDataEventArgs> RawApiDataReceived;
+
         /// <summary>
         /// A <see cref="IDataFetcher"/> used to fetch the data
         /// </summary>
@@ -96,7 +102,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Contract.Requires(identifiers != null && identifiers.Any());
             Contract.Ensures(Contract.Result<Uri>() != null);
 
-                return new Uri(string.Format(_uriFormat, identifiers));
+            return new Uri(string.Format(_uriFormat, identifiers));
         }
 
         /// <summary>

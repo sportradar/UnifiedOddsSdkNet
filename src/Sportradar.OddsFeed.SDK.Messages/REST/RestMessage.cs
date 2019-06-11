@@ -5,9 +5,10 @@
 // ReSharper disable InconsistentNaming
 
 using System.ComponentModel;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Internal;
 
-namespace Sportradar.OddsFeed.SDK.Messages.Internal.REST
+namespace Sportradar.OddsFeed.SDK.Messages.REST
 {
     /// <summary>
     /// Represents all messages (entities) received from the feed's REST API

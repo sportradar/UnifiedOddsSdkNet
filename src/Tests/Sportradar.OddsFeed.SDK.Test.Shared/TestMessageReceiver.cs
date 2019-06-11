@@ -6,7 +6,8 @@ using System.Collections.Generic;
 using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.EventArguments;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.Test.Shared
 {
@@ -18,6 +19,8 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         public event EventHandler<FeedMessageReceivedEventArgs> FeedMessageReceived;
 
         public event EventHandler<MessageDeserializationFailedEventArgs> FeedMessageDeserializationFailed;
+
+        public event EventHandler<RawFeedMessageEventArgs> RawFeedMessageReceived;
 
         public void Open(MessageInterest msgInterest)
         {

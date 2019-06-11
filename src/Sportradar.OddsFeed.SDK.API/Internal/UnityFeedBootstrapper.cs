@@ -32,9 +32,9 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping.Lottery;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
-using cashout = Sportradar.OddsFeed.SDK.Messages.Internal.REST.cashout;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
+using Sportradar.OddsFeed.SDK.Messages.REST;
+using cashout = Sportradar.OddsFeed.SDK.Messages.REST.cashout;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {

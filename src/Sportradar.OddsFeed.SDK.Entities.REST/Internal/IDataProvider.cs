@@ -1,9 +1,12 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Globalization;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
+using Sportradar.OddsFeed.SDK.Messages.EventArguments;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -13,6 +16,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
     /// <typeparam name="T">Specifies the type of data returned by this <see cref="IDataProvider{T}"/></typeparam>
     public interface IDataProvider<T> where T : class
     {
+        /// <summary>
+        /// Event raised when the data provider receives the api message
+        /// </summary>
+        event EventHandler<RawApiDataEventArgs> RawApiDataReceived;
+
         /// <summary>
         /// Asynchronously gets a <see cref="T"/> instance in language specified by the provided <code>languageCode</code>
         /// </summary>

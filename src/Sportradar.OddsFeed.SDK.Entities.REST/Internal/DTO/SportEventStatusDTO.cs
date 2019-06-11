@@ -8,7 +8,8 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 // ReSharper disable InconsistentNaming
 
@@ -127,7 +128,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// </summary>
         /// <param name="record">A <see cref="restSportEventStatus" /> instance containing status data about the associated sport event</param>
         /// <param name="homeAwayCompetitors">The list of competitors with the indicator if it is a home or away team</param>
-        public SportEventStatusDTO(Messages.Internal.Feed.sportEventStatus record, IDictionary<HomeAway, URN> homeAwayCompetitors)
+        public SportEventStatusDTO(sportEventStatus record, IDictionary<HomeAway, URN> homeAwayCompetitors)
         {
             Contract.Requires(record != null);
 

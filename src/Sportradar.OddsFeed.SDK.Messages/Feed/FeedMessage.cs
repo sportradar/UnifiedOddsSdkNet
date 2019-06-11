@@ -1,12 +1,14 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
 using System.Text;
 using System.Xml.Serialization;
+using Sportradar.OddsFeed.SDK.Messages.Internal;
 
 // ReSharper disable InconsistentNaming
 
-namespace Sportradar.OddsFeed.SDK.Messages.Internal.Feed
+namespace Sportradar.OddsFeed.SDK.Messages.Feed
 {
     /// <summary>
     /// Represents a base class for messages received from the feed

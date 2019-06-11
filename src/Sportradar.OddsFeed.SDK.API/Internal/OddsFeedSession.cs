@@ -15,7 +15,7 @@ using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -32,7 +32,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <summary>
         /// A <see cref="IMessageReceiver"/> used to provide feed messages
         /// </summary>
-        private readonly IMessageReceiver _messageReceiver;
+        internal readonly IMessageReceiver MessageReceiver;
 
         /// <summary>
         /// A <see cref="IFeedMessageProcessor"/> instance used to process received messages
@@ -105,7 +105,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             Contract.Requires(messageDataExtractor != null);
             Contract.Requires(dispatcherStore != null);
 
-            _messageReceiver = messageReceiver;
+            MessageReceiver = messageReceiver;
             _messageProcessor = messageProcessor;
             _messageValidator = messageValidator;
             _messageDataExtractor = messageDataExtractor;
@@ -228,12 +228,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <exception cref="System.NotImplementedException"></exception>
         protected override void OnOpening()
         {
-            _messageReceiver.FeedMessageReceived += OnMessageReceived;
-            _messageReceiver.FeedMessageDeserializationFailed += OnMessageDeserializationFailed;
+            MessageReceiver.FeedMessageReceived += OnMessageReceived;
+            MessageReceiver.FeedMessageDeserializationFailed += OnMessageDeserializationFailed;
             _messageProcessor.MessageProcessed += OnMessageProcessed;
 
             var routingKeys = _getRoutingKeys.Invoke(this);
-            _messageReceiver.Open(MessageInterest, routingKeys);
+            MessageReceiver.Open(MessageInterest, routingKeys);
         }
 
         /// <summary>
@@ -242,10 +242,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <exception cref="System.NotImplementedException"></exception>
         protected override void OnClosing()
         {
-            _messageReceiver.FeedMessageReceived -= OnMessageReceived;
-            _messageReceiver.FeedMessageDeserializationFailed -= OnMessageDeserializationFailed;
+            MessageReceiver.FeedMessageReceived -= OnMessageReceived;
+            MessageReceiver.FeedMessageDeserializationFailed -= OnMessageDeserializationFailed;
             _messageProcessor.MessageProcessed -= OnMessageProcessed;
-            _messageReceiver.Close();
+            MessageReceiver.Close();
         }
 
         /// <summary>

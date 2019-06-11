@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.Common;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.API
 {

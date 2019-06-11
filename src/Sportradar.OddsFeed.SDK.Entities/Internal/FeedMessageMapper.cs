@@ -19,8 +19,8 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
-using cashout = Sportradar.OddsFeed.SDK.Messages.Internal.REST.cashout;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
+using cashout = Sportradar.OddsFeed.SDK.Messages.REST.cashout;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal
 {

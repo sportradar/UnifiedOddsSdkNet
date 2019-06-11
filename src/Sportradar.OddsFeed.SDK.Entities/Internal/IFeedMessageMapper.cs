@@ -6,8 +6,8 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using Sportradar.OddsFeed.SDK.Entities.Contracts;
 using Sportradar.OddsFeed.SDK.Entities.REST;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal
 {
