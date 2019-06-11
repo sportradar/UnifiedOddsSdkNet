@@ -11,13 +11,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
-using Microsoft.Xml.Serialization.GeneratedAssembly;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -55,7 +54,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             _poster = poster;
             _deserializer = deserializer;
             _mapperFactory = mapperFactory;
-            _serializer = new XmlSerializerContract().GetSerializer(typeof(SelectionsType));
+            _serializer = new XmlSerializer(typeof(SelectionsType));
         }
 
         /// <summary>

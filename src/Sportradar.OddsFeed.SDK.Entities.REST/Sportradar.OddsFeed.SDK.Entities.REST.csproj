@@ -91,9 +91,6 @@
       <HintPath>..\packages\Metrics.NET.0.5.5\lib\net45\Metrics.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Sportradar.OddsFeed.SDK.Messages.XmlSerializers">
-      <HintPath>..\..\libs\Sportradar.OddsFeed.SDK.Messages.XmlSerializers.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />

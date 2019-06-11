@@ -6,9 +6,12 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Logging;
+using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.EventArguments;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -21,6 +24,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
     /// <seealso cref="IDataProvider{T}" />
     public class DataProvider<TIn, TOut> : IDataProvider<TOut> where TIn : RestMessage where TOut : class
     {
+        /// <summary>
+        /// A <see cref="ILog"/> used for execution logging
+        /// </summary>
+        private static readonly ILog ExecutionLog = SdkLoggerFactory.GetLogger(typeof(DataProvider<TIn, TOut>));
+
+        /// <summary>
+        /// Event raised when the data provider receives the message
+        /// </summary>
+        public event EventHandler<RawApiDataEventArgs> RawApiDataReceived;
+
         /// <summary>
         /// A <see cref="IDataFetcher"/> used to fetch the data
         /// </summary>
@@ -83,7 +96,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Contract.Requires(uri != null);
 
             var stream = await _fetcher.GetDataAsync(uri).ConfigureAwait(false);
-            return _mapperFactory.CreateMapper(_deserializer.Deserialize(stream)).Map();
+            var item = _deserializer.Deserialize(stream);
+            DispatchReceivedRawApiData(uri, item);
+            return _mapperFactory.CreateMapper(item).Map();
         }
 
         /// <summary>
@@ -96,7 +111,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Contract.Requires(uri != null);
 
             var stream = _fetcher.GetData(uri);
-            return _mapperFactory.CreateMapper(_deserializer.Deserialize(stream)).Map();
+            var item = _deserializer.Deserialize(stream);
+            DispatchReceivedRawApiData(uri, item);
+            return _mapperFactory.CreateMapper(item).Map();
         }
 
         /// <summary>
@@ -160,6 +177,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         {
             var uri = GetRequestUri(identifiers);
             return GetDataInternal(uri);
+        }
+
+        private void DispatchReceivedRawApiData(Uri uri, RestMessage restMessage)
+        {
+            // send RawFeedMessage if needed
+            try
+            {
+                var args = new RawApiDataEventArgs(uri, restMessage);
+                RawApiDataReceived?.Invoke(this, args);
+            }
+            catch (Exception e)
+            {
+                ExecutionLog.Error($"Error dispatching raw message for {uri}", e);
+            }
+            // continue normal processing
         }
     }
 }
