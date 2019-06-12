@@ -108,15 +108,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                     var tvChannels = TvChannels.ToList();
                     foreach (var tvChannelDTO in fixtureDto.TvChannels)
                     {
-                        var tvChannel = tvChannels.FirstOrDefault(f => f.Name.Equals(tvChannelDTO.Name, StringComparison.InvariantCultureIgnoreCase));
-                        if (tvChannel == null)
+                        var tvChannel = tvChannels.Find(f => f.Name.Equals(tvChannelDTO.Name, StringComparison.InvariantCultureIgnoreCase));
+                        if (tvChannel != null)
                         {
-                            tvChannels.Add(new TvChannel(tvChannelDTO.Name, tvChannelDTO.StartTime, tvChannelDTO.StreamUrl));
+                            tvChannels.Remove(tvChannel);
                         }
-                        else
-                        {
-                            tvChannel = new TvChannel(tvChannelDTO.Name, tvChannelDTO.StartTime, tvChannelDTO.StreamUrl);
-                        }
+                        tvChannels.Add(new TvChannel(tvChannelDTO.Name, tvChannelDTO.StartTime, tvChannelDTO.StreamUrl));
                     }
                     TvChannels = tvChannels;
                 }
