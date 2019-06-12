@@ -113,6 +113,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             var receivedAt =  SdkInfo.ToEpochTime(DateTime.Now);
 
             // NOT used for GetRawMessage()
+            var sessionName = _interest == null ? "system" : _interest.Name;
             string messageBody = null;
             FeedMessage feedMessage;
             try
@@ -120,7 +121,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 if (FeedLog.IsDebugEnabled)
                 {
                     messageBody = Encoding.UTF8.GetString(eventArgs.Body);
-                    var sessionName = _interest == null ? "system" : _interest.Name;
                     FeedLog.Debug($"<~> {sessionName} <~> {eventArgs.RoutingKey} <~> {messageBody}");
                 }
                 else
@@ -148,7 +148,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             try
             {
                 //ExecutionLog.Debug($"Raw msg [{_interest}]: {feedMessage.GetType().Name} for {feedMessage.EventId}.");
-                var args = new RawFeedMessageEventArgs(eventArgs.RoutingKey, feedMessage);
+                var args = new RawFeedMessageEventArgs(eventArgs.RoutingKey, feedMessage, sessionName);
                 RawFeedMessageReceived?.Invoke(this, args);
             }
             catch (Exception e)
