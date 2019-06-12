@@ -3,7 +3,6 @@
 */
 using System.Collections.Generic;
 using System.Globalization;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities;
 using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
