@@ -43,7 +43,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
         public IEnumerable<string> Groups { get; }
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
-        public MarketDescriptionCacheItem MarketDescriptionCacheItem { get; }
+        public MarketDescriptionCacheItem MarketDescriptionCI { get; }
 
         internal MarketDescription(MarketDescriptionCacheItem cacheItem, IEnumerable<CultureInfo> cultures)
         {
@@ -52,7 +52,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
 
             var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
 
-            MarketDescriptionCacheItem = cacheItem;
+            MarketDescriptionCI = cacheItem;
 
             Id = cacheItem.Id;
             _names = new ReadOnlyDictionary<CultureInfo, string>(cultureList.ToDictionary(c => c, cacheItem.GetName));
@@ -83,6 +83,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
         public void SetMappings(IReadOnlyCollection<IMarketMappingData> mappings)
         {
             Mappings = mappings;
+        }
+
+        public void SetFetchInfo(string source, DateTime lastDataReceived)
+        {
+            MarketDescriptionCI.SetFetchInfo(source, lastDataReceived);
         }
 
         public string GetName(CultureInfo culture)

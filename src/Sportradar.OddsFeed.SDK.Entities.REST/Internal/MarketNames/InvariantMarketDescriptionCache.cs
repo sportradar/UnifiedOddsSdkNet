@@ -571,7 +571,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                         var cachedItem = _cache.GetCacheItem(marketDescription.Id.ToString());
                         if (cachedItem == null)
                         {
-                            cachedItem = new CacheItem(marketDescription.Id.ToString(), MarketDescriptionCacheItem.Build(marketDescription, _mappingValidatorFactory, culture));
+                            cachedItem = new CacheItem(marketDescription.Id.ToString(), MarketDescriptionCacheItem.Build(marketDescription, _mappingValidatorFactory, culture, CacheName));
                             _cache.Add(cachedItem, _cacheItemPolicy);
                         }
                         else

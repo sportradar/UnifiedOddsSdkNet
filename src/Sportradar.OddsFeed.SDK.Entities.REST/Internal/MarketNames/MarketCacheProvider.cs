@@ -11,6 +11,7 @@ using Common.Logging;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities;
 using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
@@ -146,6 +147,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
                 ((MarketDescription) marketDescriptor).SetOutcomes(variantDescription.Outcomes as IReadOnlyCollection<IOutcomeDescription>);
                 ((MarketDescription) marketDescriptor).SetMappings(variantDescription.Mappings as IReadOnlyCollection<IMarketMappingData>);
+                var variantCI = ((VariantDescription) variantDescription).VariantDescriptionCacheItem;
+                ((MarketDescription)marketDescriptor).SetFetchInfo(variantCI.SourceCache, variantCI.LastDataReceived);
 
                 return marketDescriptor;
             }
@@ -181,6 +184,52 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         private static bool IsMarketOutcomeText(IMarketDescription marketDescriptor)
         {
             return !string.IsNullOrEmpty(marketDescriptor?.OutcomeType) && marketDescriptor.OutcomeType.Equals(SdkInfo.FreeTextVariantValue);
+        }
+
+        /// <summary>
+        /// Reload data for market descriptions
+        /// </summary>
+        /// <param name="marketId">The market identifier</param>
+        /// <param name="specifiers">A dictionary specifying market specifiers or a null reference if market is invariant</param>
+        /// <param name="sourceCache">The source cache <see cref="MarketDescriptionCacheItem"/> belongs to</param>
+        /// <returns>True if succeeded, false otherwise</returns>
+        public async Task<bool> ReloadMarketDescriptionAsync(int marketId, IReadOnlyDictionary<string, string> specifiers, string sourceCache)
+        {
+            if (string.IsNullOrEmpty(sourceCache))
+            {
+                _executionLog.Warn($"Calling ReloadMarketDescriptionAsync without sourceCache. (marketId={marketId})");
+                return false;
+            }
+            try
+            {
+
+                if (sourceCache.Equals("InvariantMarketDescriptionsCache", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    _executionLog.Debug("Reloading invariant market description list");
+                    return await _invariantMarketsCache.LoadMarketDescriptionsAsync().ConfigureAwait(false);
+                }
+                if (sourceCache.Equals("VariantDescriptionListCache", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    _executionLog.Debug("Reloading variant market description list");
+                    return await _variantDescriptionListCache.LoadMarketDescriptionsAsync().ConfigureAwait(false);
+                }
+                if (sourceCache.Equals("VariantMarketDescriptionCache", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    string variantValue = null;
+                    specifiers?.TryGetValue(SdkInfo.VariantDescriptionName, out variantValue);
+                    _executionLog.Debug($"Reloading variant market description for market={marketId} and variant={variantValue}");
+                    var variantMarketDescriptionCache = (VariantMarketDescriptionCache) _variantMarketsCache;
+                    variantMarketDescriptionCache.CacheDeleteItem(VariantMarketDescriptionCache.GetCacheKey(marketId, variantValue),
+                                                                  CacheItemType.MarketDescription);
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                _executionLog.Warn("Error reloading market description(s).", e);
+            }
+            _executionLog.Warn($"Calling ReloadMarketDescriptionAsync with unknown sourceCache={sourceCache}. (marketId={marketId})");
+            return false;
         }
     }
 }

@@ -164,7 +164,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                                                                                         new InjectionConstructor(config,
                                                                                                                  new ResolvedParameter<IMarketCacheProvider>(),
                                                                                                                  new ResolvedParameter<IMarketDescriptionCache>("InvariantMarketDescriptionsCache"),
-                                                                                                                 new ResolvedParameter<IVariantDescriptionCache>("VariantDescriptionsCache"),
+                                                                                                                 new ResolvedParameter<IVariantDescriptionCache>("VariantDescriptionListCache"),
                                                                                                                  new ResolvedParameter<IMarketDescriptionCache>("VariantMarketDescriptionCache")));
 
             container.RegisterType<IFeedMessageMapper, FeedMessageMapper>(
@@ -782,12 +782,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             // Cache for variant descriptions
             container.RegisterInstance(
-                "VariantDescriptionsCache_Cache",
-                new MemoryCache("variantDescriptionsCache"),
+                "VariantDescriptionListCache_Cache",
+                new MemoryCache("variantDescriptionListCache"),
                 new ContainerControlledLifetimeManager());
 
             // Timer for variant descriptions
-            container.RegisterType<ITimer, SdkTimer>("VariantDescriptionsCacheTimer",
+            container.RegisterType<ITimer, SdkTimer>("VariantDescriptionListCacheTimer",
                                                      new HierarchicalLifetimeManager(),
                                                      new InjectionConstructor(TimeSpan.FromSeconds(5),
                                                                               TimeSpan.FromHours(6)));
@@ -796,13 +796,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             // Variant descriptions cache
             container.RegisterType<IVariantDescriptionCache, VariantDescriptionListCache>(
-                "VariantDescriptionsCache",
+                "VariantDescriptionListCache",
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
-                    new ResolvedParameter<MemoryCache>("VariantDescriptionsCache_Cache"),
+                    new ResolvedParameter<MemoryCache>("VariantDescriptionListCache_Cache"),
                     new ResolvedParameter<IDataRouterManager>(),
                     new ResolvedParameter<IMappingValidatorFactory>(),
-                    new ResolvedParameter<ITimer>("VariantDescriptionsCacheTimer"),
+                    new ResolvedParameter<ITimer>("VariantDescriptionListCacheTimer"),
                     cultures,
                     new ResolvedParameter<ICacheManager>()));
 
@@ -812,7 +812,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new InjectionConstructor(
                     new ResolvedParameter<IMarketDescriptionCache>("InvariantMarketDescriptionsCache"),
                     new ResolvedParameter<IMarketDescriptionCache>("VariantMarketDescriptionCache"),
-                    new ResolvedParameter<IVariantDescriptionCache>("VariantDescriptionsCache")));
+                    new ResolvedParameter<IVariantDescriptionCache>("VariantDescriptionListCache")));
 
             // Cache for player and competitor profiles
             container.RegisterInstance(
@@ -898,7 +898,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 container.Resolve<SportDataCache>(),
                 container.Resolve<InvariantMarketDescriptionCache>("InvariantMarketDescriptionsCache"),
                 container.Resolve<VariantMarketDescriptionCache>("VariantMarketDescriptionCache"),
-                container.Resolve<VariantDescriptionListCache>("VariantDescriptionsCache"),
+                container.Resolve<VariantDescriptionListCache>("VariantDescriptionListCache"),
                 container.Resolve<ProfileCache>(),
                 container.Resolve<LocalizedNamedValueCache>("MatchStatusCache"),
                 container.Resolve<SportEventStatusCache>()

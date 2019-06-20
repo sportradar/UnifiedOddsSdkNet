@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Metrics;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Common.Internal.Metrics;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
@@ -344,6 +345,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         {
             if (cacheItemType == CacheItemType.All || cacheItemType == CacheItemType.MarketDescription)
             {
+                DateTime date;
+                _fetchedVariants.TryRemove(id, out date);
                 _cache.Remove(id);
             }
         }
@@ -497,7 +500,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 if (cachedItem == null)
                 {
 
-                    cachedItem = new CacheItem(GetCacheKey(description.Id, description.Variant), MarketDescriptionCacheItem.Build(description, _mappingValidatorFactory, culture));
+                    cachedItem = new CacheItem(GetCacheKey(description.Id, description.Variant), MarketDescriptionCacheItem.Build(description, _mappingValidatorFactory, culture, CacheName));
                     _cache.Add(cachedItem, _cacheItemPolicy);
 
                 }
@@ -530,14 +533,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 return true;
             }
             var date = _fetchedVariants[cacheId];
-            var result = (DateTime.Now - date).TotalSeconds > 30;
+            var result = (DateTime.Now - date).TotalSeconds > SdkInfo.MarketDescriptionMinFetchInterval;
 
             // clear records from _fetchedVariants once a min
             if ((DateTime.Now - _lastTimeFetchedVariantsWereCleared).TotalSeconds > 60)
             {
                 foreach (var variant in _fetchedVariants)
                 {
-                    if ((DateTime.Now - variant.Value).TotalSeconds > 30)
+                    if ((DateTime.Now - variant.Value).TotalSeconds > SdkInfo.MarketDescriptionMinFetchInterval)
                     {
                         _fetchedVariants.TryRemove(variant.Key, out date);
                     }

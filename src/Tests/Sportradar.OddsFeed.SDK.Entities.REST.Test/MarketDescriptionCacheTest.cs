@@ -55,7 +55,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             var msg1 = RMF.GetDescMarket(10);
             var msg2 = RMF.GetDescMarket(msg1);
 
-            var ci = MarketDescriptionCacheItem.Build(new MarketDescriptionDTO(msg1), _mappingValidatorFactory, FirstCulture);
+            var ci = MarketDescriptionCacheItem.Build(new MarketDescriptionDTO(msg1), _mappingValidatorFactory, FirstCulture, "test");
             ci.Merge(new MarketDescriptionDTO(msg2), SecondCulture);
 
             Assert.AreEqual(msg1.id, ci.Id);

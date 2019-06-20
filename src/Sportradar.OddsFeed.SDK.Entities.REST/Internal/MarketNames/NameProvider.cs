@@ -13,6 +13,7 @@ using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities;
 using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -358,33 +359,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 }
             }
 
-            IMarketDescription marketDescriptor;
-            try
-            {
-                marketDescriptor = await GetMarketDescriptorAsync(culture).ConfigureAwait(false);
-            }
-            catch (CacheItemNotFoundException ex)
-            {
-                HandleErrorCondition("Failed to retrieve market name descriptor", outcomeId, null, culture, ex);
-                return null;
-            }
+            var marketDescriptor = await GetMarketDescriptionForOutcomeAsync(outcomeId, culture, true).ConfigureAwait(false);
 
-            if (marketDescriptor == null)
-            {
-                HandleErrorCondition("Failed to retrieve market descriptor", outcomeId, null, culture, null);
-                return null;
-            }
 
-            if (marketDescriptor.Outcomes == null)
-            {
-                HandleErrorCondition("Retrieved market descriptor does not contain outcomes", outcomeId, null, culture, null);
-                return null;
-            }
-
-            var outcome = marketDescriptor.Outcomes.FirstOrDefault(o => o.Id == outcomeId);
+            var outcome = marketDescriptor?.Outcomes.FirstOrDefault(o => o.Id == outcomeId);
             if (outcome == null)
             {
-                HandleErrorCondition("Retrieved market descriptor does not contain outcome", outcomeId, null, culture, null);
                 return null;
             }
 
@@ -440,6 +420,67 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 return null;
             }
             return string.Format(nameDescriptionFormat, tasks.Select(t => (object)t.Result).ToArray());
+        }
+
+        private async Task<IMarketDescription> GetMarketDescriptionForOutcomeAsync(string outcomeId, CultureInfo culture, bool firstTime)
+        {
+            IMarketDescription marketDescriptor;
+            try
+            {
+                marketDescriptor = await GetMarketDescriptorAsync(culture).ConfigureAwait(false);
+            }
+            catch (CacheItemNotFoundException ex)
+            {
+                HandleErrorCondition("Failed to retrieve market name descriptor", outcomeId, null, culture, ex);
+                return null;
+            }
+
+            if (marketDescriptor == null)
+            {
+                HandleErrorCondition("Failed to retrieve market descriptor", outcomeId, null, culture, null);
+                return null;
+            }
+
+            if (marketDescriptor.Outcomes == null)
+            {
+                if (firstTime)
+                {
+                    HandleErrorCondition("Retrieved market descriptor is lacking outcomes", outcomeId, null, culture, null);
+                    if (((MarketDescription) marketDescriptor).MarketDescriptionCI.CanBeFetched())
+                    {
+                        HandleErrorCondition("Reloading market description", outcomeId, null, culture, null);
+                        await _marketCacheProvider.ReloadMarketDescriptionAsync((int) marketDescriptor.Id,
+                                                                                _specifiers,
+                                                                                ((MarketDescription) marketDescriptor)
+                                                                               .MarketDescriptionCI.SourceCache).ConfigureAwait(false);
+                        return await GetMarketDescriptionForOutcomeAsync(outcomeId, culture, false).ConfigureAwait(false);
+                    }
+                }
+                HandleErrorCondition("Retrieved market descriptor does not contain outcomes", outcomeId, null, culture, null);
+                return null;
+            }
+
+            var outcome = marketDescriptor.Outcomes.FirstOrDefault(o => o.Id == outcomeId);
+            if (outcome == null)
+            {
+                if (firstTime)
+                {
+                    HandleErrorCondition("Retrieved market descriptor is missing outcome", outcomeId, null, culture, null);
+                    if (((MarketDescription)marketDescriptor).MarketDescriptionCI.CanBeFetched())
+                    {
+                        HandleErrorCondition("Reloading market description", outcomeId, null, culture, null);
+                        await _marketCacheProvider.ReloadMarketDescriptionAsync((int)marketDescriptor.Id,
+                                                                                _specifiers,
+                                                                                ((MarketDescription)marketDescriptor)
+                                                                               .MarketDescriptionCI.SourceCache).ConfigureAwait(false);
+                        return await GetMarketDescriptionForOutcomeAsync(outcomeId, culture, false).ConfigureAwait(false);
+                    }
+                }
+                HandleErrorCondition("Retrieved market descriptor does not contain outcome", outcomeId, null, culture, null);
+                return null;
+            }
+
+            return marketDescriptor;
         }
     }
 }

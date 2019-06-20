@@ -121,6 +121,10 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public const string ISO8601_24H_FullFormat = "yyyy-MM-dd’T’HH:mm:ssXXX";
+        /// <summary>
+        /// The market description minimum fetch interval in seconds
+        /// </summary>
+        public const int MarketDescriptionMinFetchInterval = 30;
 
         /// <summary>
         /// Gets the assembly version number

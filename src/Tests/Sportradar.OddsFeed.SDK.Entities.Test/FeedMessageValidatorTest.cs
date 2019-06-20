@@ -30,7 +30,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
         private MemoryCache _variantDescriptionsMemoryCache;
         private IMarketDescriptionCache _variantMdCache;
         private IMarketDescriptionCache _inVariantMdCache;
-        private IVariantDescriptionCache _variantDescriptionsCache;
+        private IVariantDescriptionCache _variantDescriptionListCache;
         private IMappingValidatorFactory _mappingValidatorFactory;
 
         private readonly TimeSpan _timerInterval = TimeSpan.FromSeconds(1);
@@ -46,13 +46,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
 
             _variantMemoryCache = new MemoryCache("VariantCache");
             _invariantMemoryCache = new MemoryCache("InVariantCache");
-            _variantDescriptionsMemoryCache = new MemoryCache("VariantDescriptionsCache");
+            _variantDescriptionsMemoryCache = new MemoryCache("VariantDescriptionListCache");
 
             _timer = new SdkTimer(_timerInterval, _timerInterval);
             _mappingValidatorFactory = new MappingValidatorFactory();
             _inVariantMdCache = new InvariantMarketDescriptionCache(_invariantMemoryCache, _dataRouterManager, _mappingValidatorFactory, _timer, TestData.Cultures, _cacheManager);
             _variantMdCache = new VariantMarketDescriptionCache(_variantMemoryCache, _dataRouterManager, _mappingValidatorFactory, _cacheManager);
-            _variantDescriptionsCache = new VariantDescriptionListCache(_variantDescriptionsMemoryCache, _dataRouterManager, _mappingValidatorFactory, _timer, TestData.Cultures, _cacheManager);
+            _variantDescriptionListCache = new VariantDescriptionListCache(_variantDescriptionsMemoryCache, _dataRouterManager, _mappingValidatorFactory, _timer, TestData.Cultures, _cacheManager);
 
             var dataFetcher = new TestDataFetcher();
 
@@ -66,7 +66,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
             namedValueProviderMock.Setup(x => x.BettingStatuses).Returns(bettingStatusCache);
 
              _validator = new FeedMessageValidator(
-                 new MarketCacheProvider(_inVariantMdCache, _variantMdCache, _variantDescriptionsCache),
+                 new MarketCacheProvider(_inVariantMdCache, _variantMdCache, _variantDescriptionListCache),
                  TestData.Culture,
                  namedValueProviderMock.Object,
                  TestProducerManager.Create());

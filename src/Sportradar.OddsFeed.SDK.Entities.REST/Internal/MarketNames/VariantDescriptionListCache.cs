@@ -332,7 +332,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             }
             catch (Exception ex)
             {
-                ExecutionLog.Warn($"An error occurred while fetching market descriptions. The exception:{ex.Message}");
+                ExecutionLog.Warn($"An error occurred while fetching market descriptions variant list. The exception:{ex.Message}");
                 return false;
             }
             return true;
@@ -343,7 +343,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// </summary>
         public void RegisterHealthCheck()
         {
-            HealthChecks.RegisterHealthCheck("VariantDescriptionsCache", new Func<HealthCheckResult>(StartHealthCheck));
+            HealthChecks.RegisterHealthCheck("VariantDescriptionListCache", new Func<HealthCheckResult>(StartHealthCheck));
         }
 
         /// <summary>
@@ -541,7 +541,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                     if (cachedItem == null)
                     {
 
-                        cachedItem = new CacheItem(marketDescription.Id, VariantDescriptionCacheItem.Build(marketDescription, _mappingValidatorFactory, culture));
+                        cachedItem = new CacheItem(marketDescription.Id, VariantDescriptionCacheItem.Build(marketDescription, _mappingValidatorFactory, culture, CacheName));
                         _cache.Add(cachedItem, new CacheItemPolicy());
                     }
                     else

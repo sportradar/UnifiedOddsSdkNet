@@ -20,6 +20,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
 
         public IEnumerable<IMarketMappingData> Mappings { get; internal set; }
 
+        internal VariantDescriptionCacheItem VariantDescriptionCacheItem { get; }
+
         internal VariantDescription(VariantDescriptionCacheItem cacheItem, IEnumerable<CultureInfo> cultures)
         {
             Contract.Requires(cacheItem != null);
@@ -34,6 +36,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
             Mappings = cacheItem.Mappings == null
                 ? null
                 : new ReadOnlyCollection<IMarketMappingData>(cacheItem.Mappings.Select(m => (IMarketMappingData) new MarketMapping(m)).ToList());
+
+            VariantDescriptionCacheItem = cacheItem;
         }
 
         public void SetMappings(ReadOnlyCollection<IMarketMappingData> mappings)
