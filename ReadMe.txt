@@ -25,6 +25,14 @@ The package contains:
 For more information please contact support@sportradar.com or visit https://iodocs.betradar.com/unifiedsdk/index.html
 
 CHANGE LOG:
+2019-07-21  1.22.0.0
+Added GetStartTimeTbdAsync and GetReplacedByAsync to the ISportEventV1
+Added properties StripesColor, SplitColor, ShirtType and SleeveDetail to the IJerseyV1
+Improved on updating when new outcomes are available (outrights)
+Exposed option for user to receive raw feed and api data
+PeriodScore.MatchStatusCode no more obsolete
+Fix: unnecessary api calls for competitor profiles
+
 2019-06-07  1.21.0.0
 Added property Gender to the ICompetitorV1
 Added property Division to the ITeamCompetitorV1
