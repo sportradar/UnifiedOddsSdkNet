@@ -20,7 +20,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// Represents all sport events(races, matches, tournaments, ....)
     /// </summary>
     /// <seealso cref="EntityPrinter" />
-    internal class SportEvent : EntityPrinter, ISportEvent
+    internal class SportEvent : EntityPrinter, ISportEventV1
     {
         /// <summary>
         /// The sport identifier
@@ -207,6 +207,40 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         protected override string PrintJ()
         {
             return PrintJ(GetType(), this);
+        }
+
+        /// <summary>
+        /// Asynchronously gets a <see cref="Nullable{bool}"/> specifying if the start time to be determined is set for the associated sport event.
+        /// </summary>
+        /// <returns>A <see cref="Nullable{bool}"/> specifying if the start time to be determined is set for the associated sport event.</returns>
+        public async Task<bool?> GetStartTimeTbdAsync()
+        {
+            var sportEventCI = SportEventCache.GetEventCacheItem(Id);
+            if (sportEventCI == null)
+            {
+                ExecutionLog.Debug($"Missing data. No sportEvent cache item for id={Id}.");
+                return null;
+            }
+            return ExceptionStrategy == ExceptionHandlingStrategy.THROW
+                ? await sportEventCI.GetStartTimeTbdAsync().ConfigureAwait(false)
+                : await new Func<Task<bool?>>(sportEventCI.GetStartTimeTbdAsync).SafeInvokeAsync(ExecutionLog, GetFetchErrorMessage("StartTimeTbd")).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Asynchronously gets a <see cref="URN"/> specifying the replacement sport event for the associated sport event.
+        /// </summary>
+        /// <returns>A <see cref="URN"/> specifying the replacement sport event for the associated sport event.</returns>
+        public async Task<URN> GetReplacedByAsync()
+        {
+            var sportEventCI = SportEventCache.GetEventCacheItem(Id);
+            if (sportEventCI == null)
+            {
+                ExecutionLog.Debug($"Missing data. No sportEvent cache item for id={Id}.");
+                return null;
+            }
+            return ExceptionStrategy == ExceptionHandlingStrategy.THROW
+                ? await sportEventCI.GetReplacedByAsync().ConfigureAwait(false)
+                : await new Func<Task<URN>>(sportEventCI.GetReplacedByAsync).SafeInvokeAsync(ExecutionLog, GetFetchErrorMessage("ReplacedBy")).ConfigureAwait(false);
         }
     }
 }

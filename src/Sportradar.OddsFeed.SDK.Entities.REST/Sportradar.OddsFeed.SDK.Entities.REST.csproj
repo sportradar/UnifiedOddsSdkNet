@@ -431,6 +431,7 @@
     <Compile Include="Internal\EntitiesImpl\Venue.cs" />
     <Compile Include="Internal\EntitiesImpl\WeatherInfo.cs" />
     <Compile Include="Internal\EventArguments\TournamentReceivedEventArgs.cs" />
+    <Compile Include="ISportEventV1.cs" />
     <Compile Include="ITeamCompetitorV1.cs" />
     <Compile Include="ITvChannelV1.cs" />
     <Compile Include="MarketMapping\IMarketMappingData.cs" />
