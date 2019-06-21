@@ -71,6 +71,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         private DateTime? _scheduledEnd;
 
         /// <summary>
+        /// The start time to be determined
+        /// </summary>
+        private bool? _startTimeTbd;
+
+        /// <summary>
+        /// The replaced by
+        /// </summary>
+        private URN _replacedBy;
+
+        /// <summary>
         /// The loaded fixtures
         /// </summary>
         internal readonly List<CultureInfo> LoadedFixtures = new List<CultureInfo>();
@@ -215,6 +225,42 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             }
             await FetchMissingSummary(new List<CultureInfo> { DefaultCulture }, false).ConfigureAwait(false);
             return _scheduledEnd;
+        }
+
+        /// <summary>
+        /// Asynchronously gets a <see cref="Nullable{bool}"/> specifying if the start time to be determined is set for the associated sport event.
+        /// </summary>
+        /// <returns>A <see cref="Nullable{bool}"/> specifying if the start time to be determined is set for the associated sport event.</returns>
+        public async Task<bool?> GetStartTimeTbdAsync()
+        {
+            if (_startTimeTbd != null)
+            {
+                return _startTimeTbd;
+            }
+            if (LoadedSummaries.Any())
+            {
+                return _startTimeTbd;
+            }
+            await FetchMissingSummary(new List<CultureInfo> { DefaultCulture }, false).ConfigureAwait(false);
+            return _startTimeTbd;
+        }
+
+        /// <summary>
+        /// Asynchronously gets a <see cref="URN"/> specifying the replacement sport event for the associated sport event.
+        /// </summary>
+        /// <returns>A <see cref="URN"/> specifying the replacement sport event for the associated sport event.</returns>
+        public async Task<URN> GetReplacedByAsync()
+        {
+            if (_replacedBy != null)
+            {
+                return _replacedBy;
+            }
+            if (LoadedSummaries.Any())
+            {
+                return _replacedBy;
+            }
+            await FetchMissingSummary(new List<CultureInfo> { DefaultCulture }, false).ConfigureAwait(false);
+            return _replacedBy;
         }
 
         /// <summary>
@@ -439,6 +485,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 _sportId = eventSummary.SportId;
                 _scheduled = eventSummary.Scheduled;
                 _scheduledEnd = eventSummary.ScheduledEnd;
+                _startTimeTbd = eventSummary.StartTimeTbd;
+                _replacedBy = eventSummary.ReplacedBy;
             }
         }
     }

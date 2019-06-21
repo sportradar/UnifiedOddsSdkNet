@@ -47,6 +47,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public SportEventType? Type { get; }
 
         /// <summary>
+        /// Gets a <see cref="Nullable{bool}"/> specifying if the start time to be determined is set
+        /// for the associated sport event
+        /// </summary>
+        public bool? StartTimeTbd { get; }
+
+        /// <summary>
+        /// Gets a <see cref="URN"/> specifying the replacement sport event
+        /// for the associated sport event
+        /// </summary>
+        public URN ReplacedBy { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SportEventSummaryDTO"/> class
         /// </summary>
         /// <param name="sportEvent">A <see cref="sportEvent"/> containing basic information about the event</param>
@@ -76,6 +88,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 Type = type;
             }
+            if (!string.IsNullOrEmpty(sportEvent.replaced_by))
+            {
+                URN replacedBy;
+                if (URN.TryParse(sportEvent.replaced_by, out replacedBy))
+                {
+                    ReplacedBy = replacedBy;
+                }
+            }
+            StartTimeTbd = sportEvent.start_time_tbdSpecified ? (bool?)sportEvent.start_time_tbd : null;
         }
 
         /// <summary>
@@ -105,6 +126,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 Type = type;
             }
+            if (!string.IsNullOrEmpty(parentStage.replaced_by))
+            {
+                URN replacedBy;
+                if (URN.TryParse(parentStage.replaced_by, out replacedBy))
+                {
+                    ReplacedBy = replacedBy;
+                }
+            }
+            StartTimeTbd = parentStage.start_time_tbdSpecified ? (bool?)parentStage.start_time_tbd : null;
         }
 
         /// <summary>
@@ -134,6 +164,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 Type = type;
             }
+            if (!string.IsNullOrEmpty(childStage.replaced_by))
+            {
+                URN replacedBy;
+                if (URN.TryParse(childStage.replaced_by, out replacedBy))
+                {
+                    ReplacedBy = replacedBy;
+                }
+            }
+            StartTimeTbd = childStage.start_time_tbdSpecified ? (bool?)childStage.start_time_tbd : null;
         }
     }
 }

@@ -27,6 +27,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 
         public bool? Stripes { get; }
 
+        public string StripesColor { get; }
+
+        public string SplitColor { get; }
+
+        public string ShirtType { get; }
+
+        public string SleeveDetail { get; }
+
         public JerseyCI(JerseyDTO item)
         {
             Contract.Requires(item != null);
@@ -39,6 +47,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Split = item.Split;
             Squares = item.Squares;
             Stripes = item.Stripes;
+            StripesColor = item.StripesColor;
+            SplitColor = item.SplitColor;
+            ShirtType = item.ShirtType;
+            SleeveDetail = item.SleeveDetail;
         }
     }
 }
