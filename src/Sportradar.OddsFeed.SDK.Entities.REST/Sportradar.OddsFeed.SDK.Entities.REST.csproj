@@ -135,6 +135,7 @@
     <Compile Include="ICoverageInfoV1.cs" />
     <Compile Include="IDrawV1.cs" />
     <Compile Include="IEventResultV1.cs" />
+    <Compile Include="IJerseyV1.cs" />
     <Compile Include="IMatchV1.cs" />
     <Compile Include="IMatchStatusV1.cs" />
     <Compile Include="Internal\Caching\CI\PitcherCI.cs" />
