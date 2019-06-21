@@ -2,7 +2,6 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
@@ -38,7 +37,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <summary>
         /// The competitors
         /// </summary>
-        protected IEnumerable<TeamCompetitorCI> Competitors;
+        protected IEnumerable<URN> Competitors;
         /// <summary>
         /// The reference identifier
         /// </summary>
@@ -177,16 +176,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// </summary>
         /// <param name="cultures">A <see cref="IEnumerable{CultureInfo}" /> specifying the languages to which the returned instance should be translated</param>
         /// <returns>A <see cref="Task{T}" /> representing an async operation</returns>
-        public async Task<IEnumerable<TeamCompetitorCI>> GetCompetitorsAsync(IEnumerable<CultureInfo> cultures)
+        public async Task<IEnumerable<URN>> GetCompetitorsAsync(IEnumerable<CultureInfo> cultures)
         {
-            var wantedCultures = cultures.ToList();
-            if (Competitors != null
-                && Competitors.Any()
-                && !LanguageHelper.GetMissingCultures(wantedCultures, Competitors.First().Names.Keys.ToList()).ToList().Any())
+            var cultureInfos = cultures.ToList();
+            if (Competitors != null && Competitors.Any() && HasTranslationsFor(cultureInfos))
             {
                 return Competitors;
             }
-            await FetchMissingSummary(wantedCultures, false).ConfigureAwait(false);
+            await FetchMissingSummary(cultureInfos, false).ConfigureAwait(false);
             return Competitors;
         }
         /// <summary>
@@ -283,14 +280,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             }
             if (eventSummary.Competitors != null)
             {
-                if (Competitors == null)
-                {
-                    Competitors = new List<TeamCompetitorCI>(eventSummary.Competitors.Select(t => new TeamCompetitorCI(t, culture, DataRouterManager)));
-                }
-                else
-                {
-                    MergeCompetitors(eventSummary.Competitors, culture);
-                }
+                Competitors = new List<URN>(eventSummary.Competitors.Select(t => t.Id));
                 GenerateMatchName(eventSummary.Competitors, culture);
                 FillCompetitorsQualifiers(eventSummary.Competitors);
                 FillCompetitorsReferences(eventSummary.Competitors);
@@ -336,44 +326,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                     _bookingStatus = fixture.BookingStatus;
                 }
             }
-        }
-
-        /// <summary>
-        /// Merges the competitors
-        /// </summary>
-        /// <param name="competitors">The competitors</param>
-        /// <param name="culture">The culture</param>
-        private void MergeCompetitors(IEnumerable<TeamCompetitorDTO> competitors, CultureInfo culture)
-        {
-            Contract.Requires(culture != null);
-
-            if (competitors == null)
-            {
-                return;
-            }
-
-            if (Competitors == null)
-            {
-                Competitors = new ReadOnlyCollection<TeamCompetitorCI>(competitors.Select(s=>new TeamCompetitorCI(s, culture, DataRouterManager)).ToList());
-                return;
-            }
-
-            var tempCompetitors = new List<TeamCompetitorCI>();
-
-            foreach (var competitor in competitors)
-            {
-                var tempCompetitor = Competitors.FirstOrDefault(c => c.Id.Equals(competitor.Id));
-                if (tempCompetitor == null)
-                {
-                    tempCompetitor = new TeamCompetitorCI(competitor, culture, DataRouterManager);
-                }
-                else
-                {
-                    tempCompetitor.Merge(competitor, culture);
-                }
-                tempCompetitors.Add(tempCompetitor);
-            }
-            Competitors = new ReadOnlyCollection<TeamCompetitorCI>(tempCompetitors);
         }
 
         private void GenerateMatchName(IEnumerable<TeamCompetitorDTO> competitors, CultureInfo culture)

@@ -3,14 +3,12 @@
 */
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -280,14 +278,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
 
             if (eventSummary.Competitors != null)
             {
-                if (Competitors == null)
-                {
-                    Competitors = new List<TeamCompetitorCI>(eventSummary.Competitors.Select(t => new TeamCompetitorCI(t, culture, DataRouterManager)));
-                }
-                else
-                {
-                    MergeCompetitors(eventSummary.Competitors, culture);
-                }
+                Competitors = new List<URN>(eventSummary.Competitors.Select(t => t.Id));
             }
 
             if (eventSummary.Category != null)
@@ -331,39 +322,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                                      : StageType.Child;
                 }
             }
-        }
-
-        /// <summary>
-        /// Merges the competitors
-        /// </summary>
-        /// <param name="competitors">The competitors</param>
-        /// <param name="culture">The culture</param>
-        private void MergeCompetitors(IEnumerable<CompetitorDTO> competitors, CultureInfo culture)
-        {
-            Contract.Requires(culture != null);
-
-            if (competitors == null)
-            {
-                return;
-            }
-
-            var tempCompetitors = Competitors == null
-                ? new List<TeamCompetitorCI>()
-                : new List<TeamCompetitorCI>(Competitors);
-
-            foreach (var competitor in competitors)
-            {
-                var tempCompetitor = tempCompetitors.FirstOrDefault(c => c.Id.Equals(competitor.Id));
-                if (tempCompetitor == null)
-                {
-                    tempCompetitors.Add(new TeamCompetitorCI(competitor, culture, DataRouterManager));
-                }
-                else
-                {
-                    tempCompetitor.Merge(competitor, culture);
-                }
-            }
-            Competitors = new ReadOnlyCollection<TeamCompetitorCI>(tempCompetitors);
         }
     }
 }

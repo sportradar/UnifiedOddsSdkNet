@@ -324,6 +324,29 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="SportEntityCI"/> class
+        /// </summary>
+        /// <param name="originalCompetitorCI">A <see cref="CompetitorCI"/> containing information about the sport entity</param>
+        protected CompetitorCI(CompetitorCI originalCompetitorCI) 
+            : base(new SportEntityDTO(originalCompetitorCI.Id.ToString(), ""))
+        {
+            Names = originalCompetitorCI.Names;
+            _countryNames = originalCompetitorCI._countryNames;
+            _abbreviations = originalCompetitorCI._abbreviations;
+            _associatedPlayerIds = originalCompetitorCI._associatedPlayerIds;
+            _isVirtual = originalCompetitorCI._isVirtual;
+            _referenceId = originalCompetitorCI._referenceId;
+            _jerseys = originalCompetitorCI._jerseys;
+            _countryCode = originalCompetitorCI._countryCode;
+            _manager = originalCompetitorCI._manager;
+            _venue = originalCompetitorCI._venue;
+            _gender = originalCompetitorCI._gender;
+            _fetchedCultures = originalCompetitorCI._fetchedCultures;
+            _dataRouterManager = originalCompetitorCI._dataRouterManager;
+            _primaryCulture = originalCompetitorCI._primaryCulture;
+        }
+
+        /// <summary>
         /// Defined field invariants needed by code contracts
         /// </summary>
         [ContractInvariantMethod]
@@ -357,7 +380,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 _associatedPlayerIds.Clear();
                 _associatedPlayerIds.AddRange(competitor.Players.Select(s => s.Id));
             }
-            _gender = competitor.Gender;
+            if (!string.IsNullOrEmpty(competitor.Gender))
+            {
+                _gender = competitor.Gender;
+            }
 
             //((List<CultureInfo>)_fetchedCultures).Add(culture);
         }
@@ -417,7 +443,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                     _venue.Merge(competitorProfile.Venue, culture);
                 }
             }
-            _gender = competitorProfile.Competitor.Gender;
+            if (!string.IsNullOrEmpty(competitorProfile.Competitor.Gender))
+            {
+                _gender = competitorProfile.Competitor.Gender;
+            }
 
             ((List<CultureInfo>) _fetchedCultures).Add(culture);
         }
@@ -441,7 +470,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _referenceId =
                 UpdateReferenceIds(simpleTeamProfile.Competitor.Id, simpleTeamProfile.Competitor.ReferenceIds);
             _countryCode = simpleTeamProfile.Competitor.CountryCode;
-            _gender = simpleTeamProfile.Competitor.Gender;
+            if (!string.IsNullOrEmpty(simpleTeamProfile.Competitor.Gender))
+            {
+                _gender = simpleTeamProfile.Competitor.Gender;
+            }
             ((List<CultureInfo>) _fetchedCultures).Add(culture);
         }
 

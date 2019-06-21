@@ -469,7 +469,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                 {
                     foreach (var teamCompetitorDTO in fixture.Competitors)
                     {
-                        AddCompetitor(teamCompetitorDTO.Id, teamCompetitorDTO, culture, true);
+                        AddTeamCompetitor(teamCompetitorDTO.Id, teamCompetitorDTO, culture, true);
                     }
                 }
                 return true;
@@ -481,7 +481,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                 {
                     foreach (var teamCompetitorDTO in match.Competitors)
                     {
-                        AddCompetitor(teamCompetitorDTO.Id, teamCompetitorDTO, culture, true);
+                        AddTeamCompetitor(teamCompetitorDTO.Id, teamCompetitorDTO, culture, true);
                     }
                 }
                 return true;
@@ -493,7 +493,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                 {
                     foreach (var teamCompetitorDTO in stage.Competitors)
                     {
-                        AddCompetitor(teamCompetitorDTO.Id, teamCompetitorDTO, culture, true);
+                        AddTeamCompetitor(teamCompetitorDTO.Id, teamCompetitorDTO, culture, true);
                     }
                 }
                 return true;
@@ -503,15 +503,71 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             {
                 if (tour.Competitors != null && tour.Competitors.Any())
                 {
-                    foreach (var teamCompetitorDTO in tour.Competitors)
+                    foreach (var competitorDTO in tour.Competitors)
                     {
-                        AddCompetitor(teamCompetitorDTO.Id, teamCompetitorDTO, culture, true);
+                        AddCompetitor(competitorDTO.Id, competitorDTO, culture, true);
                     }
                 }
                 return true;
             }
 
             return false;
+        }
+
+        private void AddTeamCompetitor(URN id, TeamCompetitorDTO item, CultureInfo culture, bool useSemaphore)
+        {
+            if (_cache.Contains(id.ToString()))
+            {
+                try
+                {
+                    var ci = (CompetitorCI)_cache.Get(id.ToString());
+                    var teamCI = ci as TeamCompetitorCI;
+                    if (teamCI != null)
+                    {
+                        if (useSemaphore)
+                        {
+                            _semaphoreCacheMerge.Wait();
+                        }
+                        teamCI.Merge(item, culture);
+                    }
+                    else
+                    {
+                        if (useSemaphore)
+                        {
+                            _semaphoreCacheMerge.Wait();
+                        }
+                        teamCI = new TeamCompetitorCI(ci);
+                        teamCI.Merge(item, culture);
+                        _cache.Set(id.ToString(), teamCI, GetCorrectCacheItemPolicy(id));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ExecutionLog.Error($"Error adding team competitor for id={id}, dto type={item?.GetType().Name} and lang={culture.TwoLetterISOLanguageName}.", ex);
+                }
+                finally
+                {
+                    if (useSemaphore)
+                    {
+                        if (!_isDisposed)
+                        {
+                            _semaphoreCacheMerge.Release();
+                        }
+                    }
+                }
+            }
+            else
+            {
+                _cache.Add(id.ToString(), new TeamCompetitorCI(item, culture, _dataRouterManager), GetCorrectCacheItemPolicy(id));
+            }
+
+            if (item?.Players != null && item.Players.Any())
+            {
+                foreach (var player in item.Players)
+                {
+                    AddPlayerCompetitor(player.Id, player, culture, false);
+                }
+            }
         }
 
         private void AddCompetitor(URN id, CompetitorDTO item, CultureInfo culture, bool useSemaphore)

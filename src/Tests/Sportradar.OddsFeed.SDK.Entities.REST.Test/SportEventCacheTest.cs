@@ -286,7 +286,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.IsNotNull(item, "Cached item not found.");
             Assert.AreEqual(TestData.EventId, item.Id);
             var date = new DateTime?();
-            List<TeamCompetitorCI> competitors = null;
+            List<URN> competitors = null;
             TeamCompetitorCI comp = null;
             RoundCI round = null;
             CacheItem season = null;
@@ -295,7 +295,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             {
                 date = await item.GetScheduledAsync();
                 competitors = (await item.GetCompetitorsAsync(TestData.Cultures)).ToList();
-                comp = competitors.FirstOrDefault();
+                //comp = competitors.FirstOrDefault();
                 round = await item.GetTournamentRoundAsync(TestData.Cultures);
                 season = await item.GetSeasonAsync(TestData.Cultures);
             }).GetAwaiter().GetResult();
@@ -308,6 +308,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             Assert.AreEqual(2, competitors.Count);
 
+            //TODO - this was removed
             if (comp != null)
             {
                 Assert.AreEqual("sr:competitor:66390", comp.Id.ToString());

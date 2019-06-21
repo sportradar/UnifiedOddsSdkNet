@@ -81,9 +81,9 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                 Task.Run(async () =>
                          {
                              date = await ci.GetScheduledAsync();
-                             competitors = (await ci.GetCompetitorsAsync(checkCulture)).ToList();
+                             //competitors = (await ci.GetCompetitorsAsync(checkCulture)).ToList();
                              // ReSharper disable once AssignNullToNotNullAttribute
-                             comp = competitors.FirstOrDefault();
+                             //comp = competitors.FirstOrDefault();
                              round = await ci.GetTournamentRoundAsync(checkCulture);
                              season = await ci.GetSeasonAsync(checkCulture);
                          }).GetAwaiter().GetResult();
@@ -93,6 +93,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
                 Assert.AreEqual(2, competitors.Count);
 
+                //TODO - this was removed
                 if (comp != null)
                 {
                     Assert.AreEqual("sr:competitor:66390", comp.Id.ToString());

@@ -364,7 +364,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 }
                 else
                 {
-                    fetchTasks = missingCultures.ToDictionary(missingCulture => missingCulture, missingCulture => DataRouterManager.GetSportEventFixtureAsync(Id, missingCulture, !FixtureTimestampCache.Contains(Id.ToString()), this));
+                    fetchTasks = missingCultures.ToDictionary(missingCulture => missingCulture, missingCulture => DataRouterManager.GetSportEventFixtureAsync(
+                                                                                                                          Id,
+                                                                                                                          missingCulture,
+                                                                                                                          !FixtureTimestampCache.Contains(Id.ToString()),
+                                                                                                                          this));
                 }
                 await Task.WhenAll(fetchTasks.Values).ConfigureAwait(false);
                 LoadedFixtures.AddRange(missingCultures);

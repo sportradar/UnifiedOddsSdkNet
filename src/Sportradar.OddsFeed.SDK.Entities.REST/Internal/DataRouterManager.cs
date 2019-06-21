@@ -744,9 +744,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 {
                     if (id.Type.Equals(SdkInfo.SimpleTeamIdentifier, StringComparison.InvariantCultureIgnoreCase)
                         || id.ToString().StartsWith(SdkInfo.OutcometextVariantValue, StringComparison.InvariantCultureIgnoreCase))
+                    {
                         simpleTeamResult = await _simpleTeamProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
+                    }
                     else
+                    {
                         competitorResult = await _competitorProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
+                    }
                     restCallTime = (int) t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)

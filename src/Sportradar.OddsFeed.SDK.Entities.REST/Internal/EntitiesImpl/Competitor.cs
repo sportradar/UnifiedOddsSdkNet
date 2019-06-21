@@ -32,7 +32,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         private readonly CompetitionCI _competitionCI;
         private readonly object _lock = new object();
         protected string TeamQualifier;
-        private string _gender;
 
         /// <summary>
         /// Gets a <see cref="IReadOnlyDictionary{CultureInfo, String}"/> containing competitor's country name in different languages
@@ -147,7 +146,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             _sportEntityFactory = sportEntityFactory;
             _competitionCI = (CompetitionCI) rootCompetitionCI;
             _referenceId = null;
-            _gender = ci.Gender;
         }
 
         /// <summary>
@@ -197,7 +195,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                     _referenceId = ci.ReferenceId;
                 }
             }
-            _gender = ci.Gender;
         }
 
         /// <summary>
@@ -237,7 +234,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 associatedPlayers = string.Join(", ", AssociatedPlayers.Select(s => s.Id + ": " + s.GetName(_cultures.First())));
                 associatedPlayers = $", AssociatedPlayers=[{associatedPlayers}]";
             }
-            var reference = _referenceId == null
+            var reference = _referenceId?.ReferenceIds == null || !_referenceId.ReferenceIds.Any()
                                 ? string.Empty
                                 : _referenceId.ReferenceIds.Aggregate(string.Empty, (current, item) => current = $"{current}, {item.Key}={item.Value}").Substring(2);
             return $"{base.PrintC()}, Gender={Gender}, Reference={reference}, Abbreviations=[{abbreviations}]{associatedPlayers}";
@@ -257,7 +254,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 associatedPlayers = string.Join(", ", AssociatedPlayers.Select(s => s.ToString("f")));
                 associatedPlayers = $", AssociatedPlayers=[{associatedPlayers}]";
             }
-            var reference = References == null ? string.Empty : References.ToString("f");
+            var reference = References == null
+                                ? string.Empty
+                                : References.ToString("f");
             return $"{base.PrintF()}, Countries=[{countryNames}], Reference={reference}, Abbreviations=[{abbreviations}], IsVirtual={IsVirtual}{associatedPlayers}";
         }
 
@@ -354,6 +353,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// Gets the gender
         /// </summary>
         /// <value>The gender</value>
-        public string Gender => _gender ?? GetCompetitor()?.Gender;
+        public string Gender => GetCompetitor()?.Gender;
     }
 }

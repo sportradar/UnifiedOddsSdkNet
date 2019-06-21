@@ -54,10 +54,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// </summary>
         /// <typeparam name="T">A <see cref="ISportEvent"/></typeparam>
         /// <param name="id">The identifier</param>
-        /// <param name="sportId">The sport identifier.</param>
+        /// <param name="sportId">The sport identifier</param>
         /// <param name="cultures">The cultures used for returned instance</param>
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how the build instance will handle potential exceptions</param>
-        /// <returns>The constructed <see cref="ISportEvent"/> derived instance.</returns>
+        /// <returns>The constructed <see cref="ISportEvent"/> derived instance</returns>
         T BuildSportEvent<T>(URN id, URN sportId, IEnumerable<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy) where T : ISportEvent;
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="ci">A <see cref="CompetitorCI"/> used to create new instance</param>
         /// <param name="cultures">A cultures of the current instance of <see cref="CompetitorCI"/></param>
         /// <param name="rootCompetitionCI">A root <see cref="CompetitionCI"/> to which this competitor belongs to</param>
-        /// <returns>The constructed <see cref="ICompetitor"/> instance.</returns>
+        /// <returns>The constructed <see cref="ICompetitor"/> instance</returns>
         ICompetitor BuildCompetitor(CompetitorCI ci, IEnumerable<CultureInfo> cultures, ICompetitionCI rootCompetitionCI);
 
         /// <summary>
@@ -74,7 +74,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// </summary>
         /// <param name="ci">A <see cref="CompetitorCI"/> used to create new instance</param>
         /// <param name="cultures">A cultures of the current instance of <see cref="CompetitorCI"/></param>
-        /// <returns>The constructed <see cref="ICompetitor"/> instance.</returns>
+        /// <param name="competitorsReferences">The dictionary of competitor references (associated with specific match)</param>
+        /// <returns>The constructed <see cref="ICompetitor"/> instance</returns>
         ICompetitor BuildCompetitor(CompetitorCI ci, IEnumerable<CultureInfo> cultures, IDictionary<URN, ReferenceIdCI> competitorsReferences);
 
         /// <summary>
@@ -83,7 +84,34 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="ci">A <see cref="TeamCompetitorCI"/> used to create new instance</param>
         /// <param name="culture">A culture of the current instance of <see cref="TeamCompetitorCI"/></param>
         /// <param name="rootCompetitionCI">A root <see cref="CompetitionCI"/> to which this competitor belongs to</param>
-        /// <returns>The constructed <see cref="ITeamCompetitor"/> instance.</returns>
+        /// <returns>The constructed <see cref="ITeamCompetitor"/> instance</returns>
         ITeamCompetitor BuildTeamCompetitor(TeamCompetitorCI ci, IEnumerable<CultureInfo> culture, ICompetitionCI rootCompetitionCI);
+
+        /// <summary>
+        /// Builds the instance of the <see cref="ICompetitor"/> class
+        /// </summary>
+        /// <param name="competitorId">A <see cref="URN"/> of the <see cref="CompetitorCI"/> used to create new instance</param>
+        /// <param name="cultures">A cultures of the current instance of <see cref="CompetitorCI"/></param>
+        /// <param name="rootCompetitionCI">A root <see cref="CompetitionCI"/> to which this competitor belongs to</param>
+        /// <returns>The constructed <see cref="ICompetitor"/> instance</returns>
+        Task<ICompetitor> BuildCompetitorAsync(URN competitorId, IEnumerable<CultureInfo> cultures, ICompetitionCI rootCompetitionCI);
+
+        /// <summary>
+        /// Builds the instance of the <see cref="ICompetitor"/> class
+        /// </summary>
+        /// <param name="competitorId">A <see cref="URN"/> of the <see cref="CompetitorCI"/> used to create new instance</param>
+        /// <param name="cultures">A cultures of the current instance of <see cref="CompetitorCI"/></param>
+        /// <param name="competitorsReferences">The dictionary of competitor references (associated with specific match)</param>
+        /// <returns>The constructed <see cref="ICompetitor"/> instance</returns>
+        Task<ICompetitor> BuildCompetitorAsync(URN competitorId, IEnumerable<CultureInfo> cultures, IDictionary<URN, ReferenceIdCI> competitorsReferences);
+
+        /// <summary>
+        /// Builds the instance of the <see cref="ITeamCompetitor"/> class
+        /// </summary>
+        /// <param name="teamCompetitorId">A <see cref="URN"/> of the <see cref="TeamCompetitorCI"/> used to create new instance</param>
+        /// <param name="culture">A culture of the current instance of <see cref="TeamCompetitorCI"/></param>
+        /// <param name="rootCompetitionCI">A root <see cref="CompetitionCI"/> to which this competitor belongs to</param>
+        /// <returns>The constructed <see cref="ITeamCompetitor"/> instance</returns>
+        Task<ITeamCompetitor> BuildTeamCompetitorAsync(URN teamCompetitorId, IEnumerable<CultureInfo> culture, ICompetitionCI rootCompetitionCI);
     }
 }

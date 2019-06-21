@@ -7,6 +7,7 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Logging;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl;
 using Sportradar.OddsFeed.SDK.Entities.REST;
@@ -24,10 +25,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
     /// <summary>
     /// A factory used to construct <see cref="ISportEvent" /> and <see cref="ITournament" /> instances
     /// </summary>
-    /// <seealso cref="Sportradar.OddsFeed.SDK.Entities.REST.Internal.ISportEntityFactory" />
     /// <seealso cref="ISportEntityFactory" />
     internal class SportEntityFactory : ISportEntityFactory
     {
+        protected readonly ILog ExecutionLog = SdkLoggerFactory.GetLoggerForExecution(typeof(SportEntityFactory));
         /// <summary>
         /// A <see cref="ISportDataCache"/> instance used to retrieve sport related info
         /// </summary>
@@ -208,7 +209,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="sportId">The sport identifier</param>
         /// <param name="cultures">The cultures used for returned instance</param>
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how the build instance will handle potential exceptions</param>
-        /// <returns>The constructed <see cref="ICompetition"/> derived instance.</returns>
+        /// <returns>The constructed <see cref="ICompetition"/> derived instance</returns>
         public T BuildSportEvent<T>(URN id, URN sportId, IEnumerable<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy) where T : ISportEvent
         {
             ISportEvent sportEvent;
@@ -280,6 +281,67 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         public ITeamCompetitor BuildTeamCompetitor(TeamCompetitorCI ci, IEnumerable<CultureInfo> cultures, ICompetitionCI rootCompetitionCI)
         {
             return new TeamCompetitor(ci, cultures, this, _profileCache, rootCompetitionCI);
+        }
+
+        /// <summary>
+        /// Builds the instance of the <see cref="ICompetitor"/> class
+        /// </summary>
+        /// <param name="competitorId">A <see cref="URN"/> of the <see cref="CompetitorCI"/> used to create new instance</param>
+        /// <param name="cultures">A cultures of the current instance of <see cref="CompetitorCI"/></param>
+        /// <param name="rootCompetitionCI">A root <see cref="CompetitionCI"/> to which this competitor belongs to</param>
+        /// <returns>The constructed <see cref="ICompetitor"/> instance</returns>
+        public async Task<ICompetitor> BuildCompetitorAsync(URN competitorId, IEnumerable<CultureInfo> cultures, ICompetitionCI rootCompetitionCI)
+        {
+            var cultureInfos = cultures.ToList();
+            var competitorCI = await _profileCache.GetCompetitorProfileAsync(competitorId, cultureInfos).ConfigureAwait(false);
+            if (competitorCI != null)
+            {
+                return BuildCompetitor(competitorCI, cultureInfos, rootCompetitionCI);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Builds the instance of the <see cref="ICompetitor"/> class
+        /// </summary>
+        /// <param name="competitorId">A <see cref="URN"/> of the <see cref="CompetitorCI"/> used to create new instance</param>
+        /// <param name="cultures">A cultures of the current instance of <see cref="CompetitorCI"/></param>
+        /// <param name="competitorsReferences">The dictionary of competitor references (associated with specific match)</param>
+        /// <returns>The constructed <see cref="ICompetitor"/> instance</returns>
+        public async Task<ICompetitor> BuildCompetitorAsync(URN competitorId, IEnumerable<CultureInfo> cultures, IDictionary<URN, ReferenceIdCI> competitorsReferences)
+        {
+            var cultureInfos = cultures.ToList();
+            var competitorCI = await _profileCache.GetCompetitorProfileAsync(competitorId, cultureInfos).ConfigureAwait(false);
+            if (competitorCI != null)
+            {
+                return BuildCompetitor(competitorCI, cultureInfos, competitorsReferences);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Builds the instance of the <see cref="ITeamCompetitor"/> class
+        /// </summary>
+        /// <param name="teamCompetitorId">A <see cref="URN"/> of the <see cref="TeamCompetitorCI"/> used to create new instance</param>
+        /// <param name="cultures">A culture of the current instance of <see cref="TeamCompetitorCI"/></param>
+        /// <param name="rootCompetitionCI">A root <see cref="CompetitionCI"/> to which this competitor belongs to</param>
+        /// <returns>The constructed <see cref="ITeamCompetitor"/> instance</returns>
+        public async Task<ITeamCompetitor> BuildTeamCompetitorAsync(URN teamCompetitorId, IEnumerable<CultureInfo> cultures, ICompetitionCI rootCompetitionCI)
+        {
+            var cultureInfos = cultures.ToList();
+            var competitorCI = await _profileCache.GetCompetitorProfileAsync(teamCompetitorId, cultureInfos).ConfigureAwait(false);
+            var teamCompetitorCI = competitorCI as TeamCompetitorCI;
+            if (teamCompetitorCI != null)
+            {
+                return BuildTeamCompetitor(teamCompetitorCI, cultureInfos, rootCompetitionCI);
+            }
+            if (competitorCI != null)
+            {
+                ExecutionLog.Warn($"Transforming CompetitorCI to TeamCompetitorCI for {teamCompetitorId}");
+                var teamCI = new TeamCompetitorCI(competitorCI);
+                return BuildTeamCompetitor(teamCI, cultureInfos, rootCompetitionCI);
+            }
+            return null;
         }
     }
 }

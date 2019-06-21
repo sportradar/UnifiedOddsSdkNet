@@ -41,6 +41,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <summary>
         /// Initializes new TeamCompetitorCI instance
         /// </summary>
+        /// <param name="competitor">A <see cref="TeamCompetitorDTO"/> to be used to construct new instance</param>
+        public TeamCompetitorCI(CompetitorCI competitor)
+            : base(competitor)
+        {
+            Contract.Requires(competitor != null);
+        }
+
+        /// <summary>
+        /// Initializes new TeamCompetitorCI instance
+        /// </summary>
         /// <param name="competitor">A <see cref="CompetitorDTO"/> to be used to construct new instance</param>
         /// <param name="culture">A culture to be used to construct new instance</param>
         /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to fetch missing data</param>

@@ -75,6 +75,42 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Builds the instance of the <see cref="ICompetitor"/> class
+        /// </summary>
+        /// <param name="competitorId">A <see cref="URN"/> of the <see cref="CompetitorCI"/> used to create new instance</param>
+        /// <param name="cultures">A cultures of the current instance of <see cref="CompetitorCI"/></param>
+        /// <param name="rootCompetitionCI">A root <see cref="CompetitionCI"/> to which this competitor belongs to</param>
+        /// <returns>The constructed <see cref="ICompetitor"/> instance</returns>
+        public Task<ICompetitor> BuildCompetitorAsync(URN competitorId, IEnumerable<CultureInfo> cultures, ICompetitionCI rootCompetitionCI)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Builds the instance of the <see cref="ICompetitor"/> class
+        /// </summary>
+        /// <param name="competitorId">A <see cref="URN"/> of the <see cref="CompetitorCI"/> used to create new instance</param>
+        /// <param name="cultures">A cultures of the current instance of <see cref="CompetitorCI"/></param>
+        /// <param name="competitorsReferences">The dictionary of competitor references (associated with specific match)</param>
+        /// <returns>The constructed <see cref="ICompetitor"/> instance</returns>
+        public Task<ICompetitor> BuildCompetitorAsync(URN competitorId, IEnumerable<CultureInfo> cultures, IDictionary<URN, ReferenceIdCI> competitorsReferences)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Builds the instance of the <see cref="ITeamCompetitor"/> class
+        /// </summary>
+        /// <param name="teamCompetitorId">A <see cref="URN"/> of the <see cref="TeamCompetitorCI"/> used to create new instance</param>
+        /// <param name="culture">A culture of the current instance of <see cref="TeamCompetitorCI"/></param>
+        /// <param name="rootCompetitionCI">A root <see cref="CompetitionCI"/> to which this competitor belongs to</param>
+        /// <returns>The constructed <see cref="ITeamCompetitor"/> instance</returns>
+        public Task<ITeamCompetitor> BuildTeamCompetitorAsync(URN teamCompetitorId, IEnumerable<CultureInfo> culture, ICompetitionCI rootCompetitionCI)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     internal class TestSportEventStatusMapper : SportEventStatusMapperBase

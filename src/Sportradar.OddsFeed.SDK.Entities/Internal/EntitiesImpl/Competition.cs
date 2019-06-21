@@ -206,13 +206,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                 ExecutionLog.Debug($"Missing data. No sportEvent cache item for id={Id}.");
                 return null;
             }
-            var item = ExceptionStrategy == ExceptionHandlingStrategy.THROW
+            var items = ExceptionStrategy == ExceptionHandlingStrategy.THROW
                 ? await competitionCI.GetCompetitorsAsync(Cultures).ConfigureAwait(false)
-                : await new Func<IEnumerable<CultureInfo>, Task<IEnumerable<TeamCompetitorCI>>>(competitionCI.GetCompetitorsAsync).SafeInvokeAsync(Cultures, ExecutionLog, GetFetchErrorMessage("Competitors")).ConfigureAwait(false);
+                : await new Func<IEnumerable<CultureInfo>, Task<IEnumerable<URN>>>(competitionCI.GetCompetitorsAsync).SafeInvokeAsync(Cultures, ExecutionLog, GetFetchErrorMessage("Competitors")).ConfigureAwait(false);
 
-            return item == null
-                ? null
-                : item.Select(s => _sportEntityFactory.BuildTeamCompetitor(s, Cultures, competitionCI));
+            var competitorUrns = items as List<URN>;
+            if (competitorUrns == null || !competitorUrns.Any())
+            {
+                return null;
+            }
+
+            var tasks = competitorUrns.Select(s =>
+                                              {
+                                                  var t = _sportEntityFactory.BuildTeamCompetitorAsync(s, Cultures, competitionCI);
+                                                  t.ConfigureAwait(false);
+                                                  return t;
+                                              }).ToList();
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            return tasks.Select(s=>s.Result);
         }
     }
 }
