@@ -511,6 +511,8 @@ namespace Sportradar.OddsFeed.SDK.API
             }
             catch (CommunicationException ex)
             {
+                Interlocked.CompareExchange(ref _opened, 0, 1);
+
                 // this should really almost never happen
                 var result = _connectionValidator.ValidateConnection();
                 if (result == ConnectionValidationResult.Success)
@@ -529,6 +531,8 @@ namespace Sportradar.OddsFeed.SDK.API
             }
             catch (BrokerUnreachableException ex)
             {
+                Interlocked.CompareExchange(ref _opened, 0, 1);
+
                 // this should really almost never happen
                 var result = _connectionValidator.ValidateConnection();
                 if (result == ConnectionValidationResult.Success)
