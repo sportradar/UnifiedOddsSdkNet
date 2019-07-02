@@ -235,8 +235,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             Contract.Requires(!string.IsNullOrEmpty(hostName));
 
             var hostUrl = useSsl
-                ? "https://" + hostName
-                : "http://" + hostName;
+                              ? "https://" + hostName
+                              : "http://" + hostName;
 
             try
             {
