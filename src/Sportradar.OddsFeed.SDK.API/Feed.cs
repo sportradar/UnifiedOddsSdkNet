@@ -511,39 +511,43 @@ namespace Sportradar.OddsFeed.SDK.API
             }
             catch (CommunicationException ex)
             {
+                Interlocked.CompareExchange(ref _opened, 0, 1);
+
                 // this should really almost never happen
                 var result = _connectionValidator.ValidateConnection();
                 if (result == ConnectionValidationResult.Success)
                 {
-                    throw new CommunicationException(
-                        "Connection to the RESTful API failed, Probable Reason={Invalid or expired token}",
-                        $"{InternalConfig.ApiBaseUri}:443",
-                        ex.InnerException);
+                    throw new CommunicationException("Connection to the RESTful API failed, Probable Reason={Invalid or expired token}",
+                                                     $"{InternalConfig.ApiBaseUri}:443",
+                                                     ex.InnerException);
                 }
 
                 var publicIp = _connectionValidator.GetPublicIp();
-                throw new CommunicationException(
-                    $"Connection to the RESTful API failed. Probable Reason={result.Message}, Public IP={publicIp}",
-                    $"{InternalConfig.ApiBaseUri}:443",
-                    ex);
+                throw new CommunicationException($"Connection to the RESTful API failed. Probable Reason={result.Message}, Public IP={publicIp}",
+                                                 $"{InternalConfig.ApiBaseUri}:443",
+                                                 ex);
             }
             catch (BrokerUnreachableException ex)
             {
+                Interlocked.CompareExchange(ref _opened, 0, 1);
                 // this should really almost never happen
                 var result = _connectionValidator.ValidateConnection();
                 if (result == ConnectionValidationResult.Success)
                 {
-                    throw new CommunicationException(
-                        "Connection to the message broker failed, Probable Reason={Invalid or expired token}",
-                        $"{InternalConfig.Host}:{InternalConfig.Port}",
-                        ex.InnerException);
+                    throw new CommunicationException("Connection to the message broker failed, Probable Reason={Invalid or expired token}",
+                                                     $"{InternalConfig.Host}:{InternalConfig.Port}",
+                                                     ex.InnerException);
                 }
 
                 var publicIp = _connectionValidator.GetPublicIp();
-                throw new CommunicationException(
-                    $"Connection to the message broker failed. Probable Reason={result.Message}, Public IP={publicIp}",
-                    $"{InternalConfig.Host}:{InternalConfig.Port}",
-                    ex);
+                throw new CommunicationException($"Connection to the message broker failed. Probable Reason={result.Message}, Public IP={publicIp}",
+                                                 $"{InternalConfig.Host}:{InternalConfig.Port}",
+                                                 ex);
+            }
+            catch (Exception ex)
+            {
+                Interlocked.CompareExchange(ref _opened, 0, 1);
+                throw;
             }
         }
 

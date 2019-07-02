@@ -15,7 +15,6 @@ using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -205,6 +204,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             Contract.Requires(sportEvent != null, "SportEvent missing");
             Contract.Requires(marketSettlement != null, "marketSettlement != null");
             Contract.Ensures(Contract.Result<IMarketWithSettlement>() != null, "Contract.Result<IMarketWithSettlement>() != null");
+
             var cultureInfos = cultures.ToList();
 
             var specifiers = string.IsNullOrEmpty(marketSettlement.specifiers)
@@ -455,8 +455,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         public IFixtureChange<T> MapFixtureChange<T>(fixture_change message, IEnumerable<CultureInfo> cultures, byte[] rawMessage) where T : ISportEvent
         {
             return new FixtureChange<T>(
-                                        new MessageTimestamp(message.GeneratedAt, message.SentAt, message.ReceivedAt,
-                                                             SdkInfo.ToEpochTime(DateTime.Now)),
+                                        new MessageTimestamp(message.GeneratedAt, message.SentAt, message.ReceivedAt, SdkInfo.ToEpochTime(DateTime.Now)),
                                         _producerManager.Get(message.product),
                                         GetEventForMessage<T>(URN.Parse(message.event_id), message.SportId, cultures),
                                         message.request_idSpecified ? (long?) message.request_id : null,
@@ -499,16 +498,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
 
             return new BetCancel<T>(
                                     new MessageTimestamp(message.GeneratedAt, message.SentAt, message.ReceivedAt, SdkInfo.ToEpochTime(DateTime.Now)),
-                _producerManager.Get(message.product),
-                GetEventForMessage<T>(URN.Parse(message.event_id), message.SportId, culturesList),
-                message.request_idSpecified ? (long?)message.request_id : null,
-                message.start_timeSpecified ? (long?)message.start_time : null,
-                message.end_timeSpecified ? (long?)message.end_time : null,
-                string.IsNullOrEmpty(message.superceded_by)
-                    ? null
-                    : URN.Parse(message.superceded_by),
-                message.market.Select(m => GetMarketCancel(GetEventForNameProvider<T>(URN.Parse(message.event_id), message.SportId, culturesList), m, message.ProducerId, message.SportId, culturesList)),
-                rawMessage);
+                                    _producerManager.Get(message.product),
+                                    GetEventForMessage<T>(URN.Parse(message.event_id), message.SportId, culturesList),
+                                    message.request_idSpecified ? (long?) message.request_id : null,
+                                    message.start_timeSpecified ? (long?) message.start_time : null,
+                                    message.end_timeSpecified ? (long?) message.end_time : null,
+                                    string.IsNullOrEmpty(message.superceded_by)
+                                        ? null
+                                        : URN.Parse(message.superceded_by),
+                                    message.market.Select(m => GetMarketCancel(GetEventForNameProvider<T>(URN.Parse(message.event_id), message.SportId, culturesList),
+                                                                              m, message.ProducerId, message.SportId, culturesList)),
+                                    rawMessage);
         }
 
         /// <summary>
@@ -523,14 +523,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             var culturesList = cultures as List<CultureInfo> ?? cultures.ToList();
 
             return new RollbackBetCancel<T>(
-                                            new MessageTimestamp(message.GeneratedAt, message.SentAt, message.ReceivedAt, SdkInfo.ToEpochTime(DateTime.Now)),
-                _producerManager.Get(message.product),
-                GetEventForMessage<T>(URN.Parse(message.event_id), message.SportId, culturesList),
-                message.request_idSpecified ? (long?)message.request_id : null,
-                message.start_timeSpecified ? (long?)message.start_time : null,
-                message.end_timeSpecified ? (long?)message.end_time : null,
-                message.market.Select(m => GetMarketCancel(GetEventForNameProvider<T>(URN.Parse(message.event_id), message.SportId, culturesList), m, message.ProducerId, message.SportId, culturesList)),
-                rawMessage);
+                                            new MessageTimestamp(message.GeneratedAt, message.SentAt, message.ReceivedAt,
+                                                                 SdkInfo.ToEpochTime(DateTime.Now)),
+                                            _producerManager.Get(message.product),
+                                            GetEventForMessage<T>(URN.Parse(message.event_id), message.SportId, culturesList),
+                                            message.request_idSpecified ? (long?) message.request_id : null,
+                                            message.start_timeSpecified ? (long?) message.start_time : null,
+                                            message.end_timeSpecified ? (long?) message.end_time : null,
+                                            message.market.Select(m => GetMarketCancel(GetEventForNameProvider<T>(URN.Parse(message.event_id), message.SportId, culturesList),
+                                                                                      m, message.ProducerId, message.SportId, culturesList)),
+                                            rawMessage);
         }
 
         /// <summary>
@@ -544,13 +546,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         {
             var culturesList = cultures as List<CultureInfo> ?? cultures.ToList();
 
-            return new
-                BetSettlement<T>(new MessageTimestamp(message.GeneratedAt, message.SentAt, message.ReceivedAt, SdkInfo.ToEpochTime(DateTime.Now)),
+            return new BetSettlement<T>(new MessageTimestamp(message.GeneratedAt, message.SentAt, message.ReceivedAt, SdkInfo.ToEpochTime(DateTime.Now)),
                                  _producerManager.Get(message.product),
                                  GetEventForMessage<T>(URN.Parse(message.event_id), message.SportId, culturesList),
                                  message.request_idSpecified ? (long?) message.request_id : null,
-                                 message.outcomes.Select(m =>
-                                                             GetMarketWithResults(GetEventForNameProvider<T>(URN.Parse(message.event_id), message.SportId, culturesList),
+                                 message.outcomes.Select(m => GetMarketWithResults(GetEventForNameProvider<T>(URN.Parse(message.event_id), message.SportId, culturesList),
                                                                                   m, message.ProducerId, message.SportId, culturesList)),
                                  message.certainty,
                                  rawMessage);
