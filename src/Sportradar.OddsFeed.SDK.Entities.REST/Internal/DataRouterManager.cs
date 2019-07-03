@@ -124,16 +124,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// The available selections provider
         /// </summary>
         private readonly IDataProvider<AvailableSelectionsDTO> _availableSelectionsProvider;
-
         /// <summary>
         /// The calculate probability provider
         /// </summary>
         private readonly ICalculateProbabilityProvider _calculateProbabilityProvider;
-
         /// <summary>
         /// The fixture changes provider
         /// </summary>
         private readonly IDataProvider<IEnumerable<FixtureChangeDTO>> _fixtureChangesProvider;
+
+        /// <summary>
+        /// The list sport events provider
+        /// </summary>
+        private readonly IDataProvider<EntityList<SportEventSummaryDTO>> _listSportEventProvider;
 
         /// <summary>
         /// The cache manager
@@ -185,6 +188,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="availableSelectionsProvider">Available selections provider</param>
         /// <param name="calculateProbabilityProvider">The probability calculation provider</param>
         /// <param name="fixtureChangesProvider">Fixture changes provider</param>
+        /// <param name="listSportEventProvider">List sport events provider</param>
         public DataRouterManager(ICacheManager cacheManager,
                                  IProducerManager producerManager,
                                  ExceptionHandlingStrategy exceptionHandlingStrategy,
@@ -211,7 +215,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                                  IDataProvider<EntityList<LotteryDTO>> lotteryListProvider,
                                  IDataProvider<AvailableSelectionsDTO> availableSelectionsProvider,
                                  ICalculateProbabilityProvider calculateProbabilityProvider,
-                                 IDataProvider<IEnumerable<FixtureChangeDTO>> fixtureChangesProvider)
+                                 IDataProvider<IEnumerable<FixtureChangeDTO>> fixtureChangesProvider,
+                                 IDataProvider<EntityList<SportEventSummaryDTO>> listSportEventProvider)
         {
             Contract.Requires(cacheManager != null);
             Contract.Requires(sportEventSummaryProvider != null);
@@ -237,6 +242,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Contract.Requires(availableSelectionsProvider != null);
             Contract.Requires(calculateProbabilityProvider != null);
             Contract.Requires(fixtureChangesProvider != null);
+            Contract.Requires(listSportEventProvider != null);
 
             _cacheManager = cacheManager;
             var wnsProducer = producerManager.Get(7);
@@ -266,6 +272,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             _availableSelectionsProvider = availableSelectionsProvider;
             _calculateProbabilityProvider = calculateProbabilityProvider;
             _fixtureChangesProvider = fixtureChangesProvider;
+            _listSportEventProvider = listSportEventProvider;
 
             _sportEventSummaryProvider.RawApiDataReceived += OnRawApiDataReceived;
             _sportEventFixtureProvider.RawApiDataReceived += OnRawApiDataReceived;
@@ -290,6 +297,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             //_availableSelectionsProvider.RawApiDataReceived += OnRawApiDataReceived;
             //_calculateProbabilityProvider.RawApiDataReceived += OnRawApiDataReceived;
             _fixtureChangesProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _listSportEventProvider.RawApiDataReceived += OnRawApiDataReceived;
         }
 
         private void OnRawApiDataReceived(object sender, RawApiDataEventArgs e)
@@ -327,6 +335,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Contract.Invariant(_availableSelectionsProvider != null);
             Contract.Invariant(_calculateProbabilityProvider != null);
             Contract.Invariant(_fixtureChangesProvider != null);
+            Contract.Invariant(_listSportEventProvider != null);
         }
 
         /// <summary>
@@ -1214,6 +1223,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             return null;
         }
 
+        /// <summary>
+        /// Get available selections as an asynchronous operation.
+        /// </summary>
+        /// <param name="id">The id of the event</param>
+        /// <returns>The available selections for event</returns>
         public async Task<IAvailableSelections> GetAvailableSelectionsAsync(URN id)
         {
             Metric.Context("DataRouterManager").Meter("GetAvailableSelectionsAsync", Unit.Calls);
@@ -1255,7 +1269,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             var timer = Metric.Context("DataRouterManager").Timer("CalculateProbability", Unit.Requests);
             using (var t = timer.NewContext())
             {
-                WriteLog($"Executing CalculateProbability.", true);
+                WriteLog("Executing CalculateProbability.", true);
 
                 CalculationDTO result = null;
                 int restCallTime;
@@ -1286,7 +1300,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             var timer = Metric.Context("DataRouterManager").Timer("GetFixtureChangesAsync", Unit.Requests);
             using (var t = timer.NewContext())
             {
-                WriteLog($"Executing GetFixtureChangesAsync.", true);
+                WriteLog("Executing GetFixtureChangesAsync.", true);
 
                 IEnumerable<FixtureChangeDTO> result = null;
                 int restCallTime;
@@ -1309,6 +1323,54 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 WriteLog($"Executing GetFixtureChangesAsync took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
                 return result?.Select(f => new FixtureChange(f)).ToList();
             }
+        }
+
+        /// <summary>
+        /// Gets the list of almost all events we are offering prematch odds for.
+        /// </summary>
+        /// <param name="startIndex">Starting record (this is an index, not time)</param>
+        /// <param name="limit">How many records to return (max: 1000)</param>
+        /// <param name="culture">The culture</param>
+        /// <returns>The list of the sport event ids with the sportId it belongs to</returns>
+        public async Task<IEnumerable<Tuple<URN, URN>>> GetListOfSportEventsAsync(int startIndex, int limit, CultureInfo culture)
+        {
+            Metric.Context("DataRouterManager").Meter("GetListOfSportEventsAsync", Unit.Calls);
+            var timer = Metric.Context("DataRouterManager").Timer("GetListOfSportEventsAsync", Unit.Requests);
+            using (var t = timer.NewContext($"{startIndex} [{culture.TwoLetterISOLanguageName}]"))
+            {
+                WriteLog($"Executing GetListOfSportEventsAsync with startIndex={startIndex}, limit={limit} and culture={culture.TwoLetterISOLanguageName}.", true);
+
+                EntityList<SportEventSummaryDTO> result = null;
+                int restCallTime;
+                try
+                {
+                    result = await _listSportEventProvider.GetDataAsync(culture.TwoLetterISOLanguageName, startIndex.ToString(), limit.ToString()).ConfigureAwait(false);
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                }
+                catch (Exception e)
+                {
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    var message = e.InnerException?.Message ?? e.Message;
+                    _executionLog.Error($"Error getting list of sport events for startIndex={startIndex}, limit={limit} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
+                    if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                    {
+                        throw;
+                    }
+                }
+
+                if (result != null && result.Items.Any())
+                {
+                    await _cacheManager.SaveDtoAsync(URN.Parse($"sr:sportevents:{result.Items.Count()}"), result, culture, DtoType.SportEventSummaryList, null).ConfigureAwait(false);
+                    var urns = new List<Tuple<URN, URN>>();
+                    foreach (var item in result.Items)
+                    {
+                        urns.Add(new Tuple<URN, URN>(item.Id, item.SportId));
+                    }
+                    WriteLog($"Executing ListOfSportEventsAsync with startIndex={startIndex}, limit={limit} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
+                    return urns;
+                }
+            }
+            return null;
         }
 
         private void WriteLog(string text, bool useDebug = false)

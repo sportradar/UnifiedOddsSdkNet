@@ -13,12 +13,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
     /// A <see cref="IDataProvider{ISportEventsSchedule}"/> used to retrieve sport events scheduled for a specified date
     /// or currently live sport events
     /// </summary>
-    /// <seealso cref="DataProvider{scheduleType, EntityList}" />
+    /// <seealso cref="DataProvider{tournamentSchedule, EntityList}" />
     /// <seealso cref="IDataProvider{EntityList}" />
     public class TournamentScheduleProvider : DataProvider<tournamentSchedule, EntityList<SportEventSummaryDTO>>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DateScheduleProvider"/> class.
+        /// Initializes a new instance of the <see cref="TournamentScheduleProvider"/> class
         /// </summary>
         /// <param name="dateScheduleUriFormat">An address format used to retrieve sport events for a specified date</param>
         /// <param name="fetcher">A <see cref="IDataFetcher" /> used to fetch the data</param>
@@ -29,7 +29,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             IDataFetcher fetcher,
             IDeserializer<tournamentSchedule> deserializer,
             ISingleTypeMapperFactory<tournamentSchedule, EntityList<SportEventSummaryDTO>> mapperFactory)
-            :base(dateScheduleUriFormat, fetcher, deserializer, mapperFactory)
+            : base(dateScheduleUriFormat, fetcher, deserializer, mapperFactory)
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(dateScheduleUriFormat));
             Contract.Requires(fetcher != null);

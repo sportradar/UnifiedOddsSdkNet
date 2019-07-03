@@ -166,6 +166,9 @@
     <Compile Include="Internal\Mapping\FixtureChangesMapperFactory.cs" />
     <Compile Include="Internal\Mapping\SportCategoriesMapperFactory.cs" />
     <Compile Include="Internal\Mapping\AvailableSelectionsMapperFactory.cs" />
+    <Compile Include="Internal\ListSportEventsProvider.cs" />
+    <Compile Include="Internal\Mapping\ListSportEventsMapper.cs" />
+    <Compile Include="Internal\Mapping\ListSportEventsMapperFactory.cs" />
     <Compile Include="IPitcher.cs" />
     <Compile Include="IReferenceV1.cs" />
     <Compile Include="IRoundV2.cs" />

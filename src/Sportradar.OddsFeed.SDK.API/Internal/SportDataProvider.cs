@@ -25,7 +25,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
     /// Provides access to sport related data (sports, tournaments, sport events, ...)
     /// </summary>
     [Log(LoggerType.ClientInteraction)]
-    internal class SportDataProvider : ISportDataProviderV1
+    internal class SportDataProvider : ISportDataProviderV2
     {
         private static readonly ILog Log = SdkLoggerFactory.GetLoggerForClientInteraction(typeof(SportDataProvider));
 
@@ -382,6 +382,38 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         {
             Log.Info($"Invoked DeletePlayerProfileFromCache: Id={id}");
             _cacheManager.RemoveCacheItem(id, CacheItemType.Player, "SportDataProvider");
+        }
+
+        /// <summary>
+        /// Asynchronously gets a list of <see cref="IEnumerable{ICompetition}"/>
+        /// </summary>
+        /// <remarks>Lists almost all events we are offering prematch odds for. This endpoint can be used during early startup to obtain almost all fixtures. This endpoint is one of the few that uses pagination.</remarks>
+        /// <param name="startIndex">Starting record (this is an index, not time)</param>
+        /// <param name="limit">How many records to return (max: 1000)</param>
+        /// <param name="culture">A <see cref="CultureInfo"/> specifying the language or a null reference to use the languages specified in the configuration</param>
+        /// <returns>A <see cref="Task{T}"/> representing the async operation</returns>
+        public async Task<IEnumerable<ICompetition>> GetListOfSportEventsAsync(int startIndex, int limit, CultureInfo culture = null)
+        {
+            if (startIndex < 0)
+            {
+                throw new ArgumentException("Wrong value", nameof(startIndex));
+            }
+            if (limit < 1 || limit > 1000)
+            {
+                throw new ArgumentException("Wrong value", nameof(limit));
+            }
+
+            var cs = culture == null ? _defaultCultures : new[] { culture };
+            var s = string.Join(";", cs);
+
+            Log.Info($"Invoked GetListOfSportEventsAsync: [StartIndex={startIndex}, Limit={limit}, Cultures={s}].");
+
+            var ids = await _dataRouterManager.GetListOfSportEventsAsync(startIndex, limit, culture).ConfigureAwait(false);
+
+            return ids?.Select(item => _sportEntityFactory.BuildSportEvent<ICompetition>(item.Item1,
+                                                                                         item.Item2,
+                                                                                         cs,
+                                                                                         _exceptionStrategy)).ToList();
         }
     }
 }

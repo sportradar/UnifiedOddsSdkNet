@@ -160,12 +160,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<IDataPoster>(),
                     new ResolvedParameter<ICacheManager>()));
 
-            container.RegisterType<IMarketDescriptionManager, MarketDescriptionManager>(new ContainerControlledLifetimeManager(),
-                                                                                        new InjectionConstructor(config,
-                                                                                                                 new ResolvedParameter<IMarketCacheProvider>(),
-                                                                                                                 new ResolvedParameter<IMarketDescriptionCache>("InvariantMarketDescriptionsCache"),
-                                                                                                                 new ResolvedParameter<IVariantDescriptionCache>("VariantDescriptionListCache"),
-                                                                                                                 new ResolvedParameter<IMarketDescriptionCache>("VariantMarketDescriptionCache")));
+            container.RegisterType<IMarketDescriptionManager, MarketDescriptionManager>(
+                    new ContainerControlledLifetimeManager(),
+                    new InjectionConstructor(config,
+                                             new ResolvedParameter<IMarketCacheProvider>(),
+                                             new ResolvedParameter<IMarketDescriptionCache>("InvariantMarketDescriptionsCache"),
+                                             new ResolvedParameter<IVariantDescriptionCache>("VariantDescriptionListCache"),
+                                             new ResolvedParameter<IMarketDescriptionCache>("VariantMarketDescriptionCache")));
 
             container.RegisterType<IFeedMessageMapper, FeedMessageMapper>(
                 new ContainerControlledLifetimeManager(),
@@ -561,6 +562,18 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<IDeserializer<lotteries>>(),
                     new ResolvedParameter<ISingleTypeMapperFactory<lotteries, EntityList<LotteryDTO>>>()));
 
+            // list sport event provider
+            container.RegisterType<IDeserializer<scheduleEndpoint>, Deserializer<scheduleEndpoint>>(new ContainerControlledLifetimeManager());
+            container.RegisterType<ISingleTypeMapperFactory<scheduleEndpoint, EntityList<SportEventSummaryDTO>>, ListSportEventsMapperFactory>(new ContainerControlledLifetimeManager());
+            container.RegisterType<IDataProvider<EntityList<SportEventSummaryDTO>>, ListSportEventsProvider>(
+                "listSportEventProvider",
+                new ContainerControlledLifetimeManager(),
+                new InjectionConstructor( // sports/{0}/schedules/pre/schedule.xml?start={1}&limit={2}
+                                         config.ApiBaseUri + "/v1/sports/{0}/schedules/pre/schedule.xml?start={1}&limit={2}",
+                                         new ResolvedParameter<IDataFetcher>(),
+                                         new ResolvedParameter<IDeserializer<scheduleEndpoint>>(),
+                                         new ResolvedParameter<ISingleTypeMapperFactory<scheduleEndpoint, EntityList<SportEventSummaryDTO>>>()));
+
             container.RegisterType<IDataRouterManager, DataRouterManager>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
@@ -590,7 +603,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<IDataProvider<EntityList<LotteryDTO>>>("lotteryListProvider"),
                     new ResolvedParameter<IDataProvider<AvailableSelectionsDTO>>(),
                     new ResolvedParameter<ICalculateProbabilityProvider>(),
-                    new ResolvedParameter<IDataProvider<IEnumerable<FixtureChangeDTO>>>()));
+                    new ResolvedParameter<IDataProvider<IEnumerable<FixtureChangeDTO>>>(),
+                    new ResolvedParameter<IDataProvider<EntityList<SportEventSummaryDTO>>>("listSportEventProvider")));
         }
 
         private static void RegisterSessionTypes(IUnityContainer container)

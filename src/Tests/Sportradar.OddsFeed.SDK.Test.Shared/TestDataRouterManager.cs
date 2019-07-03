@@ -483,5 +483,17 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Gets the list of almost all events we are offering prematch odds for.
+        /// </summary>
+        /// <param name="startIndex">Starting record (this is an index, not time)</param>
+        /// <param name="limit">How many records to return (max: 1000)</param>
+        /// <param name="culture">The culture</param>
+        /// <returns>The list of the sport event ids with the sportId it belongs to</returns>
+        public Task<IEnumerable<Tuple<URN, URN>>> GetListOfSportEventsAsync(int startIndex, int limit, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
