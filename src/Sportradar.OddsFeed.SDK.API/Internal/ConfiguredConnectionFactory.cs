@@ -3,6 +3,7 @@
 */
 using System.Diagnostics.Contracts;
 using System.Net.Security;
+using System.Security.Authentication;
 using RabbitMQ.Client;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 
@@ -53,6 +54,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             Contract.Assume(Ssl != null);
             Ssl.Enabled = _config.UseSsl;
+            Ssl.Version = SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls;
             if (_config.UseSsl)
             {
                 Ssl.AcceptablePolicyErrors = SslPolicyErrors.RemoteCertificateChainErrors | SslPolicyErrors.RemoteCertificateNameMismatch | SslPolicyErrors.RemoteCertificateNotAvailable;

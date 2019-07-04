@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Runtime.Caching;
 using Common.Logging;
@@ -49,6 +50,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         {
             Contract.Requires(container != null);
             Contract.Requires(userConfig != null);
+
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
 
             //register common types
             container.RegisterType<HttpClient, HttpClient>(new ContainerControlledLifetimeManager(), new InjectionConstructor());
