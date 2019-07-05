@@ -147,7 +147,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             // send RawFeedMessage if needed
             try
             {
-                //ExecutionLog.Debug($"Raw msg [{_interest}]: {feedMessage.GetType().Name} for {feedMessage.EventId}.");
+                //ExecutionLog.Debug($"Raw msg [{_interest}]: {feedMessage.GetType().Name} for event {feedMessage.EventId}.");
                 var args = new RawFeedMessageEventArgs(eventArgs.RoutingKey, feedMessage, sessionName);
                 RawFeedMessageReceived?.Invoke(this, args);
             }

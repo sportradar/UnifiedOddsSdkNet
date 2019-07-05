@@ -196,7 +196,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                     return description;
                 }
 
-                if (!IsFetchingAllowed(GetCacheKey(id, variant)))
+                if (!IsFetchingAllowed(id, variant, missingLanguages))
                 {
                     return description;
                 }
@@ -208,7 +208,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
                 description = (MarketDescriptionCacheItem) cachedItem?.Value;
 
-                _fetchedVariants[GetCacheKey(id, variant)] = DateTime.Now;
+                foreach (var cultureInfo in missingLanguages)
+                {
+                    _fetchedVariants[GetFetchedVariantsKey(id, variant, cultureInfo)] = DateTime.Now;
+                }
             }
             finally
             {
@@ -345,8 +348,23 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         {
             if (cacheItemType == CacheItemType.All || cacheItemType == CacheItemType.MarketDescription)
             {
-                DateTime date;
-                _fetchedVariants.TryRemove(id, out date);
+                try
+                {
+
+                foreach (var fetchedVariant in _fetchedVariants)
+                {
+                    if (fetchedVariant.Key.StartsWith(id))
+                    {
+                        DateTime date;
+                        _fetchedVariants.TryRemove(id, out date);
+                    }
+                }
+                }
+                catch (Exception e)
+                {
+                    ExecutionLog.Warn($"Error deleting fetchedVariants for {id}", e);
+                }
+
                 _cache.Remove(id);
             }
         }
@@ -526,15 +544,45 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             }
         }
 
-        private bool IsFetchingAllowed(string cacheId)
+        private bool IsFetchingAllowed(int marketId, string variant, IEnumerable<CultureInfo> culture)
         {
-            if (!_fetchedVariants.ContainsKey(cacheId))
+            foreach (var cultureInfo in culture)
+            {
+                if (IsFetchingAllowed(marketId, variant, cultureInfo))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool IsFetchingAllowed(int marketId, string variant, CultureInfo culture)
+        {
+            if (_fetchedVariants.Count > 1000)
+            {
+                ClearFetchedVariants();
+            }
+
+            var key = GetFetchedVariantsKey(marketId, variant, culture);
+            if (!_fetchedVariants.ContainsKey(key))
             {
                 return true;
             }
-            var date = _fetchedVariants[cacheId];
+            var date = _fetchedVariants[key];
             var result = (DateTime.Now - date).TotalSeconds > SdkInfo.MarketDescriptionMinFetchInterval;
 
+            ClearFetchedVariants();
+
+            return result;
+        }
+
+        private string GetFetchedVariantsKey(int marketId, string variant, CultureInfo culture)
+        {
+            return $"{marketId}_{variant}_{culture.TwoLetterISOLanguageName}";
+        }
+
+        private void ClearFetchedVariants()
+        {
             // clear records from _fetchedVariants once a min
             if ((DateTime.Now - _lastTimeFetchedVariantsWereCleared).TotalSeconds > 60)
             {
@@ -542,12 +590,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 {
                     if ((DateTime.Now - variant.Value).TotalSeconds > SdkInfo.MarketDescriptionMinFetchInterval)
                     {
+                        DateTime date;
                         _fetchedVariants.TryRemove(variant.Key, out date);
                     }
                 }
                 _lastTimeFetchedVariantsWereCleared = DateTime.Now;
             }
-            return result;
         }
     }
 }

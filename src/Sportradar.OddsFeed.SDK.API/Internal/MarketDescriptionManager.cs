@@ -169,6 +169,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="variantValue">The variant value</param>
         public void DeleteVariantMarketDescriptionFromCache(int marketId, string variantValue)
         {
+            _executionLog.Info($"Invokes DeleteVariantMarketDescriptionFromCache for market {marketId} and variant {variantValue}");
             var cacheId = VariantMarketDescriptionCache.GetCacheKey(marketId, variantValue);
             ((SdkCache)_variantDescriptionCache).CacheDeleteItem(cacheId, CacheItemType.MarketDescription);
         }
