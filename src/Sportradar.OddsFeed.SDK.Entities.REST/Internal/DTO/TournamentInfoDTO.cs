@@ -376,7 +376,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                     id = fixture.Tournament?.Sport.Id.ToString(),
                     name = fixture.Tournament?.Sport.Name
                 }
-            }
+            },
+            status = fixture.StatusOnEvent
         })
         {
             TournamentCoverage = fixture.CoverageInfo == null
@@ -455,7 +456,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                         id = tournament.Sport.Id.ToString(),
                         name = tournament.Sport.Name
                     }
-                }
+                },
+                status = tournament.StatusOnEvent
             })
         {
             TournamentCoverage = tournament.TournamentCoverage;

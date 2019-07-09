@@ -101,7 +101,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
         /// <exception cref="InvalidOperationException">The provided specifiers are not valid</exception>
         public bool CanMap(IProducer producer, URN sportId, IReadOnlyDictionary<string, string> specifiers)
         {
-            if (!ProducerIds.Contains(producer.Id) || (SportId != null && !SportId.Equals(sportId)))
+            if (!ProducerIds.Contains(producer.Id) || SportId != null && !SportId.Equals(sportId))
             {
                 return false;
             }

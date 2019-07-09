@@ -654,7 +654,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     var stageDTO = item as StageDTO;
                     if (stageDTO != null)
                     {
-                        if (stageDTO.Status != null)
+                        if (stageDTO.SportEventStatus != null)
                         {
                             AddDataFromSportEventSummary(stageDTO, culture);
                         }
