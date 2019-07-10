@@ -1,16 +1,17 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Diagnostics.Contracts;
-using System.Net.Http;
-using System.Threading.Tasks;
+
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Common.Internal.Log;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.Internal;
+using System;
+using System.Diagnostics.Contracts;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -190,10 +191,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             {
                 responseMessage = await _dataPoster.PostDataAsync(new Uri(url)).ConfigureAwait(false);
             }
-            catch (Exception)
-            {
-                // ignored
-            }
             finally
             {
                 var responseCode = responseMessage == null ? 0 : (int)responseMessage.StatusCode;
@@ -241,15 +238,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             {
                 responseMessage = await _dataPoster.PostDataAsync(new Uri(url)).ConfigureAwait(false);
             }
-            catch (Exception)
-            {
-                // ignored
-            }
             finally
             {
-                var responseCode = responseMessage == null ? 0 : (int) responseMessage.StatusCode;
+                var responseCode = responseMessage == null ? 0 : (int)responseMessage.StatusCode;
                 var responseMsg = responseMessage == null ? string.Empty : responseMessage.ReasonPhrase;
-                var producerV1 = (Producer) producer;
+                var producerV1 = (Producer)producer;
                 producerV1.RecoveryInfo = new RecoveryInfo(0, timestampRequested, requestNumber, nodeId, responseCode, responseMsg);
             }
 
