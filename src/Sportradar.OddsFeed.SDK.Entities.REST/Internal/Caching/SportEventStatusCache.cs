@@ -156,10 +156,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// </summary>
         /// <param name="eventId">The eventId of the sport event status to be cached</param>
         /// <param name="sportEventStatus">The sport event status to be cached</param>
+        /// <param name="statusOnEvent">The sport event status received directly on event level</param>
         /// <param name="source">The source of the SES</param>
-        private void AddSportEventStatus(URN eventId, SportEventStatusCI sportEventStatus, string source)
+        private void AddSportEventStatus(URN eventId, SportEventStatusCI sportEventStatus, string statusOnEvent, string source)
         {
             if (_isDisposed)
+            {
+                return;
+            }
+
+            if (sportEventStatus == null)
             {
                 return;
             }
@@ -307,9 +313,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     var fixtureDTO = item as FixtureDTO;
                     if (fixtureDTO != null)
                     {
-                        if (fixtureDTO.Status != null)
+                        if (fixtureDTO.SportEventStatus != null)
                         {
-                            AddSportEventStatus(id, new SportEventStatusCI(null, fixtureDTO.Status), "Fixture");
+                            AddSportEventStatus(id, new SportEventStatusCI(null, fixtureDTO.SportEventStatus), fixtureDTO.StatusOnEvent, "Fixture");
                         }
                         saved = true;
                     }
@@ -324,9 +330,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     var matchDTO = item as MatchDTO;
                     if (matchDTO != null)
                     {
-                        if (matchDTO.Status != null)
+                        if (matchDTO.SportEventStatus != null)
                         {
-                            AddSportEventStatus(id, new SportEventStatusCI(null, matchDTO.Status), "Match");
+                            AddSportEventStatus(id, new SportEventStatusCI(null, matchDTO.SportEventStatus), matchDTO.StatusOnEvent, "Match");
                         }
                         saved = true;
                     }
@@ -341,7 +347,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     {
                         if (matchTimelineDTO.SportEventStatus != null)
                         {
-                            AddSportEventStatus(id, new SportEventStatusCI(null, matchTimelineDTO.SportEventStatus), "MatchTimeline");
+                            AddSportEventStatus(id, new SportEventStatusCI(null, matchTimelineDTO.SportEventStatus), matchTimelineDTO.SportEvent.StatusOnEvent, "MatchTimeline");
                         }
                         saved = true;
                     }
@@ -356,9 +362,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     var stageDTO = item as StageDTO;
                     if (stageDTO != null)
                     {
-                        if (stageDTO.Status != null)
+                        if (stageDTO.SportEventStatus != null)
                         {
-                            AddSportEventStatus(id, new SportEventStatusCI(null, stageDTO.Status), "Stage");
+                            AddSportEventStatus(id, new SportEventStatusCI(null, stageDTO.SportEventStatus), stageDTO.StatusOnEvent, "Stage");
                         }
                         saved = true;
                     }
@@ -375,7 +381,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     var sportEventStatusDTO = item as SportEventStatusDTO;
                     if (sportEventStatusDTO != null)
                     {
-                        AddSportEventStatus(id, new SportEventStatusCI(sportEventStatusDTO, null), "OddsChange");
+                        AddSportEventStatus(id, new SportEventStatusCI(sportEventStatusDTO, null), sportEventStatusDTO.Status.ToString(), "OddsChange");
                         saved = true;
                     }
                     else
@@ -387,9 +393,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     var competitionDTO = item as CompetitionDTO;
                     if (competitionDTO != null)
                     {
-                        if (competitionDTO.Status != null)
+                        if (competitionDTO.SportEventStatus != null)
                         {
-                            AddSportEventStatus(id, new SportEventStatusCI(null, competitionDTO.Status), "SportEventSummary");
+                            AddSportEventStatus(id, new SportEventStatusCI(null, competitionDTO.SportEventStatus), competitionDTO.StatusOnEvent, "SportEventSummary");
                         }
                         saved = true;
                     }
@@ -401,9 +407,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                         foreach (var s in summaryList.Items)
                         {
                             var compDTO = s as CompetitionDTO;
-                            if (compDTO?.Status != null)
+                            if (compDTO?.SportEventStatus != null)
                             {
-                                AddSportEventStatus(id, new SportEventStatusCI(null, compDTO.Status), "SportEventSummaryList");
+                                AddSportEventStatus(id, new SportEventStatusCI(null, compDTO.SportEventStatus), s.StatusOnEvent, "SportEventSummaryList");
                             }
                         }
                         saved = true;
@@ -434,6 +440,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 case DtoType.BookingStatus:
                     break;
                 case DtoType.SportCategories:
+                    break;
+                case DtoType.AvailableSelections:
                     break;
                 default:
                     ExecutionLog.Warn($"Trying to add unchecked dto type: {dtoType} for id: {id}.");

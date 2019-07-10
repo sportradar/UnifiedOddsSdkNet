@@ -119,7 +119,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                                                                                     divisionSpecified = t.divisionSpecified
                                                                                 }).ToArray(),
                                     parent = fixture.parent,
-                                    races = fixture.races
+                                    races = fixture.races,
+                                    status = fixture.status
                                 }
                             })
         {

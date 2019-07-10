@@ -228,9 +228,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         }
 
         /// <summary>
-        /// Asynchronously gets a <see cref="Nullable{bool}"/> specifying if the start time to be determined is set for the associated sport event.
+        /// Asynchronously gets a value specifying if the start time to be determined is set for the associated sport event
         /// </summary>
-        /// <returns>A <see cref="Nullable{bool}"/> specifying if the start time to be determined is set for the associated sport event.</returns>
+        /// <returns>A value specifying if the start time to be determined is set for the associated sport event</returns>
         public async Task<bool?> GetStartTimeTbdAsync()
         {
             if (_startTimeTbd != null)

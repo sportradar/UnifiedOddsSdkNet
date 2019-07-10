@@ -56,7 +56,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// </summary>
         /// <param name="stageEvent">A <see cref="stageSummaryEndpoint"/> containing basic information about the event</param>
         internal StageDTO(stageSummaryEndpoint stageEvent)
-            :base(stageEvent)
+            : base(stageEvent)
         {
             if (stageEvent.sport_event.parent != null)
             {

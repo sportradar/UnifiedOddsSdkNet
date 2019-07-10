@@ -47,8 +47,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public SportEventType? Type { get; }
 
         /// <summary>
-        /// Gets a <see cref="Nullable{bool}"/> specifying if the start time to be determined is set
-        /// for the associated sport event
+        /// Gets a <see cref="bool"/> specifying if the start time to be determined is set for the associated sport event
         /// </summary>
         public bool? StartTimeTbd { get; }
 
@@ -57,6 +56,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// for the associated sport event
         /// </summary>
         public URN ReplacedBy { get; }
+
+        /// <summary>
+        /// Gets the status (directly from sportEvent)
+        /// </summary>
+        /// <value>The status (directly from sportEvent)</value>
+        public string StatusOnEvent { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SportEventSummaryDTO"/> class
@@ -97,6 +102,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                 }
             }
             StartTimeTbd = sportEvent.start_time_tbdSpecified ? (bool?)sportEvent.start_time_tbd : null;
+
+            StatusOnEvent = sportEvent.status;
         }
 
         /// <summary>
@@ -110,11 +117,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
             Id = URN.Parse(parentStage.id);
             Scheduled = parentStage.scheduledSpecified
-                ? (DateTime?)parentStage.scheduled
-                : null;
+                            ? (DateTime?) parentStage.scheduled
+                            : null;
             ScheduledEnd = parentStage.scheduled_endSpecified
-                ? (DateTime?)parentStage.scheduled_end
-                : null;
+                               ? (DateTime?) parentStage.scheduled_end
+                               : null;
             //URN sportId;
             //if (URN.TryParse(parentStage.tournament?.sport?.id, out sportId))
             //{
@@ -135,6 +142,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                 }
             }
             StartTimeTbd = parentStage.start_time_tbdSpecified ? (bool?)parentStage.start_time_tbd : null;
+
+            StatusOnEvent = null;
         }
 
         /// <summary>
@@ -148,11 +157,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
             Id = URN.Parse(childStage.id);
             Scheduled = childStage.scheduledSpecified
-                ? (DateTime?)childStage.scheduled
-                : null;
+                            ? (DateTime?) childStage.scheduled
+                            : null;
             ScheduledEnd = childStage.scheduled_endSpecified
-                ? (DateTime?)childStage.scheduled_end
-                : null;
+                               ? (DateTime?) childStage.scheduled_end
+                               : null;
             //URN sportId;
             //if (URN.TryParse(childStage.tournament?.sport?.id, out sportId))
             //{
@@ -173,6 +182,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                 }
             }
             StartTimeTbd = childStage.start_time_tbdSpecified ? (bool?)childStage.start_time_tbd : null;
+
+            StatusOnEvent = null;
         }
     }
 }

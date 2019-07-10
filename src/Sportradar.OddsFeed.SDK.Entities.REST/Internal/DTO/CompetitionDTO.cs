@@ -22,7 +22,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// Gets the sport event status
         /// </summary>
         /// <value>The sport event status</value>
-        public SportEventStatusDTO Status { get; }
+        public SportEventStatusDTO SportEventStatus { get; }
 
         /// <summary>
         /// Gets a <see cref="BookingStatus"/> enum member specifying the booking status of the associated sport event
@@ -97,7 +97,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                 ? Conditions
                 : new SportEventConditionsDTO(matchSummary.sport_event_conditions);
 
-            Status = matchSummary.sport_event_status == null
+            SportEventStatus = matchSummary.sport_event_status == null
                 ? null
                 : new SportEventStatusDTO(matchSummary.sport_event_status, matchSummary.statistics, HomeAwayCompetitors);
 
@@ -120,7 +120,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         {
             Contract.Requires(stageSummary != null);
 
-            Status = stageSummary.sport_event_status == null
+            SportEventStatus = stageSummary.sport_event_status == null
                 ? null
                 : new SportEventStatusDTO(stageSummary.sport_event_status);
         }
