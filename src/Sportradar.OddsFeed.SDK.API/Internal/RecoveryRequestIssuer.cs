@@ -196,17 +196,17 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             }
             finally
             {
-                var responseCode = responseMessage == null ? 0 : (int)responseMessage.StatusCode;
+                var responseCode = responseMessage == null ? 0 : (int) responseMessage.StatusCode;
                 var responseMsg = responseMessage == null ? string.Empty : responseMessage.ReasonPhrase;
-                var producerV1 = (Producer)producer;
+                var producerV1 = (Producer) producer;
                 producerV1.RecoveryInfo = new RecoveryInfo(timestampAfter, timestampRequested, requestNumber, nodeId, responseCode, responseMsg);
             }
 
-            if (responseMessage != null && !responseMessage.IsSuccessStatusCode)
+            if (responseMessage == null || !responseMessage.IsSuccessStatusCode)
             {
-                throw new CommunicationException($"Recovery since after timestamp for Producer={producer}, RequestId={requestNumber}, After={dateAfter} failed with StatusCode={responseMessage.StatusCode}",
+                throw new CommunicationException($"Recovery since after timestamp for Producer={producer}, RequestId={requestNumber}, After={dateAfter} failed with StatusCode={responseMessage?.StatusCode}",
                                                 url,
-                                                responseMessage.StatusCode,
+                                                responseMessage?.StatusCode ?? 0,
                                                 null);
             }
             return requestNumber;
@@ -253,11 +253,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 producerV1.RecoveryInfo = new RecoveryInfo(0, timestampRequested, requestNumber, nodeId, responseCode, responseMsg);
             }
 
-            if (responseMessage != null && !responseMessage.IsSuccessStatusCode)
+            if (responseMessage == null || !responseMessage.IsSuccessStatusCode)
             {
-                throw new CommunicationException($"Recovery since after timestamp for Producer={producer}, RequestId={requestNumber}, failed with StatusCode={responseMessage.StatusCode}",
+                throw new CommunicationException($"Recovery since after timestamp for Producer={producer}, RequestId={requestNumber}, failed with StatusCode={responseMessage?.StatusCode}",
                                                 url,
-                                                responseMessage.StatusCode,
+                                                responseMessage?.StatusCode ?? 0,
                                                 null);
             }
 

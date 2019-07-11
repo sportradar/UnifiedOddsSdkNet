@@ -148,8 +148,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             }
             // if all interests are a combination of different message scopes, use the producer
             // scopes to determine whether all snapshots were received
-            else if (_allInterests.Count <= MessageInterest.MessageScopes.Length &&
-                     _allInterests.All(MessageInterest.MessageScopes.Contains))
+            else if (_allInterests.Count <= MessageInterest.MessageScopes.Length 
+                     && _allInterests.All(MessageInterest.MessageScopes.Contains))
             {
                 done = _producer.Scope
                     .Select(MessageInterest.FromScope)
@@ -206,7 +206,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     _requestId = _recoveryRequestIssuer.RequestRecoveryAfterTimestampAsync(_producer, after, _nodeId).Result;
                 }
             }
-            catch (AggregateException ex)
+            catch (Exception ex)
             {
                 var actualException = ex.InnerException ?? ex;
                 ExecutionLog.Error($"{_producer.Name} There was an error requesting recovery. Exception: {actualException.Message}");

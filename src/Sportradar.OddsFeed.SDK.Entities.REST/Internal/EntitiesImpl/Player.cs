@@ -17,7 +17,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     internal class Player : BaseEntity, IPlayer
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Player"/> class.
+        /// Initializes a new instance of the <see cref="Player"/> class
         /// </summary>
         /// <param name="id">the <see cref="URN"/> uniquely identifying the current <see cref="ICompetitor" /> instance</param>
         /// <param name="names">A <see cref="IDictionary{CultureInfo, String}"/> containing player names in different languages</param>
