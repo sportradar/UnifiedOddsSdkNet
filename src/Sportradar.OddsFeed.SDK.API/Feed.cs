@@ -367,6 +367,7 @@ namespace Sportradar.OddsFeed.SDK.API
                 throw new InvalidOperationException("Cannot create session associated with already opened feed");
             }
 
+            InitFeed();
             var childContainer = UnityContainer.CreateChildContainer();
             Func<OddsFeedSession, IEnumerable<string>> func = GetSessionRoutingKeys;
             var session = (OddsFeedSession) childContainer.Resolve<IOddsFeedSession>(new ParameterOverride("messageInterest", msgInterest), new ParameterOverride("getRoutingKeys", func));
