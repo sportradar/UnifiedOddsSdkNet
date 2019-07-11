@@ -44,6 +44,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery
         /// <value>The draw events</value>
         public IEnumerable<DrawDTO> DrawEvents { get; }
 
+        /// <summary>
+        /// Gets the <see cref="DateTime"/> specifying when the associated message was generated (on the server side)
+        /// </summary>
+        public DateTime? GeneratedAt { get; }
+
         internal LotteryDTO(lottery item)
             : base(new sportEvent
             {
@@ -88,6 +93,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery
             {
                 DrawEvents = item.draw_events.Select(draw => new DrawDTO(draw)).ToList();
             }
+
+            GeneratedAt = item.generated_atSpecified ? item.generated_at : (DateTime?) null;
         }
     }
 }

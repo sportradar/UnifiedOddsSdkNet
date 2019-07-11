@@ -1,6 +1,8 @@
 /*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Diagnostics.Contracts;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages.REST;
@@ -35,7 +37,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping
         /// <returns>The created <see cref="PlayerProfileDTO"/> instance </returns>
         public PlayerProfileDTO Map()
         {
-            return new PlayerProfileDTO(_data.player);
+            return new PlayerProfileDTO(_data.player, _data.generated_atSpecified ? _data.generated_at : (DateTime?) null);
         }
     }
 }

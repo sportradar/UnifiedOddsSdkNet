@@ -77,7 +77,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         public static IFixture GetFixture(int id = 0, int subItemCount = 0)
         {
-            return new Fixture(new FixtureDTO(MFR.GetFixture(id, subItemCount)));
+            return new Fixture(new FixtureDTO(MFR.GetFixture(id, subItemCount), null));
         }
 
         public static IGroup GetGroup()
@@ -113,7 +113,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         internal static IPlayerProfile GetPlayerProfile(int id = 0)
         {
-            return new PlayerProfile(new PlayerProfileCI(new PlayerProfileDTO(MFR.GetPlayerExtended(id)), TestData.Culture, new TestDataRouterManager(new CacheManager())), TestData.Cultures3);
+            return new PlayerProfile(new PlayerProfileCI(new PlayerProfileDTO(MFR.GetPlayerExtended(id), null), TestData.Culture, new TestDataRouterManager(new CacheManager())), TestData.Cultures3);
         }
 
         internal static IProductInfo GetProductInfo(int subItemCount = 0)

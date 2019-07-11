@@ -47,7 +47,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <value>The <see cref="URN"/> this event is replaced by</value>
         internal URN ReplacedBy { get; }
 
-        internal FixtureDTO(fixture fixture)
+        /// <summary>
+        /// Gets the <see cref="DateTime"/> specifying when the associated message was generated (on the server side)
+        /// </summary>
+        public DateTime? GeneratedAt { get; }
+
+
+        internal FixtureDTO(fixture fixture, DateTime? generatedAt)
             : base(fixture)
         {
             Contract.Requires(fixture != null);
@@ -92,6 +98,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 ScheduledStartTimeChanges = fixture.scheduled_start_time_changes.Select(s => new ScheduledStartTimeChangeDTO(s));
             }
+            GeneratedAt = generatedAt;
         }
     }
 }

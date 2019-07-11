@@ -1,6 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Diagnostics.Contracts;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages.REST;
@@ -35,7 +37,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping
         /// <returns>The created <see cref="FixtureDTO"/> instance </returns>
         public FixtureDTO Map()
         {
-            return new FixtureDTO(_data.fixture);
+            return new FixtureDTO(_data.fixture, _data.generated_atSpecified ? _data.generated_at : (DateTime?) null);
         }
     }
 }

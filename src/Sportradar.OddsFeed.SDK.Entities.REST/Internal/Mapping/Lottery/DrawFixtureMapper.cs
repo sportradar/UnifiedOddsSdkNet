@@ -31,7 +31,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping.Lottery
 
         public DrawDTO Map()
         {
-            return new DrawDTO(_drawFixture.draw_fixture);
+            return new DrawDTO(_drawFixture);
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
@@ -50,6 +52,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// </summary>
         /// <value>The home away competitors</value>
         internal IDictionary<HomeAway, URN> HomeAwayCompetitors { get; }
+
+        /// <summary>
+        /// Gets the <see cref="DateTime"/> specifying when the associated message was generated (on the server side)
+        /// </summary>
+        public DateTime? GeneratedAt { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CompetitionDTO"/> class
@@ -109,6 +116,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 Venue = new VenueDTO(matchSummary.venue);
             }
+            GeneratedAt = matchSummary.generated_atSpecified ? matchSummary.generated_at : (DateTime?) null;
         }
 
         /// <summary>
@@ -123,6 +131,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             SportEventStatus = stageSummary.sport_event_status == null
                 ? null
                 : new SportEventStatusDTO(stageSummary.sport_event_status);
+
+            GeneratedAt = stageSummary.generated_atSpecified ? stageSummary.generated_at : (DateTime?) null;
         }
     }
 }

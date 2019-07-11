@@ -82,6 +82,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public TournamentInfoDTO TournamentInfo { get; }
 
         /// <summary>
+        /// Gets the <see cref="DateTime"/> specifying when the associated message was generated (on the server side)
+        /// </summary>
+        public DateTime? GeneratedAt { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TournamentInfoDTO"/> class
         /// </summary>
         /// <param name="sportEvent">A <see cref="sportEvent"/> containing basic tournament info</param>
@@ -256,6 +261,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                         : new CurrentSeasonInfoDTO(tournament.tournament.current_season)
                 };
             }
+
+            GeneratedAt = tournament.generated_atSpecified ? tournament.generated_at : (DateTime?) null;
         }
 
         /// <summary>

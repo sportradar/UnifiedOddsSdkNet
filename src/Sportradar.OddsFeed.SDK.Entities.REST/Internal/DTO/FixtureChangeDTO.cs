@@ -23,13 +23,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// </summary>
         public DateTime UpdateTime { get; }
 
-        internal FixtureChangeDTO(fixtureChange fixtureChange)
+        /// <summary>
+        /// Gets the <see cref="DateTime"/> specifying when the associated message was generated (on the server side)
+        /// </summary>
+        public DateTime? GeneratedAt { get; }
+
+        internal FixtureChangeDTO(fixtureChange fixtureChange, DateTime? generatedAt)
         {
             if (fixtureChange == null)
                 throw new ArgumentNullException(nameof(fixtureChange));
 
             SportEventId = URN.Parse(fixtureChange.sport_event_id);
             UpdateTime = fixtureChange.update_time;
+            GeneratedAt = generatedAt;
         }
     }
 }

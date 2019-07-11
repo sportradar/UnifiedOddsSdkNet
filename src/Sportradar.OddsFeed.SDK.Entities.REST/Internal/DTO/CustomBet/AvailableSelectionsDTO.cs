@@ -26,6 +26,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet
         /// </summary>
         public IEnumerable<MarketDTO> Markets { get; }
 
+        /// <summary>
+        /// Gets the <see cref="string"/> specifying when the associated message was generated (on the server side)
+        /// </summary>
+        public string GeneratedAt { get; }
+
         internal AvailableSelectionsDTO(AvailableSelectionsType availableSelections)
         {
             if (availableSelections == null)
@@ -36,6 +41,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet
             Markets = markets != null
                 ? markets.Select(m => new MarketDTO(m)).ToList().AsReadOnly()
                 : new ReadOnlyCollection<MarketDTO>(new List<MarketDTO>());
+            GeneratedAt = availableSelections.generated_at;
         }
     }
 }

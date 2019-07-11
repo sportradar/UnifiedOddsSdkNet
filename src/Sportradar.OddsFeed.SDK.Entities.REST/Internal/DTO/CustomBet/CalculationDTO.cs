@@ -22,6 +22,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet
         /// </summary>
         public double Probability { get; }
 
+        /// <summary>
+        /// Gets the <see cref="string"/> specifying when the associated message was generated (on the server side)
+        /// </summary>
+        public string GeneratedAt { get; }
+
         internal CalculationDTO(CalculationResponseType calculation)
         {
             if (calculation == null)
@@ -29,6 +34,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet
 
             Odds = calculation.calculation.odds;
             Probability = calculation.calculation.probability;
+            GeneratedAt = calculation.generated_at;
         }
     }
 }

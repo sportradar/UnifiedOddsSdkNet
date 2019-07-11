@@ -102,7 +102,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         public void FixtureDTOMappingTest()
         {
             var msg = RMF.GetFixture();
-            var dto = new FixtureDTO(msg);
+            var dto = new FixtureDTO(msg, null);
 
             Assert.AreEqual(msg.id, dto.Id.ToString());
             Assert.AreEqual(msg.name, dto.Name);
@@ -199,7 +199,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         public void PlayerProfileDTOTest()
         {
             var msg = RMF.GetPlayerExtended();
-            var dto = new PlayerProfileDTO(msg);
+            var dto = new PlayerProfileDTO(msg, null);
 
             ValidatePlayerExtended(msg, dto);
         }
