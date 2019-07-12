@@ -95,8 +95,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 throw new ArgumentException($"Producer {producer} is disabled in the SDK", nameof(producer));
             }
             var requestNumber = _sequenceGenerator.GetNext();
-            var _producer = (Producer)producer;
-            var url = string.Format(EventMessagesRecoveryUrlFormat, _producer.ApiUrl, eventId, requestNumber);
+            var myProducer = (Producer) producer;
+            var url = string.Format(EventMessagesRecoveryUrlFormat, myProducer.ApiUrl, eventId, requestNumber);
             if (_nodeId != 0)
             {
                 url = $"{url}&node_id={_nodeId}";
@@ -112,7 +112,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                                                 null);
             }
 
-            _producer.EventRecoveries.TryAdd(requestNumber, eventId);
+            myProducer.EventRecoveries.TryAdd(requestNumber, eventId);
             return requestNumber;
         }
 
@@ -130,8 +130,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             }
 
             var requestNumber = _sequenceGenerator.GetNext();
-            var _producer = (Producer)producer;
-            var url = string.Format(EventStatefulMessagesRecoveryUrlFormat, _producer.ApiUrl, eventId, requestNumber);
+            var myProducer = (Producer) producer;
+            var url = string.Format(EventStatefulMessagesRecoveryUrlFormat, myProducer.ApiUrl, eventId, requestNumber);
             if (_nodeId != 0)
             {
                 url = $"{url}&node_id={_nodeId}";
@@ -147,7 +147,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                                                 null);
             }
 
-            _producer.EventRecoveries.TryAdd(requestNumber, eventId);
+            myProducer.EventRecoveries.TryAdd(requestNumber, eventId);
             return requestNumber;
         }
 

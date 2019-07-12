@@ -120,7 +120,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <returns>a list of valid market mappings</returns>
         public IEnumerable<IMarketMappingData> GetValidMappings()
         {
-            return _producer.Id == 5
+            return _producer.Id == 5 || _marketDescription?.Mappings == null
                 ? Enumerable.Empty<IMarketMappingData>()
                 : _marketDescription.Mappings.Where(m => m.CanMap(_producer, _sportId, _specifiers));
         }
