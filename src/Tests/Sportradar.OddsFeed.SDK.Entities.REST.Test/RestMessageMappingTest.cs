@@ -438,6 +438,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(msg.nationality, dto.Nationality);
             Assert.AreEqual(msg.type, dto.Type);
             Assert.AreEqual(msg.weight, dto.Weight); //TODO: missing jersey size
+            if (msg.jersey_numberSpecified)
+                Assert.AreEqual(msg.jersey_number, dto.JerseyNumber.Value);
+            else
+                Assert.IsFalse(dto.JerseyNumber.HasValue);
+            Assert.AreEqual(msg.gender, dto.Gender);
         }
 
         private static void ValidateSeasonCoverageInfo(seasonCoverageInfo msg, SeasonCoverageDTO dto)

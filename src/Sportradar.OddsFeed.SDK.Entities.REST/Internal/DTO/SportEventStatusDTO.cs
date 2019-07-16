@@ -124,6 +124,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public int? AwayPenaltyScore { get; }
 
         /// <summary>
+        /// Gets the indicator wither the event is decided by fed
+        /// </summary>
+        public bool? DecidedByFed { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SportEventStatusDTO"/> class
         /// </summary>
         /// <param name="record">A <see cref="restSportEventStatus" /> instance containing status data about the associated sport event</param>
@@ -383,6 +388,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 SportEventStatistics = new SportEventStatisticsDTO(statistics, _homeAwayCompetitors);
             }
+
+            DecidedByFed = record.decided_by_fedSpecified ? record.decided_by_fed : (bool?) null;
         }
 
         /// <summary>

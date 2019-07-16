@@ -42,6 +42,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         private ManagerCI _manager;
         private VenueCI _venue;
         private string _gender;
+        private RaceDriverProfileCI _raceDriverProfile;
 
         /// <summary>
         /// Gets the name of the competitor in the specified language
@@ -209,6 +210,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 return _gender;
             }
         }
+
+        /// <summary>
+        /// Gets the race driver profile
+        /// </summary>
+        /// <value>The race driver profile</value>
+        public RaceDriverProfileCI RaceDriverProfile => _raceDriverProfile;
 
         /// <summary>
         /// Gets the <see cref="IEnumerable{CultureInfo}"/> specifying the languages for which the current instance has translations
@@ -446,6 +453,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             if (!string.IsNullOrEmpty(competitorProfile.Competitor.Gender))
             {
                 _gender = competitorProfile.Competitor.Gender;
+            }
+
+            if (competitorProfile.RaceDriverProfile != null)
+            {
+                _raceDriverProfile = new RaceDriverProfileCI(competitorProfile.RaceDriverProfile);
             }
 
             ((List<CultureInfo>) _fetchedCultures).Add(culture);

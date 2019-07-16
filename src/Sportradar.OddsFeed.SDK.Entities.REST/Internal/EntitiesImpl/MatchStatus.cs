@@ -15,7 +15,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// </summary>
     /// <seealso cref="CompetitionStatus" />
     /// <seealso cref="IMatchStatus" />
-    public class MatchStatus : CompetitionStatus, IMatchStatusV1
+    public class MatchStatus : CompetitionStatus, IMatchStatusV2
     {
         /// <summary>
         /// The match statuses cache
@@ -57,6 +57,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public int? AwayPenaltyScore { get; }
 
         /// <summary>
+        /// Gets the indicator wither the event is decided by fed
+        /// </summary>
+        public bool? DecidedByFed { get; }
+
+        /// <summary>
         /// Get match status as an asynchronous operation
         /// </summary>
         /// <param name="culture">The culture used to fetch status id and description</param>
@@ -92,6 +97,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             _matchStatusesCache = matchStatusesCache;
             HomePenaltyScore = ci.HomePenaltyScore;
             AwayPenaltyScore = ci.AwayPenaltyScore;
+            DecidedByFed = ci.DecidedByFed;
         }
     }
 }
