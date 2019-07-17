@@ -171,17 +171,16 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                                              new ResolvedParameter<IVariantDescriptionCache>("VariantDescriptionListCache"),
                                              new ResolvedParameter<IMarketDescriptionCache>("VariantMarketDescriptionCache")));
 
-            container.RegisterType<IFeedMessageMapper, FeedMessageMapper>(
-                new ContainerControlledLifetimeManager(),
-                new InjectionConstructor(
-                    new ResolvedParameter<ISportEntityFactory>(),
-                    new ResolvedParameter<INameProviderFactory>(),
-                    new ResolvedParameter<IMarketMappingProviderFactory>(),
-                    new ResolvedParameter<INamedValuesProvider>(),
-                    new ResolvedParameter<ExceptionHandlingStrategy>(),
-                    new ResolvedParameter<IProducerManager>(),
-                    new ResolvedParameter<IMarketCacheProvider>(),
-                    new ResolvedParameter<INamedValueCache>("VoidReasonsCache")));
+            container.RegisterType<IFeedMessageMapper, FeedMessageMapper>(new ContainerControlledLifetimeManager(),
+                                                                          new InjectionConstructor(new ResolvedParameter<ISportEntityFactory>(),
+                                                                                                   new ResolvedParameter<INameProviderFactory>(),
+                                                                                                   new ResolvedParameter<IMarketMappingProviderFactory
+                                                                                                   >(),
+                                                                                                   new ResolvedParameter<INamedValuesProvider>(),
+                                                                                                   new ResolvedParameter<ExceptionHandlingStrategy>(),
+                                                                                                   new ResolvedParameter<IProducerManager>(),
+                                                                                                   new ResolvedParameter<IMarketCacheProvider>(),
+                                                                                                   new ResolvedParameter<INamedValueCache>("VoidReasonsCache")));
 
             RegisterNameProviderTypes(container, config.Locales.ToList());
             container.RegisterType<IFeedMessageValidator, FeedMessageValidator>(
@@ -318,8 +317,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         private static void RegisterDataRouterManager(IUnityContainer container, IOddsFeedConfigurationInternal config)
         {
             var nodeIdStr = config.NodeId != 0
-                             ? "?node_id=" + config.NodeId
-                             : string.Empty;
+                                ? "?node_id=" + config.NodeId
+                                : string.Empty;
             // sport event summary provider
             container.RegisterType<IDeserializer<RestMessage>, Deserializer<RestMessage>>(new ContainerControlledLifetimeManager());
             container.RegisterType<ISingleTypeMapperFactory<RestMessage, SportEventSummaryDTO>, SportEventSummaryMapperFactory>(new ContainerControlledLifetimeManager());
@@ -577,37 +576,51 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                                          new ResolvedParameter<IDeserializer<scheduleEndpoint>>(),
                                          new ResolvedParameter<ISingleTypeMapperFactory<scheduleEndpoint, EntityList<SportEventSummaryDTO>>>()));
 
+            // list sport available tournament
+            container.RegisterType<IDeserializer<sportTournamentsEndpoint>, Deserializer<sportTournamentsEndpoint>>(new ContainerControlledLifetimeManager());
+            container.RegisterType<ISingleTypeMapperFactory<sportTournamentsEndpoint, EntityList<TournamentInfoDTO>>,
+                ListSportAvailableTournamentMapperFactory>(new ContainerControlledLifetimeManager());
+            container.RegisterType<IDataProvider<EntityList<TournamentInfoDTO>>, ListSportAvailableTournamentProvider>(
+                 "availableSportTournaments",
+                 new ContainerControlledLifetimeManager(),
+                 new InjectionConstructor( // v1/sports/en/sports/sr:sport:55/tournaments.xml
+                                          config.ApiBaseUri + "/v1/sports/{0}/sports/{1}/tournaments.xml",
+                                          new ResolvedParameter<IDataFetcher>(),
+                                          new ResolvedParameter<IDeserializer<sportTournamentsEndpoint>>(),
+                                          new ResolvedParameter<ISingleTypeMapperFactory<sportTournamentsEndpoint, EntityList<TournamentInfoDTO>>>()));
+
             container.RegisterType<IDataRouterManager, DataRouterManager>(
-                new ContainerControlledLifetimeManager(),
-                new InjectionConstructor(
-                    new ResolvedParameter<ICacheManager>(),
-                    new ResolvedParameter<IProducerManager>(),
-                    new ResolvedParameter<ExceptionHandlingStrategy>(),
-                    config.DefaultLocale,
-                    new ResolvedParameter<IDataProvider<SportEventSummaryDTO>>("sportEventSummaryProvider"),
-                    new ResolvedParameter<IDataProvider<FixtureDTO>>("fixtureEndpointDataProvider"),
-                    new ResolvedParameter<IDataProvider<FixtureDTO>>("fixtureChangeFixtureEndpointDataProvider"),
-                    new ResolvedParameter<IDataProvider<EntityList<SportDTO>>>("allTournamentsProvider"),
-                    new ResolvedParameter<IDataProvider<EntityList<SportDTO>>>("allSportsProvider"),
-                    new ResolvedParameter<IDataProvider<EntityList<SportEventSummaryDTO>>>("dateScheduleProvider"),
-                    new ResolvedParameter<IDataProvider<EntityList<SportEventSummaryDTO>>>("tournamentScheduleProvider"),
-                    new ResolvedParameter<IDataProvider<PlayerProfileDTO>>(),
-                    new ResolvedParameter<IDataProvider<CompetitorProfileDTO>>(),
-                    new ResolvedParameter<IDataProvider<SimpleTeamProfileDTO>>(),
-                    new ResolvedParameter<IDataProvider<TournamentSeasonsDTO>>(),
-                    new ResolvedParameter<IDataProvider<MatchTimelineDTO>>(),
-                    new ResolvedParameter<IDataProvider<SportCategoriesDTO>>(),
-                    new ResolvedParameter<IDataProvider<EntityList<MarketDescriptionDTO>>>(),
-                    new ResolvedParameter<IDataProvider<MarketDescriptionDTO>>(),
-                    new ResolvedParameter<IDataProvider<EntityList<VariantDescriptionDTO>>>(),
-                    new ResolvedParameter<IDataProvider<DrawDTO>>("drawSummaryProvider"),
-                    new ResolvedParameter<IDataProvider<DrawDTO>>("drawFixtureProvider"),
-                    new ResolvedParameter<IDataProvider<LotteryDTO>>("lotteryScheduleProvider"),
-                    new ResolvedParameter<IDataProvider<EntityList<LotteryDTO>>>("lotteryListProvider"),
-                    new ResolvedParameter<IDataProvider<AvailableSelectionsDTO>>(),
-                    new ResolvedParameter<ICalculateProbabilityProvider>(),
-                    new ResolvedParameter<IDataProvider<IEnumerable<FixtureChangeDTO>>>(),
-                    new ResolvedParameter<IDataProvider<EntityList<SportEventSummaryDTO>>>("listSportEventProvider")));
+                  new ContainerControlledLifetimeManager(),
+                  new InjectionConstructor(
+                                           new ResolvedParameter<ICacheManager>(),
+                                           new ResolvedParameter<IProducerManager>(),
+                                           new ResolvedParameter<ExceptionHandlingStrategy>(),
+                                           config.DefaultLocale,
+                                           new ResolvedParameter<IDataProvider<SportEventSummaryDTO>>("sportEventSummaryProvider"),
+                                           new ResolvedParameter<IDataProvider<FixtureDTO>>("fixtureEndpointDataProvider"),
+                                           new ResolvedParameter<IDataProvider<FixtureDTO>>("fixtureChangeFixtureEndpointDataProvider"),
+                                           new ResolvedParameter<IDataProvider<EntityList<SportDTO>>>("allTournamentsProvider"),
+                                           new ResolvedParameter<IDataProvider<EntityList<SportDTO>>>("allSportsProvider"),
+                                           new ResolvedParameter<IDataProvider<EntityList<SportEventSummaryDTO>>>("dateScheduleProvider"),
+                                           new ResolvedParameter<IDataProvider<EntityList<SportEventSummaryDTO>>>("tournamentScheduleProvider"),
+                                           new ResolvedParameter<IDataProvider<PlayerProfileDTO>>(),
+                                           new ResolvedParameter<IDataProvider<CompetitorProfileDTO>>(),
+                                           new ResolvedParameter<IDataProvider<SimpleTeamProfileDTO>>(),
+                                           new ResolvedParameter<IDataProvider<TournamentSeasonsDTO>>(),
+                                           new ResolvedParameter<IDataProvider<MatchTimelineDTO>>(),
+                                           new ResolvedParameter<IDataProvider<SportCategoriesDTO>>(),
+                                           new ResolvedParameter<IDataProvider<EntityList<MarketDescriptionDTO>>>(),
+                                           new ResolvedParameter<IDataProvider<MarketDescriptionDTO>>(),
+                                           new ResolvedParameter<IDataProvider<EntityList<VariantDescriptionDTO>>>(),
+                                           new ResolvedParameter<IDataProvider<DrawDTO>>("drawSummaryProvider"),
+                                           new ResolvedParameter<IDataProvider<DrawDTO>>("drawFixtureProvider"),
+                                           new ResolvedParameter<IDataProvider<LotteryDTO>>("lotteryScheduleProvider"),
+                                           new ResolvedParameter<IDataProvider<EntityList<LotteryDTO>>>("lotteryListProvider"),
+                                           new ResolvedParameter<IDataProvider<AvailableSelectionsDTO>>(),
+                                           new ResolvedParameter<ICalculateProbabilityProvider>(),
+                                           new ResolvedParameter<IDataProvider<IEnumerable<FixtureChangeDTO>>>(),
+                                           new ResolvedParameter<IDataProvider<EntityList<SportEventSummaryDTO>>>("listSportEventProvider"),
+                                           new ResolvedParameter<IDataProvider<EntityList<TournamentInfoDTO>>>("availableSportTournaments")));
         }
 
         private static void RegisterSessionTypes(IUnityContainer container)

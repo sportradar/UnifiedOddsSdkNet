@@ -139,6 +139,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         private readonly IDataProvider<EntityList<SportEventSummaryDTO>> _listSportEventProvider;
 
         /// <summary>
+        /// The list sport available tournaments provider
+        /// </summary>
+        private readonly IDataProvider<EntityList<TournamentInfoDTO>> _availableSportTournamentsProvider;
+
+        /// <summary>
         /// The cache manager
         /// </summary>
         private readonly ICacheManager _cacheManager;
@@ -189,6 +194,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="calculateProbabilityProvider">The probability calculation provider</param>
         /// <param name="fixtureChangesProvider">Fixture changes provider</param>
         /// <param name="listSportEventProvider">List sport events provider</param>
+        /// <param name="availableSportTournamentsProvider">The sports available tournaments provider</param>
         public DataRouterManager(ICacheManager cacheManager,
                                  IProducerManager producerManager,
                                  ExceptionHandlingStrategy exceptionHandlingStrategy,
@@ -216,7 +222,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                                  IDataProvider<AvailableSelectionsDTO> availableSelectionsProvider,
                                  ICalculateProbabilityProvider calculateProbabilityProvider,
                                  IDataProvider<IEnumerable<FixtureChangeDTO>> fixtureChangesProvider,
-                                 IDataProvider<EntityList<SportEventSummaryDTO>> listSportEventProvider)
+                                 IDataProvider<EntityList<SportEventSummaryDTO>> listSportEventProvider,
+                                 IDataProvider<EntityList<TournamentInfoDTO>> availableSportTournamentsProvider)
         {
             Contract.Requires(cacheManager != null);
             Contract.Requires(sportEventSummaryProvider != null);
@@ -243,6 +250,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Contract.Requires(calculateProbabilityProvider != null);
             Contract.Requires(fixtureChangesProvider != null);
             Contract.Requires(listSportEventProvider != null);
+            Contract.Requires(availableSelectionsProvider != null);
 
             _cacheManager = cacheManager;
             var wnsProducer = producerManager.Get(7);
@@ -273,6 +281,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             _calculateProbabilityProvider = calculateProbabilityProvider;
             _fixtureChangesProvider = fixtureChangesProvider;
             _listSportEventProvider = listSportEventProvider;
+            _availableSportTournamentsProvider = availableSportTournamentsProvider;
 
             _sportEventSummaryProvider.RawApiDataReceived += OnRawApiDataReceived;
             _sportEventFixtureProvider.RawApiDataReceived += OnRawApiDataReceived;
@@ -298,6 +307,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             //_calculateProbabilityProvider.RawApiDataReceived += OnRawApiDataReceived;
             _fixtureChangesProvider.RawApiDataReceived += OnRawApiDataReceived;
             _listSportEventProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _availableSportTournamentsProvider.RawApiDataReceived += OnRawApiDataReceived;
         }
 
         private void OnRawApiDataReceived(object sender, RawApiDataEventArgs e)
@@ -336,6 +346,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Contract.Invariant(_calculateProbabilityProvider != null);
             Contract.Invariant(_fixtureChangesProvider != null);
             Contract.Invariant(_listSportEventProvider != null);
+            Contract.Invariant(_availableSportTournamentsProvider != null);
         }
 
         /// <summary>
@@ -1350,11 +1361,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 catch (Exception e)
                 {
                     restCallTime = (int)t.Elapsed.TotalMilliseconds;
-                    var message = e.InnerException?.Message ?? e.Message;
-                    _executionLog.Error($"Error getting list of sport events for startIndex={startIndex}, limit={limit} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
-                    if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                    if (e.Message.Contains("NotFound"))
                     {
-                        throw;
+                        var message = e.InnerException?.Message ?? e.Message;
+                        _executionLog.Debug($"Error getting list of sport events for startIndex={startIndex}, limit={limit} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
+                    }
+                    else
+                    {
+                        var message = e.InnerException?.Message ?? e.Message;
+                        _executionLog.Error($"Error getting list of sport events for startIndex={startIndex}, limit={limit} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
+                        if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                        {
+                            throw;
+                        }
                     }
                 }
 
@@ -1367,6 +1386,61 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                         urns.Add(new Tuple<URN, URN>(item.Id, item.SportId));
                     }
                     WriteLog($"Executing ListOfSportEventsAsync with startIndex={startIndex}, limit={limit} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
+                    return urns;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the list of all the available tournaments for a specific sport
+        /// </summary>
+        /// <param name="sportId">The specific sport id</param>
+        /// <param name="culture">The culture</param>
+        /// <returns>The list of the available tournament ids with the sportId it belongs to</returns>
+        public async Task<IEnumerable<Tuple<URN, URN>>> GetSportAvailableTournamentsAsync(URN sportId, CultureInfo culture)
+        {
+            Metric.Context("DataRouterManager").Meter("GetSportAvailableTournamentsAsync", Unit.Calls);
+            var timer = Metric.Context("DataRouterManager").Timer("GetSportAvailableTournamentsAsync", Unit.Requests);
+            using (var t = timer.NewContext($"{sportId} [{culture.TwoLetterISOLanguageName}]"))
+            {
+                WriteLog($"Executing GetSportAvailableTournamentsAsync with sportId={sportId} and culture={culture.TwoLetterISOLanguageName}.", true);
+
+                EntityList<TournamentInfoDTO> result = null;
+                int restCallTime;
+                try
+                {
+                    result = await _availableSportTournamentsProvider.GetDataAsync(culture.TwoLetterISOLanguageName, sportId.ToString()).ConfigureAwait(false);
+                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
+                }
+                catch (Exception e)
+                {
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    if (e.Message.Contains("NotFound"))
+                    {
+                        var message = e.InnerException?.Message ?? e.Message;
+                        _executionLog.Debug($"Error getting sport available tournaments for sportId={sportId} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
+                    }
+                    else
+                    {
+                        var message = e.InnerException?.Message ?? e.Message;
+                        _executionLog.Error($"Error getting sport available tournaments for sportId={sportId} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
+                        if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                        {
+                            throw;
+                        }
+                    }
+                }
+
+                if (result != null && result.Items.Any())
+                {
+                    await _cacheManager.SaveDtoAsync(URN.Parse($"sr:tournaments:{result.Items.Count()}"), result, culture, DtoType.TournamentInfoList, null).ConfigureAwait(false);
+                    var urns = new List<Tuple<URN, URN>>();
+                    foreach (var item in result.Items)
+                    {
+                        urns.Add(new Tuple<URN, URN>(item.Id, item.Sport.Id));
+                    }
+                    WriteLog($"Executing GetSportAvailableTournamentsAsync with sportId={sportId} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
                     return urns;
                 }
             }

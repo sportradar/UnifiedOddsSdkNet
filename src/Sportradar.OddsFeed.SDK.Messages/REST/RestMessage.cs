@@ -230,6 +230,10 @@ namespace Sportradar.OddsFeed.SDK.Messages.REST
     {
     }
 
+    public partial class sportTournamentsEndpoint : RestMessage
+    {
+    }
+
     [Obsolete("Not used")]
     public partial class teamExtended
     {
