@@ -26,6 +26,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         private int? _height;
         private int? _weight;
         private string _abbreviation;
+        private string _gender;
 
         /// <summary>
         /// A <see cref="IDictionary{CultureInfo, String}"/> containing player name in different languages
@@ -90,6 +91,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// </summary>
         /// <remarks>Available via <see cref="PlayerCompetitorDTO"/></remarks>
         public string Abbreviation => _abbreviation;
+
+        /// <summary>
+        /// Gets the gender
+        /// </summary>
+        public string Gender => _gender;
 
         /// <summary>
         /// Gets the <see cref="IEnumerable{CultureInfo}"/> specifying the languages for which the current instance has translations
@@ -162,6 +168,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _nationalities[culture] = profile.Nationality;
             _height = profile.Height;
             _weight = profile.Weight;
+            _gender = profile.Gender;
 
             if (string.IsNullOrEmpty(_abbreviation))
             {

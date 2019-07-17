@@ -100,6 +100,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         public int? AwayPenaltyScore => FeedStatusDTO?.AwayPenaltyScore ?? SapiStatusDTO?.AwayPenaltyScore;
 
         /// <summary>
+        /// Gets the indicator wither the event is decided by fed
+        /// </summary>
+        public bool? DecidedByFed => FeedStatusDTO?.DecidedByFed ?? SapiStatusDTO?.DecidedByFed;
+
+        /// <summary>
         /// Gets the value of the property specified by it's name
         /// </summary>
         /// <param name="propertyName">The name of the property</param>

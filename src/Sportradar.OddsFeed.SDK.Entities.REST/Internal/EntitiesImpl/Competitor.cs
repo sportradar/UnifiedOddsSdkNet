@@ -22,7 +22,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// <seealso cref="Player" />
     /// <seealso cref="ICompetitor" />
     [DataContract]
-    internal class Competitor : Player, ICompetitorV1
+    internal class Competitor : Player, ICompetitorV2
     {
         private readonly CompetitorCI _competitorCI;
         private readonly IProfileCache _profileCache;
@@ -354,5 +354,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// </summary>
         /// <value>The gender</value>
         public string Gender => GetCompetitor()?.Gender;
+
+        /// <summary>
+        /// Gets the race driver profile
+        /// </summary>
+        /// <value>The race driver profile</value>
+        public IRaceDriverProfile RaceDriverProfile
+        {
+            get
+            {
+                var raceDriverProfileCI = GetCompetitor()?.RaceDriverProfile;
+                return raceDriverProfileCI == null ? null : new RaceDriverProfile(raceDriverProfileCI);
+            }
+        }
     }
 }

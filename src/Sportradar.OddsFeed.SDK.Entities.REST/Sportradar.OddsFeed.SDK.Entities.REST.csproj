@@ -126,6 +126,12 @@
     <Compile Include="IBasicTournament.cs" />
     <Compile Include="IBonusInfo.cs" />
     <Compile Include="IBookmakerDetails.cs" />
+    <Compile Include="IMatchStatusV2.cs" />
+    <Compile Include="Internal\EntitiesImpl\Car.cs" />
+    <Compile Include="Internal\EntitiesImpl\RaceDriverProfile.cs" />
+    <Compile Include="ICar.cs" />
+    <Compile Include="IRaceDriverProfile.cs" />
+    <Compile Include="ICompetitorV2.cs" />
     <Compile Include="ICompetitorV1.cs" />
     <Compile Include="IFixtureChange.cs" />
     <Compile Include="ICategorySummary.cs" />
@@ -139,10 +145,14 @@
     <Compile Include="IMatchV1.cs" />
     <Compile Include="IMatchStatusV1.cs" />
     <Compile Include="Internal\Caching\CI\PitcherCI.cs" />
+    <Compile Include="Internal\Caching\CI\CarCI.cs" />
+    <Compile Include="Internal\Caching\CI\RaceDriverProfileCI.cs" />
     <Compile Include="Internal\CalculateProbabilityProvider.cs" />
     <Compile Include="Internal\DTO\CustomBet\CalculationDTO.cs" />
     <Compile Include="Internal\DTO\CustomBet\AvailableSelectionsDTO.cs" />
     <Compile Include="Internal\DTO\CustomBet\MarketDTO.cs" />
+    <Compile Include="Internal\DTO\CarDTO.cs" />
+    <Compile Include="Internal\DTO\RaceDriverProfileDTO.cs" />
     <Compile Include="Internal\DTO\SimpleTeamProfileDTO.cs" />
     <Compile Include="Internal\DTO\FixtureChangeDTO.cs" />
     <Compile Include="Internal\DTO\SportCategoriesDTO.cs" />
@@ -170,6 +180,7 @@
     <Compile Include="Internal\Mapping\ListSportEventsMapper.cs" />
     <Compile Include="Internal\Mapping\ListSportEventsMapperFactory.cs" />
     <Compile Include="IPitcher.cs" />
+    <Compile Include="IPlayerProfileV1.cs" />
     <Compile Include="IReferenceV1.cs" />
     <Compile Include="IRoundV2.cs" />
     <Compile Include="IRoundV1.cs" />

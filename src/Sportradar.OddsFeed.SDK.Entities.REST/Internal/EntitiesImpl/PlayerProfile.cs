@@ -16,7 +16,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// </summary>
     /// <seealso cref="Player" />
     /// <seealso cref="IPlayerProfile" />
-    internal class PlayerProfile : Player, IPlayerProfile
+    internal class PlayerProfile : Player, IPlayerProfileV1
     {
         private readonly PlayerProfileCI _playerProfileCI;
         private readonly List<CultureInfo> _cultures;
@@ -45,6 +45,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// Gets a <see cref="IReadOnlyDictionary{CultureInfo, String}" /> containing player nationality in different languages
         /// </summary>
         public IReadOnlyDictionary<CultureInfo, string> Nationalities => new ReadOnlyDictionary<CultureInfo, string>(_cultures.Where(c => _playerProfileCI.GetNationality(c) != null).ToDictionary(c => c, _playerProfileCI.GetNationality));
+
+        /// <summary>
+        /// Gets the gender
+        /// </summary>
+        public string Gender => _playerProfileCI.Gender;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PlayerProfile"/> class

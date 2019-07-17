@@ -63,6 +63,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <value>The jersey number</value>
         public int? JerseyNumber { get; }
 
+        /// <summary>
+        /// Gets the gender
+        /// </summary>
+        /// <value>The gender</value>
+        public string Gender { get; }
 
         /// <summary>
         /// Gets the <see cref="DateTime"/> specifying when the associated message was generated (on the server side)
@@ -94,6 +99,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             JerseyNumber = record.jersey_numberSpecified
                 ? (int?) record.jersey_number
                 : null;
+            Gender = record.gender;
             GeneratedAt = generatedAt;
         }
     }

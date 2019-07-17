@@ -45,6 +45,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public VenueDTO Venue { get; }
 
         /// <summary>
+        /// Gets the race driver profile
+        /// </summary>
+        /// <value>The race driver profile</value>
+        public RaceDriverProfileDTO RaceDriverProfile { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CompetitorProfileDTO"/> class
         /// </summary>
         /// <param name="record">A <see cref="competitorProfileEndpoint"/> containing information about the profile</param>
@@ -69,6 +75,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             if (record.venue != null)
             {
                 Venue = new VenueDTO(record.venue);
+            }
+            if (record.race_driver_profile != null)
+            {
+                RaceDriverProfile = new RaceDriverProfileDTO(record.race_driver_profile);
             }
         }
     }
