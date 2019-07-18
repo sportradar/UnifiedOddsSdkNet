@@ -25,7 +25,23 @@ The package contains:
 For more information please contact support@sportradar.com or visit https://iodocs.betradar.com/unifiedsdk/index.html
 
 CHANGE LOG:
-2019-07-21  1.22.0.0
+2019-07-18  1.23.0.0
+Added Gender property to the IPlayerProfileV1
+Added DecidedByFed property to the IMatchStatusV2
+Added RaceDriverProfile property to the ICompetitorV2
+Added GetExhibitionGamesAsync() to the IBasicTournamentV1 and ITournamentV1
+Added Id property to the IGroupV1
+Added TeamId and Name properties to the ITeamStatisticsV1
+Added support for List sport events - ISportDataProvider extended with ISportDataProviderV2
+Added support for TLS 1.2
+Added GetAvailableTournamentsAsync(sportId) and GetActiveTournamentsAsync() to the ISportDataProviderV3
+Fix: when sdk connects and API is down, UF SDK waits for next alive to make recovery
+Fix: not loading variant market data in multi-language scenario
+Fix: removed making whoami request in Feed ctor
+Fix: on Feed.Open exception, the Open state is reset
+Fix: NPE for validating market mappings when there are none
+
+2019-06-21  1.22.0.0
 Added GetStartTimeTbdAsync and GetReplacedByAsync to the ISportEventV1
 Added properties StripesColor, SplitColor, ShirtType and SleeveDetail to the IJerseyV1
 Improved on updating when new outcomes are available (outrights)
