@@ -87,6 +87,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public DateTime? GeneratedAt { get; }
 
         /// <summary>
+        /// Gets the <see cref="bool"/> specifying if the tournament is exhibition game
+        /// </summary>
+        public bool? ExhibitionGames { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TournamentInfoDTO"/> class
         /// </summary>
         /// <param name="sportEvent">A <see cref="sportEvent"/> containing basic tournament info</param>
@@ -176,6 +181,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             Year = null;
 
             TournamentInfo = null;
+
+            ExhibitionGames = tournament.exhibition_gamesSpecified ? tournament.exhibition_games : (bool?) null;
         }
 
         /// <summary>
@@ -263,6 +270,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             }
 
             GeneratedAt = tournament.generated_atSpecified ? tournament.generated_at : (DateTime?) null;
+
+            ExhibitionGames = tournament.tournament.exhibition_gamesSpecified
+                ? tournament.tournament.exhibition_games
+                : (bool?) null;
         }
 
         /// <summary>
@@ -494,6 +505,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                     : tournament.Year;
 
             TournamentInfo = tournament.TournamentInfo;
+
+            GeneratedAt = tournament.GeneratedAt;
+
+            ExhibitionGames = tournament.ExhibitionGames;
         }
 
         private static bool IsTournamentScheduleSpecified(tournament tournament, bool useStartTime)

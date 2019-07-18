@@ -14,6 +14,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
     {
         public URN TeamId { get; }
 
+        public string Name { get; }
+
         public HomeAway? HomeOrAway { get; }
 
         public int Cards { get; }
@@ -30,6 +32,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         {
             Contract.Requires(statistics != null);
 
+            Name = statistics.name;
             TeamId = !string.IsNullOrEmpty(statistics.id)
                 ? URN.Parse(statistics.id)
                 : null;
@@ -72,6 +75,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         internal TeamStatisticsDTO(HomeAway? homeAway, int yellowCards, int redCards, int yellowRedCards, int cornerKicks)
         {
+            Name = "";
             TeamId = null; // not available on the AMQP message
             HomeOrAway = homeAway;
             YellowCards = yellowCards;

@@ -64,6 +64,36 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         }
 
         /// <summary>
+        /// Maps the <see cref="tournamentExtended"/> instance to the one of the derived types of <see cref="SportEventSummaryDTO"/>
+        /// </summary>
+        /// <param name="item">The item to be mapped</param>
+        /// <returns>A <see cref="SportEventSummaryDTO"/> derived instance</returns>
+        /// <exception cref="ArgumentException">id</exception>
+        public static SportEventSummaryDTO MapSportEvent(tournamentExtended item)
+        {
+            if (item == null)
+            {
+                return null;
+            }
+            var id = URN.Parse(item.id);
+
+            switch (id.TypeGroup)
+            {
+                case ResourceTypeGroup.BASIC_TOURNAMENT:
+                {
+                    return new BasicTournamentDTO(item);
+                }
+                case ResourceTypeGroup.TOURNAMENT:
+                case ResourceTypeGroup.SEASON:
+                {
+                    return new TournamentInfoDTO(item);
+                }
+                default:
+                    throw new ArgumentException($"ResourceTypeGroup: {id.TypeGroup} is not supported", nameof(id));
+            }
+        }
+
+        /// <summary>
         /// It checks if there are exactly 2 competitors and one is home and seconds away. If so, it returns dictionary indicating which of team is home and which away; else null
         /// </summary>
         /// <param name="competitors">The competitors to be checked</param>

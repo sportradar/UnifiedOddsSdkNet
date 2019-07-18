@@ -87,6 +87,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         private IDictionary<URN, ReferenceIdCI> _competitorsReferences;
 
         /// <summary>
+        /// The indicator specifying if the tournament is exhibition game
+        /// </summary>
+        private bool? _exhibitionGames;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TournamentInfoCI"/> class
         /// </summary>
         /// <param name="id">A <see cref="URN" /> specifying the id of the sport event associated with the current instance</param>
@@ -351,6 +356,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         }
 
         /// <summary>
+        /// Asynchronously gets a <see cref="bool"/> specifying if the tournament is exhibition game
+        /// </summary>
+        /// <returns>A <see cref="bool"/> specifying if the tournament is exhibition game</returns>
+        public async Task<bool?> GetExhibitionGamesAsync()
+        {
+            await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
+            return _exhibitionGames;
+        }
+
+        /// <summary>
         /// Merges the specified dto
         /// </summary>
         /// <param name="dto">The dto</param>
@@ -461,6 +476,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             if (dto.SeasonCoverage != null)
             {
                 _seasonCoverage = new SeasonCoverageCI(dto.SeasonCoverage);
+            }
+
+            if (dto.ExhibitionGames != null)
+            {
+                _exhibitionGames = dto.ExhibitionGames;
             }
         }
 
