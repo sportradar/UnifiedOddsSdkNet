@@ -16,6 +16,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
     public class GroupCI
     {
         /// <summary>
+        /// Gets the id of the group
+        /// </summary>
+        public string Id { get; }
+
+        /// <summary>
         /// Gets the name of the group
         /// </summary>
         public string Name { get; }
@@ -39,6 +44,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Contract.Requires(culture != null);
 
             _dataRouterManager = dataRouterManager;
+            Id = group.Id;
             Name = group.Name;
             Competitors = group.Competitors != null
                 ? new ReadOnlyCollection<CompetitorCI>(group.Competitors.Select(c => new CompetitorCI(c, culture, _dataRouterManager)).ToList())

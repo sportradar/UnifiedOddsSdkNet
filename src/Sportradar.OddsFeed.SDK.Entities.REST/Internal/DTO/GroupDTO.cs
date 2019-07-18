@@ -14,6 +14,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
     /// </summary>
     public class GroupDTO
     {
+        internal string Id { get; }
+
         internal string Name { get; }
 
         internal IEnumerable<CompetitorDTO> Competitors { get; }
@@ -22,6 +24,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         {
             Contract.Requires(group != null);
 
+            Id = group.id ?? string.Empty;
             Name = group.name ?? string.Empty;
             Competitors = group.competitor == null
                 ? null

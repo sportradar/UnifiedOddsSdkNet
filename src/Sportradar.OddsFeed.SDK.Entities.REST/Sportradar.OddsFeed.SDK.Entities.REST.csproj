@@ -123,9 +123,11 @@
     <Compile Include="Enums\EventStatus.cs" />
     <Compile Include="Enums\HomeAway.cs" />
     <Compile Include="IAssist.cs" />
+    <Compile Include="IBasicTournamentV1.cs" />
     <Compile Include="IBasicTournament.cs" />
     <Compile Include="IBonusInfo.cs" />
     <Compile Include="IBookmakerDetails.cs" />
+    <Compile Include="IGroupV1.cs" />
     <Compile Include="IMatchStatusV2.cs" />
     <Compile Include="Internal\EntitiesImpl\Car.cs" />
     <Compile Include="Internal\EntitiesImpl\RaceDriverProfile.cs" />
@@ -450,6 +452,8 @@
     <Compile Include="Internal\EventArguments\TournamentReceivedEventArgs.cs" />
     <Compile Include="ISportEventV1.cs" />
     <Compile Include="ITeamCompetitorV1.cs" />
+    <Compile Include="ITeamStatisticsV1.cs" />
+    <Compile Include="ITournamentV1.cs" />
     <Compile Include="ITvChannelV1.cs" />
     <Compile Include="MarketMapping\IMarketMappingData.cs" />
     <Compile Include="Internal\InternalEntities\MarketDescription.cs" />
