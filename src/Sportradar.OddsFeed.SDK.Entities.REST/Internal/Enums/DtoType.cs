@@ -115,6 +115,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums
         /// <summary>
         /// The available selections for the event
         /// </summary>
-        AvailableSelections
+        AvailableSelections,
+        /// <summary>
+        /// The tournament list
+        /// </summary>
+        TournamentInfoList
     }
 }

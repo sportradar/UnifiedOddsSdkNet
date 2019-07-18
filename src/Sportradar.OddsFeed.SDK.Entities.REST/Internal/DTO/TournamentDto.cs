@@ -44,7 +44,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public SeasonCoverageDTO SeasonCoverage { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TournamentDTO"/> class.
+        /// Initializes a new instance of the <see cref="TournamentDTO"/> class
         /// </summary>
         /// <param name="tournament">The <see cref="tournament"/> used for creating instance</param>
         internal TournamentDTO(tournament tournament)

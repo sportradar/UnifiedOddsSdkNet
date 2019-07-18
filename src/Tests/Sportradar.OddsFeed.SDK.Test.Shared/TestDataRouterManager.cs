@@ -495,5 +495,16 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Gets the list of all the available tournaments for a specific sport
+        /// </summary>
+        /// <param name="sportId">The specific sport id</param>
+        /// <param name="culture">The culture</param>
+        /// <returns>The list of the available tournament ids with the sportId it belongs to</returns>
+        public Task<IEnumerable<Tuple<URN, URN>>> GetSportAvailableTournamentsAsync(URN sportId, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

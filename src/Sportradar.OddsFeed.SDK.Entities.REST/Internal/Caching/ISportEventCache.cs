@@ -3,6 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -40,5 +41,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// </summary>
         /// <param name="id">A <see cref="URN"/> representing the event</param>
         void AddFixtureTimestamp(URN id);
+
+        /// <summary>
+        /// Asynchronously gets a list of active <see cref="IEnumerable{TournamentInfoCI}"/>
+        /// </summary>
+        /// <remarks>Lists all <see cref="TournamentInfoCI"/> that are cached (once schedule is loaded)</remarks>
+        /// <param name="culture">A <see cref="CultureInfo"/> specifying the language or a null reference to use the languages specified in the configuration</param>
+        /// <returns>A <see cref="Task{T}"/> representing the async operation</returns>
+        Task<IEnumerable<TournamentInfoCI>> GetActiveTournamentsAsync(CultureInfo culture = null);
     }
 }

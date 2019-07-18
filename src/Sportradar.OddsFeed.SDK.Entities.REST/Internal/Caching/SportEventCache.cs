@@ -158,7 +158,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             }
 
             if (!datesToFetch.Any())
+            {
                 return;
+            }
 
             var culturesToFetch = _cultures.ToDictionary(ci => ci, ci => datesToFetch);
 
@@ -316,6 +318,39 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             var cache = _sportEventCacheItemFactory.GetFixtureTimestampCache();
             cache.Set(id.ToString(), id, DateTimeOffset.Now.AddMinutes(2));
+        }
+
+        /// <summary>
+        /// Asynchronously gets a list of active <see cref="IEnumerable{TournamentInfoCI}"/>
+        /// </summary>
+        /// <remarks>Lists all <see cref="TournamentInfoCI"/> that are cached (once schedule is loaded)</remarks>
+        /// <param name="culture">A <see cref="CultureInfo"/> specifying the language or a null reference to use the languages specified in the configuration</param>
+        /// <returns>A <see cref="Task{T}"/> representing the async operation</returns>
+        public Task<IEnumerable<TournamentInfoCI>> GetActiveTournamentsAsync(CultureInfo culture = null)
+        {
+            OnTimerElapsed(null, null); // this can be async
+            var tourKeys = Cache.Select(s => s.Key).Where(w => w.Contains("tournament") || w.Contains("stage") || w.Contains("outright"));
+
+            var tours = new List<TournamentInfoCI>();
+            var error = string.Empty;
+            foreach (var key in tourKeys)
+            {
+                try
+                {
+                    tours.Add((TournamentInfoCI) _sportEventCacheItemFactory.Get(Cache.Get(key)));
+                }
+                catch (Exception)
+                {
+                    error += $",{key}";
+                }
+            }
+            if (!string.IsNullOrEmpty(error))
+            {
+                error = error.Substring(1);
+            }
+            ExecutionLog.Debug($"Found {tours.Count} tournaments. Errors: {error}");
+
+            return Task.FromResult<IEnumerable<TournamentInfoCI>>(tours);
         }
 
         private void CacheItemRemovedCallback(CacheEntryRemovedArguments arguments)
@@ -601,6 +636,23 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     break;
                 case DtoType.SportCategories:
                     break;
+                case DtoType.AvailableSelections:
+                    break;
+                case DtoType.TournamentInfoList:
+                    var ts = item as EntityList<TournamentInfoDTO>;
+                    if (ts != null)
+                    {
+                        foreach (var t1 in ts.Items)
+                        {
+                            AddSportEvent(id, t1, culture, requester, dtoType);
+                        }
+                        saved = true;
+                    }
+                    else
+                    {
+                        LogSavingDtoConflict(id, typeof(EntityList<TournamentDTO>), item.GetType());
+                    }
+                    break;
                 default:
                     ExecutionLog.Warn($"Trying to add unchecked dto type:{dtoType} for id: {id}.");
                     break;
@@ -629,7 +681,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                                      DtoType.Lottery,
                                      DtoType.LotteryDraw,
                                      DtoType.LotteryList,
-                                     DtoType.BookingStatus
+                                     DtoType.BookingStatus,
+                                     DtoType.TournamentInfoList
                                  };
         }
 
