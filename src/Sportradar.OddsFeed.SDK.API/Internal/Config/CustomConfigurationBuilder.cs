@@ -200,9 +200,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
             _messagingPassword = section.Password;
             _virtualHost = section.VirtualHost;
             _useMessagingSsl = section.UseSSL;
-            _apiHost = string.IsNullOrEmpty(section.ApiHost) ? SdkInfo.IntegrationApiHost : section.ApiHost; ;
+            _apiHost = string.IsNullOrEmpty(section.ApiHost) ? SdkInfo.IntegrationApiHost : section.ApiHost;
             _useApiSsl = section.UseApiSSL;
-
         }
 
         /// <summary>

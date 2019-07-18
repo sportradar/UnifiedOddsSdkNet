@@ -210,6 +210,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             {
                 var actualException = ex.InnerException ?? ex;
                 ExecutionLog.Error($"{_producer.Name} There was an error requesting recovery. Exception: {actualException.Message}");
+                if (ex is RecoveryInitiationException)
+                {
+                    throw;
+                }
                 return false;
             }
 
