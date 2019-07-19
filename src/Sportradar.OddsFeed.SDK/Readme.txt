@@ -9,6 +9,10 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2019-07-19  1.23.1.0
+Fix: ReplayFeed init exception
+
+
 2019-07-18  1.23.0.0
 Added Gender property to the IPlayerProfileV1
 Added DecidedByFed property to the IMatchStatusV2
