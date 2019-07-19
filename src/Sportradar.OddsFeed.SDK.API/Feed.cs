@@ -130,7 +130,7 @@ namespace Sportradar.OddsFeed.SDK.API
                     var producerManager = UnityContainer.Resolve<IProducerManager>();
                     if (InternalConfig.Environment == SdkEnvironment.Replay)
                     {
-                        ((ProducerManager) ProducerManager).SetIgnoreRecovery(0);
+                        ((ProducerManager) producerManager).SetIgnoreRecovery(0);
                     }
                     return producerManager;
                 }
@@ -214,7 +214,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// </summary>
         private ConnectionValidator _connectionValidator;
 
-        private bool _feedInitialized;
+        protected bool FeedInitialized;
         private readonly object _lockInitialized = new object();
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace Sportradar.OddsFeed.SDK.API
 
             LogInit();
 
-            _feedInitialized = false;
+            FeedInitialized = false;
 
             UnityContainer = new UnityContainer();
             UnityContainer.RegisterBaseTypes(config);
@@ -239,16 +239,19 @@ namespace Sportradar.OddsFeed.SDK.API
             }
         }
 
-        private void InitFeed()
+        /// <summary>
+        /// Initializes the feed (unity)
+        /// </summary>
+        protected virtual void InitFeed()
         {
-            if (_feedInitialized)
+            if (FeedInitialized)
             {
                 return;
             }
 
             lock (_lockInitialized)
             {
-                if (_feedInitialized)
+                if (FeedInitialized)
                 {
                     return;
                 }
@@ -260,7 +263,7 @@ namespace Sportradar.OddsFeed.SDK.API
                 _feedRecoveryManager = UnityContainer.Resolve<IFeedRecoveryManager>();
                 _connectionValidator = UnityContainer.Resolve<ConnectionValidator>();
 
-                _feedInitialized = true;
+                FeedInitialized = true;
             }
         }
 

@@ -280,7 +280,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 {
                     throw new InvalidOperationException("The API configuration is already loaded");
                 }
-                _apiConfigLoaded = true;
                 if (Environment != SdkEnvironment.Replay)
                 {
                     try
@@ -328,6 +327,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                         }
                     }
                 }
+                _apiConfigLoaded = true;
             }
         }
 
