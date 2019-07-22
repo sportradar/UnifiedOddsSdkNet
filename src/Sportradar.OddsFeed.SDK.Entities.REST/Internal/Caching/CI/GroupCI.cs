@@ -33,7 +33,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         private readonly IDataRouterManager _dataRouterManager;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GroupCI"/> class.
+        /// Initializes a new instance of the <see cref="GroupCI"/> class
         /// </summary>
         /// <param name="group">A <see cref="GroupDTO"/> containing group information</param>
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the provided group information</param>

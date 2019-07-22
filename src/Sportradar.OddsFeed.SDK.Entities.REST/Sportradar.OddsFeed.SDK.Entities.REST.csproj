@@ -269,7 +269,6 @@
     <Compile Include="Internal\Caching\Events\StageCI.cs" />
     <Compile Include="Internal\Caching\Profiles\IProfileCache.cs" />
     <Compile Include="Internal\Caching\Profiles\ProfileCache.cs" />
-    <Compile Include="Internal\Caching\Sports\CacheItem.cs" />
     <Compile Include="Internal\Caching\Sports\CategoryCI.cs" />
     <Compile Include="Internal\Caching\Sports\CategoryData.cs" />
     <Compile Include="Internal\Caching\ISportDataCache.cs" />
