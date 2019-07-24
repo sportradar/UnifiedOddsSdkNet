@@ -116,7 +116,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 Venue = new VenueDTO(matchSummary.venue);
             }
-            GeneratedAt = matchSummary.generated_atSpecified ? matchSummary.generated_at : (DateTime?) null;
+            GeneratedAt = matchSummary.generated_atSpecified
+                              ? matchSummary.generated_at.ToLocalTime()
+                              : (DateTime?) null;
         }
 
         /// <summary>
@@ -132,7 +134,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                 ? null
                 : new SportEventStatusDTO(stageSummary.sport_event_status);
 
-            GeneratedAt = stageSummary.generated_atSpecified ? stageSummary.generated_at : (DateTime?) null;
+            GeneratedAt = stageSummary.generated_atSpecified
+                              ? stageSummary.generated_at.ToLocalTime()
+                              : (DateTime?) null;
         }
     }
 }

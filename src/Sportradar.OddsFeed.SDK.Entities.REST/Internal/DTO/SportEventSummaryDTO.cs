@@ -74,10 +74,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
             Id = URN.Parse(sportEvent.id);
             Scheduled = sportEvent.scheduledSpecified
-                ? (DateTime?)sportEvent.scheduled
+                ? (DateTime?)sportEvent.scheduled.ToLocalTime()
                 : null;
             ScheduledEnd = sportEvent.scheduled_endSpecified
-                ? (DateTime?)sportEvent.scheduled_end
+                ? (DateTime?)sportEvent.scheduled_end.ToLocalTime()
                 : null;
             if (sportEvent.tournament?.sport != null)
             {
@@ -117,10 +117,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
             Id = URN.Parse(parentStage.id);
             Scheduled = parentStage.scheduledSpecified
-                            ? (DateTime?) parentStage.scheduled
+                            ? (DateTime?) parentStage.scheduled.ToLocalTime()
                             : null;
             ScheduledEnd = parentStage.scheduled_endSpecified
-                               ? (DateTime?) parentStage.scheduled_end
+                               ? (DateTime?) parentStage.scheduled_end.ToLocalTime()
                                : null;
             //URN sportId;
             //if (URN.TryParse(parentStage.tournament?.sport?.id, out sportId))
@@ -157,10 +157,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
             Id = URN.Parse(childStage.id);
             Scheduled = childStage.scheduledSpecified
-                            ? (DateTime?) childStage.scheduled
+                            ? (DateTime?) childStage.scheduled.ToLocalTime()
                             : null;
             ScheduledEnd = childStage.scheduled_endSpecified
-                               ? (DateTime?) childStage.scheduled_end
+                               ? (DateTime?) childStage.scheduled_end.ToLocalTime()
                                : null;
             //URN sportId;
             //if (URN.TryParse(childStage.tournament?.sport?.id, out sportId))
