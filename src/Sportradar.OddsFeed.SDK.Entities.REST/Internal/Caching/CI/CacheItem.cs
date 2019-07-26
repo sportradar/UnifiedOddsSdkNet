@@ -1,10 +1,13 @@
 /*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -42,6 +45,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="CacheItem"/> class.
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableCI"/> representing the cache item</param>
+        protected CacheItem(ExportableCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            Id = URN.Parse(exportable.Id);
+            Name = new Dictionary<CultureInfo, string>(exportable.Name);
+        }
+
+        /// <summary>
         /// Defined field invariants needed by code contracts
         /// </summary>
         [ContractInvariantMethod]
@@ -72,7 +88,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 
             foreach (var k in item.Name.Keys)
             {
-                Name[culture] = item.Name[k];
+                Name[k] = item.Name[k];
             }
         }
 

@@ -60,6 +60,10 @@
       <HintPath>..\..\packages\Moq.4.9.0\lib\net45\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -104,6 +108,7 @@
     <Compile Include="BookmakerDetailsMapperTest.cs" />
     <Compile Include="BookmakerDetailsProviderTest.cs" />
     <Compile Include="CacheItemMergeTest.cs" />
+    <Compile Include="CacheExportTest.cs" />
     <Compile Include="CategorySummaryTest.cs" />
     <Compile Include="CompositeMappingValidatorTests.cs" />
     <Compile Include="DecimalValueMappingValidatorTests.cs" />

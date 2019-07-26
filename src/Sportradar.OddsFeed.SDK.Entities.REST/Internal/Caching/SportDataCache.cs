@@ -14,7 +14,9 @@ using Metrics;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Common.Internal.Metrics;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
@@ -30,7 +32,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
     /// A cache storing sport, category and tournament related information
     /// </summary>
     /// <seealso cref="ISportDataCache" />
-    internal class SportDataCache : SdkCache, ISportDataCache, IDisposable, IHealthStatusProvider
+    internal class SportDataCache : SdkCache, ISportDataCache, IDisposable, IHealthStatusProvider, IExportableSdkCache
     {
         /// <summary>
         /// The <see cref="IDataRouterManager"/> used to obtain data via REST request
@@ -1040,6 +1042,32 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             }
         }
 
+        private void AddSport(ExportableSportCI item)
+        {
+            lock (_mergeLock)
+            {
+                try
+                {
+                    var id = URN.Parse(item.Id);
+                    if (Sports.ContainsKey(id))
+                    {
+                        SportCI ci;
+                        Sports.TryGetValue(id, out ci);
+                        ci?.Merge(new SportCI(item), item.Name.Keys.First());
+                    }
+                    else
+                    {
+                        Sports.Add(id, new SportCI(item));
+                    }
+                }
+                catch (Exception e)
+                {
+                    ExecutionLog.Error($"Error importing  ExportableSportCI for {item.Id}.", e);
+                }
+            }
+        }
+
+
         /// <summary>
         /// Adds the category
         /// </summary>
@@ -1126,6 +1154,31 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             }
         }
 
+        private void AddCategory(ExportableCategoryCI item)
+        {
+            lock (_mergeLock)
+            {
+                try
+                {
+                    var id = URN.Parse(item.Id);
+                    if (Categories.ContainsKey(id))
+                    {
+                        CategoryCI ci;
+                        Categories.TryGetValue(id, out ci);
+                        ci?.Merge(new CategoryCI(item), item.Name.Keys.First());
+                    }
+                    else
+                    {
+                        Categories.Add(id, new CategoryCI(item));
+                    }
+                }
+                catch (Exception e)
+                {
+                    ExecutionLog.Error($"Error importing ExportableCategoryCI for {item.Id}.", e);
+                }
+            }
+        }
+
         /// <summary>
         /// Writes the log message
         /// </summary>
@@ -1134,6 +1187,74 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         protected override void WriteLog(string text, bool useDebug = false)
         {
             //base.WriteLog(text, useDebug);
+        }
+
+        /// <summary>
+        /// Exports current items in the cache
+        /// </summary>
+        /// <returns>Collection of <see cref="ExportableCI"/> containing all the items currently in the cache</returns>
+        public async Task<IEnumerable<ExportableCI>> ExportAsync()
+        {
+            List<IExportableCI> exportables;
+            lock (_mergeLock)
+            {
+                exportables = Sports.Values.Cast<IExportableCI>().Concat(Categories.Values).ToList();
+            }
+
+            var tasks = exportables.Select(e =>
+            {
+                var task = e.ExportAsync();
+                task.ConfigureAwait(false);
+                return task;
+            });
+
+            return await Task.WhenAll(tasks);
+        }
+
+        /// <summary>
+        /// Imports provided items into the cache
+        /// </summary>
+        /// <param name="items">Collection of <see cref="ExportableCI"/> to be inserted into the cache</param>
+        public Task ImportAsync(IEnumerable<ExportableCI> items)
+        {
+            foreach (var exportable in items)
+            {
+                foreach (var cultureInfo in exportable.Name.Keys)
+                {
+                    FetchedCultures.Add(cultureInfo);
+                }
+
+                var exportableSport = exportable as ExportableSportCI;
+                var exportableCategory = exportable as ExportableCategoryCI;
+
+                if (exportableSport != null)
+                {
+                    AddSport(exportableSport);
+                }
+
+                if (exportableCategory != null)
+                {
+                    AddCategory(exportableCategory);
+                }
+            }
+
+            return Task.FromResult(0);
+        }
+
+        /// <summary>
+        /// Returns current cache status
+        /// </summary>
+        /// <returns>A <see cref="IReadOnlyDictionary{TKey,TValue}"/> containing all cache item types in the cache and their counts</returns>
+        public IReadOnlyDictionary<string, int> CacheStatus()
+        {
+            lock (_mergeLock)
+            {
+                return new Dictionary<string, int>
+                {
+                    {typeof(SportCI).Name, Sports.Count},
+                    {typeof(CategoryCI).Name, Categories.Count}
+                };
+            }
         }
     }
 }
