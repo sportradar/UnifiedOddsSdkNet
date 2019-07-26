@@ -20,7 +20,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         private readonly ILocalizedNamedValueCache _matchStatusCache;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SportEventStatus"/> class.
+        /// Initializes a new instance of the <see cref="SportEventStatus"/> class
         /// </summary>
         /// <param name="cacheItem">A <see cref="SportEventStatusCI"/> containing information about sport event status, which will be used to initialize a new instance</param>
         /// <param name="matchStatusCache">A <see cref="ILocalizedNamedValueCache"/> used to retrieve event status</param>
@@ -49,8 +49,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public EventStatus Status => _cacheItem.Status;
 
         /// <summary>
-        /// Gets a value indicating whether a data journalist is present od the associated sport event, or a
-        /// null reference if the information is not available
+        /// Gets a value indicating whether a data journalist is present od the associated sport event, or a null reference if the information is not available
         /// </summary>
         public int? IsReported => _cacheItem.IsReported;
 
