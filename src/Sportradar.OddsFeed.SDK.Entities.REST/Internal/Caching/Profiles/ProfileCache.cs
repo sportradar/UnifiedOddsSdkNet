@@ -153,7 +153,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             }
             catch (Exception ex)
             {
-                if (ex is CommunicationException || ex is DeserializationException || ex is MappingException)
+                if (ex is DeserializationException || ex is MappingException)
                 {
                     throw new CacheItemNotFoundException($"An error occurred while fetching player profile for player {playerId} in cache", playerId.ToString(), ex);
                 }
@@ -203,7 +203,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             }
             catch (Exception ex)
             {
-                if (ex is CommunicationException || ex is DeserializationException || ex is MappingException)
+                if (ex is DeserializationException || ex is MappingException)
                 {
                     throw new CacheItemNotFoundException("An error occurred while fetching competitor profile not found in cache", competitorId.ToString(), ex);
                 }

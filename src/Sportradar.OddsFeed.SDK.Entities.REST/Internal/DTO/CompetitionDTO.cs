@@ -56,7 +56,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <summary>
         /// Gets the <see cref="DateTime"/> specifying when the associated message was generated (on the server side)
         /// </summary>
-        public DateTime? GeneratedAt { get; }
+        public DateTime? GeneratedAt { get; protected set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CompetitionDTO"/> class

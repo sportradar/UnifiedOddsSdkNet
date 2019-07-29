@@ -7,7 +7,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Common.Internal;
-using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
@@ -41,25 +40,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         internal IEnumerable<ScheduledStartTimeChangeDTO> ScheduledStartTimeChanges { get; }
 
-        /// <summary>
-        /// When sport event is postponed this field indicates with which event it is replaced
-        /// </summary>
-        /// <value>The <see cref="URN"/> this event is replaced by</value>
-        internal URN ReplacedBy { get; }
-
-        /// <summary>
-        /// Gets the <see cref="DateTime"/> specifying when the associated message was generated (on the server side)
-        /// </summary>
-        public DateTime? GeneratedAt { get; }
-
-
         internal FixtureDTO(fixture fixture, DateTime? generatedAt)
             : base(fixture)
         {
             Contract.Requires(fixture != null);
 
             StartTime = fixture.start_timeSpecified
-                ? (DateTime?) fixture.start_time
+                ? (DateTime?) fixture.start_time.ToLocalTime()
                 : null;
             if (!string.IsNullOrEmpty(fixture.next_live_time))
             {
@@ -90,15 +77,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             DelayedInfo = fixture.delayed_info == null
                 ? null
                 : new DelayedInfoDTO(fixture.delayed_info.id, fixture.delayed_info.description);
-            if (!string.IsNullOrEmpty(fixture.replaced_by))
-            {
-                ReplacedBy = URN.Parse(fixture.replaced_by);
-            }
             if (fixture.scheduled_start_time_changes != null && fixture.scheduled_start_time_changes.Any())
             {
                 ScheduledStartTimeChanges = fixture.scheduled_start_time_changes.Select(s => new ScheduledStartTimeChangeDTO(s));
             }
-            GeneratedAt = generatedAt;
+            if (generatedAt != null)
+            {
+                GeneratedAt = generatedAt?.ToLocalTime();
+            }
         }
     }
 }
