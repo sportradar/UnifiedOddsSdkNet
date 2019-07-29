@@ -8,7 +8,9 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -18,7 +20,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports
     /// Represents a cached sport entity
     /// </summary>
     /// <seealso cref="CacheItem" />
-    internal class SportCI : CacheItem
+    internal class SportCI : CacheItem, IExportableCI
     {
         /// <summary>
         /// Gets <see cref="IEnumerable{URN}"/> specifying the id's of child categories
@@ -63,6 +65,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="SportCI"/> class.
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableSportCI" /> representing the cache item</param>
+        public SportCI(ExportableSportCI exportable)
+            : base(exportable)
+        {
+            CategoryIds = exportable.CategoryIds != null ? new ReadOnlyCollection<URN>(exportable.CategoryIds.Select(URN.Parse).ToList()) : null;
+            _loadedCategories = exportable.LoadedCategories != null ? new List<CultureInfo>(exportable.LoadedCategories) : new List<CultureInfo>();
+        }
+
+        /// <summary>
         /// Merges the information from the provided <see cref="CacheItem" /> to data held by current instance
         /// </summary>
         /// <param name="item">A <see cref="CacheItem" /> containing the data to be merged to current instance</param>
@@ -74,6 +87,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports
             if (sportCacheItem?.CategoryIds != null && sportCacheItem.CategoryIds.Any())
             {
                 CategoryIds = new ReadOnlyCollection<URN>(sportCacheItem.CategoryIds.Concat(CategoryIds ?? new List<URN>()).Distinct().ToList());
+            }
+
+            if (sportCacheItem?._loadedCategories?.Any() ?? false)
+            {
+                _loadedCategories.AddRange(LanguageHelper.GetMissingCultures(sportCacheItem._loadedCategories, _loadedCategories));
             }
         }
 
@@ -99,6 +117,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports
             {
                 _loadedCategoriesSemaphore.Release();
             }
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableCI> ExportAsync()
+        {
+            var exportable = new ExportableSportCI
+            {
+                Id = Id.ToString(),
+                Name = new ReadOnlyDictionary<CultureInfo, string>(Name),
+                CategoryIds = CategoryIds != null ? new ReadOnlyCollection<string>(CategoryIds.Select(id => id.ToString()).ToList()) : null,
+                LoadedCategories = new ReadOnlyCollection<CultureInfo>(_loadedCategories)
+            };
+            return Task.FromResult<ExportableCI>(exportable);
         }
     }
 }

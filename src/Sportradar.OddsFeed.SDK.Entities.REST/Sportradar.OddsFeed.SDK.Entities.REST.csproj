@@ -129,6 +129,11 @@
     <Compile Include="IBookmakerDetails.cs" />
     <Compile Include="IGroupV1.cs" />
     <Compile Include="IMatchStatusV2.cs" />
+    <Compile Include="Caching\Exportable\ExportableCategoryCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableSportCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableCI.cs" />
+    <Compile Include="Internal\Caching\Exportable\IExportableCI.cs" />
+    <Compile Include="Internal\Caching\Exportable\IExportableSdkCache.cs" />
     <Compile Include="Internal\EntitiesImpl\Car.cs" />
     <Compile Include="Internal\EntitiesImpl\RaceDriverProfile.cs" />
     <Compile Include="ICar.cs" />
