@@ -267,8 +267,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
 
             var nameProvider = _nameProviderFactory.BuildNameProvider(sportEvent, marketOddsChange.id, specifiers);
             var mappingProvider = _mappingProviderFactory.BuildMarketMappingProvider(sportEvent, marketOddsChange.id, specifiers, _producerManager.Get(producerId), sportId);
-            return new MarketWithProbabilities(
-                                               marketOddsChange.id,
+            return new MarketWithProbabilities(marketOddsChange.id,
                                                specifiers,
                                                additionalInfo,
                                                nameProvider,
@@ -320,8 +319,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             var nameProvider = _nameProviderFactory.BuildNameProvider(sportEvent, marketOddsChange.id, specifiers);
             var mappingProvider = _mappingProviderFactory.BuildMarketMappingProvider(sportEvent, marketOddsChange.id, specifiers, _producerManager.Get(producerId), sportId);
 
-            return new MarketWithOdds(
-                                    marketOddsChange.id,
+            return new MarketWithOdds(marketOddsChange.id,
                                     specifiers,
                                     additionalInfo,
                                     nameProvider,
@@ -396,8 +394,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
 
             if (isValidPlayerOutcome)
             {
-                return new PlayerOutcomeOdds(
-                                            outcome.id,
+                return new PlayerOutcomeOdds(outcome.id,
                                             outcome.activeSpecified ? (bool?)(outcome.active != 0) : null,
                                             outcome.odds,
                                             outcome.probabilitiesSpecified
@@ -408,11 +405,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                                             match,
                                             outcome.team,
                                             cultures,
-                                             outcomeDefinition);
+                                            outcomeDefinition);
             }
 
-            return new OutcomeOdds(
-                                    outcome.id,
+            return new OutcomeOdds(outcome.id,
                                     outcome.activeSpecified ? (bool?)(outcome.active != 0) : null,
                                     outcome.odds,
                                     outcome.probabilitiesSpecified
@@ -421,7 +417,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                                     nameProvider,
                                     mappingProvider,
                                     cultures,
-                                   outcomeDefinition);
+                                    outcomeDefinition);
         }
 
 
@@ -454,8 +450,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <returns>A <see cref="IFixtureChange{T}" /> instance constructed from information in the provided <see cref="fixture_change" /></returns>
         public IFixtureChange<T> MapFixtureChange<T>(fixture_change message, IEnumerable<CultureInfo> cultures, byte[] rawMessage) where T : ISportEvent
         {
-            return new FixtureChange<T>(
-                                        new MessageTimestamp(message.GeneratedAt, message.SentAt, message.ReceivedAt, SdkInfo.ToEpochTime(DateTime.Now)),
+            return new FixtureChange<T>(new MessageTimestamp(message.GeneratedAt, message.SentAt, message.ReceivedAt, SdkInfo.ToEpochTime(DateTime.Now)),
                                         _producerManager.Get(message.product),
                                         GetEventForMessage<T>(URN.Parse(message.event_id), message.SportId, cultures),
                                         message.request_idSpecified ? (long?) message.request_id : null,
@@ -475,8 +470,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <returns>A <see cref="IBetStop{T}" /> instance constructed from information in the provided <see cref="bet_stop" /></returns>
         public IBetStop<T> MapBetStop<T>(bet_stop message, IEnumerable<CultureInfo> cultures, byte[] rawMessage) where T : ISportEvent
         {
-            return new BetStop<T>(
-                                  new MessageTimestamp(message.GeneratedAt, message.SentAt, message.ReceivedAt, SdkInfo.ToEpochTime(DateTime.Now)),
+            return new BetStop<T>(new MessageTimestamp(message.GeneratedAt, message.SentAt, message.ReceivedAt, SdkInfo.ToEpochTime(DateTime.Now)),
                                   _producerManager.Get(message.product),
                                   GetEventForMessage<T>(URN.Parse(message.event_id), message.SportId, cultures),
                                   message.request_idSpecified ? (long?) message.request_id : null,
@@ -496,8 +490,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         {
             var culturesList = cultures as List<CultureInfo> ?? cultures.ToList();
 
-            return new BetCancel<T>(
-                                    new MessageTimestamp(message.GeneratedAt, message.SentAt, message.ReceivedAt, SdkInfo.ToEpochTime(DateTime.Now)),
+            return new BetCancel<T>(new MessageTimestamp(message.GeneratedAt, message.SentAt, message.ReceivedAt, SdkInfo.ToEpochTime(DateTime.Now)),
                                     _producerManager.Get(message.product),
                                     GetEventForMessage<T>(URN.Parse(message.event_id), message.SportId, culturesList),
                                     message.request_idSpecified ? (long?) message.request_id : null,
@@ -522,8 +515,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         {
             var culturesList = cultures as List<CultureInfo> ?? cultures.ToList();
 
-            return new RollbackBetCancel<T>(
-                                            new MessageTimestamp(message.GeneratedAt, message.SentAt, message.ReceivedAt,
+            return new RollbackBetCancel<T>(new MessageTimestamp(message.GeneratedAt, message.SentAt, message.ReceivedAt,
                                                                  SdkInfo.ToEpochTime(DateTime.Now)),
                                             _producerManager.Get(message.product),
                                             GetEventForMessage<T>(URN.Parse(message.event_id), message.SportId, culturesList),
@@ -621,8 +613,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             var eventId = URN.Parse(message.event_id);
             var sportId = URN.Parse("sr:sport:1");
 
-            return new CashOutProbabilities<T>(
-                                               new MessageTimestamp(message.GeneratedAt, message.SentAt, message.ReceivedAt, SdkInfo.ToEpochTime(DateTime.Now)),
+            return new CashOutProbabilities<T>(new MessageTimestamp(message.GeneratedAt, message.SentAt, message.ReceivedAt, SdkInfo.ToEpochTime(DateTime.Now)),
                 _producerManager.Get(message.product),
                 GetEventForMessage<T>(eventId, sportId, culturesList),
                 message.odds != null && message.odds.betstop_reasonSpecified
@@ -658,6 +649,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             catch (CacheItemNotFoundException)
             {
                 ExecutionLog.Warn($"Market description for market={marketId}, sport={sportId} and producer={producer.Name} not found.");
+                if (_externalExceptionStrategy == ExceptionHandlingStrategy.THROW)
+                {
+                    throw;
+                }
             }
 
             return marketDescription == null
@@ -681,18 +676,26 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             {
                 var cultureInfos = cultures.ToList();
                 var marketDescription = _marketCacheProvider.GetMarketDescriptionAsync(marketId, specifiers, cultureInfos, false).Result;
-                if (marketDescription?.Outcomes == null)
+                if (marketDescription == null)
                 {
-                    return null;
+                    throw new CacheItemNotFoundException($"Market description for market={marketId}, sport={sportId} and producer={producer.Name} not found.", $"MarketId={marketId}", null);
+                }
+                if (marketDescription.Outcomes == null)
+                {
+                    return new OutcomeDefinition(marketDescription, outcomeId, sportId, _marketCacheProvider, specifiers, cultureInfos, _externalExceptionStrategy);
                 }
                 var outcomeDescription = marketDescription.Outcomes.FirstOrDefault(s => s.Id.Equals(outcomeId, StringComparison.InvariantCultureIgnoreCase));
                 return outcomeDescription == null
-                       ? null
+                       ? new OutcomeDefinition(marketDescription, outcomeId, sportId, _marketCacheProvider, specifiers, cultureInfos, _externalExceptionStrategy)
                        : new OutcomeDefinition(marketDescription, outcomeDescription, cultureInfos);
             }
             catch (CacheItemNotFoundException)
             {
                 ExecutionLog.Warn($"Market description for market={marketId}, sport={sportId} and producer={producer.Name} not found. Outcome definition can not be created.");
+                if (_externalExceptionStrategy == ExceptionHandlingStrategy.THROW)
+                {
+                    throw;
+                }
             }
             return null;
         }

@@ -1,9 +1,17 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Globalization;
+using System.Linq;
+using Sportradar.OddsFeed.SDK.Common;
+using Sportradar.OddsFeed.SDK.Common.Exceptions;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Entities.REST.Market;
+using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
 {
@@ -17,10 +25,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// </summary>
         private readonly IMarketDescription _marketDescription;
 
+        private readonly IMarketCacheProvider _marketCacheProvider;
         private readonly string _outcomeId;
-        /// <summary>
-        /// A <see cref="IDictionary{TKey,TValue}"/> containing names in different languages
-        /// </summary>
+        private readonly URN _sportId;
+        private readonly IReadOnlyDictionary<string, string> _specifiers;
+        private readonly IReadOnlyCollection<CultureInfo> _cultures;
+        private readonly ExceptionHandlingStrategy _exceptionHandlingStrategy;
         private readonly IDictionary<CultureInfo, string> _names = new Dictionary<CultureInfo, string>();
 
         /// <summary>
@@ -31,6 +41,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <param name="cultures">A <see cref="IEnumerable{CultureInfo}"/> specifying languages the current instance supports</param>
         internal OutcomeDefinition(IMarketDescription marketDescription, IOutcomeDescription outcomeDescription, IEnumerable<CultureInfo> cultures)
         {
+            Contract.Requires(cultures != null);
+
             _marketDescription = marketDescription;
 
             if (outcomeDescription != null)
@@ -43,6 +55,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
             }
         }
 
+        internal OutcomeDefinition(IMarketDescription marketDescription,
+                                   string outcomeId,
+                                   URN sportId,
+                                   IMarketCacheProvider marketCacheProvider,
+                                   IReadOnlyDictionary<string, string> specifiers,
+                                   IEnumerable<CultureInfo> cultures,
+                                   ExceptionHandlingStrategy exceptionHandlingStrategy)
+        {
+            Contract.Requires(cultures != null);
+
+            _marketDescription = marketDescription;
+            _marketCacheProvider = marketCacheProvider;
+            _outcomeId = outcomeId;
+            _sportId = sportId;
+            _specifiers = specifiers;
+            _cultures = cultures as IReadOnlyCollection<CultureInfo>;
+            _exceptionHandlingStrategy = exceptionHandlingStrategy;
+        }
+
         /// <summary>
         /// Returns the unmodified market name template
         /// </summary>
@@ -50,6 +81,44 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <returns>The unmodified market name template</returns>
         public string GetNameTemplate(CultureInfo culture)
         {
+            if (_names.Any())
+            {
+                return _names.ContainsKey(culture)
+                           ? _names[culture]
+                           : null;
+            }
+
+            if (string.IsNullOrEmpty(_outcomeId))
+            {
+                return null;
+            }
+
+            try
+            {
+                var marketDescription = _marketCacheProvider.GetMarketDescriptionAsync((int) _marketDescription.Id, _specifiers, _cultures, true).Result;
+                if (marketDescription?.Outcomes == null || !marketDescription.Outcomes.Any())
+                {
+                    return null;
+                }
+
+                var outcomeDescription = marketDescription.Outcomes.FirstOrDefault(s => s.Id.Equals(_outcomeId, StringComparison.InvariantCultureIgnoreCase));
+                if (outcomeDescription == null)
+                {
+                    throw new CacheItemNotFoundException("Item not found", nameof(_outcomeId), null);
+                }
+                foreach (var cultureInfo in _cultures)
+                {
+                    _names[cultureInfo] = outcomeDescription.GetName(cultureInfo);
+                }
+            }
+            catch (CacheItemNotFoundException e)
+            {
+                if (_exceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                {
+                    throw new CacheItemNotFoundException("Could not provide the requested translated name", nameof(_outcomeId), e);
+                }
+            }
+
             return _names.ContainsKey(culture)
                        ? _names[culture]
                        : null;
