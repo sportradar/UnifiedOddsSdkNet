@@ -1219,11 +1219,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             foreach (var exportable in items)
             {
-                foreach (var cultureInfo in exportable.Name.Keys)
-                {
-                    FetchedCultures.Add(cultureInfo);
-                }
-
                 var exportableSport = exportable as ExportableSportCI;
                 var exportableCategory = exportable as ExportableCategoryCI;
 
