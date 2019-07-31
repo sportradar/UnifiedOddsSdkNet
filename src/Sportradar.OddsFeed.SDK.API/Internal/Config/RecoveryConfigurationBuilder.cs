@@ -1,6 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Diagnostics.Contracts;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 
@@ -10,24 +12,24 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
     /// Class RecoveryConfigurationBuilder
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <seealso cref="Sportradar.OddsFeed.SDK.API.Internal.Config.ConfigurationBuilderBase{T}" />
-    /// <seealso cref="Sportradar.OddsFeed.SDK.API.IRecoveryConfigurationBuilder{T}" />
+    /// <seealso cref="Config.ConfigurationBuilderBase{T}" />
+    /// <seealso cref="API.IRecoveryConfigurationBuilder{T}" />
     internal abstract class RecoveryConfigurationBuilder<T> : ConfigurationBuilderBase<T>, IRecoveryConfigurationBuilder<T> where T : class
     {
         /// <summary>
         /// The inactivity seconds
         /// </summary>
-        protected int InactivitySeconds;
+        protected int? InactivitySeconds;
 
         /// <summary>
         /// The maximum recovery time in seconds
         /// </summary>
-        protected int MaxRecoveryTimeInSeconds;
+        protected int? MaxRecoveryTimeInSeconds;
 
         /// <summary>
         /// The value indicating if the after age should be adjusted
         /// </summary>
-        protected bool AdjustAfterAge;
+        protected bool? AdjustAfterAge;
 
         /// <summary>
         /// Construct RecoveryConfigurationBuilder
@@ -37,8 +39,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         internal RecoveryConfigurationBuilder(string accessToken, IConfigurationSectionProvider sectionProvider)
             : base(accessToken, sectionProvider)
         {
-            InactivitySeconds = SdkInfo.MinInactivitySeconds;
-            MaxRecoveryTimeInSeconds = SdkInfo.MaxRecoveryExecutionInSeconds;
         }
 
         /// <summary>
@@ -47,7 +47,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         [ContractInvariantMethod]
         private void ObjectInvariant()
         {
-
         }
 
         /// <summary>
@@ -73,8 +72,14 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <returns>A <see cref="IRecoveryConfigurationBuilder{T}" /> derived instance used to set general configuration properties</returns>
         public T SetInactivitySeconds(int inactivitySeconds)
         {
-            Contract.Requires(inactivitySeconds >= SdkInfo.MinInactivitySeconds, "Value must be at least 20.");
-            Contract.Requires(inactivitySeconds <= SdkInfo.MaxInactivitySeconds, "Value must be less then 180.");
+            if (inactivitySeconds < SdkInfo.MinInactivitySeconds)
+            {
+                throw new ArgumentException($"Value must be at least {SdkInfo.MinInactivitySeconds}.");
+            }
+            if (inactivitySeconds > SdkInfo.MaxInactivitySeconds)
+            {
+                throw new ArgumentException($"Value must be less then {SdkInfo.MaxInactivitySeconds}.");
+            }
 
             InactivitySeconds = inactivitySeconds;
             return this as T;
@@ -87,8 +92,14 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <returns>A <see cref="IRecoveryConfigurationBuilder{T}" /> instance used to set general configuration properties</returns>
         public T SetMaxRecoveryTime(int maxRecoveryTimeInSeconds)
         {
-            Contract.Requires(maxRecoveryTimeInSeconds >= SdkInfo.MinRecoveryExecutionInSeconds, "Value must be at least 600.");
-            Contract.Requires(maxRecoveryTimeInSeconds <= SdkInfo.MaxRecoveryExecutionInSeconds, "Value must be less then 3600.");
+            if (maxRecoveryTimeInSeconds < SdkInfo.MinRecoveryExecutionInSeconds)
+            {
+                throw new ArgumentException($"Value must be at least {SdkInfo.MinRecoveryExecutionInSeconds}.");
+            }
+            if (maxRecoveryTimeInSeconds > SdkInfo.MaxRecoveryExecutionInSeconds)
+            {
+                throw new ArgumentException($"Value must be less then {SdkInfo.MaxRecoveryExecutionInSeconds}.");
+            }
 
             MaxRecoveryTimeInSeconds = maxRecoveryTimeInSeconds;
             return this as T;

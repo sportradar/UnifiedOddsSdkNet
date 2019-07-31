@@ -682,20 +682,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 }
                 if (marketDescription.Outcomes == null)
                 {
-                    return new OutcomeDefinition(marketDescription, outcomeId, sportId, _marketCacheProvider, specifiers, cultureInfos, _externalExceptionStrategy);
+                    return new OutcomeDefinition(marketDescription, outcomeId, _marketCacheProvider, specifiers, cultureInfos, _externalExceptionStrategy);
                 }
                 var outcomeDescription = marketDescription.Outcomes.FirstOrDefault(s => s.Id.Equals(outcomeId, StringComparison.InvariantCultureIgnoreCase));
                 return outcomeDescription == null
-                       ? new OutcomeDefinition(marketDescription, outcomeId, sportId, _marketCacheProvider, specifiers, cultureInfos, _externalExceptionStrategy)
+                       ? new OutcomeDefinition(marketDescription, outcomeId, _marketCacheProvider, specifiers, cultureInfos, _externalExceptionStrategy)
                        : new OutcomeDefinition(marketDescription, outcomeDescription, cultureInfos);
             }
             catch (CacheItemNotFoundException)
             {
-                ExecutionLog.Warn($"Market description for market={marketId}, sport={sportId} and producer={producer.Name} not found. Outcome definition can not be created.");
-                if (_externalExceptionStrategy == ExceptionHandlingStrategy.THROW)
-                {
-                    throw;
-                }
+                ExecutionLog.Debug($"Market description for market={marketId}, sport={sportId} and producer={producer.Name} not found. Outcome definition not found (yet)");
             }
             return null;
         }

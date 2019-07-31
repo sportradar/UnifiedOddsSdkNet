@@ -11,7 +11,6 @@ using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Entities.REST.Market;
-using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
 {
@@ -27,7 +26,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
 
         private readonly IMarketCacheProvider _marketCacheProvider;
         private readonly string _outcomeId;
-        private readonly URN _sportId;
         private readonly IReadOnlyDictionary<string, string> _specifiers;
         private readonly IReadOnlyCollection<CultureInfo> _cultures;
         private readonly ExceptionHandlingStrategy _exceptionHandlingStrategy;
@@ -57,7 +55,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
 
         internal OutcomeDefinition(IMarketDescription marketDescription,
                                    string outcomeId,
-                                   URN sportId,
                                    IMarketCacheProvider marketCacheProvider,
                                    IReadOnlyDictionary<string, string> specifiers,
                                    IEnumerable<CultureInfo> cultures,
@@ -68,7 +65,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
             _marketDescription = marketDescription;
             _marketCacheProvider = marketCacheProvider;
             _outcomeId = outcomeId;
-            _sportId = sportId;
             _specifiers = specifiers;
             _cultures = cultures as IReadOnlyCollection<CultureInfo>;
             _exceptionHandlingStrategy = exceptionHandlingStrategy;

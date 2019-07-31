@@ -21,6 +21,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
         public static IDataProvider<BookmakerDetailsDTO> BuildProvider(string apiKey)
         {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+
             var fetcher = string.IsNullOrEmpty(apiKey)
                 ? new TestDataFetcher()
                 : (IDataFetcher) new HttpDataFetcher(new HttpClient(), apiKey, new Deserializer<response>());

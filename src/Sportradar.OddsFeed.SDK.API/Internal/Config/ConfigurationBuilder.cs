@@ -29,26 +29,25 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         {
             PreBuildCheck();
 
-            var config = new OddsFeedConfiguration(
-                AccessToken,
-                _environment,
-                DefaultLocale,
-                SupportedLocales,
-                _environment == SdkEnvironment.Production ? SdkInfo.ProductionHost : SdkInfo.IntegrationHost,
-                null,
-                SdkInfo.DefaultHostPort,
-                null,
-                null,
-                _environment == SdkEnvironment.Production ? SdkInfo.ProductionApiHost : SdkInfo.IntegrationApiHost,
-                true,
-                true,
-                InactivitySeconds,
-                MaxRecoveryTimeInSeconds,
-                NodeId,
-                DisabledProducers,
-                ExceptionHandlingStrategy,
-                AdjustAfterAge,
-                Section);
+            var config = new OddsFeedConfiguration(AccessToken,
+                                                   _environment,
+                                                   DefaultLocale,
+                                                   SupportedLocales,
+                                                   _environment == SdkEnvironment.Production ? SdkInfo.ProductionHost : SdkInfo.IntegrationHost,
+                                                   null,
+                                                   SdkInfo.DefaultHostPort,
+                                                   null,
+                                                   null,
+                                                   _environment == SdkEnvironment.Production ? SdkInfo.ProductionApiHost : SdkInfo.IntegrationApiHost,
+                                                   true,
+                                                   true,
+                                                   InactivitySeconds ?? SdkInfo.MinInactivitySeconds,
+                                                   MaxRecoveryTimeInSeconds ?? SdkInfo.MaxRecoveryExecutionInSeconds,
+                                                   NodeId,
+                                                   DisabledProducers,
+                                                   ExceptionHandlingStrategy,
+                                                   AdjustAfterAge ?? false,
+                                                   Section);
 
             return config;
         }

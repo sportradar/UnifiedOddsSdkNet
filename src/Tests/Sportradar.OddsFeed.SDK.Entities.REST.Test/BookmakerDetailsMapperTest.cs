@@ -2,9 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.IO;
 using System.Net;
-using System.Net.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sportradar.OddsFeed.SDK.API.Internal;
 using Sportradar.OddsFeed.SDK.Common.Internal.Log;
@@ -58,17 +56,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         {
             var details = new BookmakerDetails(_entity);
             ValidateBookmakerDetailsFromXml(details);
-        }
-
-        [TestMethod]
-        public void SomeTest()
-        {
-            var client = new HttpClient();
-            var fetcher = new HttpDataFetcher(client, TestData.AccessToken, new Deserializer<response>());
-            var stream = fetcher.GetDataAsync(new Uri("https://www.betradar.com")).Result;
-            var streamReader = new StreamReader(stream);
-            var result = streamReader.ReadToEnd();
-            Assert.IsTrue(!string.IsNullOrEmpty(result));
         }
 
         [TestMethod]

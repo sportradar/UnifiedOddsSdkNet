@@ -19,7 +19,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
     {
         private LogHttpDataFetcher _logHttpDataFetcher; // = new LogHttpDataFetcher();
         private readonly Uri _badUri = new Uri("http://www.unexisting-url.com");
-        private readonly Uri _validUri = new Uri("http://www.whatsmyip.org");
+        private readonly Uri _getUri = new Uri("http://httpbin.org/get");
         private readonly Uri _postUri = new Uri("http://httpbin.org/post");
 
         [TestInitialize]
@@ -33,7 +33,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         public void GetDataAsyncTest()
         {
             // in logRest file there should be result for this call
-            var result = _logHttpDataFetcher.GetDataAsync(_validUri).Result;
+            var result = _logHttpDataFetcher.GetDataAsync(_getUri).Result;
             Assert.IsNotNull(result);
             Assert.IsTrue(result.CanRead);
             var s = new StreamReader(result).ReadToEnd();
@@ -182,7 +182,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             ConsecutivePostFailureTest();
             try
             {
-                var result = _logHttpDataFetcher.PostDataAsync(_validUri).Result;
+                var result = _logHttpDataFetcher.PostDataAsync(_getUri).Result;
                 Assert.IsNotNull(result);
                 Assert.IsFalse(result.IsSuccessStatusCode);
             }
@@ -202,7 +202,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             _logHttpDataFetcher = new LogHttpDataFetcher(httpClient, TestData.AccessToken, new IncrementalSequenceGenerator(), new Deserializer<response>(), 5, 1);
             ConsecutivePostFailureTest();
             Thread.Sleep(1000);
-            var result = _logHttpDataFetcher.GetDataAsync(_validUri).Result;
+            var result = _logHttpDataFetcher.GetDataAsync(_getUri).Result;
             Assert.IsNotNull(result);
             Assert.IsTrue(result.Length > 0);
         }

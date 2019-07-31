@@ -57,6 +57,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             var sports = _sportDataCache.GetSportsAsync(TestData.Cultures).Result; // initial load
 
+            Assert.IsNotNull(sports);
             status = _sportDataCache.CacheStatus();
             Assert.AreEqual(TestData.CacheSportCount, status["SportCI"]);
             Assert.AreEqual(TestData.CacheCategoryCountPlus, status["CategoryCI"]);
@@ -81,6 +82,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly 0 times.");
 
             var sports = _sportDataCache.GetSportsAsync(TestData.Cultures).Result; // initial load
+            Assert.IsNotNull(sports);
 
             Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(AllTournaments), $"{AllTournaments} should be called exactly {TestData.Cultures.Count} times.");
             Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(AllSports), $"{AllSports} should be called exactly {TestData.Cultures.Count} times.");

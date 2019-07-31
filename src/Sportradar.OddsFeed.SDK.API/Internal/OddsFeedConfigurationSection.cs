@@ -36,7 +36,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// Gets the URL of the messaging broker
         /// </summary>
         [ConfigurationProperty("host", IsRequired = false, DefaultValue = null)]
-        public string Host => (string)base["host"];
+        public string Host => (string) base["host"];
 
         /// <summary>
         /// Gets the name of the virtual host configured on the messaging broker
@@ -48,19 +48,19 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// Gets the port used to connect to the messaging broker
         /// </summary>
         [ConfigurationProperty("port", IsRequired = false, DefaultValue = 0)]
-        public int Port => (int)base["port"];
+        public int Port => (int) base["port"];
 
         /// <summary>
         /// Gets the username used to connect to the messaging broker
         /// </summary>
         [ConfigurationProperty("username", IsRequired = false, DefaultValue = null)]
-        public string Username => (string)base["username"];
+        public string Username => (string) base["username"];
 
         /// <summary>
         /// Gets the password used to connect to the messaging broker
         /// </summary>
         [ConfigurationProperty("password", IsRequired = false, DefaultValue = null)]
-        public string Password => (string)base["password"];
+        public string Password => (string) base["password"];
 
         /// <summary>
         /// Gets the URL of the API host
@@ -80,45 +80,45 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// </summary>
         [ConfigurationProperty("useApiSSL", IsRequired = false, DefaultValue = true)]
         // ReSharper disable once InconsistentNaming
-        public bool UseApiSSL => (bool)base["useApiSSL"];
+        public bool UseApiSSL => (bool) base["useApiSSL"];
 
         /// <summary>
         /// Gets the comma delimited string of all wanted languages
         /// </summary>
         /// <example>https://msdn.microsoft.com/en-us/goglobal/bb896001.aspx</example>
         [ConfigurationProperty("supportedLanguages", IsRequired = false, DefaultValue = null)]
-        public string SupportedLanguages => (string)base["supportedLanguages"];
+        public string SupportedLanguages => (string) base["supportedLanguages"];
 
         /// <summary>
         /// Gets the 2-letter ISO string of default language
         /// </summary>
         /// <example>https://msdn.microsoft.com/en-us/goglobal/bb896001.aspx</example>
         [ConfigurationProperty("defaultLanguage", IsRequired = false, DefaultValue = null)]
-        public string DefaultLanguage => (string)base["defaultLanguage"];
+        public string DefaultLanguage => (string) base["defaultLanguage"];
 
         /// <summary>
         /// Is statistics collecting enabled
         /// </summary>
         [ConfigurationProperty("statisticsEnabled", IsRequired = false, DefaultValue = false)]
-        public bool StatisticsEnabled => (bool)base["statisticsEnabled"];
+        public bool StatisticsEnabled => (bool) base["statisticsEnabled"];
 
         /// <summary>
         /// Gets the timeout for automatically collecting statistics
         /// </summary>
         [ConfigurationProperty("statisticsTimeout", IsRequired = false, DefaultValue = 1800)]
-        public int StatisticsTimeout => (int)base["statisticsTimeout"];
+        public int StatisticsTimeout => (int) base["statisticsTimeout"];
 
         /// <summary>
         /// Gets the limit of records for automatically writing statistics
         /// </summary>
         [ConfigurationProperty("statisticsMaxRecord", IsRequired = false, DefaultValue = 1000000)]
-        public int StatisticsRecordLimit => (int)base["statisticsMaxRecord"];
+        public int StatisticsRecordLimit => (int) base["statisticsMaxRecord"];
 
         /// <summary>
         /// Gets the file path to the configuration file for the log4net repository used by the SDK
         /// </summary>
         [ConfigurationProperty("sdkLogConfigPath", IsRequired = false)]
-        public string SdkLogConfigPath => (string)base["sdkLogConfigPath"];
+        public string SdkLogConfigPath => (string) base["sdkLogConfigPath"];
 
         /// <summary>
         /// Gets a value indicating whether the unified feed integration environment should be used
@@ -131,7 +131,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// Gets a value indicating whether the unified feed integration environment should be used
         /// </summary>
         [ConfigurationProperty("useIntegrationEnvironment", IsRequired = false, DefaultValue = false)]
-        public bool UseIntegrationEnvironment => (bool)base["useIntegrationEnvironment"];
+        public bool UseIntegrationEnvironment => (bool) base["useIntegrationEnvironment"];
 
         /// <summary>
         /// Gets a <see cref="Common.ExceptionHandlingStrategy"/> enum member specifying how to handle exceptions thrown to outside callers
@@ -143,20 +143,20 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// Gets the comma delimited list of ids of disabled producers
         /// </summary>
         [ConfigurationProperty("disabledProducers", IsRequired = false)]
-        public string DisabledProducers => (string)base["disabledProducers"];
+        public string DisabledProducers => (string) base["disabledProducers"];
 
         /// <summary>
         /// Gets the timeout for recovery to finish
         /// </summary>
         [ConfigurationProperty("maxRecoveryTime", IsRequired = false, DefaultValue = SdkInfo.MaxRecoveryExecutionInSeconds)]
         [IntegerValidator(MinValue = SdkInfo.MinRecoveryExecutionInSeconds, MaxValue = SdkInfo.MaxRecoveryExecutionInSeconds, ExcludeRange = false)]
-        public int MaxRecoveryTime => (int)base["maxRecoveryTime"];
+        public int MaxRecoveryTime => (int) base["maxRecoveryTime"];
 
         /// <summary>
         /// Gets the node id
         /// </summary>
         [ConfigurationProperty("nodeId", IsRequired = false, DefaultValue = 0)]
-        public int NodeId => (int)base["nodeId"];
+        public int NodeId => (int) base["nodeId"];
 
         /// <summary>
         /// Gets the indication whether the after age should be adjusted before executing recovery request

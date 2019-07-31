@@ -13,8 +13,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// </summary>
         /// <param name="accessToken"></param>
         /// <param name="sectionProvider"></param>
-        public ReplayConfigurationBuilder(string accessToken,
-                                          IConfigurationSectionProvider sectionProvider)
+        public ReplayConfigurationBuilder(string accessToken, IConfigurationSectionProvider sectionProvider)
             : base(accessToken, sectionProvider)
         {
 
@@ -24,26 +23,25 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         {
             PreBuildCheck();
 
-            var config = new OddsFeedConfiguration(
-                AccessToken,
-                SdkEnvironment.Replay,
-                DefaultLocale,
-                SupportedLocales,
-                SdkInfo.ReplayHost,
-                null,
-                SdkInfo.DefaultHostPort,
-                null,
-                null,
-                null,
-                true,
-                true,
-                SdkInfo.MaxInactivitySeconds,
-                SdkInfo.MaxRecoveryExecutionInSeconds,
-                NodeId,
-                DisabledProducers,
-                ExceptionHandlingStrategy,
-                false,
-                Section);
+            var config = new OddsFeedConfiguration(AccessToken,
+                                                   SdkEnvironment.Replay,
+                                                   DefaultLocale,
+                                                   SupportedLocales,
+                                                   SdkInfo.ReplayHost,
+                                                   null,
+                                                   SdkInfo.DefaultHostPort,
+                                                   null,
+                                                   null,
+                                                   null,
+                                                   true,
+                                                   true,
+                                                   SdkInfo.MaxInactivitySeconds,
+                                                   SdkInfo.MaxRecoveryExecutionInSeconds,
+                                                   NodeId,
+                                                   DisabledProducers,
+                                                   ExceptionHandlingStrategy,
+                                                   false,
+                                                   Section);
 
             return config;
         }

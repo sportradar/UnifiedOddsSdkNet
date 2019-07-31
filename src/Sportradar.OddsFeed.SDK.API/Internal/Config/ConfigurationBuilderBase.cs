@@ -228,6 +228,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
             {
                 throw new InvalidOperationException("Missing supported locales");
             }
+            if (string.IsNullOrEmpty(AccessToken))
+            {
+                throw new InvalidOperationException("Missing access token");
+            }
         }
     }
 }

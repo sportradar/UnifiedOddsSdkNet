@@ -46,7 +46,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
             namedValuesProviderMock.Setup(x => x.BetStopReasons).Returns(namedValuesCacheMock.Object);
             namedValuesProviderMock.Setup(x => x.BettingStatuses).Returns(namedValuesCacheMock.Object);
 
-            _mapper = new FeedMessageMapper(new TestSportEventFactory(), nameProviderFactoryMock.Object, mappingProviderFactoryMock.Object, namedValuesProviderMock.Object, ExceptionHandlingStrategy.THROW, TestProducerManager.Create(), new Mock<IMarketCacheProvider>().Object, namedValuesCacheMock.Object);
+            _mapper = new FeedMessageMapper(new TestSportEventFactory(),
+                                            nameProviderFactoryMock.Object,
+                                            mappingProviderFactoryMock.Object,
+                                            namedValuesProviderMock.Object,
+                                            ExceptionHandlingStrategy.THROW,
+                                            TestProducerManager.Create(),
+                                            new Mock<IMarketCacheProvider>().Object,
+                                            namedValuesCacheMock.Object);
             _deserializer = new Deserializer<FeedMessage>();
             _validator = new TestFeedMessageValidator();
         }
