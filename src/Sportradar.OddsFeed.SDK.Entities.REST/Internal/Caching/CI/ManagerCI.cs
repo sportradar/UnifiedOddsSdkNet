@@ -2,9 +2,13 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Globalization;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
+using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 {
@@ -44,6 +48,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ManagerCI"/> class
+        /// </summary>
+        /// <param name="exportable">The <see cref="ExportableManagerCI"/> with manager info</param>
+        public ManagerCI(ExportableManagerCI exportable) 
+            : base(URN.Parse(exportable.Id), new Dictionary<CultureInfo, string>(exportable.Name))
+        {
+            Nationality = exportable.Nationality != null
+                ? new Dictionary<CultureInfo, string>(exportable.Nationality)
+                : null;
+            CountryCode = exportable.CountryCode;
+        }
+
+        /// <summary>
         /// Merges the specified item
         /// </summary>
         /// <param name="item">The item with the manager info</param>
@@ -55,6 +72,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             base.Merge(item, culture);
 
             Nationality[culture] = item.Nationality;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableManagerCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableManagerCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportableManagerCI
+            {
+                Id = Id.ToString(),
+                Name = new ReadOnlyDictionary<CultureInfo, string>(Name),
+                Nationality = Nationality != null ? new ReadOnlyDictionary<CultureInfo, string>(Nationality) : null,
+                CountryCode = CountryCode
+            });
         }
     }
 }

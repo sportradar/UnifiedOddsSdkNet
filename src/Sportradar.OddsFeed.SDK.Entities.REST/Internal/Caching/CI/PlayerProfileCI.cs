@@ -3,11 +3,14 @@
 */
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
 // ReSharper disable FieldCanBeMadeReadOnly.Global
@@ -18,7 +21,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
     /// A data-transfer-object representing player's profile
     /// </summary>
     /// <seealso cref="SportEntityCI" />
-    public class PlayerProfileCI : SportEntityCI
+    public class PlayerProfileCI : SportEntityCI, IExportableCI
     {
         private readonly IDataRouterManager _dataRouterManager;
         private string _type;
@@ -153,6 +156,34 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="PlayerProfileCI"/> class
+        /// </summary>
+        /// <param name="exportable">The <see cref="ExportablePlayerProfileCI"/> used to create instance</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to fetch <see cref="PlayerProfileDTO"/></param>
+        internal PlayerProfileCI(ExportablePlayerProfileCI exportable, IDataRouterManager dataRouterManager)
+            : base(exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+            if (dataRouterManager == null)
+                throw new ArgumentNullException(nameof(dataRouterManager));
+
+            _fetchedCultures = new List<CultureInfo>(exportable.Name.Keys);
+            _primaryCulture = exportable.Name.Keys.First();
+
+            _dataRouterManager = dataRouterManager;
+            
+            Names = new Dictionary<CultureInfo, string>(exportable.Name);
+            _nationalities = new Dictionary<CultureInfo, string>(exportable.Nationalities);
+            _type = exportable.Type;
+            _dateOfBirth = exportable.DateOfBirth;
+            _height = exportable.Height;
+            _weight = exportable.Weight;
+            _abbreviation = exportable.Abbreviation;
+            _gender = exportable.Gender;
+        }
+
+        /// <summary>
         /// Merges the specified <see cref="PlayerProfileDTO"/> into instance
         /// </summary>
         /// <param name="profile">The <see cref="PlayerProfileDTO"/> used to merge into instance</param>
@@ -193,6 +224,31 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _abbreviation = string.IsNullOrEmpty(playerCompetitor.Abbreviation)
                 ? SdkInfo.GetAbbreviationFromName(playerCompetitor.Name)
                 : playerCompetitor.Abbreviation;
+        }
+
+        /// <summary>
+        /// Merges the specified <see cref="PlayerProfileCI"/> into instance
+        /// </summary>
+        /// <param name="item">The <see cref="PlayerProfileCI"/> used to merge into instance</param>
+        internal void Merge(PlayerProfileCI item)
+        {
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
+            foreach (var k in item.Names.Keys)
+            {
+                Names[k] = item.Names[k];
+            }
+            foreach (var k in item._nationalities.Keys)
+            {
+                _nationalities[k] = item._nationalities[k];
+            }
+            _type = item._type ?? _type;
+            _dateOfBirth = item._dateOfBirth ?? _dateOfBirth;
+            _height = item._height ?? _height;
+            _weight = item._weight ?? _weight;
+            _abbreviation = item._abbreviation ?? _abbreviation;
+            _gender = item._gender ?? _gender;
         }
 
         /// <summary>
@@ -252,6 +308,26 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                     task.Wait();
                 }
             }
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableCI> ExportAsync()
+        {
+            return Task.FromResult<ExportableCI>(new ExportablePlayerProfileCI
+            {
+                Id = Id.ToString(),
+                Name = new ReadOnlyDictionary<CultureInfo, string>(Names),
+                Nationalities = new ReadOnlyDictionary<CultureInfo, string>(_nationalities),
+                Type = _type,
+                DateOfBirth = _dateOfBirth,
+                Height = _height,
+                Weight = _weight,
+                Abbreviation = _abbreviation,
+                Gender = _gender
+            });
         }
     }
 }

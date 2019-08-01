@@ -13,8 +13,10 @@ using Metrics;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Common.Internal.Metrics;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -24,7 +26,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
     /// <summary>
     /// A <see cref="IProfileCache"/> implementation using <see cref="ObjectCache"/> to cache fetched information
     /// </summary>
-    internal class ProfileCache : SdkCache, IProfileCache, IDisposable, IHealthStatusProvider
+    internal class ProfileCache : SdkCache, IProfileCache, IDisposable, IHealthStatusProvider, IExportableSdkCache
     {
         /// <summary>
         /// A <see cref="ObjectCache"/> used to store fetched information
@@ -570,6 +572,45 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             }
         }
 
+        private void AddTeamCompetitor(ExportableTeamCompetitorCI item)
+        {
+            if (_cache.Contains(item.Id))
+            {
+                try
+                {
+                    var ci = (CompetitorCI) _cache.Get(item.Id);
+                    var teamCI = ci as TeamCompetitorCI;
+                    if (teamCI != null)
+                    {
+                        _semaphoreCacheMerge.Wait();
+                        teamCI.Merge(new TeamCompetitorCI(item, _dataRouterManager));
+                    }
+                    else
+                    {
+                        _semaphoreCacheMerge.Wait();
+                        teamCI = new TeamCompetitorCI(ci);
+                        teamCI.Merge(new TeamCompetitorCI(item, _dataRouterManager));
+                        _cache.Set(item.Id, teamCI, GetCorrectCacheItemPolicy(URN.Parse(item.Id)));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ExecutionLog.Error($"Error importing team competitor for id={item.Id}.", ex);
+                }
+                finally
+                {
+                    if (!_isDisposed)
+                    {
+                        _semaphoreCacheMerge.Release();
+                    }
+                }
+            }
+            else
+            {
+                _cache.Add(item.Id, new TeamCompetitorCI(item, _dataRouterManager), GetCorrectCacheItemPolicy(URN.Parse(item.Id)));
+            }
+        }
+
         private void AddCompetitor(URN id, CompetitorDTO item, CultureInfo culture, bool useSemaphore)
         {
             if (_cache.Contains(id.ToString()))
@@ -609,6 +650,34 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                 {
                     AddPlayerCompetitor(player.Id, player, culture, false);
                 }
+            }
+        }
+
+        private void AddCompetitor(ExportableCompetitorCI item)
+        {
+            if (_cache.Contains(item.Id))
+            {
+                try
+                {
+                    var ci = (CompetitorCI) _cache.Get(item.Id);
+                    _semaphoreCacheMerge.Wait();
+                    ci.Merge(new CompetitorCI(item, _dataRouterManager));
+                }
+                catch (Exception ex)
+                {
+                    ExecutionLog.Error($"Error importing competitor for id={item.Id}.", ex);
+                }
+                finally
+                {
+                    if (!_isDisposed)
+                    {
+                        _semaphoreCacheMerge.Release();
+                    }
+                }
+            }
+            else
+            {
+                _cache.Add(item.Id, new CompetitorCI(item, _dataRouterManager), GetCorrectCacheItemPolicy(URN.Parse(item.Id)));
             }
         }
 
@@ -730,6 +799,34 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             }
         }
 
+        private void AddPlayerProfile(ExportablePlayerProfileCI item)
+        {
+            if (_cache.Contains(item.Id))
+            {
+                try
+                {
+                    var ci = (PlayerProfileCI) _cache.Get(item.Id);
+                    _semaphoreCacheMerge.Wait();
+                    ci.Merge(new PlayerProfileCI(item, _dataRouterManager));
+                }
+                catch (Exception ex)
+                {
+                    ExecutionLog.Error($"Error importing player profile for id={item.Id}.", ex);
+                }
+                finally
+                {
+                    if (!_isDisposed)
+                    {
+                        _semaphoreCacheMerge.Release();
+                    }
+                }
+            }
+            else
+            {
+                _cache.Add(item.Id, new PlayerProfileCI(item, _dataRouterManager), GetCorrectCacheItemPolicy(URN.Parse(item.Id)));
+            }
+        }
+
         private void AddPlayerCompetitor(URN id, PlayerCompetitorDTO item, CultureInfo culture, bool useSemaphore)
         {
             if (_cache.Contains(id.ToString()))
@@ -790,6 +887,87 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             return id.Type.Equals(SdkInfo.SimpleTeamIdentifier, StringComparison.InvariantCultureIgnoreCase)
                 ? _simpleTeamCacheItemPolicy
                 : _normalCacheItemPolicy;
+        }
+
+        /// <summary>
+        /// Exports current items in the cache
+        /// </summary>
+        /// <returns>Collection of <see cref="ExportableCI"/> containing all the items currently in the cache</returns>
+        public async Task<IEnumerable<ExportableCI>> ExportAsync()
+        {
+            IEnumerable<IExportableCI> exportables;
+            try
+            {
+                _semaphoreCacheMerge.Wait();
+                exportables = _cache.ToList().Select(i => (IExportableCI) i.Value);
+            }
+            finally
+            {
+                _semaphoreCacheMerge.Release();
+            }
+
+            var tasks = exportables.Select(e =>
+            {
+                var task = e.ExportAsync();
+                task.ConfigureAwait(false);
+                return task;
+            });
+
+            return await Task.WhenAll(tasks).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Imports provided items into the cache
+        /// </summary>
+        /// <param name="items">Collection of <see cref="ExportableCI"/> to be inserted into the cache</param>
+        public async Task ImportAsync(IEnumerable<ExportableCI> items)
+        {
+            foreach (var exportable in items)
+            {
+                var exportableCompetitor = exportable as ExportableCompetitorCI;
+                var exportableTeamCompetitor = exportable as ExportableTeamCompetitorCI;
+                var exportablePlayerProfile = exportable as ExportablePlayerProfileCI;
+
+                if (exportableCompetitor != null)
+                {
+                    AddCompetitor(exportableCompetitor);
+                }
+
+                if (exportableTeamCompetitor != null)
+                {
+                    AddTeamCompetitor(exportableTeamCompetitor);
+                }
+
+                if (exportablePlayerProfile != null)
+                {
+                    AddPlayerProfile(exportablePlayerProfile);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns current cache status
+        /// </summary>
+        /// <returns>A <see cref="IReadOnlyDictionary{K, V}"/> containing all cache item types in the cache and their counts</returns>
+        public IReadOnlyDictionary<string, int> CacheStatus()
+        {
+            List<KeyValuePair<string, object>> items;
+            try
+            {
+                _semaphoreCacheMerge.Wait();
+                items = _cache.ToList();
+            }
+            finally
+            {
+                _semaphoreCacheMerge.Release();
+            }
+
+            return new Dictionary<string, int>
+            {
+                {typeof(TeamCompetitorCI).Name, items.Count(i => i.Value.GetType() == typeof(TeamCompetitorCI))},
+                {typeof(CompetitorCI).Name, items.Count(i => i.Value.GetType() == typeof(CompetitorCI))},
+                {typeof(PlayerProfileCI).Name, items.Count(i => i.Value.GetType() == typeof(PlayerProfileCI))}
+            };
         }
     }
 }

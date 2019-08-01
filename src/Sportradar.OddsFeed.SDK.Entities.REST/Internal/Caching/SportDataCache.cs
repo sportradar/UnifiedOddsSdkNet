@@ -1208,14 +1208,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 return task;
             });
 
-            return await Task.WhenAll(tasks);
+            return await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Imports provided items into the cache
         /// </summary>
         /// <param name="items">Collection of <see cref="ExportableCI"/> to be inserted into the cache</param>
-        public Task ImportAsync(IEnumerable<ExportableCI> items)
+        public async Task ImportAsync(IEnumerable<ExportableCI> items)
         {
             foreach (var exportable in items)
             {
@@ -1232,8 +1232,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     AddCategory(exportableCategory);
                 }
             }
-
-            return Task.FromResult(0);
         }
 
         /// <summary>
