@@ -1,7 +1,11 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
@@ -51,6 +55,48 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             SplitColor = item.SplitColor;
             ShirtType = item.ShirtType;
             SleeveDetail = item.SleeveDetail;
+        }
+
+        public JerseyCI(ExportableJerseyCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            BaseColor = exportable.BaseColor;
+            Number = exportable.Number;
+            SleeveColor = exportable.SleeveColor;
+            Type = exportable.Type;
+            HorizontalStripes = exportable.HorizontalStripes;
+            Split = exportable.Split;
+            Squares = exportable.Squares;
+            Stripes = exportable.Stripes;
+            StripesColor = exportable.StripesColor;
+            SplitColor = exportable.SplitColor;
+            ShirtType = exportable.ShirtType;
+            SleeveDetail = exportable.SleeveDetail;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableJerseyCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableJerseyCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportableJerseyCI
+            {
+                BaseColor = BaseColor,
+                Number = Number,
+                SleeveColor = SleeveColor,
+                Type = Type,
+                HorizontalStripes = HorizontalStripes,
+                Split = Split,
+                Squares = Squares,
+                Stripes = Stripes,
+                StripesColor = StripesColor,
+                SplitColor = SplitColor,
+                ShirtType = ShirtType,
+                SleeveDetail = SleeveDetail
+            });
         }
     }
 }

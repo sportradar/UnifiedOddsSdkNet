@@ -10,7 +10,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
     /// <summary>
     /// Class used to export/import sport cache item properties
     /// </summary>
-    class ExportableSportCI : ExportableCI
+    public class ExportableSportCI : ExportableCI
     {
         /// <summary>
         /// A <see cref="IEnumerable{T}"/> specifying the id's of child categories

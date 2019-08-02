@@ -58,6 +58,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="CacheItem"/> class.
+        /// </summary>
+        /// <param name="id">A <see cref="URN"/> representing the id of the item</param>
+        /// <param name="name">The name of the item</param>
+        protected CacheItem(URN id, IDictionary<CultureInfo, string> name)
+        {
+            if (id == null)
+                throw new ArgumentNullException(nameof(id));
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+            Id = id;
+            Name = name;
+        }
+
+        /// <summary>
         /// Defined field invariants needed by code contracts
         /// </summary>
         [ContractInvariantMethod]

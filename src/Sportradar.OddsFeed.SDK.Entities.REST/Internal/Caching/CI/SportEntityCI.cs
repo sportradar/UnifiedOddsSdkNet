@@ -1,7 +1,10 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Diagnostics.Contracts;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -26,6 +29,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Contract.Requires(dto != null);
 
             Id = dto.Id;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExportableCI"/> class
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableCI"/> containing information about the sport entity</param>
+        internal SportEntityCI(ExportableCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            Id = URN.Parse(exportable.Id);
         }
 
         /// <summary>Determines whether the specified object is equal to the current object</summary>

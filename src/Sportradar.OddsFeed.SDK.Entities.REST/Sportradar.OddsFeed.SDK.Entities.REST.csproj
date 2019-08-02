@@ -104,6 +104,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Caching\Exportable\ExportableCarCI.cs" />
+    <Compile Include="Caching\Exportable\ExportablePlayerProfileCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableTeamCompetitorCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableRaceDriverProfileCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableVenueCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableManagerCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableJerseyCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableCompetitorCI.cs" />
     <Compile Include="CustomBet\ICalculation.cs" />
     <Compile Include="CustomBet\ISelection.cs" />
     <Compile Include="CustomBet\IMarket.cs" />

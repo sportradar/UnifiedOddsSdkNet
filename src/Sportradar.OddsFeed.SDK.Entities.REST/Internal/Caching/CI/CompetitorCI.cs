@@ -3,11 +3,14 @@
 */
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -16,7 +19,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
     /// <summary>
     /// Competitor cache item to be saved within cache
     /// </summary>
-    public class CompetitorCI : SportEntityCI
+    public class CompetitorCI : SportEntityCI, IExportableCI
     {
         /// <summary>
         /// A <see cref="IDictionary{CultureInfo, String}"/> containing competitor names in different languages
@@ -351,6 +354,33 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _fetchedCultures = originalCompetitorCI._fetchedCultures;
             _dataRouterManager = originalCompetitorCI._dataRouterManager;
             _primaryCulture = originalCompetitorCI._primaryCulture;
+            _raceDriverProfile = originalCompetitorCI._raceDriverProfile;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CompetitorCI"/> class
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableCompetitorCI"/> containing information about the sport entity</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to fetch <see cref="CompetitorDTO"/></param>
+        internal CompetitorCI(ExportableCompetitorCI exportable, IDataRouterManager _dataRouterManager)
+            : base(exportable)
+        {
+            Names = new Dictionary<CultureInfo, string>(exportable.Name);
+            _countryNames = new Dictionary<CultureInfo, string>(exportable.CountryNames);
+            _abbreviations = new Dictionary<CultureInfo, string>(exportable.Abbreviations);
+            _associatedPlayerIds = new List<URN>(exportable.AssociatedPlayerIds.Select(URN.Parse));
+            _isVirtual = exportable.IsVirtual;
+            _referenceId = new ReferenceIdCI(exportable.ReferenceIds);
+            _jerseys = new List<JerseyCI>(exportable.Jerseys.Select(j => new JerseyCI(j)));
+            _countryCode = exportable.CountryCode;
+            _manager = exportable.Manager != null ? new ManagerCI(exportable.Manager) : null;
+            _venue = exportable.Venue != null ? new VenueCI(exportable.Venue) : null;
+            _gender = exportable.Gender;
+            _fetchedCultures = new List<CultureInfo>(exportable.FetchedCultures);
+            this._dataRouterManager = _dataRouterManager;
+            _primaryCulture = exportable.PrimaryCulture;
+            _raceDriverProfile = exportable.RaceDriverProfile != null ? new RaceDriverProfileCI(exportable.RaceDriverProfile) : null;
+            _referenceId = new ReferenceIdCI(exportable.ReferenceIds);
         }
 
         /// <summary>
@@ -505,6 +535,41 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             // NATIONALITY
         }
 
+        /// <summary>
+        /// Merges the information from the provided <see cref="CompetitorCI"/> into the current instance
+        /// </summary>
+        /// <param name="item">A <see cref="CompetitorCI"/> containing information about the competitor</param>
+        internal void Merge(CompetitorCI item)
+        {
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
+            foreach (var k in item.Names.Keys)
+            {
+                Names[k] = item.Names[k];
+            }
+            foreach (var k in item._countryNames.Keys)
+            {
+                _countryNames[k] = item._countryNames[k];
+            }
+            foreach (var k in item._abbreviations.Keys)
+            {
+                _abbreviations[k] = item._abbreviations[k];
+            }
+            _associatedPlayerIds.Clear();
+            _associatedPlayerIds.AddRange(item._associatedPlayerIds);
+            _isVirtual = item.IsVirtual;
+            _referenceId = item._referenceId ?? _referenceId;
+            _jerseys.Clear();
+            _jerseys.AddRange(item._jerseys);
+            _countryCode = item._countryCode ?? _countryCode;
+            _manager = item._manager ?? _manager;
+            _venue = item._venue ?? _venue;
+            _gender = item._gender ?? _gender;
+            _raceDriverProfile = item._raceDriverProfile ?? _raceDriverProfile;
+            _referenceId = item._referenceId ?? _referenceId;
+        }
+
         private ReferenceIdCI UpdateReferenceIds(URN id, IDictionary<string, string> referenceIds)
         {
             if (id.Type.Equals(SdkInfo.SimpleTeamIdentifier, StringComparison.InvariantCultureIgnoreCase))
@@ -548,5 +613,41 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 }
             }
         }
+
+        protected virtual async Task<T> CreateExportableCIAsync<T>() where T : ExportableCompetitorCI, new()
+        {
+            var jerseysList = new List<ExportableJerseyCI>();
+            foreach (var jersey in _jerseys)
+            {
+                jerseysList.Add(await jersey.ExportAsync());
+            }
+
+            var exportable = new T
+            {
+                Id = Id.ToString(),
+                Name = new ReadOnlyDictionary<CultureInfo, string>(Names),
+                CountryNames = new ReadOnlyDictionary<CultureInfo, string>(_countryNames),
+                Abbreviations = new ReadOnlyDictionary<CultureInfo, string>(_abbreviations),
+                AssociatedPlayerIds = new ReadOnlyCollection<string>(_associatedPlayerIds.Select(i => i.ToString()).ToList()),
+                IsVirtual = _isVirtual,
+                ReferenceIds = _referenceId.ReferenceIds != null ? new ReadOnlyDictionary<string, string>(_referenceId.ReferenceIds as IDictionary<string, string>) : null,
+                Jerseys = new ReadOnlyCollection<ExportableJerseyCI>(jerseysList),
+                CountryCode = _countryCode,
+                Manager = _manager!= null ? await _manager.ExportAsync().ConfigureAwait(false) : null,
+                Venue = _venue != null ? await _venue.ExportAsync().ConfigureAwait(false) : null,
+                Gender = Gender,
+                RaceDriverProfile = _raceDriverProfile != null ? await _raceDriverProfile.ExportAsync().ConfigureAwait(false) : null,
+                FetchedCultures = new ReadOnlyCollection<CultureInfo>(_fetchedCultures.ToList()),
+                PrimaryCulture = _primaryCulture
+            };
+
+            return exportable;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public virtual async Task<ExportableCI> ExportAsync() => await CreateExportableCIAsync<ExportableCompetitorCI>().ConfigureAwait(false);
     }
 }
