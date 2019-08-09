@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
+using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 {
@@ -38,6 +40,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 
             _nationality = new Dictionary<CultureInfo, string>();
             Merge(referee, culture);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RefereeCI"/> class.
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableRefereeCI"/> containing information about the referee</param>
+        internal RefereeCI(ExportableRefereeCI exportable)
+            : base(URN.Parse(exportable.Id))
+        {
+            _nationality = new Dictionary<CultureInfo, string>(exportable.Nationality);
+            Name = exportable.Name;
         }
 
         /// <summary>

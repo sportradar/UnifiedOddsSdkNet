@@ -14,6 +14,7 @@ using Common.Logging;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -143,6 +144,31 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             Contract.Requires(currentCulture != null);
 
             Merge(eventSummary, currentCulture);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SportEventCI" /> class
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableSportEventCI" /> representing the the sport event</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to obtain summary and fixture</param>
+        /// <param name="semaphorePool">A <see cref="ISemaphorePool" /> instance used to obtain sync objects</param>
+        /// <param name="defaultCulture">A <see cref="CultureInfo" /> specifying the language used when fetching info which is not translatable (e.g. Scheduled, ..)</param>
+        /// <param name="fixtureTimestampCache">A <see cref="ObjectCache"/> used to cache the sport events fixture timestamps</param>
+        public SportEventCI(ExportableSportEventCI exportable,
+            IDataRouterManager dataRouterManager,
+            ISemaphorePool semaphorePool,
+            CultureInfo defaultCulture,
+            ObjectCache fixtureTimestampCache)
+            : this(URN.Parse(exportable.Id), dataRouterManager, semaphorePool, defaultCulture, fixtureTimestampCache)
+        {
+            Names = new Dictionary<CultureInfo, string>(exportable.Name);
+            _sportId = URN.Parse(exportable.SportId);
+            _scheduled = exportable.Scheduled;
+            _scheduledEnd = exportable.ScheduledEnd;
+            _startTimeTbd = exportable.StartTimeTbd;
+            _replacedBy = exportable.ReplacedBy != null ? URN.Parse(exportable.ReplacedBy) : null;
+            LoadedFixtures = new List<CultureInfo>(exportable.LoadedFixtures ?? new List<CultureInfo>());
+            LoadedSummaries = new List<CultureInfo>(exportable.LoadedSummaries ?? new List<CultureInfo>());
         }
 
         /// <summary>

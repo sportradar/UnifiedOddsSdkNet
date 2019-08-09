@@ -3,6 +3,7 @@
 */
 using System;
 using System.Diagnostics.Contracts;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
@@ -38,6 +39,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             OldTime = dto.OldTime;
             NewTime = dto.NewTime;
             ChangedAt = dto.ChangedAt;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ScheduledStartTimeChangeDTO"/> class
+        /// </summary>
+        /// <param name="exportable">The exportable</param>
+        public ScheduledStartTimeChange(ExportableScheduledStartTimeChangeCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            OldTime = exportable.OldTime;
+            NewTime = exportable.NewTime;
+            ChangedAt = exportable.ChangedAt;
         }
     }
 }

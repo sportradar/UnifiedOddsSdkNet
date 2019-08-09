@@ -1,7 +1,10 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Diagnostics.Contracts;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
@@ -37,6 +40,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             WindAdvantage = dto.WindAdvantage;
             Pitch = dto.Pitch;
             WeatherConditions = dto.WeatherConditions;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WeatherInfoCI"/> class.
+        /// </summary>
+        /// <param name="exportable">The <see cref="ExportableWeatherInfoCI"/> used to create new instance</param>
+        internal WeatherInfoCI(ExportableWeatherInfoCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            TemperatureCelsius = exportable.TemperatureCelsius;
+            Wind = exportable.Wind;
+            WindAdvantage = exportable.WindAdvantage;
+            Pitch = exportable.Pitch;
+            WeatherConditions = exportable.WeatherConditions;
         }
     }
 }

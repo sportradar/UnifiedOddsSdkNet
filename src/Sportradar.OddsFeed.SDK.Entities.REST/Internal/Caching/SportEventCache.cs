@@ -15,7 +15,9 @@ using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Common.Internal.Metrics;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
@@ -28,7 +30,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
     /// A implementation of the interface <see cref="ISportEventCache"/>
     /// </summary>
     /// <seealso cref="ISportEventCache" />
-    internal class SportEventCache : SdkCache, ISportEventCache, IHealthStatusProvider, IDisposable
+    internal class SportEventCache : SdkCache, ISportEventCache, IHealthStatusProvider, IDisposable, IExportableSdkCache
     {
         /// <summary>
         /// A <see cref="ILog"/> instance used for logging
@@ -1091,6 +1093,39 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         private void AddNewCacheItem(SportEventCI item)
         {
             Cache.Add(item.Id.ToString(), item, new CacheItemPolicy { RemovedCallback = CacheItemRemovedCallback });
+        }
+
+        /// <summary>
+        /// Exports current items in the cache
+        /// </summary>
+        /// <returns>Collection of <see cref="ExportableCI"/> containing all the items currently in the cache</returns>
+        public async Task<IEnumerable<ExportableCI>> ExportAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Imports provided items into the cache
+        /// </summary>
+        /// <param name="items">Collection of <see cref="ExportableCI"/> to be inserted into the cache</param>
+        public async Task ImportAsync(IEnumerable<ExportableCI> items)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns current cache status
+        /// </summary>
+        /// <returns>A <see cref="IReadOnlyDictionary{K, V}"/> containing all cache item types in the cache and their counts</returns>
+        public IReadOnlyDictionary<string, int> CacheStatus()
+        {
+            List<KeyValuePair<string, object>> items;
+            lock (_addLock)
+            {
+                items = Cache.ToList();
+            }
+
+            return items.GroupBy(i => i.Value.GetType().Name).ToDictionary(g => g.Key, g => g.Count());
         }
     }
 }

@@ -1,7 +1,10 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Diagnostics.Contracts;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
 
@@ -42,5 +45,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             TimeType = dto.TimeType;
             GameType = dto.GameType;
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DrawInfoCI"/> class
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableDrawInfoCI"/> instance containing information about the draw info</param>
+        public DrawInfoCI(ExportableDrawInfoCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            DrawType = exportable.DrawType;
+            TimeType = exportable.TimeType;
+            GameType = exportable.GameType;
+        }
+
     }
 }

@@ -2,6 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
 {
@@ -37,6 +38,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             _name = name;
             _startTime = startTime;
             _streamUrl = streamUrl;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TvChannel"/> class
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableTvChannelCI"/> instance specifying the current item</param>
+        public TvChannel(ExportableTvChannelCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            _name = exportable.Name;
+            _startTime = exportable.StartTime;
+            _streamUrl = exportable.StreamUrl;
         }
 
         /// <summary>

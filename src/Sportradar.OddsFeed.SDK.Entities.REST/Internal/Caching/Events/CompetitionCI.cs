@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -114,6 +115,30 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             Merge(eventSummary, currentCulture, true);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CompetitionCI" /> class
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableSportEventCI" /> representing the the sport event</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to obtain summary and fixture</param>
+        /// <param name="semaphorePool">A <see cref="ISemaphorePool" /> instance used to obtain sync objects</param>
+        /// <param name="defaultCulture">A <see cref="CultureInfo" /> specifying the language used when fetching info which is not translatable (e.g. Scheduled, ..)</param>
+        /// <param name="fixtureTimestampCache">A <see cref="ObjectCache"/> used to cache the sport events fixture timestamps</param>
+        public CompetitionCI(ExportableSportEventCI exportable,
+            IDataRouterManager dataRouterManager,
+            ISemaphorePool semaphorePool,
+            CultureInfo defaultCulture,
+            ObjectCache fixtureTimestampCache)
+            : base(exportable, dataRouterManager, semaphorePool, defaultCulture, fixtureTimestampCache)
+        {
+            var exportableCompetition = exportable as ExportableCompetitionCI;
+            _bookingStatus = exportableCompetition.BookingStatus;
+            _venue = exportableCompetition.Venue != null ? new VenueCI(exportableCompetition.Venue) : null;
+            _conditions = exportableCompetition.Conditions != null ? new SportEventConditionsCI(exportableCompetition.Conditions) : null;
+            Competitors = exportableCompetition.Competitors != null ? new List<URN>(exportableCompetition.Competitors.Select(URN.Parse)) : null;
+            _referenceId = exportableCompetition.ReferenceId != null ? new ReferenceIdCI(exportableCompetition.ReferenceId) : null;
+            _competitorsQualifiers = exportableCompetition.CompetitorsQualifiers != null ? new Dictionary<URN, string>(exportableCompetition.CompetitorsQualifiers.ToDictionary(c => URN.Parse(c.Key), c => c.Value)) : null;
+            _competitorsReferences = exportableCompetition.CompetitorsReferences != null ? new Dictionary<URN, ReferenceIdCI>(exportableCompetition.CompetitorsReferences.ToDictionary(c => URN.Parse(c.Key), c => new ReferenceIdCI(c.Value))) : null;
+        }
 
         /// <summary>
         /// Asynchronously fetch event summary associated with the current instance (saving done in <see cref="ISportEventStatusCache"/>)
@@ -121,7 +146,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <returns>A <see cref="Task{T}"/> representing an async operation</returns>
         public async Task<bool> FetchSportEventStatusAsync()
         {
-            await FetchMissingSummary(new[] { DefaultCulture }, true).ConfigureAwait(false);
+            await FetchMissingSummary(new[] {DefaultCulture}, true).ConfigureAwait(false);
             return true;
         }
 

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
@@ -44,7 +45,33 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Merge(dto, culture);
         }
 
-        public void Merge(BasicEventDTO dto, CultureInfo culture)
+        internal TimelineEventCI(ExportableTimelineEventCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            Id = exportable.Id;
+            HomeScore = exportable.HomeScore;
+            AwayScore = exportable.AwayScore;
+            MatchTime = exportable.MatchTime;
+            Period = exportable.Period;
+            PeriodName = exportable.PeriodName;
+            Points = exportable.Points;
+            StoppageTime = exportable.StoppageTime;
+            Team = exportable.Team;
+            Type = exportable.Type;
+            Value = exportable.Value;
+            X = exportable.X;
+            Y = exportable.Y;
+            Time = exportable.Time;
+            Assists = exportable.Assists?.Select(a => new EventPlayerAssistCI(a)).ToList();
+            GoalScorer = exportable.GoalScorer != null ? new CacheItem(exportable.GoalScorer) : null;
+            Player = exportable.Player != null ? new CacheItem(exportable.Player) : null;
+            MatchStatusCode = exportable.MatchStatusCode;
+            MatchClock = exportable.MatchClock;
+        }
+
+    public void Merge(BasicEventDTO dto, CultureInfo culture)
         {
             HomeScore = dto.HomeScore;
             AwayScore = dto.AwayScore;

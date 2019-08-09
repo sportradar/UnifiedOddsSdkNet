@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -113,6 +114,27 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             : base(tournamentSummary, dataRouterManager, semaphorePool, currentCulture, defaultCulture, fixtureTimestampCache)
         {
             Merge(tournamentSummary, currentCulture, true);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StageCI"/> class
+        /// </summary>
+        /// <param name="exportable">The exportable cache item</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to obtain summary and fixture</param>
+        /// <param name="semaphorePool">The semaphore pool</param>
+        /// <param name="defaultCulture">The default culture</param>
+        /// <param name="fixtureTimestampCache">A <see cref="ObjectCache"/> used to cache the sport events fixture timestamps</param>
+        public StageCI(ExportableStageCI exportable,
+            IDataRouterManager dataRouterManager,
+            ISemaphorePool semaphorePool,
+            CultureInfo defaultCulture,
+            ObjectCache fixtureTimestampCache)
+            : base(exportable, dataRouterManager, semaphorePool, defaultCulture, fixtureTimestampCache)
+        {
+            _categoryId = URN.Parse(exportable.CategoryId);
+            _parentStage = exportable.ParentStage != null ? new StageCI(exportable.ParentStage, dataRouterManager, semaphorePool, defaultCulture, fixtureTimestampCache) : null;
+            _childStages = exportable.ChildStages?.Select(s => new StageCI(s, dataRouterManager, semaphorePool, defaultCulture, fixtureTimestampCache));
+            _stageType = exportable.StageType;
         }
 
         /// <summary>

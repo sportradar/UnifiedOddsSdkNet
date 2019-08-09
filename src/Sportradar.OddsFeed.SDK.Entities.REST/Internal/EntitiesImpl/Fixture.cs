@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -141,6 +142,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             {
                 ScheduledStartTimeChanges = fixtureDto.ScheduledStartTimeChanges.Select(s => new ScheduledStartTimeChange(s));
             }
+        }
+
+        internal Fixture(ExportableFixtureCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            StartTime = exportable.StartTime;
+            NextLiveTime = exportable.NextLiveTime;
+            StartTimeConfirmed = exportable.StartTimeConfirmed;
+            StartTimeTBD = exportable.StartTimeTBD;
+            ReplacedBy = exportable.ReplacedBy != null ? URN.Parse(exportable.ReplacedBy) : null;
+            ExtraInfo = exportable.ExtraInfo != null ? new Dictionary<string, string>(exportable.ExtraInfo) : null;
+            TvChannels = exportable.TvChannels?.Select(t => new TvChannel(t)).ToList();
+            CoverageInfo = exportable.CoverageInfo != null ? new CoverageInfo(exportable.CoverageInfo) : null;
+            ProductInfo = exportable.ProductInfo != null ? new ProductInfo(exportable.ProductInfo) : null;
+            References = exportable.References != null ? new Reference(new ReferenceIdCI(exportable.References)) : null;
+            ScheduledStartTimeChanges = exportable.ScheduledStartTimeChanges
+                ?.Select(s => new ScheduledStartTimeChange(s)).ToList();
         }
 
         /// <summary>

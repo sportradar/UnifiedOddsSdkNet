@@ -1,7 +1,10 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Diagnostics.Contracts;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
 
@@ -38,5 +41,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             BonusDrumType = dto.BonusDrumType;
             BonusRange = dto.BonusRange;
         }
+
+        internal BonusInfoCI(ExportableBonusInfoCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            BonusBalls = exportable.BonusBalls;
+            BonusDrumType = exportable.BonusDrumType;
+            BonusRange = exportable.BonusRange;
+        }
+
     }
 }

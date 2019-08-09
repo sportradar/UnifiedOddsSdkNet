@@ -3,6 +3,7 @@
 */
 using System.Diagnostics.Contracts;
 using System.Globalization;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -49,6 +50,23 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 CurrentSeason = new CurrentSeasonInfoCI(dto.CurrentSeason, culture, _dataRouterManager);
             }
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TournamentInfoBasicCI"/> class
+        /// </summary>
+        /// <param name="exportable">The exportable</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to fetch missing data</param>
+        public TournamentInfoBasicCI(ExportableTournamentInfoBasicCI exportable, IDataRouterManager dataRouterManager)
+            : base(exportable)
+        {
+            _dataRouterManager = dataRouterManager;
+
+            Category = exportable.Category != null ? URN.Parse(exportable.Category) : null;
+            CurrentSeason = exportable.CurrentSeason != null
+                ? new CurrentSeasonInfoCI(exportable.CurrentSeason, dataRouterManager)
+                : null;
+        }
+
         /// <summary>
         /// Merges the specified dto
         /// </summary>

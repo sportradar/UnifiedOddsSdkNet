@@ -1,10 +1,13 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
@@ -28,6 +31,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         {
             _fetchedCultures = new List<CultureInfo>();
             Merge(dto, culture);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventTimelineCI"/> class.
+        /// </summary>
+        /// <param name="exportable">The events.</param>
+        public EventTimelineCI(ExportableEventTimelineCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            _timeline = exportable.Timeline?.Select(t => new TimelineEventCI(t)).ToList();
+            _isFinalized = exportable.IsFinalized;
+            _fetchedCultures = new List<CultureInfo>(exportable.FetchedCultures ?? new List<CultureInfo>());
         }
 
         /// <summary>

@@ -48,7 +48,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// Initializes a new instance of the <see cref="CacheItem"/> class.
         /// </summary>
         /// <param name="exportable">A <see cref="ExportableCI"/> representing the cache item</param>
-        protected CacheItem(ExportableCI exportable)
+        public CacheItem(ExportableCI exportable)
         {
             if (exportable == null)
                 throw new ArgumentNullException(nameof(exportable));

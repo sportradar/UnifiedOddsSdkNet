@@ -1,9 +1,12 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
@@ -78,6 +81,23 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 dto.StreamingChannels?.Select(s => new StreamingChannel(s.Id, s.Name)))
         {
 
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProductInfo"/> class.
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableProductInfoCI" /> representing the current item</param>
+        public ProductInfo(ExportableProductInfoCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            _isAutoTraded = exportable.IsAutoTraded;
+            _isInHostedStatistics = exportable.IsInHostedStatistics;
+            _isInLiveCenterSoccer = exportable.IsInLiveCenterSoccer;
+            _isInLiveScore = exportable.IsInLiveScore;
+            _links = exportable.Links?.Select(l => new ProductInfoLink(l)).ToList();
+            _channels = exportable.Channels?.Select(c => new StreamingChannel(c)).ToList();
         }
 
         /// <summary>

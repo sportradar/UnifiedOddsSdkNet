@@ -1,10 +1,13 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
@@ -36,6 +39,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 
             Descriptions = new Dictionary<CultureInfo, string>();
             Merge(dto, culture);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DelayedInfoCI"/> class
+        /// </summary>
+        /// <param name="exportable">The <see cref="ExportableDelayedInfoCI"/> used to create new instance</param>
+        internal DelayedInfoCI(ExportableDelayedInfoCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            Id = exportable.Id;
+            Descriptions = new Dictionary<CultureInfo, string>(exportable.Descriptions ?? new Dictionary<CultureInfo, string>());
         }
 
         /// <summary>

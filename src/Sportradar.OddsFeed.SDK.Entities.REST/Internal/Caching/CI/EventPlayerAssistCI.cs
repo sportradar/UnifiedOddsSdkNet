@@ -3,6 +3,7 @@
 */
 using System.Diagnostics.Contracts;
 using System.Globalization;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
@@ -21,6 +22,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Contract.Requires(dto != null);
 
             Type = dto.Type;
+        }
+
+        public EventPlayerAssistCI(ExportableEventPlayerAssistCI exportable)
+            : base(exportable)
+        {
+            Type = exportable.Type;
         }
     }
 }

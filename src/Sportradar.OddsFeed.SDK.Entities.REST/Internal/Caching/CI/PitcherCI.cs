@@ -3,8 +3,10 @@
 */
 using System.Diagnostics.Contracts;
 using System.Globalization;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
+using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 {
@@ -43,6 +45,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Contract.Requires(culture != null);
 
             Merge(pitcher, culture);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PitcherCI"/> class
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportablePitcherCI"/> containing information about the pitcher</param>
+        internal PitcherCI(ExportablePitcherCI exportable)
+            : base(URN.Parse(exportable.Id))
+        {
+            Name = exportable.Name;
+            Hand = exportable.Hand;
+            Competitor = exportable.Competitor;
         }
 
         /// <summary>

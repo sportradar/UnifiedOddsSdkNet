@@ -1,10 +1,13 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -88,6 +91,28 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _names = new Dictionary<CultureInfo, string>();
             _phaseOrGroupLongName = new Dictionary<CultureInfo, string>();
             Merge(dto, culture);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RoundCI"/> class
+        /// </summary>
+        /// <param name="exportable">The <see cref="ExportableRoundCI"/> used to create new instance</param>
+        internal RoundCI(ExportableRoundCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            _names = new Dictionary<CultureInfo, string>(exportable.Names);
+            _phaseOrGroupLongName = new Dictionary<CultureInfo, string>(exportable.PhaseOrGroupLongName);
+            Type = exportable.Type;
+            Group = exportable.Group;
+            GroupId = exportable.GroupId != null ? URN.Parse(exportable.GroupId) : null;
+            OtherMatchId = exportable.OtherMatchId;
+            Number = exportable.Number;
+            CupRoundMatches = exportable.CupRoundMatches;
+            CupRoundMatchNumber = exportable.CupRoundMatchNumber;
+            BetradarId = exportable.BetradarId;
+            Phase = exportable.Phase;
         }
 
         /// <summary>

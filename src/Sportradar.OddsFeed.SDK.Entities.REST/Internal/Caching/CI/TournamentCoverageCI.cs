@@ -1,7 +1,10 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Diagnostics.Contracts;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
@@ -26,6 +29,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Contract.Requires(tournamentCoverage != null);
 
             LiveCoverage = tournamentCoverage.LiveCoverage;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TournamentCoverageCI"/> class.
+        /// </summary>
+        /// <param name="exportable">The tournament coverage.</param>
+        internal TournamentCoverageCI(ExportableTournamentCoverageCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            LiveCoverage = exportable.LiveCoverage;
         }
     }
 }

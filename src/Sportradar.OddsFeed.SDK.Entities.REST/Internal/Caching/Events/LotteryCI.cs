@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -80,6 +81,27 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             Contract.Requires(currentCulture != null);
 
             Merge(eventSummary, currentCulture);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LotteryCI"/> class
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableLotteryCI" /> specifying the current instance</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to obtain summary and fixture</param>
+        /// <param name="semaphorePool">A <see cref="ISemaphorePool" /> instance used to obtain sync objects</param>
+        /// <param name="defaultCulture">A <see cref="CultureInfo" /> specifying the language used when fetching info which is not translatable (e.g. Scheduled, ..)</param>
+        /// <param name="fixtureTimestampCache">A <see cref="ObjectCache"/> used to cache the sport events fixture timestamps</param>
+        public LotteryCI(ExportableLotteryCI exportable,
+            IDataRouterManager dataRouterManager,
+            ISemaphorePool semaphorePool,
+            CultureInfo defaultCulture,
+            ObjectCache fixtureTimestampCache)
+            : base(exportable, dataRouterManager, semaphorePool, defaultCulture, fixtureTimestampCache)
+        {
+            _categoryId = URN.Parse(exportable.CategoryId);
+            _bonusInfo = exportable.BonusInfo != null ? new BonusInfoCI(exportable.BonusInfo) : null;
+            _drawInfo = exportable.DrawInfo != null ? new DrawInfoCI(exportable.DrawInfo) : null;
+            _scheduledDraws = exportable.ScheduledDraws?.Select(URN.Parse).ToList();
         }
 
         /// <summary>

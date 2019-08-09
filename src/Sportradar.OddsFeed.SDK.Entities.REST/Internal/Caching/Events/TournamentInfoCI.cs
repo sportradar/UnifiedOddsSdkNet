@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -149,10 +150,52 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         }
 
         /// <summary>
-        /// Get category identifier as an asynchronous operation
+        /// Initializes a new instance of the <see cref="TournamentInfoCI"/> class
         /// </summary>
-        /// <returns>A <see cref="Task{URN}" /> representing the asynchronous operation</returns>
-        public async Task<URN> GetCategoryIdAsync()
+        /// <param name="exportable">A <see cref="ExportableTournamentInfoCI" /> specifying the current instance</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to obtain summary and fixture</param>
+        /// <param name="semaphorePool">A <see cref="ISemaphorePool" /> instance used to obtain sync objects</param>
+        /// <param name="defaultCulture">A <see cref="CultureInfo" /> specifying the language used when fetching info which is not translatable (e.g. Scheduled, ..)</param>
+        /// <param name="fixtureTimestampCache">A <see cref="ObjectCache"/> used to cache the sport events fixture timestamps</param>
+        public TournamentInfoCI(ExportableTournamentInfoCI exportable,
+            IDataRouterManager dataRouterManager,
+            ISemaphorePool semaphorePool,
+            CultureInfo defaultCulture,
+            ObjectCache fixtureTimestampCache)
+            : base(exportable, dataRouterManager, semaphorePool, defaultCulture, fixtureTimestampCache)
+        {
+            _categoryId = URN.Parse(exportable.CategoryId);
+            _tournamentCoverage = exportable.TournamentCoverage != null
+                ? new TournamentCoverageCI(exportable.TournamentCoverage)
+                : null;
+            _competitors = exportable.Competitors?.Select(c => new CompetitorCI(c, dataRouterManager)).ToList();
+            _currentSeasonInfo = exportable.CurrentSeasonInfo != null
+                ? new CurrentSeasonInfoCI(exportable.CurrentSeasonInfo, dataRouterManager)
+                : null;
+            _groups = exportable.Groups?.Select(g => new GroupCI(g, dataRouterManager)).ToList();
+            _scheduleUrns = exportable.ScheduleUrns?.Select(URN.Parse).ToList();
+            _round = exportable.Round != null ? new RoundCI(exportable.Round) : null;
+            _year = exportable.Year;
+            _tournamentInfoBasic = exportable.TournamentInfoBasic != null
+                ? new TournamentInfoBasicCI(exportable.TournamentInfoBasic, dataRouterManager)
+                : null;
+            _referenceId = exportable.ReferenceId != null ? new ReferenceIdCI(exportable.ReferenceId) : null;
+            _seasonCoverage = exportable.SeasonCoverage != null
+                ? new SeasonCoverageCI(exportable.SeasonCoverage)
+                : null;
+            _seasons = exportable.Seasons?.Select(URN.Parse).ToList();
+            _loadedSeasons = new List<CultureInfo>(exportable.LoadedSeasons ?? new List<CultureInfo>());
+            _loadedSchedules = new List<CultureInfo>(exportable.LoadedSchedules ?? new List<CultureInfo>());
+            _competitorsReferences =
+                exportable.CompetitorsReferences?.ToDictionary(c => URN.Parse(c.Key), c => new ReferenceIdCI(c.Value));
+            _exhibitionGames = exportable.ExhibitionGames;
+        }
+
+        /// <summary>
+    /// Get category identifier as an asynchronous operation
+    /// </summary>
+    /// <returns>A <see cref="Task{URN}" /> representing the asynchronous operation</returns>
+    public async Task<URN> GetCategoryIdAsync()
         {
             if (_categoryId != null)
             {

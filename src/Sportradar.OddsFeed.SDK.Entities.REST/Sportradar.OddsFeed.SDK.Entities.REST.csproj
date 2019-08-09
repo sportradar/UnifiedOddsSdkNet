@@ -105,6 +105,37 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Caching\Exportable\ExportableCarCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableCompetitionCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableBonusInfoCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableCoverageInfoCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableEventTimelineCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableEventPlayerAssistCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableDelayedInfoCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableTimelineEventCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableScheduledStartTimeChangeCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableProductInfoLinkCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableStreamingChannelCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableProductInfoCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableTvChannelCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableFixtureCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableMatchCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableTournamentInfoBasicCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableRoundCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableGroupCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableSeasonCoverageCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableCurrentSeasonInfoCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableTournamentCoverageCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableTournamentInfoCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableDrawInfoCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableDrawCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableDrawResultCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableLotteryCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableStageCI.cs" />
+    <Compile Include="Caching\Exportable\ExportablePitcherCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableWeatherInfoCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableRefereeCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableSportEventConditionsCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableSportEventCI.cs" />
     <Compile Include="Caching\Exportable\ExportablePlayerProfileCI.cs" />
     <Compile Include="Caching\Exportable\ExportableTeamCompetitorCI.cs" />
     <Compile Include="Caching\Exportable\ExportableRaceDriverProfileCI.cs" />

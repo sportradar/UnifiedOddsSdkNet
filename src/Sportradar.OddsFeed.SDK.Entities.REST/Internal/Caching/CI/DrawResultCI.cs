@@ -1,9 +1,13 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
+using System.Linq;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
@@ -34,6 +38,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 
             Names = new Dictionary<CultureInfo, string>();
             Merge(dto, culture);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DrawInfoCI"/> class
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableDrawResultCI"/> instance containing information about the draw result</param>
+        public DrawResultCI(ExportableDrawResultCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            Value = exportable.Value;
+            Names = exportable.Names != null ? new Dictionary<CultureInfo, string>(exportable.Names) : null;
         }
 
         /// <summary>

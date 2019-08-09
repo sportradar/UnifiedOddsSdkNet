@@ -1,11 +1,14 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
@@ -49,6 +52,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Competitors = group.Competitors != null
                 ? new ReadOnlyCollection<CompetitorCI>(group.Competitors.Select(c => new CompetitorCI(c, culture, _dataRouterManager)).ToList())
                 : null;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GroupCI"/> class
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableGroupCI"/> containing group information</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to fetch missing data</param>
+        internal GroupCI(ExportableGroupCI exportable, IDataRouterManager dataRouterManager)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            _dataRouterManager = dataRouterManager;
+            Id = exportable.Id;
+            Name = exportable.Name;
+            Competitors = exportable.Competitors?.Select(c => new CompetitorCI(c, dataRouterManager)).ToList();
         }
 
         /// <summary>

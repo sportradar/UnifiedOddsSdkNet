@@ -1,10 +1,13 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
 
@@ -52,6 +55,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Contract.Requires(culture != null);
 
             Merge(dto, culture);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SportEventConditions"/> class
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableSportEventConditionsCI"/> used to create new instance</param>
+        internal SportEventConditionsCI(ExportableSportEventConditionsCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            Attendance = exportable.Attendance;
+            EventMode = exportable.EventMode;
+            Referee = exportable.Referee != null ? new RefereeCI(exportable.Referee) : null;
+            WeatherInfo = exportable.WeatherInfo != null ? new WeatherInfoCI(exportable.WeatherInfo) : null;
+            Pitchers = exportable.Pitchers?.Select(p => new PitcherCI(p)).ToList();
         }
 
         /// <summary>

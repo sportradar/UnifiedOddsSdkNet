@@ -43,6 +43,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Id = URN.Parse(exportable.Id);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExportableCI"/> class
+        /// </summary>
+        /// <param name="id">A <see cref="URN"/> containing the sport entity id</param>
+        internal SportEntityCI(URN id)
+        {
+            if (id == null)
+                throw new ArgumentNullException(nameof(id));
+
+            Id = id;
+        }
+
         /// <summary>Determines whether the specified object is equal to the current object</summary>
         /// <returns>true if the specified object  is equal to the current object; otherwise, false</returns>
         /// <param name="obj">The object to compare with the current object</param>
