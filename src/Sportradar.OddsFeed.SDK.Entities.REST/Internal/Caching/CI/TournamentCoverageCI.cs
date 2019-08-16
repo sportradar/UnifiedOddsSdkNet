@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
@@ -41,6 +42,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 throw new ArgumentNullException(nameof(exportable));
 
             LiveCoverage = exportable.LiveCoverage;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableTournamentCoverageCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportableTournamentCoverageCI
+            {
+                LiveCoverage = LiveCoverage
+            });
         }
     }
 }

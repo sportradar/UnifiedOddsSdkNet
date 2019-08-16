@@ -686,5 +686,38 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 }
             }
         }
+
+        protected override async Task<T> CreateExportableCIAsync<T>()
+        {
+            var exportable = await base.CreateExportableCIAsync<T>();
+            var info = exportable as ExportableTournamentInfoCI;
+
+            info.CategoryId = _categoryId.ToString();
+            info.TournamentCoverage = _tournamentCoverage != null ? await _tournamentCoverage.ExportAsync().ConfigureAwait(false) : null;
+            var competitorsTasks = _competitors?.Select(async c => await c.ExportAsync().ConfigureAwait(false) as ExportableCompetitorCI);
+            info.Competitors = competitorsTasks != null ? await Task.WhenAll(competitorsTasks) : null;
+            info.CurrentSeasonInfo = _currentSeasonInfo != null ? await _currentSeasonInfo.ExportAsync().ConfigureAwait(false) : null;
+            var groupsTasks = _groups?.Select(async g => await g.ExportAsync().ConfigureAwait(false));
+            info.Groups = groupsTasks != null ? await Task.WhenAll(groupsTasks) : null;
+            info.ScheduleUrns = _scheduleUrns?.Select(s => s.ToString()).ToList();
+            info.Round = _round != null ? await _round.ExportAsync().ConfigureAwait(false) : null;
+            info.Year = _year;
+            info.TournamentInfoBasic = _tournamentInfoBasic != null ? await _tournamentInfoBasic.ExportAsync().ConfigureAwait(false) : null;
+            info.ReferenceId = _referenceId?.ReferenceIds?.ToDictionary(r => r.Key, r => r.Value);
+            info.SeasonCoverage = _seasonCoverage != null ? await _seasonCoverage.ExportAsync().ConfigureAwait(false) : null;
+            info.Seasons = _seasons?.Select(s => s.ToString()).ToList();
+            info.LoadedSeasons = new List<CultureInfo>(_loadedSeasons ?? new List<CultureInfo>());
+            info.LoadedSchedules = new List<CultureInfo>(_loadedSchedules ?? new List<CultureInfo>());
+            info.CompetitorsReferences = _competitorsReferences?.ToDictionary(r => r.Key.ToString(), r => (IDictionary<string, string>)r.Value.ReferenceIds.ToDictionary(v => v.Key, v => v.Value));
+            info.ExhibitionGames = _exhibitionGames;
+
+            return exportable;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public override async Task<ExportableCI> ExportAsync() => await CreateExportableCIAsync<ExportableTournamentInfoCI>().ConfigureAwait(false);
     }
 }

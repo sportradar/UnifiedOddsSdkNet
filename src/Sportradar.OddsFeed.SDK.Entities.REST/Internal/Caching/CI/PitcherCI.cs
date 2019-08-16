@@ -3,6 +3,7 @@
 */
 using System.Diagnostics.Contracts;
 using System.Globalization;
+using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -72,6 +73,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Name = pitcher.Name;
             Hand = pitcher.Hand;
             Competitor = pitcher.Competitor;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportablePitcherCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportablePitcherCI
+            {
+                Id = Id.ToString(),
+                Name = Name,
+                Hand = Hand,
+                Competitor = Competitor
+            });
         }
     }
 }

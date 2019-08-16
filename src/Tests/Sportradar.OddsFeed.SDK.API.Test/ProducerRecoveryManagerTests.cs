@@ -3,7 +3,6 @@
 */
 using System;
 using System.Diagnostics;
-using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Sportradar.OddsFeed.SDK.API.EventArguments;

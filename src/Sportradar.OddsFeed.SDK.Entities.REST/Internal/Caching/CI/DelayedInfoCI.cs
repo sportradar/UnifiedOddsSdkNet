@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
@@ -88,6 +89,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public virtual bool HasTranslationsFor(IEnumerable<CultureInfo> cultures)
         {
             return cultures.All(c => Descriptions.ContainsKey(c));
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableDelayedInfoCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportableDelayedInfoCI
+            {
+                Id = Id,
+                Descriptions = new Dictionary<CultureInfo, string>(Descriptions ?? new Dictionary<CultureInfo, string>())
+            });
         }
     }
 }

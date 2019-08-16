@@ -13,7 +13,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
     public class ExportableRefereeCI
     {
         /// <summary>
-        /// A <see cref="string" /> specifying the id
+        /// A <see cref="string"/> representing id of the related entity
         /// </summary>
         public string Id { get; set; }
 

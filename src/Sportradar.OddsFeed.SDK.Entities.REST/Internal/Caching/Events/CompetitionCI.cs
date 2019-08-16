@@ -431,5 +431,27 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         {
             _bookingStatus = BookingStatus.Booked;
         }
+
+        protected override async Task<T> CreateExportableCIAsync<T>()
+        {
+            var exportable = await base.CreateExportableCIAsync<T>();
+            var competition = exportable as ExportableCompetitionCI;
+
+            competition.BookingStatus = _bookingStatus;
+            competition.Venue = _venue != null ? await _venue.ExportAsync() : null;
+            competition.Conditions = _conditions != null ? await _conditions.ExportAsync() : null;
+            competition.Competitors = Competitors?.Select(c => c.ToString()).ToList();
+            competition.ReferenceId = _referenceId?.ReferenceIds?.ToDictionary(r => r.Key, r => r.Value);
+            competition.CompetitorsQualifiers = _competitorsQualifiers?.ToDictionary(q => q.Key.ToString(), q => q.Value);
+            competition.CompetitorsReferences = _competitorsReferences?.ToDictionary(r => r.Key.ToString(), r => (IDictionary<string, string>) r.Value.ReferenceIds.ToDictionary(v => v.Key, v => v.Value));
+
+            return exportable;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public override async Task<ExportableCI> ExportAsync() => await CreateExportableCIAsync<ExportableCompetitionCI>().ConfigureAwait(false);
     }
 }

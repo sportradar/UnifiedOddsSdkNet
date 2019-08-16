@@ -345,5 +345,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 }
             }
         }
+
+        protected override async Task<T> CreateExportableCIAsync<T>()
+        {
+            var exportable = await base.CreateExportableCIAsync<T>();
+            var stage = exportable as ExportableStageCI;
+
+            stage.CategoryId = _categoryId?.ToString();
+            stage.ParentStage = _parentStage != null ? await _parentStage.ExportAsync().ConfigureAwait(false) as ExportableStageCI : null;
+            var childTasks = _childStages?.Select(async s => await s.ExportAsync().ConfigureAwait(false) as ExportableStageCI);
+            stage.ChildStages = childTasks != null ? await Task.WhenAll(childTasks) : null;
+            stage.StageType = _stageType;
+
+            return exportable;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public override async Task<ExportableCI> ExportAsync() => await CreateExportableCIAsync<ExportableStageCI>().ConfigureAwait(false);
     }
 }

@@ -1101,7 +1101,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <returns>Collection of <see cref="ExportableCI"/> containing all the items currently in the cache</returns>
         public async Task<IEnumerable<ExportableCI>> ExportAsync()
         {
-            throw new NotImplementedException();
+            IEnumerable<IExportableCI> exportables;
+            lock (_addLock)
+            {
+                exportables = Cache.ToList().Select(i => (IExportableCI) i.Value);
+            }
+
+            var tasks = exportables.Select(e =>
+            {
+                var task = e.ExportAsync();
+                task.ConfigureAwait(false);
+                return task;
+            });
+
+            return await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -1110,7 +1123,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="items">Collection of <see cref="ExportableCI"/> to be inserted into the cache</param>
         public async Task ImportAsync(IEnumerable<ExportableCI> items)
         {
-            throw new NotImplementedException();
+            lock (_addLock)
+            {
+                foreach (var exportable in items)
+                {
+                    AddNewCacheItem(_sportEventCacheItemFactory.Build(exportable));
+                }
+            }
         }
 
         /// <summary>
@@ -1119,13 +1138,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <returns>A <see cref="IReadOnlyDictionary{K, V}"/> containing all cache item types in the cache and their counts</returns>
         public IReadOnlyDictionary<string, int> CacheStatus()
         {
+            var types = new[] {
+                typeof(SportEventCI), typeof(CompetitionCI), typeof(DrawCI), typeof(LotteryCI),
+                typeof(TournamentInfoCI), typeof(MatchCI), typeof(StageCI)
+            };
+
             List<KeyValuePair<string, object>> items;
             lock (_addLock)
             {
                 items = Cache.ToList();
             }
 
-            return items.GroupBy(i => i.Value.GetType().Name).ToDictionary(g => g.Key, g => g.Count());
+            var status = items.GroupBy(i => i.Value.GetType().Name).ToDictionary(g => g.Key, g => g.Count());
+
+            foreach (var type in types.Select(t => t.Name))
+            {
+                if (!status.ContainsKey(type))
+                    status[type] = 0;
+            }
+            return status;
         }
     }
 }

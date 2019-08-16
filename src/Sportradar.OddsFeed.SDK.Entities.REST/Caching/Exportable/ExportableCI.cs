@@ -10,7 +10,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
     /// <summary>
     /// Abstract class used to export/import cache item properties
     /// </summary>
-    public abstract class ExportableCI
+    public class ExportableCI
     {
         /// <summary>
         /// A <see cref="string"/> representing id of the related entity

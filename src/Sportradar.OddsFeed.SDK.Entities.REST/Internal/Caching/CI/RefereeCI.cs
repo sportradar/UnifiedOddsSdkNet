@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -89,6 +90,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public bool HasTranslationsFor(IEnumerable<CultureInfo> cultures)
         {
             return cultures.All(c => _nationality.ContainsKey(c));
+        }
+
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableRefereeCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportableRefereeCI
+            {
+                Id = Id.ToString(),
+                Nationality = new Dictionary<CultureInfo, string>(_nationality ?? new Dictionary<CultureInfo, string>()),
+                Name = Name
+            });
         }
     }
 }
