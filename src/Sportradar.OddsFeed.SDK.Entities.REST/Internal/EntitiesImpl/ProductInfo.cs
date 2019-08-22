@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
@@ -153,6 +154,26 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         protected override string PrintJ()
         {
             return PrintJ(GetType(), this);
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public async Task<ExportableProductInfoCI> ExportAsync()
+        {
+            var linkTasks = _links?.Select(async l => await ((ProductInfoLink) l).ExportAsync().ConfigureAwait(false));
+            var channeltasks = _channels?.Select(async c => await ((StreamingChannel) c).ExportAsync().ConfigureAwait(false));
+
+            return new ExportableProductInfoCI
+            {
+                IsInLiveCenterSoccer = _isInLiveCenterSoccer,
+                IsAutoTraded = _isAutoTraded,
+                IsInHostedStatistics = _isInHostedStatistics,
+                Links = linkTasks != null ? await Task.WhenAll(linkTasks) : null,
+                Channels = channeltasks != null ? await Task.WhenAll(channeltasks) : null,
+                IsInLiveScore = _isInLiveScore
+            };
         }
     }
 }

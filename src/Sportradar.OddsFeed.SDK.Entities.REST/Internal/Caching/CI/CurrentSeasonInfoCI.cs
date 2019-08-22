@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -144,6 +145,29 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             {
                 Schedule = dto.Schedule.Select(s => s.Id);
             }
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public async Task<ExportableCurrentSeasonInfoCI> ExportAsync()
+        {
+            var groupsTask = Groups?.Select(async g => await g.ExportAsync().ConfigureAwait(false));
+            var competitorsTask = Competitors?.Select(async c => await c.ExportAsync().ConfigureAwait(false) as ExportableCompetitorCI);
+            return new ExportableCurrentSeasonInfoCI
+            {
+                Id = Id.ToString(),
+                Name = new Dictionary<CultureInfo, string>(Name),
+                Year = Year,
+                StartDate = StartDate,
+                EndDate = EndDate,
+                SeasonCoverage = SeasonCoverage != null ? await SeasonCoverage.ExportAsync().ConfigureAwait(false) : null,
+                Groups = groupsTask != null ? await Task.WhenAll(groupsTask) : null,
+                CurrentRound = CurrentRound != null ? await CurrentRound.ExportAsync().ConfigureAwait(false) : null,
+                Competitors = competitorsTask != null ? await Task.WhenAll(competitorsTask) : null,
+                Schedule = Schedule?.Select(s => s.ToString()).ToList()
+            };
         }
     }
 }

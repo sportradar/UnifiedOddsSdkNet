@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
@@ -56,6 +57,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             WindAdvantage = exportable.WindAdvantage;
             Pitch = exportable.Pitch;
             WeatherConditions = exportable.WeatherConditions;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableWeatherInfoCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportableWeatherInfoCI
+            {
+                TemperatureCelsius = TemperatureCelsius,
+                Wind = Wind,
+                WindAdvantage = WindAdvantage,
+                Pitch = Pitch,
+                WeatherConditions = WeatherConditions
+            });
         }
     }
 }

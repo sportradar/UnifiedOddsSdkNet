@@ -207,5 +207,24 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 _scheduledDraws = eventSummary.DrawEvents.Select(s => s.Id);
             }
         }
+
+        protected override async Task<T> CreateExportableCIAsync<T>()
+        {
+            var exportable = await base.CreateExportableCIAsync<T>();
+            var lottery = exportable as ExportableLotteryCI;
+
+            lottery.CategoryId = _categoryId.ToString();
+            lottery.BonusInfo = _bonusInfo != null ? await _bonusInfo.ExportAsync().ConfigureAwait(false) : null;
+            lottery.DrawInfo = _drawInfo != null ? await _drawInfo.ExportAsync().ConfigureAwait(false) : null;
+            lottery.ScheduledDraws = _scheduledDraws?.Select(s => s.ToString()).ToList();
+
+            return exportable;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public override async Task<ExportableCI> ExportAsync() => await CreateExportableCIAsync<ExportableLotteryCI>().ConfigureAwait(false);
     }
 }

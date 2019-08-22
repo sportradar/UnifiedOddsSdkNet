@@ -3,6 +3,7 @@
 */
 using System;
 using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
@@ -53,6 +54,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             OldTime = exportable.OldTime;
             NewTime = exportable.NewTime;
             ChangedAt = exportable.ChangedAt;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableScheduledStartTimeChangeCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportableScheduledStartTimeChangeCI
+            {
+                ChangedAt = ChangedAt,
+                NewTime = NewTime,
+                OldTime = OldTime
+            });
         }
     }
 }

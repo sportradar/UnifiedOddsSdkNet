@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -71,7 +72,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             MatchClock = exportable.MatchClock;
         }
 
-    public void Merge(BasicEventDTO dto, CultureInfo culture)
+        public void Merge(BasicEventDTO dto, CultureInfo culture)
         {
             HomeScore = dto.HomeScore;
             AwayScore = dto.AwayScore;
@@ -108,9 +109,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                             newAssists.Add(new EventPlayerAssistCI(assist, culture));
                         }
                     }
+
                     Assists = newAssists;
                 }
             }
+
             if (dto.GoalScorer != null)
             {
                 if (GoalScorer == null)
@@ -122,6 +125,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                     GoalScorer.Merge(dto.GoalScorer, culture);
                 }
             }
+
             if (dto.Player != null)
             {
                 if (Player == null)
@@ -133,8 +137,54 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                     Player.Merge(dto.Player, culture);
                 }
             }
+
             MatchStatusCode = dto.MatchStatusCode;
             MatchClock = dto.MatchClock;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public async Task<ExportableTimelineEventCI> ExportAsync()
+        {
+            var assistsTasks = Assists?.Select(async a => await a.ExportAsync().ConfigureAwait(false));
+
+            return new ExportableTimelineEventCI
+            {
+                Id = Id,
+                Value = Value,
+                Type = Type,
+                GoalScorer = GoalScorer != null
+                    ? new ExportableCI
+                    {
+                        Id = GoalScorer.Id.ToString(),
+                        Name = new Dictionary<CultureInfo, string>(
+                            GoalScorer.Name ?? new Dictionary<CultureInfo, string>())
+                    }
+                    : null,
+                MatchStatusCode = MatchStatusCode,
+                Assists = assistsTasks != null ? await Task.WhenAll(assistsTasks) : null,
+                HomeScore = HomeScore,
+                Time = Time,
+                StoppageTime = StoppageTime,
+                Period = Period,
+                Points = Points,
+                MatchTime = MatchTime,
+                Team = Team,
+                PeriodName = PeriodName,
+                AwayScore = AwayScore,
+                MatchClock = MatchClock,
+                Y = Y,
+                X = X,
+                Player = Player != null
+                    ? new ExportableCI
+                    {
+                        Id = Player.Id.ToString(),
+                        Name = new Dictionary<CultureInfo, string>(Player.Name ?? new Dictionary<CultureInfo, string>())
+                    }
+                    : null
+            };
         }
     }
 }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -201,6 +202,30 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         protected override string PrintJ()
         {
             return PrintJ(GetType(), this);
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public async Task<ExportableFixtureCI> ExportAsync()
+        {
+            var scheduledTasks = ScheduledStartTimeChanges?.Select(async s => await ((ScheduledStartTimeChange) s).ExportAsync().ConfigureAwait(false));
+            var channelTasks = TvChannels?.Select(async c => await ((TvChannel) c).ExportAsync().ConfigureAwait(false));
+            return new ExportableFixtureCI
+            {
+                ExtraInfo = ExtraInfo?.ToDictionary(i => i.Key, i => i.Value),
+                CoverageInfo = CoverageInfo != null ? await ((CoverageInfo) CoverageInfo).ExportAsync().ConfigureAwait(false) : null,
+                ProductInfo = ProductInfo != null ? await ((ProductInfo) ProductInfo).ExportAsync().ConfigureAwait(false) : null,
+                ReplacedBy = ReplacedBy?.ToString(),
+                References = References?.References?.ToDictionary(r => r.Key, r => r.Value),
+                NextLiveTime = NextLiveTime,
+                StartTimeConfirmed = StartTimeConfirmed,
+                ScheduledStartTimeChanges = scheduledTasks != null ? await Task.WhenAll(scheduledTasks) : null,
+                StartTime = StartTime,
+                TvChannels = channelTasks != null ? await Task.WhenAll(channelTasks) : null,
+                StartTimeTBD = StartTimeTBD
+            };
         }
     }
 }

@@ -272,5 +272,26 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             }
             _results = new ReadOnlyCollection<DrawResultCI>(tempResults);
         }
+
+        protected override async Task<T> CreateExportableCIAsync<T>()
+        {
+            var exportable = await base.CreateExportableCIAsync<T>();
+            var draw = exportable as ExportableDrawCI;
+
+            draw.LotteryId = _lotteryId?.ToString();
+            draw.DrawStatus = _drawStatus;
+            draw.ResultsChronological = _resultsChronological;
+            var resultTasks = _results?.Select(async r => await r.ExportAsync().ConfigureAwait(false));
+            draw.Results = resultTasks != null ? await Task.WhenAll(resultTasks) : null;
+            draw.DisplayId = _displayId;
+
+            return exportable;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public override async Task<ExportableCI> ExportAsync() => await CreateExportableCIAsync<ExportableDrawCI>().ConfigureAwait(false);
     }
 }

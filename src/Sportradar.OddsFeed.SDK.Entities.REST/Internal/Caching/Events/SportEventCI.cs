@@ -15,6 +15,7 @@ using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -24,7 +25,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
     /// Base class of the cache item for sport event
     /// </summary>
     /// <seealso cref="SportEventCI" />
-    public class SportEventCI : ISportEventCI
+    public class SportEventCI : ISportEventCI, IExportableCI
     {
         /// <summary>
         /// The <see cref="ILog" /> instance used for execution logging
@@ -515,5 +516,29 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 _replacedBy = eventSummary.ReplacedBy;
             }
         }
+
+        protected virtual Task<T> CreateExportableCIAsync<T>() where T : ExportableSportEventCI, new()
+        {
+            var exportable = new T
+            {
+                Id = Id.ToString(),
+                Name = new Dictionary<CultureInfo, string>(Names),
+                SportId = _sportId.ToString(),
+                Scheduled = _scheduled,
+                ScheduledEnd = _scheduledEnd,
+                StartTimeTbd = _startTimeTbd,
+                ReplacedBy = _replacedBy?.ToString(),
+                LoadedFixtures = new List<CultureInfo>(LoadedFixtures ?? new List<CultureInfo>()),
+                LoadedSummaries = new List<CultureInfo>(LoadedSummaries ?? new List<CultureInfo>())
+            };
+
+            return Task.FromResult(exportable);
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public virtual async Task<ExportableCI> ExportAsync() => await CreateExportableCIAsync<ExportableSportEventCI>().ConfigureAwait(false);
     }
 }

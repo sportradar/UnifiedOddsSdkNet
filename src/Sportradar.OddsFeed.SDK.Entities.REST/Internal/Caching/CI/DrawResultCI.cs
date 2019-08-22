@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
-using System.Linq;
+using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
 
@@ -82,6 +82,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             return Names.ContainsKey(culture)
                 ? Names[culture]
                 : null;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableDrawResultCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportableDrawResultCI
+            {
+                Value = Value,
+                Names = new Dictionary<CultureInfo, string>(Names ?? new Dictionary<CultureInfo, string>())
+            });
         }
     }
 }

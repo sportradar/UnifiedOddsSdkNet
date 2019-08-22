@@ -362,5 +362,34 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 _eventTimeline.Merge(timelineDTO, culture);
             }
         }
+
+        protected override async Task<T> CreateExportableCIAsync<T>()
+        {
+            var exportable = await base.CreateExportableCIAsync<T>();
+            var match = exportable as ExportableMatchCI;
+
+            match.Season = _season != null
+                ? new ExportableCI
+                {
+                    Id = _season.Id.ToString(),
+                    Name = new Dictionary<CultureInfo, string>(_season.Name ?? new Dictionary<CultureInfo, string>())
+                }
+                : null;
+            match.TournamentRound = _tournamentRound != null
+                ? await _tournamentRound.ExportAsync().ConfigureAwait(false)
+                : null;
+            match.TournamentId = _tournamentId?.ToString();
+            match.Fixture = _fixture != null ? await ((Fixture) _fixture).ExportAsync().ConfigureAwait(false) : null;
+            match.EventTimeline = _eventTimeline != null ? await _eventTimeline.ExportAsync().ConfigureAwait(false) : null;
+            match.DelayedInfo = _delayedInfo != null ? await _delayedInfo.ExportAsync().ConfigureAwait(false) : null;
+
+            return exportable;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public override async Task<ExportableCI> ExportAsync() => await CreateExportableCIAsync<ExportableMatchCI>().ConfigureAwait(false);
     }
 }

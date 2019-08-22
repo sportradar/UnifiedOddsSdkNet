@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
@@ -106,6 +107,24 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             {
                 Pitchers = dto.Pitchers.Select(s => new PitcherCI(s, culture));
             }
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public async Task<ExportableSportEventConditionsCI> ExportAsync()
+        {
+            var pitcherTasks = Pitchers?.Select(async p => await p.ExportAsync().ConfigureAwait(false));
+
+            return new ExportableSportEventConditionsCI
+            {
+                Attendance = Attendance,
+                EventMode = EventMode,
+                Referee = Referee != null ? await Referee.ExportAsync().ConfigureAwait(false) : null,
+                WeatherInfo = WeatherInfo != null ? await WeatherInfo.ExportAsync().ConfigureAwait(false) as ExportableWeatherInfoCI : null,
+                Pitchers = pitcherTasks != null ? await Task.WhenAll(pitcherTasks) : null
+            };
         }
     }
 }

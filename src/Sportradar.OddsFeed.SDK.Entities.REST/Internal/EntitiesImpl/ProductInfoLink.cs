@@ -3,6 +3,7 @@
 */
 
 using System;
+using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
@@ -74,6 +75,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         protected override string PrintJ()
         {
             return PrintJ(GetType(), this);
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableProductInfoLinkCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportableProductInfoLinkCI
+            {
+                Name = _name,
+                Reference = _reference
+            });
         }
     }
 }

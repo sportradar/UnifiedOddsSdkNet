@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
@@ -95,6 +96,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 }
             }
             Competitors = new ReadOnlyCollection<CompetitorCI>(tempCompetitors);
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public async Task<ExportableGroupCI> ExportAsync()
+        {
+            var competitorsTask = Competitors?.Select(async c => await c.ExportAsync().ConfigureAwait(false) as ExportableCompetitorCI);
+
+            return new ExportableGroupCI
+            {
+                Id = Id,
+                Competitors = competitorsTask != null ? await Task.WhenAll(competitorsTask) : null,
+                Name = Name
+            };
         }
     }
 }

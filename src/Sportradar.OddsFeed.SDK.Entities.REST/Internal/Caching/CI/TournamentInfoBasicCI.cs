@@ -1,8 +1,11 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
+using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -94,6 +97,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                     CurrentSeason.Merge(dto.CurrentSeason, culture);
                 }
             }
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public async Task<ExportableTournamentInfoBasicCI> ExportAsync()
+        {
+            return new ExportableTournamentInfoBasicCI
+            {
+                Id = Id.ToString(),
+                Name = new Dictionary<CultureInfo, string>(Name ?? new Dictionary<CultureInfo, string>()),
+                CurrentSeason = CurrentSeason != null ? await CurrentSeason.ExportAsync().ConfigureAwait(false) : null,
+                Category = Category?.ToString()
+            };
         }
     }
 }

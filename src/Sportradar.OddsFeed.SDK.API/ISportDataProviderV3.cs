@@ -15,20 +15,20 @@ namespace Sportradar.OddsFeed.SDK.API
     public interface ISportDataProviderV3 : ISportDataProviderV2
     {
         /// <summary>
-        /// Asynchronously gets a list of active <see cref="IEnumerable{ILongTermEvent}"/>
+        /// Asynchronously gets a list of active <see cref="IEnumerable{ISportEvent}"/>
         /// </summary>
-        /// <remarks>Lists all <see cref="ILongTermEvent"/> that are cached (once schedule is loaded)</remarks>
+        /// <remarks>Lists all <see cref="ISportEvent"/> that are cached (once schedule is loaded)</remarks>
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language or a null reference to use the languages specified in the configuration</param>
         /// <returns>A <see cref="Task{T}"/> representing the async operation</returns>
-        Task<IEnumerable<ILongTermEvent>> GetActiveTournamentsAsync(CultureInfo culture = null);
+        Task<IEnumerable<ISportEvent>> GetActiveTournamentsAsync(CultureInfo culture = null);
 
         /// <summary>
-        /// Asynchronously gets a list of available <see cref="IEnumerable{ILongTermEvent}"/> for a specific sport
+        /// Asynchronously gets a list of available <see cref="IEnumerable{ISportEvent}"/> for a specific sport
         /// </summary>
         /// <remarks>Lists all available tournaments for a sport event we provide coverage for</remarks>
         /// <param name="sportId">A <see cref="URN"/> specifying the sport to retrieve</param>
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language or a null reference to use the languages specified in the configuration</param>
         /// <returns>A <see cref="Task{T}"/> representing the async operation</returns>
-        Task<IEnumerable<ILongTermEvent>> GetAvailableTournamentsAsync(URN sportId, CultureInfo culture = null);
+        Task<IEnumerable<ISportEvent>> GetAvailableTournamentsAsync(URN sportId, CultureInfo culture = null);
     }
 }

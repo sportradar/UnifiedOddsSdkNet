@@ -3,7 +3,6 @@
 */
 using System;
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace Sportradar.OddsFeed.SDK.Common.Exceptions
 {
