@@ -355,6 +355,48 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             return Task.FromResult<IEnumerable<TournamentInfoCI>>(tours);
         }
 
+        /// <summary>
+        /// Deletes the sport events from cache which are scheduled before specific DateTime
+        /// </summary>
+        /// <param name="before">The scheduled DateTime used to delete sport events from cache</param>
+        /// <returns>Number of deleted items</returns>
+        public int DeleteSportEventsFromCache(DateTime before)
+        {
+            lock (_addLock)
+            {
+                var startCount = Cache.Count();
+                foreach (var keyValuePair in Cache)
+                {
+                    try
+                    {
+
+                        var ci = (SportEventCI) keyValuePair.Value;
+                        if (ci.Scheduled != null)
+                        {
+                            if (ci.Scheduled < before)
+                            {
+                                Cache.Remove(keyValuePair.Key);
+                            }
+                        }
+                        else if (ci.ScheduledEnd != null)
+                        {
+                            if (ci.ScheduledEnd < before)
+                            {
+                                Cache.Remove(keyValuePair.Key);
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
+                }
+                var endCount = Cache.Count();
+                ExecutionLog.Info($"Deleted {startCount - endCount} items from cache.");
+                return startCount - endCount;
+            }
+        }
+
         private void CacheItemRemovedCallback(CacheEntryRemovedArguments arguments)
         {
             if (arguments?.CacheItem == null)
@@ -362,7 +404,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 return;
             }
 
-            if (arguments.RemovedReason != CacheEntryRemovedReason.CacheSpecificEviction)
+            if (arguments.RemovedReason != CacheEntryRemovedReason.CacheSpecificEviction && arguments.RemovedReason != CacheEntryRemovedReason.Removed)
             {
                 CacheLog.Debug($"SportEventCI {arguments.CacheItem.Key} removed from cache. Reason={arguments.RemovedReason}.");
             }

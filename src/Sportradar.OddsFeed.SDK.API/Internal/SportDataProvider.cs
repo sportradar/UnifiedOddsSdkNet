@@ -25,7 +25,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
     /// Provides access to sport related data (sports, tournaments, sport events, ...)
     /// </summary>
     [Log(LoggerType.ClientInteraction)]
-    internal class SportDataProvider : ISportDataProviderV3
+    internal class SportDataProvider : ISportDataProviderV4
     {
         private static readonly ILog Log = SdkLoggerFactory.GetLoggerForClientInteraction(typeof(SportDataProvider));
 
@@ -445,6 +445,16 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             var tours = await _dataRouterManager.GetSportAvailableTournamentsAsync(sportId, cul).ConfigureAwait(false);
             return tours?.Select(t => _sportEntityFactory.BuildSportEvent<ILongTermEvent>(t.Item1, t.Item2, new[] { cul }, _exceptionStrategy));
+        }
+
+        /// <summary>
+        /// Deletes the sport events from cache which are scheduled before specific DateTime
+        /// </summary>
+        /// <param name="before">The scheduled DateTime used to delete sport events from cache</param>
+        /// <returns>Number of deleted items</returns>
+        public int DeleteSportEventsFromCache(DateTime before)
+        {
+            return _sportEventCache.DeleteSportEventsFromCache(before);
         }
     }
 }

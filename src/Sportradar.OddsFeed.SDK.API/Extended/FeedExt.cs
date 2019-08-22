@@ -15,7 +15,7 @@ using Sportradar.OddsFeed.SDK.Messages.EventArguments;
 namespace Sportradar.OddsFeed.SDK.API.Extended
 {
     /// <summary>
-    /// A <see cref="IOddsFeed"/> implementation acting as an entry point to the odds feed Replay Service for doing integration tests against played matches that are older than 48 hours
+    /// A <see cref="IOddsFeed"/> implementation acting as an entry point to the odds feed service with possibility to get raw feed and api data
     /// </summary>
     public class FeedExt : Feed, IOddsFeedExt
     {

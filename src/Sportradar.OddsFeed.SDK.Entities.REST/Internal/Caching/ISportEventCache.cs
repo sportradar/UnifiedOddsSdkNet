@@ -49,5 +49,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language or a null reference to use the languages specified in the configuration</param>
         /// <returns>A <see cref="Task{T}"/> representing the async operation</returns>
         Task<IEnumerable<TournamentInfoCI>> GetActiveTournamentsAsync(CultureInfo culture = null);
+
+        /// <summary>
+        /// Deletes the sport events from cache which are scheduled before specific DateTime
+        /// </summary>
+        /// <param name="before">The scheduled DateTime used to delete sport events from cache</param>
+        /// <returns>Number of deleted items</returns>
+        int DeleteSportEventsFromCache(DateTime before);
     }
 }

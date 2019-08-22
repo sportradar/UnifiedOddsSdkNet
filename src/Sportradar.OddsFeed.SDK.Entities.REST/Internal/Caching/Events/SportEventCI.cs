@@ -64,12 +64,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <summary>
         /// The scheduled
         /// </summary>
-        private DateTime? _scheduled;
+        internal DateTime? Scheduled;
 
         /// <summary>
         /// The scheduled end
         /// </summary>
-        private DateTime? _scheduledEnd;
+        internal DateTime? ScheduledEnd;
 
         /// <summary>
         /// The start time to be determined
@@ -163,8 +163,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         {
             Names = new Dictionary<CultureInfo, string>(exportable.Name);
             _sportId = URN.Parse(exportable.SportId);
-            _scheduled = exportable.Scheduled;
-            _scheduledEnd = exportable.ScheduledEnd;
+            Scheduled = exportable.Scheduled;
+            ScheduledEnd = exportable.ScheduledEnd;
             _startTimeTbd = exportable.StartTimeTbd;
             _replacedBy = exportable.ReplacedBy != null ? URN.Parse(exportable.ReplacedBy) : null;
             LoadedFixtures = new List<CultureInfo>(exportable.LoadedFixtures ?? new List<CultureInfo>());
@@ -219,16 +219,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// instance was scheduled, or a null reference if the time is not known</returns>
         public async Task<DateTime?> GetScheduledAsync()
         {
-            if (_scheduled != null && _scheduled > DateTime.MinValue)
+            if (Scheduled != null && Scheduled > DateTime.MinValue)
             {
-                return _scheduled;
+                return Scheduled;
             }
             if (LoadedSummaries.Any())
             {
-                return _scheduled;
+                return Scheduled;
             }
             await FetchMissingSummary(new List<CultureInfo> { DefaultCulture }, false).ConfigureAwait(false);
-            return _scheduled;
+            return Scheduled;
         }
 
         /// <summary>
@@ -237,20 +237,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <returns>A <see cref="Task{DateTime}" /> representing the retrieval operation</returns>
         public async Task<DateTime?> GetScheduledEndAsync()
         {
-            if (_scheduledEnd != null && _scheduledEnd > DateTime.MinValue)
+            if (ScheduledEnd != null && ScheduledEnd > DateTime.MinValue)
             {
-                return _scheduledEnd;
+                return ScheduledEnd;
             }
-            if (_scheduled != null && _scheduled > DateTime.MinValue) // if _schedule is loaded, then something was prefetched
+            if (Scheduled != null && Scheduled > DateTime.MinValue) // if _schedule is loaded, then something was prefetched
             {
-                return _scheduledEnd;
+                return ScheduledEnd;
             }
             if (LoadedSummaries.Any())
             {
-                return _scheduledEnd;
+                return ScheduledEnd;
             }
             await FetchMissingSummary(new List<CultureInfo> { DefaultCulture }, false).ConfigureAwait(false);
-            return _scheduledEnd;
+            return ScheduledEnd;
         }
 
         /// <summary>
@@ -509,8 +509,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 Names[culture] = eventSummary.Name;
                 _sportId = eventSummary.SportId;
-                _scheduled = eventSummary.Scheduled;
-                _scheduledEnd = eventSummary.ScheduledEnd;
+                Scheduled = eventSummary.Scheduled;
+                ScheduledEnd = eventSummary.ScheduledEnd;
                 _startTimeTbd = eventSummary.StartTimeTbd;
                 _replacedBy = eventSummary.ReplacedBy;
             }

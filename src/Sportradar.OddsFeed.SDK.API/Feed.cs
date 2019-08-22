@@ -214,6 +214,9 @@ namespace Sportradar.OddsFeed.SDK.API
         /// </summary>
         private ConnectionValidator _connectionValidator;
 
+        /// <summary>
+        /// The feed initialized
+        /// </summary>
         protected bool FeedInitialized;
         private readonly object _lockInitialized = new object();
 
