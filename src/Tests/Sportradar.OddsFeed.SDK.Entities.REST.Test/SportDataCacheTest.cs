@@ -152,9 +152,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                     sport = await _sportDataCache.GetSportAsync(TestData.SportId, TestData.Cultures);
                     tournamentSport = await _sportDataCache.GetSportForTournamentAsync(URN.Parse("sr:tournament:146"), TestData.Cultures);
 
-                    tournamentEvents = await _sportEventCache.GetEventIdsAsync(TestData.TournamentId);
+                    tournamentEvents = await _sportEventCache.GetEventIdsAsync(TestData.TournamentId, _cultureEn);
                     tournament = (TournamentInfoCI)_sportEventCache.GetEventCacheItem(TestData.TournamentId);
-                    dateEvents = await _sportEventCache.GetEventIdsAsync(DateTime.Now);
+                    dateEvents = await _sportEventCache.GetEventIdsAsync(DateTime.Now, _cultureEn);
                 }).GetAwaiter().GetResult();
 
                 Assert.IsNotNull(sports, "Retrieved sports cannot be null");

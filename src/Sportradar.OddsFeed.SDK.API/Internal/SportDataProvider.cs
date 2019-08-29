@@ -135,14 +135,14 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// </summary>
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language or a null reference to use the languages specified in the configuration</param>
         /// <returns>A <see cref="Task{T}"/> representing the async operation</returns>
-        public Task<IEnumerable<ISport>> GetSportsAsync(CultureInfo culture = null)
+        public async Task<IEnumerable<ISport>> GetSportsAsync(CultureInfo culture = null)
         {
             var cs = culture == null ? _defaultCultures : new[] {culture};
             var s = cs.Aggregate(string.Empty, (current, cultureInfo) => current + (";" + cultureInfo.TwoLetterISOLanguageName));
             s = s.Substring(1);
 
             Log.Info($"Invoked GetSportsAsync: [Cultures={s}].");
-            var result = _sportEntityFactory.BuildSportsAsync(cs, _exceptionStrategy);
+            var result = await _sportEntityFactory.BuildSportsAsync(cs, _exceptionStrategy).ConfigureAwait(false);
 
             return result;
         }
@@ -153,14 +153,14 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="id">A <see cref="URN"/> identifying the sport to retrieve</param>
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language or a null reference to use the languages specified in the configuration</param>
         /// <returns>A <see cref="Task{ISport}"/> representing the async operation</returns>
-        public Task<ISport> GetSportAsync(URN id, CultureInfo culture = null)
+        public async Task<ISport> GetSportAsync(URN id, CultureInfo culture = null)
         {
             var cs = culture == null ? _defaultCultures : new[] { culture };
             var s = cs.Aggregate(string.Empty, (current, cultureInfo) => current + (";" + cultureInfo.TwoLetterISOLanguageName));
             s = s.Substring(1);
 
             Log.Info($"Invoked GetSportsAsync: [Id={id}, Cultures={s}].");
-            return _sportEntityFactory.BuildSportAsync(id, cs,_exceptionStrategy);
+            return await _sportEntityFactory.BuildSportAsync(id, cs,_exceptionStrategy).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -176,7 +176,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             Log.Info($"Invoked GetLiveSportEventsAsync: [Cultures={s}].");
 
-            var ids = await _sportEventCache.GetEventIdsAsync((DateTime?)null).ConfigureAwait(false);
+            var tasks = cs.Select(c => _sportEventCache.GetEventIdsAsync((DateTime?) null, c)).ToList();
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            var ids = tasks.First().Result;
             return ids.Select(item => _sportEntityFactory.BuildSportEvent<ICompetition>(item.Item1,
                                                                                         item.Item2,
                                                                                         culture == null ? _defaultCultures : new[] {culture},
@@ -198,7 +201,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             Log.Info($"Invoked GetSportEventsByDateAsync: [Date={date}, Cultures={s}].");
 
-            var ids = await _sportEventCache.GetEventIdsAsync(date).ConfigureAwait(false);
+            var tasks = cs.Select(c => _sportEventCache.GetEventIdsAsync(date, c)).ToList();
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            var ids = tasks.First().Result;
             return ids.Select(item => _sportEntityFactory.BuildSportEvent<ICompetition>(item.Item1,
                                                                                         item.Item2,
                                                                                         culture == null ? _defaultCultures : new[] {culture},

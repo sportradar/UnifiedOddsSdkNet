@@ -2,6 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -154,7 +155,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 var cache = _sportEventCache as SportEventCache;
                 if (cache != null)
                 {
-                    Task.Run(async () => await cache.GetEventIdsAsync(urn, null)).ConfigureAwait(false);
+                    Task.Run(async () => await cache.GetEventIdsAsync(urn, (IEnumerable<CultureInfo>) null)).ConfigureAwait(false);
                 }
             }
             catch (Exception e)

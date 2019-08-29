@@ -260,14 +260,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// Asynchronous gets a <see cref="IEnumerable{URN}"/> containing id's of sport events, which belong to the specified tournament
         /// </summary>
         /// <param name="tournamentId">A <see cref="URN"/> representing the tournament identifier</param>
+        /// <param name="culture">The culture to fetch the data</param>
         /// <returns>A <see cref="Task{T}"/> representing an asynchronous operation</returns>
-        public async Task<IEnumerable<Tuple<URN, URN>>> GetEventIdsAsync(URN tournamentId)
+        public async Task<IEnumerable<Tuple<URN, URN>>> GetEventIdsAsync(URN tournamentId, CultureInfo culture)
         {
             Metric.Context("CACHE").Meter("SportEventCache->GetEventIdsAsync by tournamentId", Unit.Calls);
 
             Contract.Assume(_cultures.Any());
 
-            var ci = _cultures.FirstOrDefault();
+            var ci = culture ?? _cultures.FirstOrDefault();
             Contract.Assume(ci != null);
 
             var schedule = await _dataRouterManager.GetSportEventsForTournamentAsync(tournamentId, ci, null).ConfigureAwait(false);
@@ -295,19 +296,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// Asynchronous gets a <see cref="IEnumerable{URN}"/> containing id's of sport events, which are scheduled for specified date
         /// </summary>
         /// <param name="date">The date for which to retrieve the schedule, or a null reference to get currently live events</param>
+        /// <param name="culture">The culture to fetch the data</param>
         /// <returns>A <see cref="Task{T}"/> representing an asynchronous operation</returns>
-        public async Task<IEnumerable<Tuple<URN, URN>>> GetEventIdsAsync(DateTime? date)
+        public async Task<IEnumerable<Tuple<URN, URN>>> GetEventIdsAsync(DateTime? date, CultureInfo culture)
         {
             Metric.Context("CACHE").Meter("SportEventCache->GetEventIdsAsync by date", Unit.Calls);
 
             Contract.Assume(_cultures.Any());
 
-            var culture = _cultures.FirstOrDefault();
+            var ci = culture ?? _cultures.FirstOrDefault();
             Contract.Assume(culture != null);
 
             var schedule = date == null
-                ? await _dataRouterManager.GetLiveSportEventsAsync(culture).ConfigureAwait(false)
-                : await _dataRouterManager.GetSportEventsForDateAsync(date.Value, culture).ConfigureAwait(false);
+                ? await _dataRouterManager.GetLiveSportEventsAsync(ci).ConfigureAwait(false)
+                : await _dataRouterManager.GetSportEventsForDateAsync(date.Value, ci).ConfigureAwait(false);
 
             return schedule;
         }

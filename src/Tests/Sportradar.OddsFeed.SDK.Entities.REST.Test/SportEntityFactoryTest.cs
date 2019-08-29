@@ -169,7 +169,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
                 for (var i = -1; i < 3; i++)
                 {
-                    tasks.Add(_sef.SportEventCache.GetEventIdsAsync(DateTime.Now.AddDays(i)));
+                    tasks.Add(_sef.SportEventCache.GetEventIdsAsync(DateTime.Now.AddDays(i), TestData.Culture));
                 }
 
                 IEnumerable<IEnumerable<Tuple<URN, URN>>> results = null;

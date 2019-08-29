@@ -171,7 +171,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             Task.Run(async () =>
             {
-                await _sportEventCache.GetEventIdsAsync(DateTime.Now);
+                await _sportEventCache.GetEventIdsAsync(DateTime.Now, TestData.Culture);
             }).GetAwaiter().GetResult();
 
             Assert.AreEqual(ScheduleEventCount, _memoryCache.Count());
@@ -196,7 +196,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             Task.Run(async () =>
             {
-                await _sportEventCache.GetEventIdsAsync(DateTime.Now);
+                await _sportEventCache.GetEventIdsAsync(DateTime.Now, TestData.Culture);
             }).GetAwaiter().GetResult();
 
             Assert.AreEqual(ScheduleEventCount, _sportEventCache.Cache.Count(c => c.Key.Contains("match")));
@@ -215,7 +215,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             Task.Run(async () =>
             {
-                await _sportEventCache.GetEventIdsAsync(TestData.TournamentId);
+                await _sportEventCache.GetEventIdsAsync(TestData.TournamentId, TestData.Culture);
                 Assert.AreEqual(TournamentEventCount, _memoryCache.Count());
                 Assert.AreEqual(1, _dataRouterManager.GetCallCount(TournamentSchedule), $"{TournamentSchedule} should be called exactly 1 times.");
 
@@ -230,7 +230,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(0, _memoryCache.Count());
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(TournamentSchedule), $"{TournamentSchedule} should be called exactly 0 times.");
 
-            var events = _sportEventCache.GetEventIdsAsync(TestData.TournamentId).Result;
+            var events = _sportEventCache.GetEventIdsAsync(TestData.TournamentId, TestData.Culture).Result;
             Assert.AreEqual(TournamentEventCount, _memoryCache.Count());
             Assert.AreEqual(TournamentEventCount, events.Count());
             Assert.AreEqual(1, _dataRouterManager.GetCallCount(TournamentSchedule), $"{TournamentSchedule} should be called exactly 1 times.");

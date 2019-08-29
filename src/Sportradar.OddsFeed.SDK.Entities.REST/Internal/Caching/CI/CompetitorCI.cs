@@ -362,7 +362,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// </summary>
         /// <param name="exportable">A <see cref="ExportableCompetitorCI"/> containing information about the sport entity</param>
         /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to fetch <see cref="CompetitorDTO"/></param>
-        internal CompetitorCI(ExportableCompetitorCI exportable, IDataRouterManager _dataRouterManager)
+        internal CompetitorCI(ExportableCompetitorCI exportable, IDataRouterManager dataRouterManager)
             : base(exportable)
         {
             Names = new Dictionary<CultureInfo, string>(exportable.Name);
@@ -377,7 +377,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _venue = exportable.Venue != null ? new VenueCI(exportable.Venue) : null;
             _gender = exportable.Gender;
             _fetchedCultures = new List<CultureInfo>(exportable.FetchedCultures);
-            this._dataRouterManager = _dataRouterManager;
+            _dataRouterManager = dataRouterManager;
             _primaryCulture = exportable.PrimaryCulture;
             _raceDriverProfile = exportable.RaceDriverProfile != null ? new RaceDriverProfileCI(exportable.RaceDriverProfile) : null;
             _referenceId = new ReferenceIdCI(exportable.ReferenceIds);
@@ -614,6 +614,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             }
         }
 
+        /// <summary>
+        /// Create exportable ci as an asynchronous operation
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>Task&lt;T&gt;.</returns>
         protected virtual async Task<T> CreateExportableCIAsync<T>() where T : ExportableCompetitorCI, new()
         {
             var jerseysList = new List<ExportableJerseyCI>();

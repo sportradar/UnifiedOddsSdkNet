@@ -55,12 +55,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <param name="cultures">A list of all languages for this instance</param>
         /// <param name="exceptionStrategy">The <see cref="ExceptionHandlingStrategy"/> indicating how to handle potential exceptions thrown during execution</param>
         public Season(URN id,
-                    URN sportId,
-                    ISportEntityFactory sportEntityFactory,
-                    ISportEventCache sportEventCache,
-                    ISportDataCache sportDataCache,
-                    IEnumerable<CultureInfo> cultures,
-                    ExceptionHandlingStrategy exceptionStrategy)
+                      URN sportId,
+                      ISportEntityFactory sportEntityFactory,
+                      ISportEventCache sportEventCache,
+                      ISportDataCache sportDataCache,
+                      IEnumerable<CultureInfo> cultures,
+                      ExceptionHandlingStrategy exceptionStrategy)
             : base(id, sportId, ExecutionLogPrivate, sportEventCache, cultures, exceptionStrategy)
         {
             Contract.Requires(id != null);
@@ -296,9 +296,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <returns>A <see cref="Task{T}"/> representing the asynchronous operation</returns>
         public async Task<IEnumerable<ICompetition>> GetScheduleAsync()
         {
-            var sportEventIds = ExceptionStrategy == ExceptionHandlingStrategy.THROW
-                ? await _sportEventCache.GetEventIdsAsync(Id).ConfigureAwait(false)
-                : await new Func<URN, Task<IEnumerable<Tuple<URN, URN>>>>(_sportEventCache.GetEventIdsAsync).SafeInvokeAsync(Id, ExecutionLog, GetFetchErrorMessage("Schedule")).ConfigureAwait(false);
+            IEnumerable<Tuple<URN, URN>> sportEventIds = null;
+            if (ExceptionStrategy == ExceptionHandlingStrategy.THROW)
+            {
+                var tasks = Cultures.Select(s => _sportEventCache.GetEventIdsAsync(Id, s)).ToList();
+                await Task.WhenAll(tasks).ConfigureAwait(false);
+                sportEventIds = tasks.First().Result;
+            }
+            else
+            {
+                var tasks = Cultures.Select(s => new Func<URN, CultureInfo, Task<IEnumerable<Tuple<URN, URN>>>>(_sportEventCache.GetEventIdsAsync).SafeInvokeAsync(Id, s, ExecutionLog, GetFetchErrorMessage("Schedule"))).ToList();
+                await Task.WhenAll(tasks).ConfigureAwait(false);
+                sportEventIds = tasks.First().Result;
+            }
+            //var sportEventIds = ExceptionStrategy == ExceptionHandlingStrategy.THROW
+            //    ? await _sportEventCache.GetEventIdsAsync(Id).ConfigureAwait(false)
+            //    : await new Func<URN, Task<IEnumerable<Tuple<URN, URN>>>>(_sportEventCache.GetEventIdsAsync).SafeInvokeAsync(Id, ExecutionLog, GetFetchErrorMessage("Schedule")).ConfigureAwait(false);
 
             return sportEventIds?.Select(i => _sportEntityFactory.BuildSportEvent<ICompetition>(i.Item1, i.Item2, Cultures, ExceptionStrategy)).ToList();
         }
