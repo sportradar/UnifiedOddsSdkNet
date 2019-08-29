@@ -273,6 +273,26 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 AwayPenaltyScore = record.away_penalty_score;
             }
+
+            // load home and away penalty score from the penalty period score
+            if (HomePenaltyScore == null && AwayPenaltyScore == null && PeriodScores != null && PeriodScores.Any())
+            {
+                try
+                {
+                    foreach (var periodScoreDTO in PeriodScores)
+                    {
+                        if (periodScoreDTO.Type.HasValue && periodScoreDTO.Type.Value == PeriodType.Penalties)
+                        {
+                            HomePenaltyScore = (int) periodScoreDTO.HomeScore;
+                            AwayPenaltyScore = (int) periodScoreDTO.AwayScore;
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    //ignored
+                }
+            }
         }
 
         /// <summary>
@@ -390,6 +410,26 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             }
 
             DecidedByFed = record.decided_by_fedSpecified ? record.decided_by_fed : (bool?) null;
+
+            // load home and away penalty score from the penalty period score
+            if (HomePenaltyScore == null && AwayPenaltyScore == null && PeriodScores != null && PeriodScores.Any())
+            {
+                try
+                {
+                    foreach (var periodScoreDTO in PeriodScores)
+                    {
+                        if (periodScoreDTO.Type.HasValue && periodScoreDTO.Type.Value == PeriodType.Penalties)
+                        {
+                            HomePenaltyScore = (int) periodScoreDTO.HomeScore;
+                            AwayPenaltyScore = (int) periodScoreDTO.AwayScore;
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    //ignored
+                }
+            }
         }
 
         /// <summary>
@@ -426,24 +466,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
             Status = MessageMapperHelper.GetEnumValue(record.status, EventStatus.Unknown);
             ApplyPropertyValue(true, "Status", (int) Status, tempProperties);
-            //IsReported = record.reportingSpecified
-            //    ? (int?)record.reporting
-            //    : null;
-
-            //HomeScore = record.home_scoreSpecified
-            //    ? (decimal?)record.home_score
-            //    : null;
-
-            //AwayScore = record.away_scoreSpecified
-            //    ? (decimal?)record.away_score
-            //    : null;
-
-            //if (!string.IsNullOrEmpty(record.status))
-            //{
-            //    int statusId;
-            //    int.TryParse(record.status, out statusId);
-            //    MatchStatusId = statusId;
-            //}
 
             MatchStatusId = -1;
 
