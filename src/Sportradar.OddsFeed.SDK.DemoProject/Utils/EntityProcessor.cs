@@ -3,6 +3,7 @@
 */
 using System;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.API;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
@@ -13,35 +14,42 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
     /// <summary>
     /// Class used to handle messages dispatched by non-specific entity dispatchers - the event is always represented as <see cref="ISportEvent"/>
     /// </summary>
-    internal class EntityProcessor : IEntityProcessor
+    internal class EntityProcessor<T> : IEntityProcessor where T : ISportEvent
     {
         /// <summary>
         /// A <see cref="ILog"/> instance used for logging
         /// </summary>
         // ReSharper disable once StaticMemberInGenericType
-        private static readonly ILog Log = LogManager.GetLogger(typeof(EntityProcessor));
+        private static readonly ILog Log = LogManager.GetLogger("EntityProcessor");
 
         /// <summary>
         /// A <see cref="IEntityDispatcher{ISportEvent}"/> used to obtain SDK messages
         /// </summary>
-        private readonly IEntityDispatcher<ISportEvent> _dispatcher;
+        private readonly IEntityDispatcher<T> _dispatcher;
 
         /// <summary>
         /// A <see cref="SportEntityWriter"/> used to write the sport entities data
         /// </summary>
-        private readonly SportEntityWriter _writer;
+        private readonly SportEntityWriter _sportEntityWriter;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EntityProcessor"/> class.
+        /// A <see cref="MarketWriter"/> used to write market and outcome data
+        /// </summary>
+        private readonly MarketWriter _marketWriter;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EntityProcessor"/> class
         /// </summary>
         /// <param name="dispatcher">A <see cref="IEntityDispatcher{ISportEvent}" /> whose dispatched entities will be processed by the current instance</param>
         /// <param name="writer">A <see cref="SportEntityWriter" /> used to output / log the dispatched entities</param>
-        public EntityProcessor(IEntityDispatcher<ISportEvent> dispatcher, SportEntityWriter writer = null)
+        /// <param name="marketWriter">A <see cref="MarketWriter"/> used to write market and outcome data</param>
+        public EntityProcessor(IEntityDispatcher<T> dispatcher, SportEntityWriter writer = null, MarketWriter marketWriter = null)
         {
             Contract.Requires(dispatcher != null);
 
             _dispatcher = dispatcher;
-            _writer = writer;
+            _sportEntityWriter = writer;
+            _marketWriter = marketWriter;
         }
 
         /// <summary>
@@ -52,7 +60,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         {
             Contract.Invariant(Log != null);
             Contract.Invariant(_dispatcher != null);
-            Contract.Invariant(_writer != null);
+            Contract.Invariant(_sportEntityWriter != null);
         }
 
         /// <summary>
@@ -60,10 +68,11 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// </summary>
         /// <param name="sender">The instance raising the event</param>
         /// <param name="e">The event arguments</param>
-        private void OnBetStopReceived(object sender, BetStopEventArgs<ISportEvent> e)
+        protected virtual void OnBetStopReceived(object sender, BetStopEventArgs<T> e)
         {
-            // this method should never be invoked because the entity is always processed by a specific entity dispatcher
-            throw new NotImplementedException();
+            var betstop = e.GetBetStop();
+            Log.Info($"BetStop received. EventId:{betstop.Event.Id} Producer:{betstop.Producer}, Tag:{betstop.Groups}, RequestId:{betstop.RequestId}");
+            _sportEntityWriter?.WriteData(betstop.Event);
         }
 
         /// <summary>
@@ -71,10 +80,14 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// </summary>
         /// <param name="sender">The instance raising the event</param>
         /// <param name="e">The event arguments</param>
-        private void OnOddsChangeReceived(object sender, OddsChangeEventArgs<ISportEvent> e)
+        protected virtual void OnOddsChangeReceived(object sender, OddsChangeEventArgs<T> e)
         {
-            // this method should never be invoked because the entity is always processed by a specific entity dispatcher
-            throw new NotImplementedException();
+            Contract.Requires(e != null);
+
+            var oddsChange = e.GetOddsChange();
+            Log.Info($"OddsChange received. EventId:{oddsChange.Event.Id} Producer:{oddsChange.Producer} RequestId:{oddsChange.RequestId}");
+            _sportEntityWriter?.WriteData(oddsChange.Event);
+            _marketWriter?.WriteMarketNamesForEvent(oddsChange.Markets);
         }
 
         /// <summary>
@@ -82,10 +95,12 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// </summary>
         /// <param name="sender">The instance raising the event</param>
         /// <param name="e">The event arguments</param>
-        private void OnBetSettlementReceived(object sender, BetSettlementEventArgs<ISportEvent> e)
+        private void OnBetSettlementReceived(object sender, BetSettlementEventArgs<T> e)
         {
-            // this method should never be invoked because the entity is always processed by a specific entity dispatcher
-            throw new NotImplementedException();
+            var betSettlement = e.GetBetSettlement();
+            Log.Info($"BetSettlement received. EventId:{betSettlement.Event.Id} Producer:{betSettlement.Producer}, RequestId:{betSettlement.RequestId}, Market count:{betSettlement.Markets.Count()}");
+            _sportEntityWriter?.WriteData(betSettlement.Event);
+            _marketWriter?.WriteMarketNamesForEvent(betSettlement.Markets);
         }
 
         /// <summary>
@@ -93,10 +108,12 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// </summary>
         /// <param name="sender">The instance raising the event</param>
         /// <param name="e">The event arguments</param>
-        private void OnRollbackBetSettlement(object sender, RollbackBetSettlementEventArgs<ISportEvent> e)
+        private void OnRollbackBetSettlement(object sender, RollbackBetSettlementEventArgs<T> e)
         {
-            // this method should never be invoked because the entity is always processed by a specific entity dispatcher
-            throw new NotImplementedException();
+            var settlementRollback = e.GetBetSettlementRollback();
+            Log.Info($"RollbackBetSettlement received. Producer:{settlementRollback.Producer}, RequestId:{settlementRollback.RequestId}, MarketCount:{settlementRollback.Markets.Count()}");
+            _sportEntityWriter?.WriteData(settlementRollback.Event);
+            _marketWriter?.WriteMarketNamesForEvent(settlementRollback.Markets);
         }
 
         /// <summary>
@@ -104,10 +121,12 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// </summary>
         /// <param name="sender">The instance raising the event</param>
         /// <param name="e">The event arguments</param>
-        private void OnBetCancel(object sender, BetCancelEventArgs<ISportEvent> e)
+        private void OnBetCancel(object sender, BetCancelEventArgs<T> e)
         {
-            // this method should never be invoked because the entity is always processed by a specific entity dispatcher
-            throw new NotImplementedException();
+            var betCancel = e.GetBetCancel();
+            Log.Info($"BetCancel received. Producer:{betCancel.Producer}, RequestId:{betCancel.RequestId}, MarketCount:{betCancel.Markets.Count()}");
+            _sportEntityWriter?.WriteData(betCancel.Event);
+            _marketWriter?.WriteMarketNamesForEvent(betCancel.Markets);
         }
 
         /// <summary>
@@ -115,10 +134,12 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// </summary>
         /// <param name="sender">The instance raising the event</param>
         /// <param name="e">The event arguments</param>
-        private void OnRollbackBetCancel(object sender, RollbackBetCancelEventArgs<ISportEvent> e)
+        private void OnRollbackBetCancel(object sender, RollbackBetCancelEventArgs<T> e)
         {
-            // this method should never be invoked because the entity is always processed by a specific entity dispatcher
-            throw new NotImplementedException();
+            var cancelRollback = e.GetBetCancelRollback();
+            Log.Info($"RollbackBetCancel received. Producer:{cancelRollback.Producer}, RequestId:{cancelRollback.RequestId}, MarketCount:{cancelRollback.Markets.Count()}");
+            _sportEntityWriter?.WriteData(cancelRollback.Event);
+            _marketWriter?.WriteMarketNamesForEvent(cancelRollback.Markets);
         }
 
         /// <summary>
@@ -126,10 +147,11 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// </summary>
         /// <param name="sender">The instance raising the event</param>
         /// <param name="e">The event arguments</param>
-        private void OnFixtureChange(object sender, FixtureChangeEventArgs<ISportEvent> e)
+        private void OnFixtureChange(object sender, FixtureChangeEventArgs<T> e)
         {
-            // this method should never be invoked because the entity is always processed by a specific entity dispatcher
-            throw new NotImplementedException();
+            var fixtureChange = e.GetFixtureChange();
+            Log.Info($"FixtureChange received. Producer:{fixtureChange.Producer}, RequestId:{fixtureChange.RequestId}, EventId:{fixtureChange.Event.Id}");
+            _sportEntityWriter?.WriteData(fixtureChange.Event);
         }
 
         /// <summary>

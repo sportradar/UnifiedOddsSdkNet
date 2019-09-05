@@ -89,6 +89,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
             if (orgIds == null)
             {
                 _log.Debug($"No market mapping for marketId:{market.Id}.");
+                return;
             }
             foreach (var orgId in orgIds)
             {

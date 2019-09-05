@@ -25,6 +25,16 @@ The package contains:
 For more information please contact support@sportradar.com or visit https://iodocs.betradar.com/unifiedsdk/index.html
 
 CHANGE LOG:
+2019-09-05  1.24.0.0
+Exposed option to delete old matches from cache - introduced ISportDataProviderV4
+Loading home and away penalty score from penalty PeriodScore if present
+Fix: return types in ISportDataProviderV3 (breaking change)
+Fix: updated CustomConfigurationBuilder not to override pre-configured values
+Fix: OutcomeDefinition null for variant markets
+Fix: ProfileCache - CommunicationException is not wrapped in CacheItemNotFoundException
+Fix: schedule date between normal and virtual feed synchronized
+Fix: SportDataProvider methods invokes API requests for correct language
+
 2019-07-19  1.23.1.0
 Fix: ReplayFeed init exception
 

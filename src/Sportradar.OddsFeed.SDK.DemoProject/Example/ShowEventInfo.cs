@@ -60,7 +60,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Example
             var seasonDispatcher = session.CreateSportSpecificMessageDispatcher<ISeason>();
 
             _log.Info("Creating event processors");
-            var defaultEventsProcessor = new EntityProcessor(session, sportEntityWriter);
+            var defaultEventsProcessor = new EntityProcessor<ISportEvent>(session, sportEntityWriter);
             var matchEventsProcessor = new SpecificEntityProcessor<IMatch>(_log, matchDispatcher, sportEntityWriter);
             var stageEventsProcessor = new SpecificEntityProcessor<IStage>(_log, stageDispatcher, sportEntityWriter);
             var tournamentEventsProcessor = new SpecificEntityProcessor<ITournament>(_log, tournamentDispatcher, sportEntityWriter);
