@@ -117,7 +117,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// </summary>
         public const string NameProviderCompositeIdSeparator = ",";
         /// <summary>
-        /// The is o8601 24 h full format
+        /// The iso8601 24h full format
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public const string ISO8601_24H_FullFormat = "yyyy-MM-dd’T’HH:mm:ssXXX";

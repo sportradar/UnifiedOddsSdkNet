@@ -37,12 +37,12 @@ namespace Sportradar.OddsFeed.SDK.API.Extended
         /// <summary>
         /// The data router manager
         /// </summary>
-        private readonly IDataRouterManager _dataRouterManager;
+        private IDataRouterManager _dataRouterManager;
 
         /// <summary>
         /// The feed message receiver
         /// </summary>
-        private readonly IMessageReceiver _feedMessageReceiver;
+        private IMessageReceiver _feedMessageReceiver;
 
         /// <summary>
         /// Constructs a new instance of the <see cref="Feed"/> class
@@ -51,17 +51,6 @@ namespace Sportradar.OddsFeed.SDK.API.Extended
         public FeedExt(IOddsFeedConfiguration config)
             : base(config)
         {
-            _dataRouterManager = UnityContainer.Resolve<IDataRouterManager>();
-            if (_dataRouterManager != null)
-            {
-                _dataRouterManager.RawApiDataReceived += OnRawApiDataReceived;
-            }
-
-            _feedMessageReceiver = UnityContainer.Resolve<IMessageReceiver>();
-            if (_feedMessageReceiver != null)
-            {
-                _feedMessageReceiver.RawFeedMessageReceived += OnRawFeedMessageReceived;
-            }
         }
 
         private void OnRawApiDataReceived(object sender, RawApiDataEventArgs e)
@@ -140,6 +129,18 @@ namespace Sportradar.OddsFeed.SDK.API.Extended
             }
 
             base.Open();
+
+            _dataRouterManager = UnityContainer.Resolve<IDataRouterManager>();
+            if (_dataRouterManager != null)
+            {
+                _dataRouterManager.RawApiDataReceived += OnRawApiDataReceived;
+            }
+
+            _feedMessageReceiver = UnityContainer.Resolve<IMessageReceiver>();
+            if (_feedMessageReceiver != null)
+            {
+                _feedMessageReceiver.RawFeedMessageReceived += OnRawFeedMessageReceived;
+            }
         }
     }
 }
