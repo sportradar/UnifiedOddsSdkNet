@@ -222,7 +222,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             RegisterSportEventCache(container, config.Locales.ToList());
             RegisterSportDataCache(container, config.Locales.ToList());
             RegisterCacheMessageProcessor(container);
-            RegisterSessionTypes(container);
+            RegisterSessionTypes(container, config);
             RegisterProducersProvider(container, config);
             RegisterMarketMappingProviderTypes(container);
             RegisterFeedSystemSession(container);
@@ -623,14 +623,23 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                                            new ResolvedParameter<IDataProvider<EntityList<TournamentInfoDTO>>>("availableSportTournaments")));
         }
 
-        private static void RegisterSessionTypes(IUnityContainer container)
+        private static void RegisterSessionTypes(IUnityContainer container, IOddsFeedConfigurationInternal config)
         {
             Contract.Requires(container != null);
 
             container.RegisterType<IDeserializer<FeedMessage>, Deserializer<FeedMessage>>(new HierarchicalLifetimeManager());
             container.RegisterType<IRoutingKeyParser, RegexRoutingKeyParser>(new HierarchicalLifetimeManager());
             container.RegisterType<IRabbitMqChannel, RabbitMqChannel>(new HierarchicalLifetimeManager());
-            container.RegisterType<IMessageReceiver, RabbitMqMessageReceiver>(new HierarchicalLifetimeManager());
+            container.RegisterType<IMessageReceiver, RabbitMqMessageReceiver>(
+                new HierarchicalLifetimeManager(),
+                new InjectionConstructor(
+                    new ResolvedParameter<IRabbitMqChannel>(),
+                    new ResolvedParameter<IDeserializer<FeedMessage>>(),
+                    new ResolvedParameter<IRoutingKeyParser>(),
+                    new ResolvedParameter<IProducerManager>(),
+                    config.Environment == SdkEnvironment.Replay));
+
+            //IRabbitMqChannel channel, IDeserializer<FeedMessage> deserializer, IRoutingKeyParser keyParser, IProducerManager producerManager, bool usedReplay
 
             RegisterSessionMessageProcessor(container);
 

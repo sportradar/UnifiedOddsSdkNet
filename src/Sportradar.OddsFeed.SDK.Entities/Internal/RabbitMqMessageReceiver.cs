@@ -55,6 +55,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// </summary>
         private readonly IRoutingKeyParser _keyParser;
 
+        /// <summary>
+        /// The <see cref="IProducerManager"/> used to get the available <see cref="IProducer"/>
+        /// </summary>
         private readonly IProducerManager _producerManager;
 
         /// <summary>
@@ -78,13 +81,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         public event EventHandler<RawFeedMessageEventArgs> RawFeedMessageReceived;
 
         /// <summary>
+        /// Is connected to the replay server
+        /// </summary>
+        private readonly bool _useReplay;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RabbitMqMessageReceiver"/> class
         /// </summary>
         /// <param name="channel">A <see cref="IRabbitMqChannel"/> representing a channel to the RabbitMQ broker</param>
         /// <param name="deserializer">A <see cref="IDeserializer{T}"/> instance used for de-serialization of messages received from the feed</param>
         /// <param name="keyParser">A <see cref="IRoutingKeyParser"/> used to parse the rabbit's routing key</param>
         /// <param name="producerManager">An <see cref="IProducerManager"/> used to get <see cref="IProducer"/></param>
-        public RabbitMqMessageReceiver(IRabbitMqChannel channel, IDeserializer<FeedMessage> deserializer, IRoutingKeyParser keyParser, IProducerManager producerManager)
+        /// <param name="usedReplay">Is connected to the replay server</param>
+        public RabbitMqMessageReceiver(IRabbitMqChannel channel, IDeserializer<FeedMessage> deserializer, IRoutingKeyParser keyParser, IProducerManager producerManager, bool usedReplay)
         {
             Contract.Requires(channel != null);
             Contract.Requires(deserializer != null);
@@ -95,6 +104,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             _deserializer = deserializer;
             _keyParser = keyParser;
             _producerManager = producerManager;
+            _useReplay = usedReplay;
         }
 
         /// <summary>
@@ -154,7 +164,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             catch (Exception e)
             {
                 ExecutionLog.Error($"Error dispatching raw message for {feedMessage.EventId}", e);
-            }
+            } 
             // continue normal processing
 
             if (!_producerManager.Exists(feedMessage.ProducerId))
@@ -166,7 +176,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             var producer = _producerManager.Get(feedMessage.ProducerId);
             var messageName = feedMessage.GetType().Name;
 
-            if (!producer.IsAvailable || producer.IsDisabled)
+            if (!_useReplay && (!producer.IsAvailable || producer.IsDisabled))
             {
                 ExecutionLog.Debug($"A message for producer which is disabled was received. Producer={producer}, MessageType={messageName}");
                 return;
