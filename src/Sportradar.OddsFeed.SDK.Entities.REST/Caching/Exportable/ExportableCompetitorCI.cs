@@ -63,6 +63,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public string Gender { get; set; }
 
         /// <summary>
+        /// A <see cref="string"/> representing the age group
+        /// </summary>
+        public string AgeGroup { get; set; }
+
+        /// <summary>
         /// A <see cref="ExportableRaceDriverProfileCI"/> representing the race driver profile
         /// </summary>
         public ExportableRaceDriverProfileCI RaceDriverProfile { get; set; }

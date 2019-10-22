@@ -166,6 +166,7 @@
     <Compile Include="IBasicTournament.cs" />
     <Compile Include="IBonusInfo.cs" />
     <Compile Include="IBookmakerDetails.cs" />
+    <Compile Include="ICompetitorV3.cs" />
     <Compile Include="IGroupV1.cs" />
     <Compile Include="IMatchStatusV2.cs" />
     <Compile Include="Caching\Exportable\ExportableCategoryCI.cs" />

@@ -22,7 +22,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// <seealso cref="Player" />
     /// <seealso cref="ICompetitor" />
     [DataContract]
-    internal class Competitor : Player, ICompetitorV2
+    internal class Competitor : Player, ICompetitorV3
     {
         private readonly CompetitorCI _competitorCI;
         private readonly IProfileCache _profileCache;
@@ -367,5 +367,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 return raceDriverProfileCI == null ? null : new RaceDriverProfile(raceDriverProfileCI);
             }
         }
+
+        /// <summary>
+        /// Gets the age group
+        /// </summary>
+        /// <value>The age group</value>
+        public string AgeGroup => GetCompetitor()?.AgeGroup;
     }
 }
