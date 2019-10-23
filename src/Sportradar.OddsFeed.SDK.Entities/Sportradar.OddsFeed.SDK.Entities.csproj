@@ -102,8 +102,11 @@
   <ItemGroup>
     <Compile Include="BetSettlementCertainty.cs" />
     <Compile Include="CashoutStatus.cs" />
+    <Compile Include="IAdditionalProbabilities.cs" />
     <Compile Include="IMarketCancel.cs" />
+    <Compile Include="Internal\AdditionalProbabilities.cs" />
     <Compile Include="Internal\EntitiesImpl\OutcomeDefinition.cs" />
+    <Compile Include="IOutcomeOddsV2.cs" />
     <Compile Include="IOutcomeV1.cs" />
     <Compile Include="IOutcomeDefinition.cs" />
     <Compile Include="IMessageV1.cs" />
