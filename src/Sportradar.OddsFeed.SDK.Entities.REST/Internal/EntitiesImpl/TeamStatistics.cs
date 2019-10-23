@@ -8,7 +8,7 @@ using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
 {
-    class TeamStatistics : ITeamStatisticsV1
+    class TeamStatistics : ITeamStatisticsV2
     {
         public URN TeamId { get; }
         public string Name { get; }
@@ -18,6 +18,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public int? RedCards { get; }
         public int? YellowRedCards { get; }
         public int? CornerKicks { get; }
+        public int? GreenCards { get; }
 
         public TeamStatistics(TeamStatisticsDTO dto)
         {
@@ -31,6 +32,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             RedCards = dto.RedCards;
             YellowRedCards = dto.YellowRedCards;
             CornerKicks = dto.CornerKicks;
+            GreenCards = dto.GreenCards;
         }
     }
 }
