@@ -25,6 +25,14 @@ The package contains:
 For more information please contact support@sportradar.com or visit https://iodocs.betradar.com/unifiedsdk/index.html
 
 CHANGE LOG:
+2019-10-24  1.25.0.0
+Added cache state export/import
+Added property AgeGroup to the Competitor (extended with ICompetitorV3)
+Added property GreenCards to the TeamStatistics (extended with ITeamStatisticsV2)
+Added IAdditionalProbabilities to the OutcomesOdds (extended with IOutcomesOddsV2)
+Fix: replay ignores messages from inactive producers
+Fix: green card can be null in sport event statistics
+
 2019-09-05  1.24.0.0
 Exposed option to delete old matches from cache - introduced ISportDataProviderV4
 Loading home and away penalty score from penalty PeriodScore if present
