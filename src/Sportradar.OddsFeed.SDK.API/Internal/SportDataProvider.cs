@@ -499,11 +499,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="skipInitialFetch">Indicates wither the cache managers should skip initial fetch after the import</param>
         public Task CacheImportAsync(IEnumerable<ExportableCI> items)
         {
+            var cacheItems = items.ToList();
             var tasks = new List<Task>
             {
-                (_sportDataCache as IExportableSdkCache).ImportAsync(items),
-                (_sportEventCache as IExportableSdkCache).ImportAsync(items),
-                (_profileCache as IExportableSdkCache).ImportAsync(items)
+                (_sportDataCache as IExportableSdkCache).ImportAsync(cacheItems),
+                (_sportEventCache as IExportableSdkCache).ImportAsync(cacheItems),
+                (_profileCache as IExportableSdkCache).ImportAsync(cacheItems)
             };
             tasks.ForEach(t => t.ConfigureAwait(false));
             return Task.WhenAll(tasks);

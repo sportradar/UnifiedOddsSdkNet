@@ -50,6 +50,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject
             Console.WriteLine(" 6 - All together \t\t(includes all options above)");
             Console.WriteLine(" 7 - Extra: Market Mappings \t(displays market mappings related to sport events)");
             Console.WriteLine(" 8 - Extra: Replay Server \t(how to interact with xReplay Server)");
+            Console.WriteLine(" 9 - Extra: Export/import \t(how to export/import current cache state)");
             Console.Write(" Enter number: ");
             var k = Console.ReadKey();
 
@@ -98,6 +99,11 @@ namespace Sportradar.OddsFeed.SDK.DemoProject
                 case '8':
                 {
                     new ReplayServer(_log).Run(MessageInterest.AllMessages);
+                    break;
+                }
+                case '9':
+                {
+                    new CacheExportImport(_log).Run(MessageInterest.AllMessages);
                     break;
                 }
                 default:

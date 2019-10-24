@@ -1171,7 +1171,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             {
                 foreach (var exportable in items)
                 {
-                    AddNewCacheItem(_sportEventCacheItemFactory.Build(exportable));
+                    if (exportable is ExportableSportEventCI)
+                        AddNewCacheItem(_sportEventCacheItemFactory.Build(exportable));
                 }
             }
         }
