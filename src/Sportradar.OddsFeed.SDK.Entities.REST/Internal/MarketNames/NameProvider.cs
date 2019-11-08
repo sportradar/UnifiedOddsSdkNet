@@ -450,9 +450,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                     {
                         HandleErrorCondition("Reloading market description", outcomeId, null, culture, null);
                         await _marketCacheProvider.ReloadMarketDescriptionAsync((int) marketDescriptor.Id,
-                                                                                _specifiers,
-                                                                                ((MarketDescription) marketDescriptor)
-                                                                               .MarketDescriptionCI.SourceCache).ConfigureAwait(false);
+                                                                                _specifiers).ConfigureAwait(false);
                         return await GetMarketDescriptionForOutcomeAsync(outcomeId, culture, false).ConfigureAwait(false);
                     }
                 }
@@ -470,9 +468,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                     {
                         HandleErrorCondition("Reloading market description", outcomeId, null, culture, null);
                         await _marketCacheProvider.ReloadMarketDescriptionAsync((int)marketDescriptor.Id,
-                                                                                _specifiers,
-                                                                                ((MarketDescription)marketDescriptor)
-                                                                               .MarketDescriptionCI.SourceCache).ConfigureAwait(false);
+                                                                                _specifiers).ConfigureAwait(false);
                         return await GetMarketDescriptionForOutcomeAsync(outcomeId, culture, false).ConfigureAwait(false);
                     }
                 }

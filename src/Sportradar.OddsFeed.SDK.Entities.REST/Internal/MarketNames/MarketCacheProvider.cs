@@ -191,45 +191,31 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// </summary>
         /// <param name="marketId">The market identifier</param>
         /// <param name="specifiers">A dictionary specifying market specifiers or a null reference if market is invariant</param>
-        /// <param name="sourceCache">The source cache <see cref="MarketDescriptionCacheItem"/> belongs to</param>
         /// <returns>True if succeeded, false otherwise</returns>
-        public async Task<bool> ReloadMarketDescriptionAsync(int marketId, IReadOnlyDictionary<string, string> specifiers, string sourceCache)
+        public async Task<bool> ReloadMarketDescriptionAsync(int marketId, IReadOnlyDictionary<string, string> specifiers)
         {
-            if (string.IsNullOrEmpty(sourceCache))
-            {
-                _executionLog.Warn($"Calling ReloadMarketDescriptionAsync without sourceCache. (marketId={marketId})");
-                return false;
-            }
             try
             {
-
-                if (sourceCache.Equals("InvariantMarketDescriptionsCache", StringComparison.InvariantCultureIgnoreCase))
+                string variantValue = null;
+                specifiers?.TryGetValue(SdkInfo.VariantDescriptionName, out variantValue);
+                if (string.IsNullOrEmpty(variantValue))
                 {
                     _executionLog.Debug("Reloading invariant market description list");
                     return await _invariantMarketsCache.LoadMarketDescriptionsAsync().ConfigureAwait(false);
                 }
-                if (sourceCache.Equals("VariantDescriptionListCache", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    _executionLog.Debug("Reloading variant market description list");
-                    return await _variantDescriptionListCache.LoadMarketDescriptionsAsync().ConfigureAwait(false);
-                }
-                if (sourceCache.Equals("VariantMarketDescriptionCache", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    string variantValue = null;
-                    specifiers?.TryGetValue(SdkInfo.VariantDescriptionName, out variantValue);
-                    _executionLog.Debug($"Reloading variant market description for market={marketId} and variant={variantValue}");
-                    var variantMarketDescriptionCache = (VariantMarketDescriptionCache) _variantMarketsCache;
-                    variantMarketDescriptionCache.CacheDeleteItem(VariantMarketDescriptionCache.GetCacheKey(marketId, variantValue),
-                                                                  CacheItemType.MarketDescription);
-                    return true;
-                }
+
+                _executionLog.Debug($"Reloading variant market description for market={marketId} and variant={variantValue}");
+                var variantMarketDescriptionCache = (VariantMarketDescriptionCache)_variantMarketsCache;
+                variantMarketDescriptionCache.CacheDeleteItem(VariantMarketDescriptionCache.GetCacheKey(marketId, variantValue),
+                    CacheItemType.MarketDescription);
+                _executionLog.Debug("Reloading variant market description list");
+                return await _variantDescriptionListCache.LoadMarketDescriptionsAsync().ConfigureAwait(false);
             }
             catch (Exception e)
             {
                 _executionLog.Warn("Error reloading market description(s).", e);
+                return false;
             }
-            _executionLog.Warn($"Calling ReloadMarketDescriptionAsync with unknown sourceCache={sourceCache}. (marketId={marketId})");
-            return false;
         }
     }
 }
