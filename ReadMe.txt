@@ -25,6 +25,10 @@ The package contains:
 For more information please contact support@sportradar.com or visit https://iodocs.betradar.com/unifiedsdk/index.html
 
 CHANGE LOG:
+2019-11-08  1.26.0.0
+Fix: better market description cache handling
+Fix: Season.GetCompetitorsAsync returns competitors from groups if needed
+
 2019-10-24  1.25.0.0
 Added cache state export/import
 Added property AgeGroup to the Competitor (extended with ICompetitorV3)
