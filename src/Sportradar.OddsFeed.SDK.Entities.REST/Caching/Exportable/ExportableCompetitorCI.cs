@@ -83,5 +83,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         /// A <see cref="CultureInfo"/> representing the primary culture
         /// </summary>
         public CultureInfo PrimaryCulture { get; set; }
+
+        /// <summary>
+        /// A <see cref="DateTime"/>
+        /// </summary>
+        public DateTime? LastTimeCompetitorProfileIsFetched { get; set; }
+
+        /// <summary>
+        /// The list of CultureInfo used to fetch competitor profiles
+        /// </summary>
+        public IEnumerable<CultureInfo> CultureCompetitorProfileFetched { get; set; }
     }
 }

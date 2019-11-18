@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
@@ -77,9 +78,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public IEnumerable<IPlayer> AssociatedPlayers {
             get
             {
-                if (GetCompetitor().AssociatedPlayerIds != null && GetCompetitor().AssociatedPlayerIds.Any())
+                var associatedPlayerIds = GetCompetitor()?.AssociatedPlayerIds?.ToList();
+                if (associatedPlayerIds != null && associatedPlayerIds.Any())
                 {
-                    return _sportEntityFactory.BuildPlayersAsync(GetCompetitor().AssociatedPlayerIds, _cultures).Result;
+                    return _sportEntityFactory.BuildPlayersAsync(associatedPlayerIds, _cultures).Result;
                 }
 
                 return null;

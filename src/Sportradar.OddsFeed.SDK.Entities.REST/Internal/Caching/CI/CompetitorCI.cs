@@ -47,6 +47,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         private string _gender;
         private string _ageGroup;
         private RaceDriverProfileCI _raceDriverProfile;
+        private DateTime _lastTimeCompetitorProfileFetched;
+        private List<CultureInfo> _cultureCompetitorProfileFetched;
+
+        /// <summary>
+        /// Last time (if any) competitor profile was fetched
+        /// </summary>
+        public DateTime LastTimeCompetitorProfileFetched => _lastTimeCompetitorProfileFetched;
+
+        /// <summary>
+        /// The list of CultureInfo used to fetch competitor profiles
+        /// </summary>
+        public List<CultureInfo> CultureCompetitorProfileFetched => _cultureCompetitorProfileFetched;
 
         /// <summary>
         /// Gets the name of the competitor in the specified language
@@ -268,6 +280,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _abbreviations = new Dictionary<CultureInfo, string>();
             _associatedPlayerIds = new List<URN>();
             _jerseys = new List<JerseyCI>();
+            _lastTimeCompetitorProfileFetched = DateTime.MinValue;
+            _cultureCompetitorProfileFetched = new List<CultureInfo>();
             Merge(competitor, culture);
         }
 
@@ -277,8 +291,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="competitor">A <see cref="CompetitorProfileDTO"/> containing information about the competitor</param>
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the passed <code>dto</code></param>
         /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to fetch <see cref="CompetitorProfileDTO"/></param>
-        internal CompetitorCI(CompetitorProfileDTO competitor, CultureInfo culture,
-            IDataRouterManager dataRouterManager = null)
+        internal CompetitorCI(CompetitorProfileDTO competitor, CultureInfo culture, IDataRouterManager dataRouterManager = null)
             : base(competitor.Competitor)
         {
             Contract.Requires(competitor != null);
@@ -294,6 +307,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _abbreviations = new Dictionary<CultureInfo, string>();
             _associatedPlayerIds = new List<URN>();
             _jerseys = new List<JerseyCI>();
+            _lastTimeCompetitorProfileFetched = DateTime.MinValue;
+            _cultureCompetitorProfileFetched = new List<CultureInfo>();
             Merge(competitor, culture);
         }
 
@@ -303,8 +318,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="competitor">A <see cref="SimpleTeamProfileDTO"/> containing information about the competitor</param>
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the passed <code>dto</code></param>
         /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to fetch <see cref="SimpleTeamProfileDTO"/></param>
-        internal CompetitorCI(SimpleTeamProfileDTO competitor, CultureInfo culture,
-            IDataRouterManager dataRouterManager = null)
+        internal CompetitorCI(SimpleTeamProfileDTO competitor, CultureInfo culture, IDataRouterManager dataRouterManager = null)
             : base(competitor.Competitor)
         {
             Contract.Requires(competitor != null);
@@ -320,6 +334,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _abbreviations = new Dictionary<CultureInfo, string>();
             _associatedPlayerIds = new List<URN>();
             _jerseys = new List<JerseyCI>();
+            _lastTimeCompetitorProfileFetched = DateTime.MinValue;
+            _cultureCompetitorProfileFetched = new List<CultureInfo>();
             Merge(competitor, culture);
         }
 
@@ -329,8 +345,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="playerCompetitor">A <see cref="PlayerCompetitorDTO"/> containing information about the competitor</param>
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the passed <code>dto</code></param>
         /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to fetch <see cref="CompetitorDTO"/></param>
-        internal CompetitorCI(PlayerCompetitorDTO playerCompetitor, CultureInfo culture,
-            IDataRouterManager dataRouterManager)
+        internal CompetitorCI(PlayerCompetitorDTO playerCompetitor, CultureInfo culture, IDataRouterManager dataRouterManager)
             : base(playerCompetitor)
         {
             Contract.Requires(playerCompetitor != null);
@@ -347,6 +362,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _abbreviations = new Dictionary<CultureInfo, string>();
             _associatedPlayerIds = new List<URN>();
             _jerseys = new List<JerseyCI>();
+            _lastTimeCompetitorProfileFetched = DateTime.MinValue;
+            _cultureCompetitorProfileFetched = new List<CultureInfo>();
             Merge(playerCompetitor, culture);
         }
 
@@ -373,6 +390,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _dataRouterManager = originalCompetitorCI._dataRouterManager;
             _primaryCulture = originalCompetitorCI._primaryCulture;
             _raceDriverProfile = originalCompetitorCI._raceDriverProfile;
+            _lastTimeCompetitorProfileFetched = originalCompetitorCI._lastTimeCompetitorProfileFetched;
+            _cultureCompetitorProfileFetched = originalCompetitorCI._cultureCompetitorProfileFetched;
         }
 
         /// <summary>
@@ -400,6 +419,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _primaryCulture = exportable.PrimaryCulture;
             _raceDriverProfile = exportable.RaceDriverProfile != null ? new RaceDriverProfileCI(exportable.RaceDriverProfile) : null;
             _referenceId = new ReferenceIdCI(exportable.ReferenceIds);
+            _lastTimeCompetitorProfileFetched = DateTime.MinValue;
+            if (exportable.LastTimeCompetitorProfileIsFetched.HasValue)
+            {
+                _lastTimeCompetitorProfileFetched = exportable.LastTimeCompetitorProfileIsFetched.Value;
+            }
+            if (exportable.CultureCompetitorProfileFetched != null)
+            {
+                _cultureCompetitorProfileFetched = exportable.CultureCompetitorProfileFetched.ToList();
+            }
         }
 
         /// <summary>
@@ -517,6 +545,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 _raceDriverProfile = new RaceDriverProfileCI(competitorProfile.RaceDriverProfile);
             }
 
+            if (competitorProfile.Players != null && competitorProfile.Players.Any())
+            {
+                _lastTimeCompetitorProfileFetched = DateTime.Now;
+                _cultureCompetitorProfileFetched.Add(culture);
+            }
+
             ((List<CultureInfo>) _fetchedCultures).Add(culture);
         }
 
@@ -547,6 +581,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             {
                 _ageGroup = simpleTeamProfile.Competitor.AgeGroup;
             }
+
+            if (simpleTeamProfile.Competitor.Players != null && simpleTeamProfile.Competitor.Players.Any())
+            {
+                _lastTimeCompetitorProfileFetched = DateTime.Now;
+                _cultureCompetitorProfileFetched.Add(culture);
+            }
             ((List<CultureInfo>) _fetchedCultures).Add(culture);
         }
 
@@ -573,7 +613,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         internal void Merge(CompetitorCI item)
         {
             if (item == null)
+            {
                 throw new ArgumentNullException(nameof(item));
+            }
 
             foreach (var k in item.Names.Keys)
             {
@@ -600,6 +642,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _ageGroup = item._ageGroup ?? _ageGroup;
             _raceDriverProfile = item._raceDriverProfile ?? _raceDriverProfile;
             _referenceId = item._referenceId ?? _referenceId;
+            _lastTimeCompetitorProfileFetched = item._lastTimeCompetitorProfileFetched;
+            _cultureCompetitorProfileFetched = item._cultureCompetitorProfileFetched?.ToList();
         }
 
         private ReferenceIdCI UpdateReferenceIds(URN id, IDictionary<string, string> referenceIds)
@@ -676,7 +720,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 AgeGroup = _ageGroup,
                 RaceDriverProfile = _raceDriverProfile != null ? await _raceDriverProfile.ExportAsync().ConfigureAwait(false) : null,
                 FetchedCultures = new ReadOnlyCollection<CultureInfo>(_fetchedCultures.ToList()),
-                PrimaryCulture = _primaryCulture
+                PrimaryCulture = _primaryCulture,
+                LastTimeCompetitorProfileIsFetched = _lastTimeCompetitorProfileFetched > DateTime.MinValue
+                                                     ? _lastTimeCompetitorProfileFetched
+                                                     : (DateTime?) null,
+                CultureCompetitorProfileFetched = _cultureCompetitorProfileFetched
             };
 
             return exportable;
