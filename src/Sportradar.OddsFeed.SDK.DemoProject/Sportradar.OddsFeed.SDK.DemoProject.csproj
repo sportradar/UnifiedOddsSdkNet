@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Example\CacheExportImport.cs" />
+    <Compile Include="Example\MultiThreaded.cs" />
     <Compile Include="Example\ReplayServer.cs" />
     <Compile Include="Example\Basic.cs" />
     <Compile Include="Example\CompleteInfo.cs" />
