@@ -151,10 +151,13 @@
     <Compile Include="Internal\RecoveryOperation.cs" />
     <Compile Include="Internal\RecoveryResult.cs" />
     <Compile Include="Internal\RecoveryStatusChangeReason.cs" />
+    <Compile Include="Internal\Replay\ReplayEvent.cs" />
     <Compile Include="Internal\TimestampTracker.cs" />
     <Compile Include="Extended\IOddsFeedExt.cs" />
     <Compile Include="IOddsFeedV2.cs" />
     <Compile Include="IOddsFeedV1.cs" />
+    <Compile Include="IReplayEvent.cs" />
+    <Compile Include="IReplayManagerV2.cs" />
     <Compile Include="IReplayManagerV1.cs" />
     <Compile Include="IReplayScenario.cs" />
     <Compile Include="Internal\Replay\ReplayScenario.cs" />
