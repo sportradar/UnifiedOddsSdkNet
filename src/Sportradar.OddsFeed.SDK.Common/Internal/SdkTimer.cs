@@ -124,7 +124,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
             _dueTime = dueTime;
             _period = period;
 
-            _timer.Change(_dueTime, _period);
+            _timer?.Change(_dueTime, _period);
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <param name="dueTime">The due time.</param>
         public void FireOnce(TimeSpan dueTime)
         {
-            _timer.Change(dueTime, TimeSpan.FromMilliseconds(-1));
+            _timer?.Change(dueTime, TimeSpan.FromMilliseconds(-1));
         }
 
         /// <summary>
@@ -143,7 +143,10 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// </summary>
         public void Stop()
         {
-            _timer.Change(-1, -1);
+            if (!_isDisposed)
+            {
+                _timer?.Change(-1, -1);
+            }
         }
 
         /// <summary>
