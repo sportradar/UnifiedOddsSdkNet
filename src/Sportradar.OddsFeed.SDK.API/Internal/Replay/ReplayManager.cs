@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Net.Http;
 using System.Xml;
 using Sportradar.OddsFeed.SDK.Common.Internal.Log;
@@ -18,7 +19,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
     /// </summary>
     /// <seealso cref="IReplayManagerV1" />
     [Log(LoggerType.ClientInteraction)]
-    public class ReplayManager : MarshalByRefObject, IReplayManagerV1
+    public class ReplayManager : MarshalByRefObject, IReplayManagerV2
     {
         private readonly IDataRestful _dataRestful;
 
@@ -92,6 +93,16 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
         /// </summary>
         public IEnumerable<URN> GetEventsInQueue()
         {
+            var result = GetReplayEventsInQueue();
+            return result?.Select(e => e.Id).ToList();
+        }
+
+        /// <summary>
+        /// Gets list of replay events in queue.
+        /// </summary>
+        /// <returns>Returns a list of replay events</returns>
+        public IEnumerable<IReplayEvent> GetReplayEventsInQueue()
+        {
             var uri = new Uri($"{_apiHost}/{BuildNodeIdQuery("?")}");
 
             var response = _dataRestful.GetDataAsync(uri).Result;
@@ -105,20 +116,21 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
             var xml = new XmlDocument();
             xml.Load(response);
 
-            var result = new List<URN>();
+            var result = new List<IReplayEvent>();
             var xmlNodeList = xml.DocumentElement?.SelectNodes("event");
-            if (xmlNodeList != null)
+            if (xmlNodeList == null)
+                return result;
+
+            foreach (XmlNode node in xmlNodeList)
             {
-                foreach (XmlNode node in xmlNodeList)
-                {
-                    if (node.Attributes != null)
-                    {
-                        var urn = node.Attributes["id"].Value;
-                        int position;
-                        int.TryParse(node.Attributes["position"].Value, out position);
-                        result.Add(URN.Parse(urn));
-                    }
-                }
+                if (node.Attributes == null)
+                    continue;
+
+                int outValue;
+                var urn = node.Attributes["id"].Value;
+                var position = int.TryParse(node.Attributes["position"].Value, out outValue) ? (int?) outValue : null;
+                var startTime = int.TryParse(node.Attributes["start_time"].Value, out outValue) ? (int?)outValue : null;
+                result.Add(new ReplayEvent(URN.Parse(urn), position, startTime));
             }
             return result;
         }
