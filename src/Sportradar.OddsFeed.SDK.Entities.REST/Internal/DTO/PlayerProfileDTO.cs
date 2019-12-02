@@ -73,10 +73,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// Gets the <see cref="DateTime"/> specifying when the associated message was generated (on the server side)
         /// </summary>
         public DateTime? GeneratedAt { get; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PlayerProfileDTO"/> class
         /// </summary>
         /// <param name="record">A <see cref="playerExtended"/> containing information about the player</param>
+        /// <param name="generatedAt">The time the message this belongs to was created</param>
         public PlayerProfileDTO(playerExtended record, DateTime? generatedAt)
             :base(record.id, record.name)
         {
