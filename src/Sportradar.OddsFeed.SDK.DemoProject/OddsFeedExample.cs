@@ -51,7 +51,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject
             Console.WriteLine("  7 - Extra: Market Mappings \t(displays market mappings related to sport events)");
             Console.WriteLine("  8 - Extra: Replay Server \t(how to interact with xReplay Server)");
             Console.WriteLine("  9 - Extra: Export/import \t(how to export/import current cache state)");
-            Console.WriteLine(" 10 - Extra: Advanced setup \t(single session with multithreaded message parsing)");
+            Console.WriteLine(" 10 - Extra: Advanced setup \t(single session with multi-threaded message parsing)");
             Console.Write(" Enter number: ");
             var k = Console.ReadLine();
 

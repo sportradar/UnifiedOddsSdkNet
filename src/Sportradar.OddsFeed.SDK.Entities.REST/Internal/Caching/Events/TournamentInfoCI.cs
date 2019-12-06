@@ -236,11 +236,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             return await PrepareCompetitorList(_competitors, wantedCultures);
         }
 
-        private async Task<IEnumerable<CompetitorCI>> PrepareCompetitorList(IEnumerable<CompetitorCI> competitors,
-            IEnumerable<CultureInfo> cultures)
+        private async Task<IEnumerable<CompetitorCI>> PrepareCompetitorList(IEnumerable<CompetitorCI> competitors, IEnumerable<CultureInfo> cultures)
         {
             if (competitors != null)
+            {
                 return competitors;
+            }
 
             var groups = await GetGroupsAsync(cultures);
             return groups?.SelectMany(g => g.Competitors).Distinct();

@@ -20,7 +20,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
         public ReplayEvent(URN id, int? position, int? startTime)
         {
             if (id == null)
+            {
                 throw new ArgumentNullException(nameof(id));
+            }
             Id = id;
             Position = position;
             StartTime = startTime;

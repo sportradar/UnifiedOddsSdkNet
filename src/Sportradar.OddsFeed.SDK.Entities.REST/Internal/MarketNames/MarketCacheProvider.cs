@@ -206,8 +206,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
                 _executionLog.Debug($"Reloading variant market description for market={marketId} and variant={variantValue}");
                 var variantMarketDescriptionCache = (VariantMarketDescriptionCache)_variantMarketsCache;
-                variantMarketDescriptionCache.CacheDeleteItem(VariantMarketDescriptionCache.GetCacheKey(marketId, variantValue),
-                    CacheItemType.MarketDescription);
+                variantMarketDescriptionCache.CacheDeleteItem(VariantMarketDescriptionCache.GetCacheKey(marketId, variantValue), CacheItemType.MarketDescription);
                 _executionLog.Debug("Reloading variant market description list");
                 return await _variantDescriptionListCache.LoadMarketDescriptionsAsync().ConfigureAwait(false);
             }

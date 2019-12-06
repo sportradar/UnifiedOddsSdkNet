@@ -496,7 +496,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// Exports current items in the cache
         /// </summary>
         /// <param name="items">Collection of <see cref="ExportableCI"/> containing the items to be imported</param>
-        /// <param name="skipInitialFetch">Indicates wither the cache managers should skip initial fetch after the import</param>
         public Task CacheImportAsync(IEnumerable<ExportableCI> items)
         {
             var cacheItems = items.ToList();

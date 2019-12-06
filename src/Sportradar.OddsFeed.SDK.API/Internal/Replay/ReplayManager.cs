@@ -119,7 +119,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
             var result = new List<IReplayEvent>();
             var xmlNodeList = xml.DocumentElement?.SelectNodes("event");
             if (xmlNodeList == null)
+            {
                 return result;
+            }
 
             foreach (XmlNode node in xmlNodeList)
             {
