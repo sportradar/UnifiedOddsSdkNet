@@ -9,6 +9,14 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2019-12-09  1.27.0.0
+Added GetReplayEventsInQueue to the ReplayManager (extended with IReplayManagerV2)
+Added example for parsing messages in separate thread
+Improved fetching and loading PeriodStatistics
+Improved logic for getting player profiles
+Improved logic for parsing round groupId
+Fix: handling null markets in MarketMessage
+
 2019-11-08  1.26.0.0
 Fix: better market description cache handling
 Fix: Season.GetCompetitorsAsync returns competitors from groups if needed
