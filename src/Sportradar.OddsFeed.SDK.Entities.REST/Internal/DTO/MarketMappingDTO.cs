@@ -95,7 +95,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
             if (mapping.mapping_outcome != null)
             {
-                OutcomeMappings = mapping.mapping_outcome.Select(o => new OutcomeMappingDTO(o, mapping.market_id));
+                OutcomeMappings = mapping.mapping_outcome.Select(o => new OutcomeMappingDTO(o,
+                    string.IsNullOrEmpty(mapping.product_market_id) ? mapping.market_id : mapping.product_market_id));
             }
         }
     }
