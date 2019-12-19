@@ -88,8 +88,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         {
             Guard.Argument(culture).NotNull();
             Guard.Argument(item).NotNull();
-            Guard.Argument(item.Name).NotNull();
-            Guard.Argument(item.Name.Any());
+            Guard.Argument(item.Name).NotNull().NotEmpty();
 
             if (item.Name.Count == 1) // must be only 1 name (received from mapper)
             {
