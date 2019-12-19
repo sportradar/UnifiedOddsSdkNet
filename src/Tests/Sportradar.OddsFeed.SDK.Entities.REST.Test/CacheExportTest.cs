@@ -1,7 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Caching;
@@ -123,12 +122,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(0, status["CompetitorCI"]);
             Assert.AreEqual(0, status["PlayerProfileCI"]);
 
-            object _ci = _profileCache.GetPlayerProfileAsync(URN.Parse("sr:player:1"), TestData.Cultures).Result;
-            _ci = _profileCache.GetPlayerProfileAsync(URN.Parse("sr:player:2"), TestData.Cultures).Result;
-            _ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:competitor:1"), TestData.Cultures).Result;
-            _ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:competitor:2"), TestData.Cultures).Result;
-            _ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:simpleteam:1"), TestData.Cultures).Result;
-            _ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:simpleteam:2"), TestData.Cultures).Result;
+            object ci = _profileCache.GetPlayerProfileAsync(URN.Parse("sr:player:1"), TestData.Cultures).Result;
+            Assert.IsNotNull(ci);
+            ci = _profileCache.GetPlayerProfileAsync(URN.Parse("sr:player:2"), TestData.Cultures).Result;
+            Assert.IsNotNull(ci);
+            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:competitor:1"), TestData.Cultures).Result;
+            Assert.IsNotNull(ci);
+            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:competitor:2"), TestData.Cultures).Result;
+            Assert.IsNotNull(ci);
+            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:simpleteam:1"), TestData.Cultures).Result;
+            Assert.IsNotNull(ci);
+            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:simpleteam:2"), TestData.Cultures).Result;
+            Assert.IsNotNull(ci);
 
             status = _profileCache.CacheStatus();
             Assert.AreEqual(0, status["TeamCompetitorCI"]);
@@ -153,12 +158,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(Competitor), $"{Competitor} should be called exactly 0 times.");
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(PlayerProfile), $"{PlayerProfile} should be called exactly 0 times.");
 
-            object _ci = _profileCache.GetPlayerProfileAsync(URN.Parse("sr:player:1"), TestData.Cultures).Result;
-            _ci = _profileCache.GetPlayerProfileAsync(URN.Parse("sr:player:2"), TestData.Cultures).Result;
-            _ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:competitor:1"), TestData.Cultures).Result;
-            _ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:competitor:2"), TestData.Cultures).Result;
-            _ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:simpleteam:1"), TestData.Cultures).Result;
-            _ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:simpleteam:2"), TestData.Cultures).Result;
+            // ReSharper disable once RedundantAssignment
+            object ci = _profileCache.GetPlayerProfileAsync(URN.Parse("sr:player:1"), TestData.Cultures).Result;
+            ci = _profileCache.GetPlayerProfileAsync(URN.Parse("sr:player:2"), TestData.Cultures).Result;
+            Assert.IsNotNull(ci);
+            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:competitor:1"), TestData.Cultures).Result;
+            Assert.IsNotNull(ci);
+            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:competitor:2"), TestData.Cultures).Result;
+            Assert.IsNotNull(ci);
+            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:simpleteam:1"), TestData.Cultures).Result;
+            Assert.IsNotNull(ci);
+            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:simpleteam:2"), TestData.Cultures).Result;
+            Assert.IsNotNull(ci);
 
             Assert.AreEqual(TestData.Cultures.Count * 4, _dataRouterManager.GetCallCount(Competitor), $"{Competitor} should be called exactly {TestData.Cultures.Count * 4} times.");
             Assert.AreEqual(TestData.Cultures.Count * 2, _dataRouterManager.GetCallCount(PlayerProfile), $"{PlayerProfile} should be called exactly {TestData.Cultures.Count * 2} times.");

@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Common.Internal;
@@ -47,8 +47,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
 
         internal MarketDescription(MarketDescriptionCacheItem cacheItem, IEnumerable<CultureInfo> cultures)
         {
-            Contract.Requires(cacheItem != null);
-            Contract.Requires(cultures != null && cultures.Any());
+            Guard.Argument(cacheItem).NotNull();
+            Guard.Argument(cultures != null && cultures.Any());
 
             var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
 

@@ -2,11 +2,9 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
-using Sportradar.OddsFeed.SDK.Entities.REST.Contracts;
 using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
@@ -14,7 +12,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
     /// <summary>
     /// Defines a contract implemented by classes used to cache market descriptions
     /// </summary>
-    [ContractClass(typeof(MarketDescriptionCacheContract))]
     public interface IMarketDescriptionCache
     {
         /// <summary>

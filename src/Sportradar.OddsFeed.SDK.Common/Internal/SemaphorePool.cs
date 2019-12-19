@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -132,6 +132,8 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <returns>A <see cref="Task{SemaphoreSlim}"/> representing an async operation</returns>
         public Task<SemaphoreSlim> Acquire(string id)
         {
+            Guard.Argument(id).NotNull().NotEmpty();
+
             var idFound = false;
             //_executionLog.Debug($"Entering lock for request with id={id}");
             lock (_syncObject)
@@ -179,6 +181,8 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <exception cref="System.ArgumentException"></exception>
         public void Release(string id)
         {
+            Guard.Argument(id).NotNull().NotEmpty();
+
             lock (_syncObject)
             {
                 foreach (var holder in _semaphores)
@@ -227,7 +231,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
             /// <param name="semaphore">The semaphore</param>
             public SemaphoreHolder(SemaphoreSlim semaphore)
             {
-                Contract.Requires(semaphore != null);
+                Guard.Argument(semaphore).NotNull();
 
                 Semaphore = semaphore;
             }

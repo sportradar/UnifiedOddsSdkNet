@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
@@ -96,12 +96,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                                        ICacheManager cacheManager)
             : base(cacheManager)
         {
-            Contract.Requires(cache != null);
-            Contract.Requires(dataRouterManager != null);
-            Contract.Requires(mappingValidatorFactory != null);
-            Contract.Requires(timer != null);
-            Contract.Requires(prefetchLanguages != null && prefetchLanguages.Any());
-
+            Guard.Argument(cache).NotNull();
+            Guard.Argument(dataRouterManager).NotNull();
+            Guard.Argument(mappingValidatorFactory).NotNull();
+            Guard.Argument(timer).NotNull();
+            Guard.Argument(prefetchLanguages).NotNull().NotEmpty();
 
             _cache = cache;
             _dataRouterManager = dataRouterManager;
@@ -110,19 +109,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             _prefetchLanguages = new ReadOnlyCollection<CultureInfo>(prefetchLanguages.ToList());
             _timer.Elapsed += OnTimerElapsed;
             _timer.Start();
-        }
-
-        /// <summary>
-        /// Defines object invariants as required by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_cache != null);
-            Contract.Invariant(_dataRouterManager != null);
-            Contract.Invariant(_mappingValidatorFactory != null);
-            Contract.Invariant(_timer != null);
-            Contract.Invariant(_prefetchLanguages != null && _prefetchLanguages.Any());
         }
 
         /// <summary>
@@ -205,7 +191,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <exception cref="FormatException">An error occurred while mapping deserialized entities</exception>
         private async Task<VariantDescriptionCacheItem> GetVariantDescriptionInternalAsync(string id, IEnumerable<CultureInfo> cultures)
         {
-            Contract.Requires(cultures != null && cultures.Any());
+            Guard.Argument(cultures).NotNull().NotEmpty();
 
             var cultureList = cultures as List<CultureInfo> ?? cultures.ToList();
 
@@ -528,8 +514,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <param name="descriptions">A <see cref="IEnumerable{MarketDescriptionDTO}"/> containing market descriptions in specified language</param>
         private void Merge(CultureInfo culture, IEnumerable<VariantDescriptionDTO> descriptions)
         {
-            Contract.Requires(culture != null);
-            Contract.Requires(descriptions != null && descriptions.Any());
+            Guard.Argument(culture).NotNull();
+            Guard.Argument(descriptions).NotNull().NotEmpty();
 
             var descriptionList = descriptions as List<VariantDescriptionDTO> ?? descriptions.ToList();
             try

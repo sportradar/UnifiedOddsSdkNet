@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using System.Net.Http;
 using System.Xml;
@@ -35,19 +35,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
         /// <param name="nodeId">The node id used to connect to replay server</param>
         public ReplayManager(string replayApiHost, IDataRestful dataRestful, int nodeId)
         {
+            Guard.Argument(replayApiHost).NotNull().NotEmpty();
+            Guard.Argument(dataRestful).NotNull();
+
             _apiHost = replayApiHost;
             _dataRestful = dataRestful;
             _nodeId = nodeId;
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_dataRestful != null);
-            Contract.Invariant(!string.IsNullOrEmpty(_apiHost));
         }
 
         /// <summary>

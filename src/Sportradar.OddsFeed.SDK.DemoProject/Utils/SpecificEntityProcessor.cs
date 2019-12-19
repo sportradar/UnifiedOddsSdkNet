@@ -1,7 +1,7 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.API;
@@ -45,23 +45,13 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// <param name="marketWriter">A <see cref="MarketWriter"/> used to write market and outcome data</param>
         public SpecificEntityProcessor(ILog log, ISpecificEntityDispatcher<T> dispatcher, SportEntityWriter sportEntityWriter = null, MarketWriter marketWriter = null)
         {
-            Contract.Requires(dispatcher != null);
-            Contract.Requires(log != null);
+            Guard.Argument(dispatcher).NotNull();
+            Guard.Argument(log).NotNull();
 
             _log = log;
             _dispatcher = dispatcher;
             _sportEntityWriter = sportEntityWriter;
             _marketWriter = marketWriter;
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_log != null);
-            Contract.Invariant(_dispatcher != null);
         }
 
         /// <summary>
@@ -83,7 +73,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// <param name="e">The event arguments</param>
         protected virtual void OnOddsChangeReceived(object sender, OddsChangeEventArgs<T> e)
         {
-            Contract.Requires(e != null);
+            Guard.Argument(e).NotNull();
 
             var oddsChange = e.GetOddsChange();
             _log.Info($"OddsChange received. EventId:{oddsChange.Event.Id} Producer:{oddsChange.Producer} RequestId:{oddsChange.RequestId}");

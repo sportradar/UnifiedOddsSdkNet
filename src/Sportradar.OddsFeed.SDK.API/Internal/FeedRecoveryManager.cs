@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using System.Threading;
 using Common.Logging;
@@ -115,27 +115,16 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                                    IProducerManager producerManager,
                                    IFeedSystemSession systemSession)
         {
-            Contract.Requires(producerRecoveryManagerFactory != null);
-            Contract.Requires(config != null);
-            Contract.Requires(timer != null);
-            Contract.Requires(producerManager != null);
-            Contract.Requires(systemSession != null);
+            Guard.Argument(producerRecoveryManagerFactory).NotNull();
+            Guard.Argument(config).NotNull();
+            Guard.Argument(timer).NotNull();
+            Guard.Argument(producerManager).NotNull();
+            Guard.Argument(systemSession).NotNull();
 
             _producerRecoveryManagerFactory = producerRecoveryManagerFactory;
             _inactivityTimer = timer;
             _producerManager = producerManager;
             _systemSession = systemSession;
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_producerRecoveryManagerFactory != null);
-            Contract.Invariant(_inactivityTimer != null);
-            Contract.Invariant(_executionLog != null);
         }
 
         /// <summary>
@@ -239,7 +228,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="interests">The interests for which to open trackers</param>
         public void Open(IEnumerable<MessageInterest> interests)
         {
-            Contract.Requires(interests != null);
+            Guard.Argument(interests).NotNull().NotEmpty();
 
             var interestList = interests as List<MessageInterest> ?? interests.ToList();
 

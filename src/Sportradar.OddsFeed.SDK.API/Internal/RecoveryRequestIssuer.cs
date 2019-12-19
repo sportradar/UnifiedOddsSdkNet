@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
@@ -63,23 +63,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="config">The <see cref="IOddsFeedConfiguration"/> used to get nodeId</param>
         public RecoveryRequestIssuer(IDataPoster dataPoster, ISequenceGenerator sequenceGenerator, IOddsFeedConfiguration config)
         {
-            Contract.Requires(dataPoster != null);
-            Contract.Requires(sequenceGenerator != null);
-            Contract.Requires(config != null);
+            Guard.Argument(dataPoster).NotNull();
+            Guard.Argument(sequenceGenerator).NotNull();
+            Guard.Argument(config).NotNull();
 
             _dataPoster = dataPoster;
             _sequenceGenerator = sequenceGenerator;
             _nodeId = config.NodeId;
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_sequenceGenerator != null);
-            Contract.Invariant(_dataPoster != null);
         }
 
         /// <summary>
@@ -90,6 +80,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns> <see cref="Task{HttpStatusCode}"/> representing the async operation</returns>
         public async Task<long> RecoverEventMessagesAsync(IProducer producer, URN eventId)
         {
+            Guard.Argument(producer).NotNull();
+            Guard.Argument(eventId).NotNull();
+
             if (!producer.IsAvailable || producer.IsDisabled)
             {
                 throw new ArgumentException($"Producer {producer} is disabled in the SDK", nameof(producer));
@@ -124,6 +117,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns> <see cref="Task{HttpStatusCode}"/> representing the async operation</returns>
         public async Task<long> RecoverEventStatefulMessagesAsync(IProducer producer, URN eventId)
         {
+            Guard.Argument(producer).NotNull();
+            Guard.Argument(eventId).NotNull();
+
             if (!producer.IsAvailable || producer.IsDisabled)
             {
                 throw new ArgumentException($"Producer {producer} is disabled in the SDK", nameof(producer));
@@ -162,6 +158,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <exception cref="NotImplementedException"></exception>
         public async Task<long> RequestRecoveryAfterTimestampAsync(IProducer producer, DateTime dateAfter, int nodeId)
         {
+            Guard.Argument(producer).NotNull();
+
             if (!producer.IsAvailable || producer.IsDisabled)
             {
                 throw new ArgumentException($"Producer {producer} is disabled in the SDK", nameof(producer));
@@ -222,6 +220,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <exception cref="System.NotImplementedException"></exception>
         public async Task<long> RequestFullOddsRecoveryAsync(IProducer producer, int nodeId)
         {
+            Guard.Argument(producer).NotNull();
+
             if (!producer.IsAvailable || producer.IsDisabled)
             {
                 throw new ArgumentException($"Producer {producer} is disabled in the SDK", nameof(producer));

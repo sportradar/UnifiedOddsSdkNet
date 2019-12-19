@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -48,23 +48,12 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// <param name="writeNotCacheableData">A <see cref="bool"/> indicating whether data not cached by the SDK should also be retrieved & written</param>
         internal SportEntityWriter(TaskProcessor taskProcessor, CultureInfo culture, bool writeNotCacheableData = false)
         {
-            Contract.Requires(taskProcessor != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(taskProcessor).NotNull();
+            Guard.Argument(culture).NotNull();
 
             _taskProcessor = taskProcessor;
             _culture = culture;
             _writeNotCacheableData = writeNotCacheableData;
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_log != null);
-            Contract.Invariant(_taskProcessor != null);
-            Contract.Invariant(_culture != null);
         }
 
         /// <summary>
@@ -74,8 +63,8 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// <param name="builder">The <see cref="StringBuilder"/> to which to add the data</param>
         private void AddEntityData(ISportEvent sportEvent, StringBuilder builder)
         {
-            Contract.Requires(sportEvent != null);
-            Contract.Requires(builder != null);
+            Guard.Argument(sportEvent).NotNull();
+            Guard.Argument(builder).NotNull();
 
             var scheduled = _taskProcessor.GetTaskResult(sportEvent.GetScheduledTimeAsync());
             var scheduledEnd = _taskProcessor.GetTaskResult(sportEvent.GetScheduledEndTimeAsync());
@@ -96,8 +85,8 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// <param name="builder">The <see cref="StringBuilder"/> to which to add the data</param>
         private void AddSportEventData(ICompetition competition, StringBuilder builder)
         {
-            Contract.Requires(competition != null);
-            Contract.Requires(builder != null);
+            Guard.Argument(competition).NotNull();
+            Guard.Argument(builder).NotNull();
 
             AddEntityData(competition, builder);
 
@@ -124,8 +113,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// <returns>A <see cref="StringBuilder"/> containing string representation of the provided stage</returns>
         private StringBuilder WriteStageData(IStage stage)
         {
-            Contract.Requires(stage != null);
-            Contract.Ensures(Contract.Result<StringBuilder>() != null);
+            Guard.Argument(stage).NotNull();
 
             var builder = new StringBuilder();
             AddSportEventData(stage, builder);
@@ -171,8 +159,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// <returns>A <see cref="StringBuilder"/> containing string representation of the provided match</returns>
         private StringBuilder WriteMatchData(IMatch match)
         {
-            Contract.Requires(match != null);
-            Contract.Ensures(Contract.Result<StringBuilder>() != null);
+            Guard.Argument(match).NotNull();
 
             var builder = new StringBuilder();
             AddSportEventData(match, builder);
@@ -274,8 +261,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// <returns>A <see cref="StringBuilder"/> containing string representation of the provided season</returns>
         private StringBuilder WriteBasicTournamentData(IBasicTournament tournament)
         {
-            Contract.Requires(tournament != null);
-            Contract.Ensures(Contract.Result<StringBuilder>() != null);
+            Guard.Argument(tournament).NotNull();
 
             var builder = new StringBuilder();
             AddEntityData(tournament, builder);
@@ -303,8 +289,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// <returns>A <see cref="StringBuilder"/> containing string representation of the provided tournament</returns>
         private StringBuilder WriteTournamentData(ITournament tournament)
         {
-            Contract.Requires(tournament != null);
-            Contract.Ensures(Contract.Result<StringBuilder>() != null);
+            Guard.Argument(tournament).NotNull();
 
             var builder = new StringBuilder();
             AddEntityData(tournament, builder);
@@ -339,8 +324,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// <returns>A <see cref="StringBuilder"/> containing string representation of the provided season</returns>
         private StringBuilder WriteSeasonData(ISeason season)
         {
-            Contract.Requires(season != null);
-            Contract.Ensures(Contract.Result<StringBuilder>() != null);
+            Guard.Argument(season).NotNull();
 
             var builder = new StringBuilder();
             AddEntityData(season, builder);
@@ -392,7 +376,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// <returns>A <see cref="StringBuilder"/> containing string representation of the provided tournament</returns>
         private string WriteTournamentInfoData(ITournamentInfo tournament)
         {
-            Contract.Requires(tournament != null);
+            Guard.Argument(tournament).NotNull();
 
             var tourSeasonStr = string.Empty;
             if (tournament.CurrentSeason != null)
@@ -452,8 +436,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// <returns>A <see cref="StringBuilder"/> containing string representation of the provided draw</returns>
         private StringBuilder WriteDrawData(IDraw draw)
         {
-            Contract.Requires(draw != null);
-            Contract.Ensures(Contract.Result<StringBuilder>() != null);
+            Guard.Argument(draw).NotNull();
 
             var builder = new StringBuilder();
             AddEntityData(draw, builder);
@@ -479,8 +462,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// <returns>A <see cref="StringBuilder"/> containing string representation of the provided lottery</returns>
         private StringBuilder WriteLotteryData(ILottery lottery)
         {
-            Contract.Requires(lottery != null);
-            Contract.Ensures(Contract.Result<StringBuilder>() != null);
+            Guard.Argument(lottery).NotNull();
 
             var builder = new StringBuilder();
             AddEntityData(lottery, builder);
@@ -530,7 +512,6 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// <param name="entity">The <see cref="T"/> whose data is to be written</param>
         public void WriteData<T>(T entity) where T : ISportEvent
         {
-            Contract.Requires(entity != null);
             try
             {
                 var match = entity as IMatch;

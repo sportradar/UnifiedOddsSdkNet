@@ -3,7 +3,6 @@
 */
 using System;
 using System.Configuration;
-using System.Diagnostics.Contracts;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 
@@ -164,12 +163,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         [ConfigurationProperty("adjustAfterAge", IsRequired = false, DefaultValue = false)]
         public bool AdjustAfterAge => (bool) base["adjustAfterAge"];
 
-        ///// <summary>
-        ///// Gets a <see cref="SdkEnvironment"/> enum member specifying the environment sdk connects to
-        ///// </summary>
-        //[ConfigurationProperty("environment", IsRequired = false, DefaultValue = SdkEnvironment.Integration)]
-        //public SdkEnvironment Environment => (SdkEnvironment)base["environment"];
-
         /// <summary>
         /// Retrieves the <see cref="OddsFeedConfigurationSection"/> from the app.config file
         /// </summary>
@@ -178,8 +171,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <exception cref="ConfigurationErrorsException">The section in the configuration file is not valid</exception>
         internal static OddsFeedConfigurationSection GetSection()
         {
-            Contract.Ensures(Contract.Result<OddsFeedConfigurationSection>() != null);
-
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             if (config == null)
             {

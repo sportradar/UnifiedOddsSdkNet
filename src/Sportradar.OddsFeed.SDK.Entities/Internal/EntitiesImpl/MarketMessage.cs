@@ -3,7 +3,7 @@
 */
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -36,7 +36,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         protected MarketMessage(IMessageTimestamp timestamp, IProducer producer, T1 @event, long? requestId, IEnumerable<T> markets, byte[] rawMessage)
             : base(timestamp, producer, @event, requestId, rawMessage)
         {
-            Contract.Requires(@event != null);
+            Guard.Argument(@event).Require(@event != null);
 
             _markets = markets == null ? null : new ReadOnlyCollection<T>(markets.ToList());
         }

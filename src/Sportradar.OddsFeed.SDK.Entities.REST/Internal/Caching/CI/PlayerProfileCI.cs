@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -127,9 +127,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         internal PlayerProfileCI(PlayerProfileDTO profile, URN competitorId, CultureInfo culture, IDataRouterManager dataRouterManager)
             : base(profile)
         {
-            Contract.Requires(profile != null);
-            Contract.Requires(culture != null);
-            Contract.Requires(dataRouterManager != null);
+            Guard.Argument(profile).NotNull();
+            Guard.Argument(culture).NotNull();
+            Guard.Argument(dataRouterManager).NotNull();
 
             _fetchedCultures = new List<CultureInfo>();
             _primaryCulture = culture;
@@ -151,9 +151,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         internal PlayerProfileCI(PlayerCompetitorDTO playerCompetitor, URN competitorId, CultureInfo culture, IDataRouterManager dataRouterManager)
             : base(playerCompetitor)
         {
-            Contract.Requires(playerCompetitor != null);
-            Contract.Requires(culture != null);
-            Contract.Requires(dataRouterManager != null);
+            Guard.Argument(playerCompetitor).NotNull();
+            Guard.Argument(culture).NotNull();
+            Guard.Argument(dataRouterManager).NotNull();
 
             _fetchedCultures = new List<CultureInfo>();
             _primaryCulture = culture;
@@ -207,8 +207,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">The culture of the <see cref="PlayerProfileDTO"/> used to merge</param>
         internal void Merge(PlayerProfileDTO profile, URN competitorId, CultureInfo culture)
         {
-            Contract.Requires(profile != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(profile).NotNull();
+            Guard.Argument(culture).NotNull();
 
             _type = profile.Type;
             _dateOfBirth = profile.DateOfBirth;
@@ -239,8 +239,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">The culture of the <see cref="PlayerCompetitorDTO"/> used to merge</param>
         internal void Merge(PlayerCompetitorDTO playerCompetitor, URN competitorId, CultureInfo culture)
         {
-            Contract.Requires(playerCompetitor != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(playerCompetitor).NotNull();
+            Guard.Argument(culture).NotNull();
 
             Names[culture] = playerCompetitor.Name;
             _nationalities[culture] = playerCompetitor.Nationality;
@@ -289,7 +289,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <returns>The name of the player in the specified language if it exists. Null otherwise.</returns>
         public string GetName(CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture).NotNull();
 
             if (!Names.ContainsKey(culture))
             {
@@ -308,7 +308,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <returns>The nationality of the player in the specified language if it exists. Null otherwise.</returns>
         public string GetNationality(CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture).NotNull();
 
             if (!_nationalities.ContainsKey(culture))
             {

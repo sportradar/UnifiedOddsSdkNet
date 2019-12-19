@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
@@ -99,11 +99,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                                ICacheManager cacheManager)
             : base(cacheManager)
         {
-            Contract.Requires(cache != null);
-            Contract.Requires(dataRouterManager != null);
-            Contract.Requires(sportEventCacheItemFactory != null);
-            Contract.Requires(timer != null);
-            Contract.Requires(cultures.Any());
+            Guard.Argument(cache).NotNull();
+            Guard.Argument(dataRouterManager).NotNull();
+            Guard.Argument(sportEventCacheItemFactory).NotNull();
+            Guard.Argument(timer).NotNull();
+            Guard.Argument(cultures.Any());
 
             Cache = cache;
             _dataRouterManager = dataRouterManager;
@@ -119,18 +119,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             _timer = timer;
             _timer.Elapsed += OnTimerElapsed;
             _timer.Start();
-        }
-
-        /// <summary>
-        /// Defines object invariants as required by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(Cache != null);
-            Contract.Invariant(_dataRouterManager != null);
-            Contract.Invariant(_sportEventCacheItemFactory != null);
-            Contract.Invariant(SpecialTournaments != null);
         }
 
         /// <summary>
@@ -208,7 +196,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <returns>A <see cref="Task" /> representing the retrieval operation</returns>
         private async Task GetScheduleAsync(DateTime date, CultureInfo culture)
         {
-            Contract.Requires(date != null && date > DateTime.MinValue);
+            Guard.Argument(date).Require(date > DateTime.MinValue);
 
             Metric.Context("CACHE").Meter("SportEventCache->GetScheduleAsync", Unit.Calls);
 
@@ -266,10 +254,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             Metric.Context("CACHE").Meter("SportEventCache->GetEventIdsAsync by tournamentId", Unit.Calls);
 
-            Contract.Assume(_cultures.Any());
-
             var ci = culture ?? _cultures.FirstOrDefault();
-            Contract.Assume(ci != null);
 
             var schedule = await _dataRouterManager.GetSportEventsForTournamentAsync(tournamentId, ci, null).ConfigureAwait(false);
 
@@ -302,10 +287,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             Metric.Context("CACHE").Meter("SportEventCache->GetEventIdsAsync by date", Unit.Calls);
 
-            Contract.Assume(_cultures.Any());
-
             var ci = culture ?? _cultures.FirstOrDefault();
-            Contract.Assume(culture != null);
 
             var schedule = date == null
                 ? await _dataRouterManager.GetLiveSportEventsAsync(ci).ConfigureAwait(false)
@@ -775,7 +757,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// </summary>
         public void RegisterHealthCheck()
         {
-            HealthChecks.RegisterHealthCheck("SportEventCache", new Func<HealthCheckResult>(StartHealthCheck));
+            HealthChecks.RegisterHealthCheck("SportEventCache", StartHealthCheck);
         }
 
         /// <summary>
@@ -837,7 +819,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             if (secondId != null && !Equals(tournamentDto.Id, secondId))
             {
                 var tourInfoDto = new TournamentInfoDTO(tournamentDto);
-                var newTournamentDto = new TournamentInfoDTO(tourInfoDto, tourInfoDto.Season != null, tourInfoDto.CurrentSeason != null);
+                var newTournamentDto = new TournamentInfoDTO(tourInfoDto, tourInfoDto.Season != null, tourInfoDto.CurrentSeason!= null);
                 CacheAddDtoItem(secondId, newTournamentDto, culture, DtoType.TournamentInfo, null);
             }
         }
@@ -848,7 +830,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
 
             if (secondId != null && !Equals(tournamentDto.Id, secondId))
             {
-                var newTournamentDto = new TournamentInfoDTO(tournamentDto, tournamentDto.Season != null, tournamentDto.CurrentSeason != null);
+                var newTournamentDto = new TournamentInfoDTO(tournamentDto, tournamentDto.Season != null, tournamentDto.CurrentSeason!= null);
                 CacheAddDtoItem(secondId, newTournamentDto, culture, DtoType.TournamentInfo, null);
             }
         }
@@ -1068,7 +1050,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                             var tInfo = item as TournamentInfoDTO;
                             if (tInfo != null)
                             {
-                                var newTournamentDto = new TournamentInfoDTO(tInfo, tInfo.Season != null, tInfo.CurrentSeason != null);
+                                var newTournamentDto = new TournamentInfoDTO(tInfo, tInfo.Season != null, tInfo.CurrentSeason!= null);
                                 var ci2 = _sportEventCacheItemFactory.Build(newTournamentDto, culture);
                                 AddNewCacheItem(ci2);
                             }

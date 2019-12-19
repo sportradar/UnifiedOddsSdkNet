@@ -3,7 +3,6 @@
 */
 
 using System;
-using System.Diagnostics.Contracts;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal.Config
@@ -11,9 +10,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
     /// <summary>
     /// Class RecoveryConfigurationBuilder
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <seealso cref="Config.ConfigurationBuilderBase{T}" />
-    /// <seealso cref="API.IRecoveryConfigurationBuilder{T}" />
+    /// <seealso cref="ConfigurationBuilderBase{T}" />
+    /// <seealso cref="IRecoveryConfigurationBuilder{T}" />
     internal abstract class RecoveryConfigurationBuilder<T> : ConfigurationBuilderBase<T>, IRecoveryConfigurationBuilder<T> where T : class
     {
         /// <summary>
@@ -38,14 +36,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <param name="sectionProvider">A <see cref="IConfigurationSectionProvider"/> used to access <see cref="IOddsFeedConfigurationSection"/></param>
         internal RecoveryConfigurationBuilder(string accessToken, IConfigurationSectionProvider sectionProvider)
             : base(accessToken, sectionProvider)
-        {
-        }
-
-        /// <summary>
-        /// Defines object invariants as required by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
         {
         }
 

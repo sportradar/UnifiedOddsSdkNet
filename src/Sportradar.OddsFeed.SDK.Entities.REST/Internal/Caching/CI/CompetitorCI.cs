@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -67,7 +67,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <returns>The name of the competitor in the specified language if it exists, null otherwise</returns>
         public string GetName(CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture).NotNull();
 
             if (!Names.ContainsKey(culture))
             {
@@ -86,7 +86,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <returns>The country name of the competitor in the specified language if it exists, null otherwise</returns>
         public string GetCountry(CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture).NotNull();
 
             if (!_countryNames.ContainsKey(culture))
             {
@@ -105,7 +105,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <returns>The abbreviation of the competitor in the specified language if it exists, null otherwise</returns>
         public string GetAbbreviation(CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture).NotNull();
 
             if (!_abbreviations.ContainsKey(culture))
             {
@@ -267,8 +267,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         internal CompetitorCI(CompetitorDTO competitor, CultureInfo culture, IDataRouterManager dataRouterManager)
             : base(competitor)
         {
-            Contract.Requires(competitor != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(competitor).NotNull();
+            Guard.Argument(culture).NotNull();
 
             _fetchedCultures = new List<CultureInfo>();
             _primaryCulture = culture;
@@ -294,8 +294,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         internal CompetitorCI(CompetitorProfileDTO competitor, CultureInfo culture, IDataRouterManager dataRouterManager = null)
             : base(competitor.Competitor)
         {
-            Contract.Requires(competitor != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(competitor).NotNull();
+            Guard.Argument(culture).NotNull();
 
             _fetchedCultures = new List<CultureInfo>();
             _primaryCulture = culture;
@@ -321,8 +321,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         internal CompetitorCI(SimpleTeamProfileDTO competitor, CultureInfo culture, IDataRouterManager dataRouterManager = null)
             : base(competitor.Competitor)
         {
-            Contract.Requires(competitor != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(competitor).NotNull();
+            Guard.Argument(culture).NotNull();
 
             _fetchedCultures = new List<CultureInfo>();
             _primaryCulture = culture;
@@ -348,9 +348,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         internal CompetitorCI(PlayerCompetitorDTO playerCompetitor, CultureInfo culture, IDataRouterManager dataRouterManager)
             : base(playerCompetitor)
         {
-            Contract.Requires(playerCompetitor != null);
-            Contract.Requires(culture != null);
-            Contract.Requires(dataRouterManager != null);
+            Guard.Argument(playerCompetitor).NotNull();
+            Guard.Argument(culture).NotNull();
+            Guard.Argument(dataRouterManager).NotNull();
 
             _fetchedCultures = new List<CultureInfo>();
             _primaryCulture = culture;
@@ -431,25 +431,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         }
 
         /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_countryNames != null);
-            Contract.Invariant(_abbreviations != null);
-            Contract.Invariant(_associatedPlayerIds != null);
-            Contract.Invariant(_jerseys != null);
-        }
-
-        /// <summary>
         /// Merges the information from the provided <see cref="CompetitorDTO"/> into the current instance
         /// </summary>
         /// <param name="competitor">A <see cref="CompetitorDTO"/> containing information about the competitor</param>
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the passed <code>dto</code></param>
         internal void Merge(CompetitorDTO competitor, CultureInfo culture)
         {
-            Contract.Requires(competitor != null);
+            Guard.Argument(competitor).NotNull();
 
             _isVirtual = competitor.IsVirtual;
             Names[culture] = competitor.Name;
@@ -483,8 +471,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the passed <code>dto</code></param>
         internal void Merge(CompetitorProfileDTO competitorProfile, CultureInfo culture)
         {
-            Contract.Requires(competitorProfile != null);
-            Contract.Requires(competitorProfile.Competitor != null);
+            Guard.Argument(competitorProfile).NotNull();
+            Guard.Argument(competitorProfile.Competitor).NotNull();
 
             _isVirtual = competitorProfile.Competitor.IsVirtual;
             Names[culture] = competitorProfile.Competitor.Name;
@@ -561,8 +549,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the passed <code>dto</code></param>
         internal void Merge(SimpleTeamProfileDTO simpleTeamProfile, CultureInfo culture)
         {
-            Contract.Requires(simpleTeamProfile != null);
-            Contract.Requires(simpleTeamProfile.Competitor != null);
+            Guard.Argument(simpleTeamProfile).NotNull();
+            Guard.Argument(simpleTeamProfile.Competitor).NotNull();
 
             _isVirtual = simpleTeamProfile.Competitor.IsVirtual;
             Names[culture] = simpleTeamProfile.Competitor.Name;
@@ -597,7 +585,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the passed <code>dto</code></param>
         internal void Merge(PlayerCompetitorDTO playerCompetitor, CultureInfo culture)
         {
-            Contract.Requires(playerCompetitor != null);
+            Guard.Argument(playerCompetitor).NotNull();
 
             Names[culture] = playerCompetitor.Name;
             _abbreviations[culture] = string.IsNullOrEmpty(playerCompetitor.Abbreviation)

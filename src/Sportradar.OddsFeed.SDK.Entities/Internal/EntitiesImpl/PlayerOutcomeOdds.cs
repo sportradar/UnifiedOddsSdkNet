@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST;
@@ -58,8 +58,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                                    IAdditionalProbabilities additionalProbabilities)
             : base(id, active, odds, probabilities, nameProvider, mappingProvider, cultures, outcomeDefinition, additionalProbabilities)
         {
-            Contract.Requires(match != null);
-            Contract.Requires(teamFlag >= 1 && teamFlag <= 2);
+            Guard.Argument(match).NotNull();
+            Guard.Argument(teamFlag >= 1 && teamFlag <= 2);
 
             _teamFlag = teamFlag;
             _match = match;

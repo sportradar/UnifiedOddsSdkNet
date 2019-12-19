@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -89,6 +89,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <exception cref="DeserializationException">The deserialization failed</exception>
         public T Deserialize(Stream stream)
         {
+            Guard.Argument(stream).NotNull();
+
             return Deserialize<T>(stream);
         }
 
@@ -101,6 +103,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <exception cref="DeserializationException">The deserialization failed</exception>
         public T1 Deserialize<T1>(Stream stream) where T1 : T
         {
+            Guard.Argument(stream).NotNull();
+
             using (var reader = new NamespaceIgnorantXmlTextReader(stream))
             {
                 bool startElementFound;
@@ -167,7 +171,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
             public SerializerWithInfo(XmlSerializer serializer, bool ignoreNamespace)
             {
-                Contract.Requires(serializer != null);
+                Guard.Argument(serializer).NotNull();
 
                 Serializer = serializer;
                 IgnoreNamespace = ignoreNamespace;

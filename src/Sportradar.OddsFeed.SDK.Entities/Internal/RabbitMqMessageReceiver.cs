@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -95,10 +95,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="usedReplay">Is connected to the replay server</param>
         public RabbitMqMessageReceiver(IRabbitMqChannel channel, IDeserializer<FeedMessage> deserializer, IRoutingKeyParser keyParser, IProducerManager producerManager, bool usedReplay)
         {
-            Contract.Requires(channel != null);
-            Contract.Requires(deserializer != null);
-            Contract.Requires(keyParser != null);
-            Contract.Requires(producerManager != null);
+            Guard.Argument(channel).NotNull();
+            Guard.Argument(deserializer).NotNull();
+            Guard.Argument(keyParser).NotNull();
+            Guard.Argument(producerManager).NotNull();
 
             _channel = channel;
             _deserializer = deserializer;
@@ -216,7 +216,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="rawMessage">A raw message received from the broker</param>
         private void RaiseMessageReceived(FeedMessage message, byte[] rawMessage)
         {
-            Contract.Requires(message != null);
+            Guard.Argument(message).NotNull();
 
             FeedMessageReceived?.Invoke(this, new FeedMessageReceivedEventArgs(message, null, rawMessage));
         }

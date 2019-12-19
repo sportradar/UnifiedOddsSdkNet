@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.API;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
@@ -82,7 +82,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Example
         /// <param name="oddsFeed">A <see cref="IOddsFeed"/> instance </param>
         private void AttachToFeedEvents(IOddsFeed oddsFeed)
         {
-            Contract.Requires(oddsFeed != null);
+            Guard.Argument(oddsFeed).NotNull();
 
             _log.Info("Attaching to feed events");
             oddsFeed.ProducerUp += OnProducerUp;
@@ -97,7 +97,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Example
         /// <param name="oddsFeed">A <see cref="IOddsFeed"/> instance</param>
         private void DetachFromFeedEvents(IOddsFeed oddsFeed)
         {
-            Contract.Requires(oddsFeed != null);
+            Guard.Argument(oddsFeed).NotNull();
 
             _log.Info("Detaching from feed events");
             oddsFeed.ProducerUp -= OnProducerUp;
@@ -112,7 +112,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Example
         /// <param name="session">A <see cref="IOddsFeedSession"/> instance </param>
         private void AttachToSessionEvents(IOddsFeedSession session)
         {
-            Contract.Requires(session != null);
+            Guard.Argument(session).NotNull();
 
             _log.Info("Attaching to session events");
             session.OnUnparsableMessageReceived += SessionOnUnparsableMessageReceived;
@@ -131,7 +131,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Example
         /// <param name="session">A <see cref="IOddsFeedSession"/> instance</param>
         private void DetachFromSessionEvents(IOddsFeedSession session)
         {
-            Contract.Requires(session != null);
+            Guard.Argument(session).NotNull();
 
             _log.Info("Detaching from session events");
             session.OnUnparsableMessageReceived -= SessionOnUnparsableMessageReceived;

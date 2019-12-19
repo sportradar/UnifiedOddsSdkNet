@@ -5,7 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -98,10 +98,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                               ICacheManager cacheManager)
             : base(cacheManager)
         {
-            Contract.Requires(dataRouterManager != null);
-            Contract.Requires(timer != null);
-            Contract.Requires(cultures != null && cultures.Any());
-            Contract.Requires(sportEventCache != null);
+            Guard.Argument(dataRouterManager).NotNull();
+            Guard.Argument(timer).NotNull();
+            Guard.Argument(cultures != null && cultures.Any());
+            Guard.Argument(sportEventCache).NotNull();
 
             _dataRouterManager = dataRouterManager;
             _requiredCultures = cultures as ReadOnlyCollection<CultureInfo> ?? new ReadOnlyCollection<CultureInfo>(cultures.ToList());
@@ -177,7 +177,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <returns>A <see cref="Task" /> representing the async operation</returns>
         private async Task FetchAndMergeAll(IEnumerable<CultureInfo> cultures, bool clearExistingData)
         {
-            Contract.Requires(cultures != null && cultures.Any());
+            Guard.Argument(cultures != null && cultures.Any());
 
             var cultureInfos = cultures as IReadOnlyList<CultureInfo> ?? cultures.ToList();
             Metric.Context("CACHE").Meter("SportDataCache->FetchAndMergeAll", Unit.Calls).Mark($"Getting for cultures='{string.Join(",", cultureInfos.Select(c => c.TwoLetterISOLanguageName))}'.");

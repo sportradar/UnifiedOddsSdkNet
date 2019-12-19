@@ -3,7 +3,7 @@
 */
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
@@ -612,7 +612,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <param name="culture">The culture</param>
         private void MergeCompetitors(IEnumerable<CompetitorDTO> competitors, CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture).NotNull();
 
             if (competitors == null)
             {
@@ -645,7 +645,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <param name="culture">The culture</param>
         private void MergeGroups(IEnumerable<GroupDTO> groups, CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture).NotNull();
 
             if (groups == null)
             {

@@ -83,6 +83,9 @@
       <HintPath>..\packages\Common.Logging.Core.3.4.1\lib\net40\Common.Logging.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Dawn.Guard, Version=1.10.0.0, Culture=neutral, PublicKeyToken=234740ae15f786ce, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\LocalProjects\UfNet\UfNetLocal\packages\Dawn.Guard.1.10.0\lib\netstandard1.0\Dawn.Guard.dll</HintPath>
+    </Reference>
     <Reference Include="Humanizer, Version=2.1.0.0, Culture=neutral, PublicKeyToken=979442b78dfc278e, processorArchitecture=MSIL">
       <HintPath>..\packages\Humanizer.Core.2.1.0\lib\netstandard1.0\Humanizer.dll</HintPath>
       <Private>True</Private>
@@ -92,10 +95,19 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\LocalProjects\UfNet\UfNetLocal\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\LocalProjects\UfNet\UfNetLocal\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -154,11 +166,6 @@
     <Compile Include="Enums\DrawType.cs" />
     <Compile Include="Enums\BonusDrumType.cs" />
     <Compile Include="Enums\BookingStatus.cs" />
-    <Compile Include="Contracts\MarketDescriptionCacheContract.cs" />
-    <Compile Include="Contracts\NamedValueProviderContract.cs" />
-    <Compile Include="Contracts\SportEventStatusCacheContract.cs" />
-    <Compile Include="Contracts\NameExpressionContract.cs" />
-    <Compile Include="Contracts\MappingValidatorFactoryContract.cs" />
     <Compile Include="Enums\EventStatus.cs" />
     <Compile Include="Enums\HomeAway.cs" />
     <Compile Include="IAssist.cs" />

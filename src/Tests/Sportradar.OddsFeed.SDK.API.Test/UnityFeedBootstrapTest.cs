@@ -16,6 +16,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.REST;
 using Sportradar.OddsFeed.SDK.Test.Shared;
+
 // ReSharper disable RedundantTypeArgumentsOfMethod
 
 namespace Sportradar.OddsFeed.SDK.API.Test
@@ -65,8 +66,8 @@ namespace Sportradar.OddsFeed.SDK.API.Test
 
             container.RegisterAdditionalTypes();
 
-            _childContainer1 = container.CreateChildContainer();
-            _childContainer2 = container.CreateChildContainer();
+            _childContainer1 = ((IUnityContainer) container).CreateChildContainer();
+            _childContainer2 = ((IUnityContainer) container).CreateChildContainer();
         }
 
         [TestMethod]

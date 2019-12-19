@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 
@@ -27,18 +27,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="validators">The <see cref="IReadOnlyCollection{T}"/> containing actual validators.</param>
         public CompositeMappingValidator(IEnumerable<IMappingValidator> validators)
         {
-            Contract.Requires(validators != null && validators.Any());
+            Guard.Argument(validators).NotNull().NotEmpty();
 
             _validators = validators as IReadOnlyCollection<IMappingValidator> ?? new ReadOnlyCollection<IMappingValidator>(validators.ToList());
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_validators != null && _validators.Any());
         }
 
 

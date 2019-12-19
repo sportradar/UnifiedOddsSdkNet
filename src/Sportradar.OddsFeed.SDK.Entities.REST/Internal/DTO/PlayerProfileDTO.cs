@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Messages.REST;
 
 // ReSharper disable FieldCanBeMadeReadOnly.Global
@@ -82,7 +82,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public PlayerProfileDTO(playerExtended record, DateTime? generatedAt)
             :base(record.id, record.name)
         {
-            Contract.Requires(record != null);
+            Guard.Argument(record).NotNull();
 
             Type = record.type;
             DateOfBirth = string.IsNullOrEmpty(record.date_of_birth)

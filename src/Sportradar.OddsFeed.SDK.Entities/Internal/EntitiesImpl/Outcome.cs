@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -59,9 +59,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <param name="outcomeDefinition"></param>
         protected Outcome(string id, INameProvider nameProvider, IMarketMappingProvider mappingProvider, IEnumerable<CultureInfo> cultures, IOutcomeDefinition outcomeDefinition)
         {
-            Contract.Requires(nameProvider != null);
-            Contract.Requires(cultures != null);
-            Contract.Requires(cultures.Any());
+            Guard.Argument(nameProvider).NotNull();
+            Guard.Argument(cultures).NotNull();
+            Guard.Argument(cultures.Any());
 
             Id = id;
             _nameProvider = nameProvider;

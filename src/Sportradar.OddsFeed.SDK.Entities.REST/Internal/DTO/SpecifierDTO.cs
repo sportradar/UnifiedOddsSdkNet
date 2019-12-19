@@ -1,7 +1,7 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Diagnostics.Contracts;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
@@ -22,9 +22,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <param name="specifier">The <see cref="desc_specifiersSpecifier"/> used for creating instance</param>
         internal SpecifierDTO(desc_specifiersSpecifier specifier)
         {
-            Contract.Requires(specifier != null);
-            Contract.Requires(!string.IsNullOrEmpty(specifier.name));
-            Contract.Requires(!string.IsNullOrEmpty(specifier.type));
+            Guard.Argument(specifier).NotNull();
+            Guard.Argument(!string.IsNullOrEmpty(specifier.name));
+            Guard.Argument(!string.IsNullOrEmpty(specifier.type));
 
 
             Name = specifier.name;

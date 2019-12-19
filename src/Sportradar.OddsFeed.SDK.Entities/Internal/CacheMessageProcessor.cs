@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Threading.Tasks;
 using Common.Logging;
@@ -66,10 +66,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                                      ICacheManager cacheManager,
                                      IFeedMessageHandler feedMessageHandler)
         {
-            Contract.Requires(mapperFactory != null);
-            Contract.Requires(sportEventCache != null);
-            Contract.Requires(cacheManager != null);
-            Contract.Requires(feedMessageHandler != null);
+            Guard.Argument(mapperFactory).NotNull();
+            Guard.Argument(sportEventCache).NotNull();
+            Guard.Argument(cacheManager).NotNull();
+            Guard.Argument(feedMessageHandler).NotNull();
 
             ProcessorId = "CMP" + Guid.NewGuid().ToString().Substring(0, 4);
 
@@ -80,18 +80,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         }
 
         /// <summary>
-        /// Defines object invariants as required by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_mapperFactory != null);
-            Contract.Invariant(_sportEventCache != null);
-            Contract.Invariant(_cacheManager != null);
-            Contract.Invariant(_feedMessageHandler != null);
-        }
-
-        /// <summary>
         /// Processes and dispatches the provided <see cref="FeedMessage" /> instance
         /// </summary>
         /// <param name="message">A <see cref="FeedMessage" /> instance to be processed</param>
@@ -99,6 +87,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="rawMessage">A raw message received from the feed</param>
         public void ProcessMessage(FeedMessage message, MessageInterest interest, byte[] rawMessage)
         {
+            Guard.Argument(message).NotNull();
+            Guard.Argument(interest).NotNull();
+
             // process odds_change
             var oddsChange = message as odds_change;
             if (oddsChange?.sport_event_status != null)

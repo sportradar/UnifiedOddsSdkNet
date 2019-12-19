@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -57,9 +57,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public CashOutProbabilitiesProvider(IDataProvider<cashout> dataProvider, IFeedMessageMapper messageMapper, IEnumerable<CultureInfo> defaultCultures, ExceptionHandlingStrategy exceptionStrategy)
         {
-            Contract.Requires(dataProvider != null);
-            Contract.Requires(messageMapper != null);
-            Contract.Requires(defaultCultures != null && defaultCultures.Any());
+            Guard.Argument(dataProvider).NotNull();
+            Guard.Argument(messageMapper).NotNull();
+            Guard.Argument(defaultCultures != null && defaultCultures.Any());
 
             _dataProvider = dataProvider;
             _messageMapper = messageMapper;
@@ -96,6 +96,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>A <see cref="Task{T}" /> representing the asynchronous operation</returns>
         public Task<ICashOutProbabilities<T>> GetCashOutProbabilitiesAsync<T>(URN eventId, CultureInfo culture = null) where T : ISportEvent
         {
+            Guard.Argument(eventId).NotNull();
+
             return GetProbabilitiesInternalAsync<T>(eventId.ToString(), culture);
         }
 
@@ -110,6 +112,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>A <see cref="Task{T}" /> representing the asynchronous operation</returns>
         public Task<ICashOutProbabilities<T>> GetCashOutProbabilitiesAsync<T>(URN eventId, int marketId, IReadOnlyDictionary<string, string> specifiers, CultureInfo culture = null) where T : ISportEvent
         {
+            Guard.Argument(eventId).NotNull();
+
             var param = $"{eventId}/{marketId}";
             if (specifiers != null && specifiers.Any())
             {

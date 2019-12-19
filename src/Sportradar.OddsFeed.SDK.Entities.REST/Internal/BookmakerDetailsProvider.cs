@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -53,24 +53,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             : base(bookmakerDetailsUriFormat, fetcher, deserializer, mapperFactory)
         {
 
-            Contract.Requires(!string.IsNullOrEmpty(bookmakerDetailsUriFormat));
-            Contract.Requires(fetcher != null);
-            Contract.Requires(deserializer != null);
-            Contract.Requires(mapperFactory != null);
+            Guard.Argument(bookmakerDetailsUriFormat).NotNull().NotEmpty();
+            Guard.Argument(fetcher).NotNull();
+            Guard.Argument(deserializer).NotNull();
+            Guard.Argument(mapperFactory).NotNull();
 
             _uriFormat = bookmakerDetailsUriFormat;
             _fetcher = fetcher;
             _deserializer = deserializer;
             _mapperFactory = mapperFactory;
-        }
-
-        /// <summary>
-        /// Defines object invariants used by the code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(!string.IsNullOrWhiteSpace(_uriFormat));
         }
 
         /// <summary>

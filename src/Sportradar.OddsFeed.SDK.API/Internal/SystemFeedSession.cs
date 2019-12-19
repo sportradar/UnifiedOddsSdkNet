@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using System.Threading;
 using Common.Logging;
@@ -93,30 +93,17 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             IFeedMessageValidator messageValidator,
             IMessageDataExtractor messageDataExtractor)
         {
-            Contract.Requires(globalEventDispatcher != null);
-            Contract.Requires(messageReceiver != null);
-            Contract.Requires(messageMapper != null);
-            Contract.Requires(messageValidator != null);
-            Contract.Requires(messageDataExtractor != null);
+            Guard.Argument(globalEventDispatcher).NotNull();
+            Guard.Argument(messageReceiver).NotNull();
+            Guard.Argument(messageMapper).NotNull();
+            Guard.Argument(messageValidator).NotNull();
+            Guard.Argument(messageDataExtractor).NotNull();
 
             _globalEventDispatcher = globalEventDispatcher;
             _messageReceiver = messageReceiver;
             _messageValidator = messageValidator;
             _messageMapper = messageMapper;
             _messageDataExtractor = messageDataExtractor;
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_globalEventDispatcher != null);
-            Contract.Invariant(_messageReceiver != null);
-            Contract.Invariant(_messageValidator != null);
-            Contract.Invariant(_messageMapper != null);
-            Contract.Invariant(_messageDataExtractor != null);
         }
 
         /// <summary>
@@ -196,8 +183,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="eventName">The name of the event</param>
         private void Dispatch<T>(EventHandler<T> handler, T eventArgs, string eventName)
         {
-            Contract.Assume(_log != null);
-
             if (handler == null)
             {
                 _log.Warn($"No event listeners attached to event {eventName}.");

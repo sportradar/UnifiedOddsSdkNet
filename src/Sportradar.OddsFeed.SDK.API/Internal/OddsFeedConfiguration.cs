@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using Common.Logging;
@@ -142,11 +142,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             bool adjustAfterAge,
             IOddsFeedConfigurationSection section){
 
-            Contract.Requires(!string.IsNullOrEmpty(accessToken));
-            Contract.Requires(inactivitySeconds >= SdkInfo.MinInactivitySeconds && inactivitySeconds <= SdkInfo.MaxInactivitySeconds);
-            Contract.Requires(!string.IsNullOrEmpty(apiHost));
-            Contract.Requires(!string.IsNullOrEmpty(host));
-            Contract.Requires(requiredLanguages != null);
+            Guard.Argument(accessToken).NotNull().NotEmpty();
+            Guard.Argument(requiredLanguages).NotNull().NotEmpty();
+            Guard.Argument(inactivitySeconds).InRange(SdkInfo.MinInactivitySeconds, SdkInfo.MaxInactivitySeconds);
+            Guard.Argument(maxRecoveryTimeInSeconds).Min(SdkInfo.MinRecoveryExecutionInSeconds);
+            Guard.Argument(apiHost).NotNull().NotEmpty();
+            Guard.Argument(host).NotNull().NotEmpty();
 
             AccessToken = accessToken;
             InactivitySeconds = inactivitySeconds;
@@ -212,9 +213,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             bool adjustAfterAge,
             IOddsFeedConfigurationSection section)
         {
-            Contract.Requires(!string.IsNullOrEmpty(accessToken));
-            Contract.Requires(defaultCulture != null);
-            Contract.Requires(inactivitySeconds >= SdkInfo.MinInactivitySeconds && inactivitySeconds <= SdkInfo.MaxInactivitySeconds);
+            Guard.Argument(accessToken).NotNull().NotEmpty();
+            Guard.Argument(defaultCulture).NotNull();
+            Guard.Argument(inactivitySeconds).InRange(SdkInfo.MinInactivitySeconds, SdkInfo.MaxInactivitySeconds);
+            Guard.Argument(maxRecoveryExecutionInSeconds).Min(SdkInfo.MinRecoveryExecutionInSeconds);
 
             AccessToken = accessToken;
             Environment = environment;
@@ -251,19 +253,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             ExceptionHandlingStrategy = exceptionHandlingStrategy;
             AdjustAfterAge = adjustAfterAge;
             Section = section;
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(!string.IsNullOrEmpty(AccessToken));
-            Contract.Invariant(DefaultLocale != null);
-            Contract.Invariant(Locales != null && Locales.Any());
-            Contract.Invariant(InactivitySeconds >= SdkInfo.MinInactivitySeconds && InactivitySeconds <= SdkInfo.MaxInactivitySeconds);
-            Contract.Invariant(MaxRecoveryTime >= SdkInfo.MinRecoveryExecutionInSeconds);
         }
     }
 }

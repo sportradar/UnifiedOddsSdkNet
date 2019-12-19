@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -227,7 +227,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <param name="isReplay">Value indicating whether the constructed instance will be used to connect to replay server</param>
         protected Feed(IOddsFeedConfiguration config, bool isReplay)
         {
-            Contract.Requires(config != null);
+            Guard.Argument(config).NotNull();
 
             LogInit();
 
@@ -360,8 +360,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <returns>A <see cref="IOddsFeedSession"/> instance with the specified <see cref="MessageInterest"/></returns>
         internal IOddsFeedSession CreateSession(MessageInterest msgInterest)
         {
-            Contract.Requires(msgInterest != null);
-            Contract.Ensures(Contract.Result<IOddsFeedSession>() != null);
+            Guard.Argument(msgInterest).NotNull();
 
             if (_isDisposed)
             {
@@ -405,6 +404,8 @@ namespace Sportradar.OddsFeed.SDK.API
         /// </summary>
         void IGlobalEventDispatcher.DispatchEventRecoveryCompleted(long requestId, URN eventId)
         {
+            Guard.Argument(eventId).NotNull();
+
             Dispatch(EventRecoveryCompleted, new EventRecoveryCompletedEventArgs(requestId, eventId), "EventRecoveryCompleted");
         }
 
@@ -414,6 +415,8 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <param name="producerStatusChange">The <see cref="IProducerStatusChange"/> instance to be dispatched</param>
         void IGlobalEventDispatcher.DispatchProducerDown(IProducerStatusChange producerStatusChange)
         {
+            Guard.Argument(producerStatusChange).NotNull();
+
             var eventArgs = new ProducerStatusChangeEventArgs(producerStatusChange);
             Dispatch(ProducerDown, eventArgs, "ProducerDown");
         }
@@ -424,6 +427,8 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <param name="producerStatusChange">The <see cref="IProducerStatusChange"/> instance to be dispatched</param>
         void IGlobalEventDispatcher.DispatchProducerUp(IProducerStatusChange producerStatusChange)
         {
+            Guard.Argument(producerStatusChange).NotNull();
+
             var eventArgs = new ProducerStatusChangeEventArgs(producerStatusChange);
             Dispatch(ProducerUp, eventArgs, "ProducerUp");
         }
@@ -435,7 +440,6 @@ namespace Sportradar.OddsFeed.SDK.API
         [Obsolete("Use GetConfigurationBuilder")]
         public static IConfigurationAccessTokenSetter CreateConfigurationBuilder()
         {
-            Contract.Ensures(Contract.Result<IConfigurationAccessTokenSetter>() != null);
             return new OddsFeedConfigurationBuilder(null);
         }
 
@@ -448,9 +452,6 @@ namespace Sportradar.OddsFeed.SDK.API
         [Obsolete("Use GetConfigurationBuilder")]
         public static IOddsFeedConfigurationBuilder GetConfigurationBuilderFromConfig()
         {
-            Contract.Ensures(Contract.Result<IOddsFeedConfigurationBuilder>() != null);
-            //var section = OddsFeedConfigurationSection.GetSection();
-
             return new OddsFeedConfigurationBuilder(new ConfigurationSectionProvider());
         }
 
@@ -460,7 +461,6 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <returns>A <see cref="IOddsFeedConfiguration"/> instance created from provided information</returns>
         public static ITokenSetter GetConfigurationBuilder()
         {
-            Contract.Ensures(Contract.Result<ITokenSetter>() != null);
             return new TokenSetter(new ConfigurationSectionProvider());
         }
 
@@ -634,7 +634,6 @@ namespace Sportradar.OddsFeed.SDK.API
         {
             var msg = "UF SDK .NET initialization. Version: " + SdkInfo.GetVersion();
             var logger = SdkLoggerFactory.GetLoggerForFeedTraffic(typeof(Feed));
-            Contract.Assume(logger != null);
             logger.Info(msg);
             logger = SdkLoggerFactory.GetLoggerForCache(typeof(Feed));
             logger.Info(msg);

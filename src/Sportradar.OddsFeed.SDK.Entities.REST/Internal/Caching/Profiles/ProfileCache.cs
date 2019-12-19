@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
@@ -79,25 +79,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                         ICacheManager cacheManager)
             : base(cacheManager)
         {
-            Contract.Requires(cache != null);
-            Contract.Requires(dataRouterManager != null);
+            Guard.Argument(cache).NotNull();
+            Guard.Argument(dataRouterManager).NotNull();
 
             _cache = cache;
             _dataRouterManager = dataRouterManager;
             _isDisposed = false;
-        }
-
-        /// <summary>
-        /// Lists the invariants members as required by the code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_cache != null);
-            Contract.Invariant(_dataRouterManager != null);
-            Contract.Invariant(_semaphorePlayer != null);
-            Contract.Invariant(_semaphoreCompetitor != null);
-            Contract.Invariant(_semaphoreCacheMerge != null);
         }
 
         /// <summary>
@@ -139,8 +126,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         /// <exception cref="CacheItemNotFoundException">The requested item was not found in cache and could not be obtained from the API</exception>
         public async Task<PlayerProfileCI> GetPlayerProfileAsync(URN playerId, IEnumerable<CultureInfo> cultures)
         {
-            Contract.Requires(playerId != null);
-            Contract.Requires(cultures != null && cultures.Any());
+            Guard.Argument(playerId).NotNull();
+            Guard.Argument(cultures).NotNull().NotEmpty();
 
             Metric.Context("CACHE").Meter("ProfileCache->GetPlayerProfileAsync", Unit.Calls);
 
@@ -225,8 +212,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         /// <exception cref="CacheItemNotFoundException">The requested item was not found in cache and could not be obtained from the API</exception>
         public async Task<CompetitorCI> GetCompetitorProfileAsync(URN competitorId, IEnumerable<CultureInfo> cultures)
         {
-            Contract.Requires(competitorId != null);
-            Contract.Requires(cultures != null && cultures.Any());
+            Guard.Argument(competitorId).NotNull();
+            Guard.Argument(cultures).NotNull().NotEmpty();
 
             Metric.Context("CACHE").Meter("ProfileCache->GetCompetitorProfileAsync", Unit.Calls);
 

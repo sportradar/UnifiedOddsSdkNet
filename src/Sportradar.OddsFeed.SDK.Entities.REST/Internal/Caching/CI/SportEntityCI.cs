@@ -1,9 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -26,7 +25,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="dto">A <see cref="SportEntityDTO"/> containing information about the sport entity</param>
         internal SportEntityCI(SportEntityDTO dto)
         {
-            Contract.Requires(dto != null);
+            Guard.Argument(dto).NotNull();
 
             Id = dto.Id;
         }

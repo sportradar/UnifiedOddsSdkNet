@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
@@ -80,24 +80,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                                              ICacheManager cacheManager)
             : base(cacheManager)
         {
-            Contract.Requires(cache != null);
-            Contract.Requires(dataRouterManager != null);
-            Contract.Requires(mappingValidatorFactory != null);
+            Guard.Argument(cache).NotNull();
+            Guard.Argument(dataRouterManager).NotNull();
+            Guard.Argument(mappingValidatorFactory).NotNull();
 
             _cache = cache;
             _dataRouterManager = dataRouterManager;
             _mappingValidatorFactory = mappingValidatorFactory;
-        }
-
-        /// <summary>
-        /// Defines object invariants as required by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_cache != null);
-            Contract.Invariant(_dataRouterManager != null);
-            Contract.Invariant(_mappingValidatorFactory != null);
         }
 
         /// <summary>
@@ -108,8 +97,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <returns>a cache key generated from the provided <code>id</code> and <code>variant</code></returns>
         public static string GetCacheKey(long id, string variant)
         {
-            Contract.Requires(!string.IsNullOrEmpty(variant));
-            Contract.Ensures(!string.IsNullOrEmpty(Contract.Result<string>()));
+            Guard.Argument(variant).NotNull().NotEmpty();
 
             return $"{id}_{variant}";
         }
@@ -122,7 +110,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <returns>The <see cref="MarketDescriptionCacheItem"/> retrieved from the cache or a null reference if item is not found</returns>
         private MarketDescriptionCacheItem GetItemFromCache(int id, string variant)
         {
-            Contract.Requires(!string.IsNullOrEmpty(variant));
+            Guard.Argument(variant).NotNull().NotEmpty();
 
             _semaphoreCacheMerge.Wait();
             var cacheItem = _cache.GetCacheItem(GetCacheKey(id, variant));
@@ -142,7 +130,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <returns>A <see cref="IEnumerable{CultureInfo}"/> containing missing translations or a null reference if none of the translations are missing</returns>
         private static IEnumerable<CultureInfo> GetMissingTranslations(MarketDescriptionCacheItem item, IEnumerable<CultureInfo> requiredTranslations)
         {
-            Contract.Requires(requiredTranslations != null && requiredTranslations.Any());
+            Guard.Argument(requiredTranslations != null && requiredTranslations.Any());
 
             if (item == null)
             {
@@ -168,8 +156,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <exception cref="FormatException">An error occurred while mapping deserialized entities</exception>
         private async Task<MarketDescriptionCacheItem> GetMarketInternal(int id, string variant, IEnumerable<CultureInfo> cultures)
         {
-            Contract.Requires(!string.IsNullOrEmpty(variant));
-            Contract.Requires(cultures != null && cultures.Any());
+            Guard.Argument(!string.IsNullOrEmpty(variant));
+            Guard.Argument(cultures != null && cultures.Any());
 
             var cultureList = cultures as List<CultureInfo> ?? cultures.ToList();
 
@@ -503,8 +491,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <param name="description">A <see cref="MarketDescriptionDTO"/> containing market description in specified language</param>
         private void Merge(CultureInfo culture, MarketDescriptionDTO description)
         {
-            Contract.Requires(culture != null);
-            Contract.Requires(description != null);
+            Guard.Argument(culture).NotNull();
+            Guard.Argument(description).NotNull();
 
             if (_isDisposed)
             {

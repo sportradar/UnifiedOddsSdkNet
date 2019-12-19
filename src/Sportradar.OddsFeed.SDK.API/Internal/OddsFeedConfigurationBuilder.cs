@@ -3,7 +3,6 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Common;
@@ -80,16 +79,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         }
 
         /// <summary>
-        /// Defines object invariants used by the code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_locales != null);
-            Contract.Invariant(_inactivitySeconds >= SdkInfo.MinInactivitySeconds && _inactivitySeconds <= SdkInfo.MaxInactivitySeconds);
-        }
-
-        /// <summary>
         /// Sets local fields to values read from the <see cref="OddsFeedConfigurationSection"/>
         /// </summary>
         private void Init()
@@ -126,7 +115,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
 
         /// <summary>
-        /// Sets the access token.
+        /// Sets the access token
         /// </summary>
         /// <param name="accessToken">The access token</param>
         /// <returns>OddsFeedConfigurationBuilder</returns>
@@ -142,7 +131,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         }
 
         /// <summary>
-        /// Sets the inactivity seconds.
+        /// Sets the inactivity seconds
         /// </summary>
         /// <param name="inactivitySeconds">The inactivity seconds</param>
         /// <returns>OddsFeedConfigurationBuilder</returns>
@@ -191,7 +180,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         }
 
         /// <summary>
-        /// Sets the API host.
+        /// Sets the API host
         /// </summary>
         /// <param name="apiHost">The API host</param>
         /// <returns>OddsFeedConfigurationBuilder</returns>

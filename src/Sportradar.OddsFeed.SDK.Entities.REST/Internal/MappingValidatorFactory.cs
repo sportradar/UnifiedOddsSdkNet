@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -29,8 +29,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <returns>IMappingValidator</returns>
         private static IMappingValidator BuildSingle(string name, string value)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-            Contract.Requires(!string.IsNullOrEmpty(value));
+            Guard.Argument(name).NotNull().NotEmpty();
+            Guard.Argument(value).NotNull().NotEmpty();
 
             return Regex.IsMatch(value, DecimalPattern)
                 ? new DecimalValueMappingValidator(name, decimal.Parse(value.Replace("*", "0"), NumberStyles.Any, CultureInfo.InvariantCulture))
@@ -44,6 +44,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <returns>A <see cref="IMappingValidator"/> build from the provided string</returns>
         public IMappingValidator Build(string value)
         {
+            Guard.Argument(value).NotNull().NotEmpty();
+
             IReadOnlyDictionary<string, string> specifiers;
             try
             {

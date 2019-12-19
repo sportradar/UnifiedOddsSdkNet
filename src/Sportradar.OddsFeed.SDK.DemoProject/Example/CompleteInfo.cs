@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.API;
@@ -113,7 +113,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Example
         /// <param name="oddsFeed">A <see cref="IOddsFeed"/> instance </param>
         private void AttachToFeedEvents(IOddsFeed oddsFeed)
         {
-            Contract.Requires(oddsFeed != null);
+            Guard.Argument(oddsFeed).NotNull();
 
             _log.Info("Attaching to feed events");
             oddsFeed.ProducerUp += OnProducerUp;
@@ -128,7 +128,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Example
         /// <param name="oddsFeed">A <see cref="IOddsFeed"/> instance</param>
         private void DetachFromFeedEvents(IOddsFeed oddsFeed)
         {
-            Contract.Requires(oddsFeed != null);
+            Guard.Argument(oddsFeed).NotNull();
 
             _log.Info("Detaching from feed events");
             oddsFeed.ProducerUp -= OnProducerUp;
