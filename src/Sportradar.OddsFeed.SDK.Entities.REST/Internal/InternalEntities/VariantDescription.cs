@@ -25,7 +25,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
         internal VariantDescription(VariantDescriptionCacheItem cacheItem, IEnumerable<CultureInfo> cultures)
         {
             Guard.Argument(cacheItem).NotNull();
-            Guard.Argument(cultures != null && cultures.Any());
+            Guard.Argument(cultures).NotNull().NotEmpty();
 
             var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
 

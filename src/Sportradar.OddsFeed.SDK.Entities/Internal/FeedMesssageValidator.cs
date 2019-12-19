@@ -79,7 +79,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         private static void LogWarning<T>(FeedMessage message, string propertyName, T propertyValue)
         {
             Guard.Argument(message).NotNull();
-            Guard.Argument(!string.IsNullOrEmpty(propertyName));
+            Guard.Argument(propertyName).NotNull().NotEmpty();
 
             ExecutionLog.WarnFormat("Validation warning: message={{{0}}}, property value {1}={2} is not expected", message, propertyName, propertyValue);
         }
@@ -94,7 +94,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         private static void LogFailure<T>(FeedMessage message, string propertyName, T propertyValue)
         {
             Guard.Argument(message).NotNull();
-            Guard.Argument(!string.IsNullOrEmpty(propertyName));
+            Guard.Argument(propertyName).NotNull().NotEmpty();
 
             ExecutionLog.ErrorFormat("Validation failure: message={{{0}}}, property value {1}={2} is not supported", message, propertyName, propertyValue);
         }
@@ -109,7 +109,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         {
             Guard.Argument(message).NotNull();
             Guard.Argument(market).NotNull();
-            Guard.Argument(marketIndex >= 0);
+            Guard.Argument(marketIndex).NotNegative();
 
             if (string.IsNullOrEmpty(market.SpecifierString))
             {

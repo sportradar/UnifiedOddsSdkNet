@@ -23,7 +23,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal CoverageInfoDTO(coverageInfo coverageInfo)
         {
             Guard.Argument(coverageInfo).NotNull();
-            Guard.Argument(!string.IsNullOrEmpty(coverageInfo.level));
+            Guard.Argument(coverageInfo.level).NotNull().NotEmpty();
 
             Level = coverageInfo.level;
             IsLive = coverageInfo.live_coverage;

@@ -100,7 +100,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <returns>True if the provided value could be parsed, otherwise false.</returns>
         public static bool TryParse(string value, out Score score)
         {
-            Guard.Argument(!string.IsNullOrEmpty(value));
+            Guard.Argument(value).NotNull().NotEmpty();
+
             try
             {
                 score = Parse(value);

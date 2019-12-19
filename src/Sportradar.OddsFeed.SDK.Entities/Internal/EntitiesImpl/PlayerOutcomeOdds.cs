@@ -59,7 +59,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
             : base(id, active, odds, probabilities, nameProvider, mappingProvider, cultures, outcomeDefinition, additionalProbabilities)
         {
             Guard.Argument(match).NotNull();
-            Guard.Argument(teamFlag >= 1 && teamFlag <= 2);
+            Guard.Argument(teamFlag).InRange(1, 2);
 
             _teamFlag = teamFlag;
             _match = match;

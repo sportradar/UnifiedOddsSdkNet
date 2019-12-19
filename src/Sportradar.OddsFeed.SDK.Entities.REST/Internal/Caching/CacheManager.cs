@@ -32,7 +32,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="cache">The cache to be registered</param>
         public void RegisterCache(string name, ISdkCache cache)
         {
-            Guard.Argument(!string.IsNullOrEmpty(name));
+            Guard.Argument(name).NotNull().NotEmpty();
             Guard.Argument(cache).NotNull();
 
             if (_caches == null)

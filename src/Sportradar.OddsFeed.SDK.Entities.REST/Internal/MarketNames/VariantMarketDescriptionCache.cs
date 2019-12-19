@@ -130,7 +130,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <returns>A <see cref="IEnumerable{CultureInfo}"/> containing missing translations or a null reference if none of the translations are missing</returns>
         private static IEnumerable<CultureInfo> GetMissingTranslations(MarketDescriptionCacheItem item, IEnumerable<CultureInfo> requiredTranslations)
         {
-            Guard.Argument(requiredTranslations != null && requiredTranslations.Any());
+            Guard.Argument(requiredTranslations).NotNull().NotEmpty();
 
             if (item == null)
             {
@@ -156,8 +156,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <exception cref="FormatException">An error occurred while mapping deserialized entities</exception>
         private async Task<MarketDescriptionCacheItem> GetMarketInternal(int id, string variant, IEnumerable<CultureInfo> cultures)
         {
-            Guard.Argument(!string.IsNullOrEmpty(variant));
-            Guard.Argument(cultures != null && cultures.Any());
+            Guard.Argument(variant).NotNull().NotEmpty();
+            Guard.Argument(cultures).NotNull().NotEmpty();
 
             var cultureList = cultures as List<CultureInfo> ?? cultures.ToList();
 

@@ -70,7 +70,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal SportEventSummaryDTO(sportEvent sportEvent)
         {
             Guard.Argument(sportEvent).NotNull();
-            Guard.Argument(!string.IsNullOrEmpty(sportEvent.id));
+            Guard.Argument(sportEvent.id).NotNull().NotEmpty();
 
             Id = URN.Parse(sportEvent.id);
             Scheduled = sportEvent.scheduledSpecified
@@ -113,7 +113,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         protected SportEventSummaryDTO(parentStage parentStage)
         {
             Guard.Argument(parentStage).NotNull();
-            Guard.Argument(!string.IsNullOrEmpty(parentStage.id));
+            Guard.Argument(parentStage.id).NotNull().NotEmpty();
 
             Id = URN.Parse(parentStage.id);
             Scheduled = parentStage.scheduledSpecified
@@ -153,7 +153,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         protected SportEventSummaryDTO(sportEventChildrenSport_event childStage)
         {
             Guard.Argument(childStage).NotNull();
-            Guard.Argument(!string.IsNullOrEmpty(childStage.id));
+            Guard.Argument(childStage.id).NotNull().NotEmpty();
 
             Id = URN.Parse(childStage.id);
             Scheduled = childStage.scheduledSpecified

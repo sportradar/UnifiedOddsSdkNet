@@ -103,7 +103,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             Guard.Argument(dataRouterManager).NotNull();
             Guard.Argument(sportEventCacheItemFactory).NotNull();
             Guard.Argument(timer).NotNull();
-            Guard.Argument(cultures.Any());
+            Guard.Argument(cultures).NotNull().NotEmpty();
 
             Cache = cache;
             _dataRouterManager = dataRouterManager;

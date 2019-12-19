@@ -22,7 +22,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal OutcomeMappingDTO(mappingsMappingMapping_outcome outcome, string marketId)
         {
             Guard.Argument(outcome).NotNull();
-            Guard.Argument(!string.IsNullOrEmpty(marketId));
+            Guard.Argument(marketId).NotNull().NotEmpty();
 
             OutcomeId = outcome.outcome_id;
             ProducerOutcomeId = outcome.product_outcome_id;
@@ -33,7 +33,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal OutcomeMappingDTO(variant_mappingsMappingMapping_outcome outcome, string marketId)
         {
             Guard.Argument(outcome).NotNull();
-            Guard.Argument(!string.IsNullOrEmpty(marketId));
+            Guard.Argument(marketId).NotNull().NotEmpty();
 
             OutcomeId = outcome.outcome_id;
             ProducerOutcomeId = outcome.product_outcome_id;

@@ -15,7 +15,6 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.Feed;
-using System.Linq;
 
 namespace Sportradar.OddsFeed.SDK.Test.Shared
 {

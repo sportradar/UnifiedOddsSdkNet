@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using Dawn;
 using System.Globalization;
-using System.Linq;
 using System.Threading;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
@@ -83,7 +82,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         internal EntityDispatcher(IFeedMessageMapper messageMapper, IEnumerable<CultureInfo> defaultCultures)
         {
             Guard.Argument(messageMapper).NotNull();
-            Guard.Argument(defaultCultures != null && defaultCultures.Any());
+            Guard.Argument(defaultCultures).NotNull().NotEmpty();
 
             MessageMapper = messageMapper;
             DefaultCultures = defaultCultures as IReadOnlyCollection<CultureInfo>;

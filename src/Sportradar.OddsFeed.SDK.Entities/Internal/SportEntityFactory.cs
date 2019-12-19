@@ -92,7 +92,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         private ISport BuildSportInternal(SportData sportData, IEnumerable<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy)
         {
             Guard.Argument(sportData).NotNull();
-            Guard.Argument(cultures != null && cultures.Any());
+            Guard.Argument(cultures).NotNull().NotEmpty();
 
             var categories = sportData.Categories?.Select(categoryData => new Category(
                 categoryData.Id,

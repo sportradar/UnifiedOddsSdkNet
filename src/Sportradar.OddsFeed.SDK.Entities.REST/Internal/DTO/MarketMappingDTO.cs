@@ -38,9 +38,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal MarketMappingDTO(mappingsMapping mapping)
         {
             Guard.Argument(mapping).NotNull();
-            Guard.Argument(mapping.product_id > 0);
-            Guard.Argument(!string.IsNullOrEmpty(mapping.sport_id));
-            Guard.Argument(!string.IsNullOrEmpty(mapping.market_id));
+            Guard.Argument(mapping.product_id).Positive();
+            Guard.Argument(mapping.sport_id).NotNull().NotEmpty();
+            Guard.Argument(mapping.market_id).NotNull().NotEmpty();
 
             ProducerId = mapping.product_id;
             ProducerIds = string.IsNullOrEmpty(mapping.product_ids)
@@ -69,9 +69,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal MarketMappingDTO(variant_mappingsMapping mapping)
         {
             Guard.Argument(mapping).NotNull();
-            Guard.Argument(mapping.product_id > 0);
-            Guard.Argument(!string.IsNullOrEmpty(mapping.sport_id));
-            Guard.Argument(!string.IsNullOrEmpty(mapping.market_id));
+            Guard.Argument(mapping.product_id).Positive();
+            Guard.Argument(mapping.sport_id).NotNull().NotEmpty();
+            Guard.Argument(mapping.market_id).NotNull().NotEmpty();
 
             ProducerId = mapping.product_id;
             ProducerIds = string.IsNullOrEmpty(mapping.product_ids)
@@ -95,8 +95,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
             if (mapping.mapping_outcome != null)
             {
-                OutcomeMappings = mapping.mapping_outcome.Select(o => new OutcomeMappingDTO(o,
-                    string.IsNullOrEmpty(mapping.product_market_id) ? mapping.market_id : mapping.product_market_id));
+                OutcomeMappings = mapping.mapping_outcome.Select(o => new OutcomeMappingDTO(o, string.IsNullOrEmpty(mapping.product_market_id) ? mapping.market_id : mapping.product_market_id));
             }
         }
     }

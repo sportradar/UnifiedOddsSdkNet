@@ -23,9 +23,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal SpecifierDTO(desc_specifiersSpecifier specifier)
         {
             Guard.Argument(specifier).NotNull();
-            Guard.Argument(!string.IsNullOrEmpty(specifier.name));
-            Guard.Argument(!string.IsNullOrEmpty(specifier.type));
-
+            Guard.Argument(specifier.name).NotNull().NotEmpty();
+            Guard.Argument(specifier.type).NotNull().NotEmpty();
 
             Name = specifier.name;
             Type = specifier.type;

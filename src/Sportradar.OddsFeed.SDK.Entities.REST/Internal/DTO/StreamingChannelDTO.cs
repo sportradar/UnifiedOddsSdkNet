@@ -22,7 +22,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal StreamingChannelDTO(streamingChannel channel)
         {
             Guard.Argument(channel).NotNull();
-            Guard.Argument(!string.IsNullOrEmpty(channel.name));
+            Guard.Argument(channel.name).NotNull().NotEmpty();
 
             Id = channel.id;
             Name = channel.name;

@@ -100,7 +100,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             Guard.Argument(dataRouterManager).NotNull();
             Guard.Argument(timer).NotNull();
-            Guard.Argument(cultures != null && cultures.Any());
+            Guard.Argument(cultures).NotNull().NotEmpty();
             Guard.Argument(sportEventCache).NotNull();
 
             _dataRouterManager = dataRouterManager;
@@ -177,7 +177,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <returns>A <see cref="Task" /> representing the async operation</returns>
         private async Task FetchAndMergeAll(IEnumerable<CultureInfo> cultures, bool clearExistingData)
         {
-            Guard.Argument(cultures != null && cultures.Any());
+            Guard.Argument(cultures).NotNull().NotEmpty();
 
             var cultureInfos = cultures as IReadOnlyList<CultureInfo> ?? cultures.ToList();
             Metric.Context("CACHE").Meter("SportDataCache->FetchAndMergeAll", Unit.Calls).Mark($"Getting for cultures='{string.Join(",", cultureInfos.Select(c => c.TwoLetterISOLanguageName))}'.");

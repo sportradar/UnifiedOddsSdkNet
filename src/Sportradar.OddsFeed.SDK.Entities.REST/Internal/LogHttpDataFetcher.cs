@@ -42,8 +42,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             :base(client, accessToken, responseDeserializer, connectionFailureLimit, connectionFailureTimeout)
         {
             Guard.Argument(sequenceGenerator).NotNull();
-            Guard.Argument(connectionFailureLimit >= 1);
-            Guard.Argument(connectionFailureTimeout >= 1);
+            Guard.Argument(connectionFailureLimit).Positive();
+            Guard.Argument(connectionFailureTimeout).Positive();
 
             _sequenceGenerator = sequenceGenerator;
         }

@@ -49,7 +49,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public SportEventConditions(SportEventConditionsCI ci, IEnumerable<CultureInfo> cultures)
         {
             Guard.Argument(ci).NotNull();
-            Guard.Argument(cultures != null && cultures.Any());
+            Guard.Argument(cultures).NotNull().NotEmpty();
+
             Attendance = ci.Attendance;
             EventMode = ci.EventMode;
             if (ci.Referee != null)

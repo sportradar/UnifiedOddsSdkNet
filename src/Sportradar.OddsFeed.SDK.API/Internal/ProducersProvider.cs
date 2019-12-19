@@ -63,7 +63,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         private IEnumerable<IProducer> MapProducers(producers message)
         {
             Guard.Argument(message).NotNull();
-            Guard.Argument(message.producer.Length > 0);
+            Guard.Argument(message.producer.Length).Positive();
 
             return message.producer.Select(producer => new Producer(
                                                                     (int) producer.id,

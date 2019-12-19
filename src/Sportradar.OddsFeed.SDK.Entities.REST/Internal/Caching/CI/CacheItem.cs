@@ -37,7 +37,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public CacheItem(URN id, string name, CultureInfo culture)
         {
             Guard.Argument(id).NotNull();
-            //Guard.Argument(!string.IsNullOrEmpty(name)); // there were tournaments with empty name!
+            //Guard.Argument(name)); // there were tournaments with empty name!
             Guard.Argument(culture).NotNull();
 
             Id = id;

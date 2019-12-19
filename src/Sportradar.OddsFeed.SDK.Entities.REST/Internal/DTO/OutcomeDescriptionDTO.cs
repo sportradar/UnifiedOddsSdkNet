@@ -20,8 +20,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal OutcomeDescriptionDTO(desc_outcomesOutcome outcome)
         {
             Guard.Argument(outcome).NotNull();
-            Guard.Argument(!string.IsNullOrEmpty(outcome.id));
-            Guard.Argument(!string.IsNullOrEmpty(outcome.name));
+            Guard.Argument(outcome.id).NotNull().NotEmpty();
+            Guard.Argument(outcome.name).NotNull().NotEmpty();
 
             Id = outcome.id;
             Name = outcome.name;
@@ -31,8 +31,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal OutcomeDescriptionDTO(desc_variant_outcomesOutcome outcome)
         {
             Guard.Argument(outcome).NotNull();
-            Guard.Argument(!string.IsNullOrEmpty(outcome.id));
-            Guard.Argument(!string.IsNullOrEmpty(outcome.name));
+            Guard.Argument(outcome.id).NotNull().NotEmpty();
+            Guard.Argument(outcome.name).NotNull().NotEmpty();
 
             Id = outcome.id;
             Name = outcome.name;

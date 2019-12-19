@@ -27,7 +27,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         {
             Guard.Argument(id).NotNull();
             Guard.Argument(names).NotNull().NotEmpty();
-            //Guard.Argument(!string.IsNullOrEmpty(countryCode));
+            //Guard.Argument(countryCode));
 
             CountryCode = countryCode;
         }

@@ -42,9 +42,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
         {
             Guard.Argument(client).NotNull();
             Guard.Argument(client.DefaultRequestHeaders).NotNull();
-            Guard.Argument(!string.IsNullOrWhiteSpace(accessToken));
-            Guard.Argument(connectionFailureLimit >= 1);
-            Guard.Argument(connectionFailureTimeout >= 1);
+            Guard.Argument(accessToken).NotNull().NotEmpty();
+            Guard.Argument(connectionFailureLimit).Positive();
+            Guard.Argument(connectionFailureTimeout).Positive();
 
             _client = client;
             if (_client.DefaultRequestHeaders != null && !_client.DefaultRequestHeaders.Contains("x-access-token"))

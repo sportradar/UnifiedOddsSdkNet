@@ -62,9 +62,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         {
             Guard.Argument(client).NotNull();
             Guard.Argument(client.DefaultRequestHeaders).NotNull();
-            Guard.Argument(!string.IsNullOrWhiteSpace(accessToken));
-            Guard.Argument(connectionFailureLimit >= 1);
-            Guard.Argument(connectionFailureTimeout >= 1);
+            Guard.Argument(accessToken).NotNull().NotEmpty();
+            Guard.Argument(connectionFailureLimit).Positive();
+            Guard.Argument(connectionFailureTimeout).Positive();
             Guard.Argument(responseDeserializer).NotNull();
 
             _client = client;

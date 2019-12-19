@@ -18,8 +18,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal ProductInfoLinkDTO(productInfoLink productInfoLink)
         {
             Guard.Argument(productInfoLink).NotNull();
-            Guard.Argument(!string.IsNullOrEmpty(productInfoLink.name));
-            Guard.Argument(!string.IsNullOrEmpty(productInfoLink.@ref));
+            Guard.Argument(productInfoLink.name).NotNull().NotEmpty();
+            Guard.Argument(productInfoLink.@ref).NotNull().NotEmpty();
 
             Name = productInfoLink.name;
             Reference = productInfoLink.@ref;

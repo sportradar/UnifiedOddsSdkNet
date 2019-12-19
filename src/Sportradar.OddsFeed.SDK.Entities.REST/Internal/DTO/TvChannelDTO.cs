@@ -25,7 +25,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal TvChannelDTO(tvChannel tvChannel)
         {
             Guard.Argument(tvChannel).NotNull();
-            Guard.Argument(!string.IsNullOrEmpty(tvChannel.name));
+            Guard.Argument(tvChannel.name).NotNull().NotEmpty();
 
             Name = tvChannel.name;
             StartTime = tvChannel.start_timeSpecified
