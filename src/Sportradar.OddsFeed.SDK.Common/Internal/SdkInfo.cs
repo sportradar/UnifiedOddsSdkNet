@@ -213,9 +213,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
                 return null;
             }
 
-            DateTime date;
-
-            if (DateTime.TryParse(input, out date))
+            if (DateTime.TryParse(input, out var date))
             {
                 return date;
             }

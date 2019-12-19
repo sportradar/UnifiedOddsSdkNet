@@ -3,6 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Dawn;
 using System.Threading;
 using Common.Logging;
@@ -78,6 +79,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// Opens the current channel and binds the created queue to provided routing keys
         /// </summary>
         /// <param name="routingKeys">A <see cref="IEnumerable{String}"/> specifying the routing keys of the constructed queue.</param>
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public void Open(IEnumerable<string> routingKeys)
         {
             if (Interlocked.CompareExchange(ref _isOpened, 1, 0) != 0)
