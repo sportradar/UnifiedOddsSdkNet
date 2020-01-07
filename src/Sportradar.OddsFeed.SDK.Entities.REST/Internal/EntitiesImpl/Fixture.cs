@@ -60,7 +60,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// Gets a <see cref="IEnumerable{ITvChannel}" /> representing TV channels covering the sport event
         /// represented by the current <see cref="IFixture" /> instance
         /// </summary>
-        /// <value>The tv channels.</value>
+        /// <value>The TV channels</value>
         public IEnumerable<ITvChannel> TvChannels { get; }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
 
         internal Fixture(FixtureDTO fixtureDto)
         {
-            Guard.Argument(fixtureDto).NotNull();
+            Guard.Argument(fixtureDto, nameof(fixtureDto)).NotNull();
 
             StartTime = fixtureDto.StartTime;
             NextLiveTime = fixtureDto.NextLiveTime;

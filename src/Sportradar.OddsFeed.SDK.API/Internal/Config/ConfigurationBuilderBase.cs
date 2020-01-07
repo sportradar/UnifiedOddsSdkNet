@@ -60,8 +60,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <param name="sectionProvider">A <see cref="IConfigurationSectionProvider"/> used to access <see cref="IOddsFeedConfigurationSection"/></param>
         internal ConfigurationBuilderBase(string accessToken, IConfigurationSectionProvider sectionProvider)
         {
-            Guard.Argument(accessToken).NotNull().NotEmpty();
-            Guard.Argument(sectionProvider).NotNull();
+            Guard.Argument(accessToken, nameof(accessToken)).NotNull().NotEmpty();
+            Guard.Argument(sectionProvider, nameof(sectionProvider)).NotNull();
 
             AccessToken = accessToken;
             SectionProvider = sectionProvider;
@@ -79,7 +79,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <returns>T.</returns>
         internal virtual void LoadFromConfigFile(IOddsFeedConfigurationSection section)
         {
-            Guard.Argument(section).NotNull();
+            Guard.Argument(section, nameof(section)).NotNull();
 
             Section = section;
 
@@ -136,7 +136,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <returns>A <see cref="T:Sportradar.OddsFeed.SDK.API.IConfigurationBuilderBase`1" /> derived instance used to set general configuration properties</returns>
         public T SetDefaultLanguage(CultureInfo culture)
         {
-            Guard.Argument(culture).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             DefaultLocale = culture;
             return this as T;

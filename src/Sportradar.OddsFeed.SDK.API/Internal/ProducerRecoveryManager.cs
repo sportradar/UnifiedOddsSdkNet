@@ -73,9 +73,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="timestampTracker">A <see cref="ITimestampTracker"/> used to track message timings</param>
         internal ProducerRecoveryManager(IProducer producer, IRecoveryOperation recoveryOperation, ITimestampTracker timestampTracker)
         {
-            Guard.Argument(producer).NotNull();
-            Guard.Argument(recoveryOperation).NotNull();
-            Guard.Argument(timestampTracker).NotNull();
+            Guard.Argument(producer, nameof(producer)).NotNull();
+            Guard.Argument(recoveryOperation, nameof(recoveryOperation)).NotNull();
+            Guard.Argument(timestampTracker, nameof(timestampTracker)).NotNull();
 
             Producer = producer;
             _producer = (Producer)producer;
@@ -219,11 +219,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// </remarks>
         /// <param name="message">The <see cref="IMessage" /> message to be processed</param>
         /// <param name="interest">The <see cref="MessageInterest"/> describing the session from which the message originates </param>
-        /// <exception cref="System.ArgumentException">The Producer.Id of the message and the Producer associated with this manager do not match</exception>
+        /// <exception cref="ArgumentException">The Producer.Id of the message and the Producer associated with this manager do not match</exception>
         public void ProcessUserMessage(FeedMessage message, MessageInterest interest)
         {
-            Guard.Argument(message).NotNull();
-            Guard.Argument(interest).NotNull();
+            Guard.Argument(message, nameof(message)).NotNull();
+            Guard.Argument(interest, nameof(interest)).NotNull();
 
             if (message.ProducerId != Producer.Id)
             {
@@ -289,7 +289,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="message">A <see cref="FeedMessage"/> received on the system session</param>
         public void ProcessSystemMessage(FeedMessage message)
         {
-            Guard.Argument(message).NotNull();
+            Guard.Argument(message, nameof(message)).NotNull();
 
             var alive = message as alive;
 

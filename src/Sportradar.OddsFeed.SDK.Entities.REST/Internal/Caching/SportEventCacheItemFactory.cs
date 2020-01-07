@@ -50,10 +50,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="fixtureTimestampCache">The in-memory cache of sport events fixture timestamps</param>
         public SportEventCacheItemFactory(IDataRouterManager dataRouterManager, ISemaphorePool semaphorePool, CultureInfo defaultCulture, ObjectCache fixtureTimestampCache)
         {
-            Guard.Argument(dataRouterManager).NotNull();
-            Guard.Argument(semaphorePool).NotNull();
-            Guard.Argument(defaultCulture).NotNull();
-            Guard.Argument(fixtureTimestampCache).NotNull();
+            Guard.Argument(dataRouterManager, nameof(dataRouterManager)).NotNull();
+            Guard.Argument(semaphorePool, nameof(semaphorePool)).NotNull();
+            Guard.Argument(defaultCulture, nameof(defaultCulture)).NotNull();
+            Guard.Argument(fixtureTimestampCache, nameof(fixtureTimestampCache)).NotNull();
 
             _dataRouterManager = dataRouterManager;
             _semaphorePool = semaphorePool;
@@ -176,7 +176,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             if (fixture.Id.TypeGroup == ResourceTypeGroup.DRAW || fixture.Id.TypeGroup == ResourceTypeGroup.LOTTERY)
             {
                 // should not be any fixture
-                var a = 1;
             }
             return new SportEventCI(fixture, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture, _fixtureTimestampCache);
         }
@@ -184,7 +183,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <summary>
         /// Builds a <see cref="SportEventCI"/> instance from the provided exportable cache item
         /// </summary>
-        /// <param name="exportable">A <see cref="ExportableCI"/> representing the the sport event</param>
+        /// <param name="exportable">A <see cref="ExportableCI"/> representing the sport event</param>
         /// <returns>a new instance of <see cref="SportEventCI"/> instance</returns>
         public SportEventCI Build(ExportableCI exportable)
         {

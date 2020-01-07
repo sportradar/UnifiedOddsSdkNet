@@ -23,7 +23,7 @@ namespace Sportradar.OddsFeed.SDK.API.EventArguments
         /// <param name="producerStatusChange">a <see cref="IProducerStatusChange"/> implementation containing information about the producer whose status has changed</param>
         internal ProducerStatusChangeEventArgs(IProducerStatusChange producerStatusChange)
         {
-            Guard.Argument(producerStatusChange).NotNull();
+            Guard.Argument(producerStatusChange, nameof(producerStatusChange)).NotNull();
 
             _statusChange = producerStatusChange;
         }

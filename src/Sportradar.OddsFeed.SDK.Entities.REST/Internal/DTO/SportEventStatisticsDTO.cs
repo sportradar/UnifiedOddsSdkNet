@@ -19,26 +19,26 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         public IEnumerable<PeriodStatisticsDTO> PeriodStatisticsDTOs { get; internal set; }
 
-        public SportEventStatisticsDTO(statisticsType result)
+        public SportEventStatisticsDTO(statisticsType record)
         {
-            Guard.Argument(result).NotNull();
+            Guard.Argument(record, nameof(record)).NotNull();
 
             var totalStatisticsDTOs = new List<TeamStatisticsDTO>();
             totalStatisticsDTOs.Add(new TeamStatisticsDTO(
                 HomeAway.Home,
-                result.yellow_cards.home,
-                result.red_cards.home,
-                result.yellow_red_cards.home,
-                result.corners.home,
-                result.green_cards == null ? 0 : result.green_cards.home
+                record.yellow_cards.home,
+                record.red_cards.home,
+                record.yellow_red_cards.home,
+                record.corners.home,
+                record.green_cards == null ? 0 : record.green_cards.home
             ));
             totalStatisticsDTOs.Add(new TeamStatisticsDTO(
                 HomeAway.Away,
-                result.yellow_cards.away,
-                result.red_cards.away,
-                result.yellow_red_cards.away,
-                result.corners.away,
-                result.green_cards == null ? 0 : result.green_cards.away
+                record.yellow_cards.away,
+                record.red_cards.away,
+                record.yellow_red_cards.away,
+                record.corners.away,
+                record.green_cards == null ? 0 : record.green_cards.away
             ));
             TotalStatisticsDTOs = totalStatisticsDTOs;
 
@@ -47,7 +47,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         public SportEventStatisticsDTO(matchStatistics statistics, IDictionary<HomeAway, URN> homeAwayCompetitors)
         {
-            Guard.Argument(statistics).NotNull();
+            Guard.Argument(statistics, nameof(statistics)).NotNull();
 
             var teamStats = new List<TeamStatisticsDTO>();
             if (statistics.totals != null)

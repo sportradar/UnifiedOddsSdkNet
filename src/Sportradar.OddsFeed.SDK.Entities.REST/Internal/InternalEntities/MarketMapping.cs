@@ -72,7 +72,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
         /// <param name="cacheItem">A <see cref="MarketMappingCacheItem"/> containing mapping info</param>
         internal MarketMapping(MarketMappingCacheItem cacheItem)
         {
-            Guard.Argument(cacheItem).NotNull();
+            Guard.Argument(cacheItem, nameof(cacheItem)).NotNull();
 
             ProducerId = cacheItem.ProducerId;
             ProducerIds = cacheItem.ProducerIds;

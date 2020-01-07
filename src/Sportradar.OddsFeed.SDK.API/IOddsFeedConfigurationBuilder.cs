@@ -17,7 +17,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// </summary>
         /// <param name="accessToken">The access token.</param>
         /// <returns>The <see cref="IConfigurationInactivitySecondsSetter"/> instance used to set additional values.</returns>
-        /// <exception cref="System.ArgumentException">Value cannot be a null reference or empty string</exception>
+        /// <exception cref="ArgumentException">Value cannot be a null reference or empty string</exception>
         IConfigurationInactivitySecondsSetter SetAccessToken(string accessToken);
     }
 

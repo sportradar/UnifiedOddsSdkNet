@@ -35,7 +35,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="config">A <see cref="IOddsFeedConfigurationInternal"/> instance containing configuration information</param>
         public ConfiguredConnectionFactory(IOddsFeedConfigurationInternal config)
         {
-            Guard.Argument(config).NotNull();
+            Guard.Argument(config, nameof(config)).NotNull();
 
             _config = config;
         }

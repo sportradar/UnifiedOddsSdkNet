@@ -33,7 +33,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="feed">The <see cref="Feed"/> instance on which the build sessions will be constructed</param>
         internal OddsFeedSessionBuilder(Feed feed)
         {
-            Guard.Argument(feed).NotNull();
+            Guard.Argument(feed, nameof(feed)).NotNull();
 
             _feed = feed;
         }

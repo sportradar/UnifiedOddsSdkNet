@@ -36,9 +36,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="cacheManager">A <see cref="ICacheManager"/> used to save booking status</param>
         public BookingManager(IOddsFeedConfigurationInternal config, IDataPoster dataPoster, ICacheManager cacheManager)
         {
-            Guard.Argument(config).NotNull();
-            Guard.Argument(dataPoster).NotNull();
-            Guard.Argument(cacheManager).NotNull();
+            Guard.Argument(config, nameof(config)).NotNull();
+            Guard.Argument(dataPoster, nameof(dataPoster)).NotNull();
+            Guard.Argument(cacheManager, nameof(cacheManager)).NotNull();
 
             _config = config;
             _dataPoster = dataPoster;
@@ -52,7 +52,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns><c>true</c> if event was successfully booked, <c>false</c> otherwise</returns>
         public bool BookLiveOddsEvent(URN eventId)
         {
-            Guard.Argument(eventId).NotNull();
+            Guard.Argument(eventId, nameof(eventId)).NotNull();
 
             try
             {

@@ -26,7 +26,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping
         /// <param name="data">A <see cref="playerProfileEndpoint"/> instance containing player profile data</param>
         internal PlayerProfileMapper(playerProfileEndpoint data)
         {
-            Guard.Argument(data).NotNull();
+            Guard.Argument(data, nameof(data)).NotNull();
 
             _data = data;
         }

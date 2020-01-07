@@ -97,10 +97,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="maxMessageAgeInSeconds">The maximum latency of the user messages</param>
         public TimestampTracker(Producer producer, IEnumerable<MessageInterest> allInterests, int maxInactivitySeconds, int maxMessageAgeInSeconds)
         {
-            Guard.Argument(producer).NotNull();
-            Guard.Argument(maxInactivitySeconds).Positive();
-            Guard.Argument(maxMessageAgeInSeconds).Positive();
-            Guard.Argument(allInterests).NotNull().NotEmpty();
+            Guard.Argument(producer, nameof(producer)).NotNull();
+            Guard.Argument(maxInactivitySeconds, nameof(maxInactivitySeconds)).Positive();
+            Guard.Argument(maxMessageAgeInSeconds, nameof(maxMessageAgeInSeconds)).Positive();
+            Guard.Argument(allInterests, nameof(allInterests)).NotNull().NotEmpty();
 
             _producer = producer;
             _maxInactivitySeconds = maxInactivitySeconds;
@@ -131,9 +131,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="message">The received <see cref="FeedMessage"/></param>
         private static void UpdateTimingInfo(IReadOnlyDictionary<MessageInterest, MessageTimingInfo> dictionary, MessageInterest interest, FeedMessage message)
         {
-            Guard.Argument(dictionary).NotNull();
-            Guard.Argument(interest).NotNull();
-            Guard.Argument(message).NotNull();
+            Guard.Argument(dictionary, nameof(dictionary)).NotNull();
+            Guard.Argument(interest, nameof(interest)).NotNull();
+            Guard.Argument(message, nameof(message)).NotNull();
 
             MessageTimingInfo timingInfo;
             if (dictionary.TryGetValue(interest, out timingInfo))
@@ -157,9 +157,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="message">The received <see cref="FeedMessage"/></param>
         private static void UpdateTimingInfoIfLatencyLower(IReadOnlyDictionary<MessageInterest, MessageTimingInfo> dictionary, MessageInterest interest, FeedMessage message)
         {
-            Guard.Argument(dictionary).NotNull();
-            Guard.Argument(interest).NotNull();
-            Guard.Argument(message).NotNull();
+            Guard.Argument(dictionary, nameof(dictionary)).NotNull();
+            Guard.Argument(interest, nameof(interest)).NotNull();
+            Guard.Argument(message, nameof(message)).NotNull();
 
             MessageTimingInfo timingInfo;
             if (dictionary.TryGetValue(interest, out timingInfo))
@@ -237,7 +237,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             public DateTime GeneratedAt { get; private set; }
 
             /// <summary>
-            /// Gets <see cref="TimeSpan"/> specifying the latency between message generation and receival
+            /// Gets <see cref="TimeSpan"/> specifying the latency between message generation and receival 
             /// </summary>
             public TimeSpan Latency { get; private set; }
 

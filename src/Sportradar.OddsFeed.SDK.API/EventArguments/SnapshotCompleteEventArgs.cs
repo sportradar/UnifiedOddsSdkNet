@@ -45,9 +45,9 @@ namespace Sportradar.OddsFeed.SDK.API.EventArguments
         /// <param name="rawMessage">A raw message received from the feed</param>
         internal SnapshotCompleteEventArgs(IFeedMessageMapper messageMapper, snapshot_complete feedMessage, MessageInterest interest, byte[] rawMessage)
         {
-            Guard.Argument(messageMapper).NotNull();
-            Guard.Argument(feedMessage).NotNull();
-            Guard.Argument(interest).NotNull();
+            Guard.Argument(messageMapper, nameof(messageMapper)).NotNull();
+            Guard.Argument(feedMessage, nameof(feedMessage)).NotNull();
+            Guard.Argument(interest, nameof(interest)).NotNull();
 
             _messageMapper = messageMapper;
             _feedMessage = feedMessage;

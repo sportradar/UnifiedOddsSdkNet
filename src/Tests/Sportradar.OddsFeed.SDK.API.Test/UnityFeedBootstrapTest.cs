@@ -50,7 +50,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             bookmakerDetailsProviderMock.Setup(x => x.GetData(It.IsAny<string>())).Returns(TestConfigurationInternal.GetBookmakerDetails());
             var defaultBookmakerDetailsProvider = bookmakerDetailsProviderMock.Object;
             container.RegisterInstance<IDataProvider<BookmakerDetailsDTO>>(defaultBookmakerDetailsProvider, new ContainerControlledLifetimeManager());
-            container.RegisterInstance<BookmakerDetailsProvider>(defaultBookmakerDetailsProvider, new ContainerControlledLifetimeManager());
+            container.RegisterInstance(defaultBookmakerDetailsProvider, new ContainerControlledLifetimeManager());
             var newConfig = new OddsFeedConfigurationInternal(config, defaultBookmakerDetailsProvider);
             newConfig.Load();
             container.RegisterInstance<IOddsFeedConfiguration>(newConfig, new ContainerControlledLifetimeManager());

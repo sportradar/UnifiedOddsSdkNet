@@ -35,8 +35,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
         /// <param name="nodeId">The node id used to connect to replay server</param>
         public ReplayManager(string replayApiHost, IDataRestful dataRestful, int nodeId)
         {
-            Guard.Argument(replayApiHost).NotNull().NotEmpty();
-            Guard.Argument(dataRestful).NotNull();
+            Guard.Argument(replayApiHost, nameof(replayApiHost)).NotNull().NotEmpty();
+            Guard.Argument(dataRestful, nameof(dataRestful)).NotNull();
 
             _apiHost = replayApiHost;
             _dataRestful = dataRestful;

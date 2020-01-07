@@ -85,8 +85,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                              ObjectCache fixtureTimestampCache)
             : base(eventSummary, dataRouterManager, semaphorePool, currentCulture, defaultCulture, fixtureTimestampCache)
         {
-            Guard.Argument(eventSummary).NotNull();
-            Guard.Argument(currentCulture).NotNull();
+            Guard.Argument(eventSummary, nameof(eventSummary)).NotNull();
+            Guard.Argument(currentCulture, nameof(currentCulture)).NotNull();
 
             Merge(eventSummary, currentCulture, true);
         }
@@ -247,7 +247,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <param name="culture">The culture</param>
         private void MergeDrawResults(IEnumerable<DrawResultDTO> results, CultureInfo culture)
         {
-            Guard.Argument(culture).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             if (results == null)
             {

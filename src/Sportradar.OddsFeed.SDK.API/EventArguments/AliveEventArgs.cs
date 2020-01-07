@@ -37,8 +37,8 @@ namespace Sportradar.OddsFeed.SDK.API.EventArguments
         /// <param name="rawMessage">A raw message received from the feed</param>
         internal AliveEventArgs(IFeedMessageMapper messageMapper, alive feedMessage, byte[] rawMessage)
         {
-            Guard.Argument(messageMapper).NotNull();
-            Guard.Argument(feedMessage).NotNull();
+            Guard.Argument(messageMapper, nameof(messageMapper)).NotNull();
+            Guard.Argument(feedMessage, nameof(feedMessage)).NotNull();
 
             _messageMapper = messageMapper;
             _feedMessage = feedMessage;
@@ -55,9 +55,9 @@ namespace Sportradar.OddsFeed.SDK.API.EventArguments
         }
 
         /// <summary>
-        /// Gets the raw xml message received from the feed
+        /// Gets the raw XML message received from the feed
         /// </summary>
-        /// <returns>Returns the raw xml message received from the feed</returns>
+        /// <returns>Returns the raw XML message received from the feed</returns>
         [Obsolete("The message was moved to event")]
         public string GetRawMessage()
         {

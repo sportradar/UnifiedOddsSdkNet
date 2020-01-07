@@ -42,9 +42,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> specifying how to handle potential exceptions thrown to the user code</param>
         public NameProviderFactory(IMarketCacheProvider marketCacheProvider, IProfileCache profileCache, INameExpressionFactory expressionFactory, ExceptionHandlingStrategy exceptionStrategy)
         {
-            Guard.Argument(marketCacheProvider).NotNull();
-            Guard.Argument(profileCache).NotNull();
-            Guard.Argument(expressionFactory).NotNull();
+            Guard.Argument(marketCacheProvider, nameof(marketCacheProvider)).NotNull();
+            Guard.Argument(profileCache, nameof(profileCache)).NotNull();
+            Guard.Argument(expressionFactory, nameof(expressionFactory)).NotNull();
 
             _marketCacheProvider = marketCacheProvider;
             _profileCache = profileCache;

@@ -22,7 +22,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <returns>A <see cref="string"/> representation of the <see cref="Stream"/> content.</returns>
         public static string GetData(this Stream stream)
         {
-            Guard.Argument(stream).NotNull();
+            Guard.Argument(stream, nameof(stream)).NotNull();
 
             using (var memoryStream = new MemoryStream())
             {
@@ -36,10 +36,10 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// not throw an exception if the semaphore is already disposed
         /// </summary>
         /// <param name="semaphore">The <see cref="SemaphoreSlim"/> on which to wait</param>
-        /// <returns>True if entering the semaphore succedded (e.g. isntance was not yet disposed); otherwise false</returns>
+        /// <returns>True if entering the semaphore succeeded (e.g. instance was not yet disposed); otherwise false</returns>
         public static bool WaitSafe(this SemaphoreSlim semaphore)
         {
-            Guard.Argument(semaphore).NotNull();
+            Guard.Argument(semaphore, nameof(semaphore)).NotNull();
 
             try
             {
@@ -57,11 +57,11 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// not throw an exception if the semaphore is already disposed
         /// </summary>
         /// <param name="semaphore">The <see cref="SemaphoreSlim"/> on which to wait</param>
-        /// <returns>True if entering the semaphore succedded (e.g. isntance was not yet disposed); otherwise false</returns>
+        /// <returns>True if entering the semaphore succeeded (e.g. instance was not yet disposed); otherwise false</returns>
 
         public static async Task<bool> WaitAsyncSafe(this SemaphoreSlim semaphore)
         {
-            Guard.Argument(semaphore).NotNull();
+            Guard.Argument(semaphore, nameof(semaphore)).NotNull();
             try
             {
                 await semaphore.WaitAsync().ConfigureAwait(false);
@@ -78,11 +78,11 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// not throw an exception if the semaphore is already disposed
         /// </summary>
         /// <param name="semaphore">The <see cref="SemaphoreSlim"/> to be released</param>
-        /// <returns>True if releasing the semaphore succedded (e.g. isntance was not yet disposed); otherwise false</returns>
+        /// <returns>True if releasing the semaphore succeeded (e.g. instance was not yet disposed); otherwise false</returns>
 
         public static bool ReleaseSafe(this SemaphoreSlim semaphore)
         {
-            Guard.Argument(semaphore).NotNull();
+            Guard.Argument(semaphore, nameof(semaphore)).NotNull();
             try
             {
                 semaphore.Release();

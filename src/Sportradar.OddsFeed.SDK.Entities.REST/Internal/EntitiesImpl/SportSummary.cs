@@ -21,8 +21,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public SportSummary(URN id, IReadOnlyDictionary<CultureInfo, string> names)
             : base(id, names)
         {
-            Guard.Argument(id).NotNull();
-            Guard.Argument(names).NotNull().NotEmpty();
+            Guard.Argument(id, nameof(id)).NotNull();
+            Guard.Argument(names, nameof(names)).NotNull().NotEmpty();
         }
     }
 }

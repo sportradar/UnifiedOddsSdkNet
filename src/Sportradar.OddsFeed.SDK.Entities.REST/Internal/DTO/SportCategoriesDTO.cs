@@ -14,7 +14,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
     public class SportCategoriesDTO
     {
         /// <summary>
-        /// Gets the <see cref="SportEntityDTO"/> specifying the the parent sport
+        /// Gets the <see cref="SportEntityDTO"/> specifying the parent sport
         /// </summary>
         public SportEntityDTO Sport { get; }
 
@@ -25,8 +25,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         internal SportCategoriesDTO(sportCategoriesEndpoint categoriesEndpoint)
         {
-            Guard.Argument(categoriesEndpoint).NotNull();
-            Guard.Argument(categoriesEndpoint.sport).NotNull();
+            Guard.Argument(categoriesEndpoint, nameof(categoriesEndpoint)).NotNull();
+            Guard.Argument(categoriesEndpoint.sport, nameof(categoriesEndpoint.sport)).NotNull();
 
             Sport = new SportEntityDTO(categoriesEndpoint.sport.id, categoriesEndpoint.sport.name);
             Categories = categoriesEndpoint.categories?.Select(c => new CategoryDTO(c.id, c.name, c.country_code, new List<tournamentExtended>())).ToList();

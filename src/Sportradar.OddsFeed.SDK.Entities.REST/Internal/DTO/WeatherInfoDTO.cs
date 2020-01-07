@@ -27,7 +27,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <param name="weatherInfo">The <see cref="weatherInfo"/> used for creating instance</param>
         internal WeatherInfoDTO(weatherInfo weatherInfo)
         {
-            Guard.Argument(weatherInfo).NotNull();
+            Guard.Argument(weatherInfo, nameof(weatherInfo)).NotNull();
 
             TemperatureCelsius = weatherInfo.temperature_celsiusSpecified
                 ? (int?) weatherInfo.temperature_celsius

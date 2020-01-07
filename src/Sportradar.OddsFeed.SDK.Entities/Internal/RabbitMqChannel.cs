@@ -60,7 +60,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="channelFactory">A <see cref="IChannelFactory"/> used to construct the <see cref="IModel"/> representing Rabbit MQ channel.</param>
         public RabbitMqChannel(IChannelFactory channelFactory)
         {
-            Guard.Argument(channelFactory).NotNull();
+            Guard.Argument(channelFactory, nameof(channelFactory)).NotNull();
 
             _channelFactory = channelFactory;
         }
@@ -88,7 +88,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 throw new InvalidOperationException("The instance is already opened");
             }
 
-            Guard.Argument(routingKeys).NotNull().NotEmpty();
+            Guard.Argument(routingKeys, nameof(routingKeys)).NotNull().NotEmpty();
 
             _channel = _channelFactory.CreateChannel();
             ExecutionLog.Info($"Opening the channel with channelNumber: {_channel.ChannelNumber}.");
@@ -111,7 +111,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <summary>
         /// Closes the current channel
         /// </summary>
-        /// <exception cref="System.InvalidOperationException">The instance is already closed</exception>
+        /// <exception cref="InvalidOperationException">The instance is already closed</exception>
         public void Close()
         {
             if (Interlocked.CompareExchange(ref _isOpened, 0, 1) != 1)

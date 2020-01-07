@@ -98,12 +98,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             Func<OddsFeedSession, IEnumerable<string>> getRoutingKeys)
             :base(messageMapper, defaultCultures)
         {
-            Guard.Argument(messageReceiver).NotNull();
-            Guard.Argument(messageInterest).NotNull();
-            Guard.Argument(messageProcessor).NotNull();
-            Guard.Argument(messageValidator).NotNull();
-            Guard.Argument(messageDataExtractor).NotNull();
-            Guard.Argument(dispatcherStore).NotNull();
+            Guard.Argument(messageReceiver, nameof(messageReceiver)).NotNull();
+            Guard.Argument(messageInterest, nameof(messageInterest)).NotNull();
+            Guard.Argument(messageProcessor, nameof(messageProcessor)).NotNull();
+            Guard.Argument(messageValidator, nameof(messageValidator)).NotNull();
+            Guard.Argument(messageDataExtractor, nameof(messageDataExtractor)).NotNull();
+            Guard.Argument(dispatcherStore, nameof(dispatcherStore)).NotNull();
 
             MessageReceiver = messageReceiver;
             _messageProcessor = messageProcessor;
@@ -183,7 +183,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>a <see cref="IEntityDispatcherInternal"/> which should be used to dispatch the provided <see cref="FeedMessage"/></returns>
         private IEntityDispatcherInternal SelectDispatcher(FeedMessage message)
         {
-            Guard.Argument(message).NotNull();
+            Guard.Argument(message, nameof(message)).NotNull();
 
             if (!message.IsEventRelated)
             {
@@ -203,7 +203,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="rawMessage"></param>
         public override void Dispatch(FeedMessage feedMessage, byte[] rawMessage)
         {
-            Guard.Argument(feedMessage).NotNull();
+            Guard.Argument(feedMessage, nameof(feedMessage)).NotNull();
 
             var alive = feedMessage as alive;
             if (alive != null)
@@ -226,7 +226,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <summary>
         /// It executes steps needed when opening the instance
         /// </summary>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         protected override void OnOpening()
         {
             MessageReceiver.FeedMessageReceived += OnMessageReceived;
@@ -240,7 +240,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <summary>
         /// It executes steps needed when closing the instance
         /// </summary>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         protected override void OnClosing()
         {
             MessageReceiver.FeedMessageReceived -= OnMessageReceived;

@@ -37,10 +37,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         internal MarketMappingDTO(mappingsMapping mapping)
         {
-            Guard.Argument(mapping).NotNull();
-            Guard.Argument(mapping.product_id).Positive();
-            Guard.Argument(mapping.sport_id).NotNull().NotEmpty();
-            Guard.Argument(mapping.market_id).NotNull().NotEmpty();
+            Guard.Argument(mapping, nameof(mapping)).NotNull();
+            Guard.Argument(mapping.product_id, nameof(mapping.product_id)).Positive();
+            Guard.Argument(mapping.sport_id, nameof(mapping.sport_id)).NotNull().NotEmpty();
+            Guard.Argument(mapping.market_id, nameof(mapping.market_id)).NotNull().NotEmpty();
 
             ProducerId = mapping.product_id;
             ProducerIds = string.IsNullOrEmpty(mapping.product_ids)
@@ -68,10 +68,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         internal MarketMappingDTO(variant_mappingsMapping mapping)
         {
-            Guard.Argument(mapping).NotNull();
-            Guard.Argument(mapping.product_id).Positive();
-            Guard.Argument(mapping.sport_id).NotNull().NotEmpty();
-            Guard.Argument(mapping.market_id).NotNull().NotEmpty();
+            Guard.Argument(mapping, nameof(mapping)).NotNull();
+            Guard.Argument(mapping.product_id, nameof(mapping.product_id)).Positive();
+            Guard.Argument(mapping.sport_id, nameof(mapping.sport_id)).NotNull().NotEmpty();
+            Guard.Argument(mapping.market_id, nameof(mapping.market_id)).NotNull().NotEmpty();
 
             ProducerId = mapping.product_id;
             ProducerIds = string.IsNullOrEmpty(mapping.product_ids)

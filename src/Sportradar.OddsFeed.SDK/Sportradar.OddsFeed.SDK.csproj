@@ -117,9 +117,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="BuildEventMerge.bat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="BuildEventMerge.bat" />
     <None Include="NugetPackage.nuspec">
       <SubType>Designer</SubType>
     </None>

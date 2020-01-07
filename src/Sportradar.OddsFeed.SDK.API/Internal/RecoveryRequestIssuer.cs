@@ -63,9 +63,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="config">The <see cref="IOddsFeedConfiguration"/> used to get nodeId</param>
         public RecoveryRequestIssuer(IDataPoster dataPoster, ISequenceGenerator sequenceGenerator, IOddsFeedConfiguration config)
         {
-            Guard.Argument(dataPoster).NotNull();
-            Guard.Argument(sequenceGenerator).NotNull();
-            Guard.Argument(config).NotNull();
+            Guard.Argument(dataPoster, nameof(dataPoster)).NotNull();
+            Guard.Argument(sequenceGenerator, nameof(sequenceGenerator)).NotNull();
+            Guard.Argument(config, nameof(config)).NotNull();
 
             _dataPoster = dataPoster;
             _sequenceGenerator = sequenceGenerator;
@@ -80,8 +80,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns> <see cref="Task{HttpStatusCode}"/> representing the async operation</returns>
         public async Task<long> RecoverEventMessagesAsync(IProducer producer, URN eventId)
         {
-            Guard.Argument(producer).NotNull();
-            Guard.Argument(eventId).NotNull();
+            Guard.Argument(producer, nameof(producer)).NotNull();
+            Guard.Argument(eventId, nameof(eventId)).NotNull();
 
             if (!producer.IsAvailable || producer.IsDisabled)
             {
@@ -117,8 +117,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns> <see cref="Task{HttpStatusCode}"/> representing the async operation</returns>
         public async Task<long> RecoverEventStatefulMessagesAsync(IProducer producer, URN eventId)
         {
-            Guard.Argument(producer).NotNull();
-            Guard.Argument(eventId).NotNull();
+            Guard.Argument(producer, nameof(producer)).NotNull();
+            Guard.Argument(eventId, nameof(eventId)).NotNull();
 
             if (!producer.IsAvailable || producer.IsDisabled)
             {
@@ -158,7 +158,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <exception cref="NotImplementedException"></exception>
         public async Task<long> RequestRecoveryAfterTimestampAsync(IProducer producer, DateTime dateAfter, int nodeId)
         {
-            Guard.Argument(producer).NotNull();
+            Guard.Argument(producer, nameof(producer)).NotNull();
 
             if (!producer.IsAvailable || producer.IsDisabled)
             {
@@ -217,10 +217,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="nodeId">The node id where recovery message will be processed</param>
         /// <returns><see cref="Task{Long}" /> representing a asynchronous method.
         /// Once the execution is complete it provides the request id associated with the recovery</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         public async Task<long> RequestFullOddsRecoveryAsync(IProducer producer, int nodeId)
         {
-            Guard.Argument(producer).NotNull();
+            Guard.Argument(producer, nameof(producer)).NotNull();
 
             if (!producer.IsAvailable || producer.IsDisabled)
             {

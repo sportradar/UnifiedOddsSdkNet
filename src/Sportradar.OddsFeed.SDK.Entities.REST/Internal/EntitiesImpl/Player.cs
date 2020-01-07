@@ -22,8 +22,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public Player(URN id, IDictionary<CultureInfo, string> names)
             : base(id, names as IReadOnlyDictionary<CultureInfo, string>)
         {
-            Guard.Argument(id).NotNull();
-            Guard.Argument(names).NotNull();
+            Guard.Argument(id, nameof(id)).NotNull();
+            Guard.Argument(names, nameof(names)).NotNull();
         }
     }
 }

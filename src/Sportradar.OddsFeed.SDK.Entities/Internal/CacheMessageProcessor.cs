@@ -66,10 +66,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                                      ICacheManager cacheManager,
                                      IFeedMessageHandler feedMessageHandler)
         {
-            Guard.Argument(mapperFactory).NotNull();
-            Guard.Argument(sportEventCache).NotNull();
-            Guard.Argument(cacheManager).NotNull();
-            Guard.Argument(feedMessageHandler).NotNull();
+            Guard.Argument(mapperFactory, nameof(mapperFactory)).NotNull();
+            Guard.Argument(sportEventCache, nameof(sportEventCache)).NotNull();
+            Guard.Argument(cacheManager, nameof(cacheManager)).NotNull();
+            Guard.Argument(feedMessageHandler, nameof(feedMessageHandler)).NotNull();
 
             ProcessorId = "CMP" + Guid.NewGuid().ToString().Substring(0, 4);
 
@@ -87,8 +87,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="rawMessage">A raw message received from the feed</param>
         public void ProcessMessage(FeedMessage message, MessageInterest interest, byte[] rawMessage)
         {
-            Guard.Argument(message).NotNull();
-            Guard.Argument(interest).NotNull();
+            Guard.Argument(message, nameof(message)).NotNull();
+            Guard.Argument(interest, nameof(interest)).NotNull();
 
             // process odds_change
             var oddsChange = message as odds_change;

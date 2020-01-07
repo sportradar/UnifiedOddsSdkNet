@@ -227,7 +227,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <param name="isReplay">Value indicating whether the constructed instance will be used to connect to replay server</param>
         protected Feed(IOddsFeedConfiguration config, bool isReplay)
         {
-            Guard.Argument(config).NotNull();
+            Guard.Argument(config, nameof(config)).NotNull();
 
             LogInit();
 
@@ -360,7 +360,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <returns>A <see cref="IOddsFeedSession"/> instance with the specified <see cref="MessageInterest"/></returns>
         internal IOddsFeedSession CreateSession(MessageInterest msgInterest)
         {
-            Guard.Argument(msgInterest).NotNull();
+            Guard.Argument(msgInterest, nameof(msgInterest)).NotNull();
 
             if (_isDisposed)
             {
@@ -404,7 +404,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// </summary>
         void IGlobalEventDispatcher.DispatchEventRecoveryCompleted(long requestId, URN eventId)
         {
-            Guard.Argument(eventId).NotNull();
+            Guard.Argument(eventId, nameof(eventId)).NotNull();
 
             Dispatch(EventRecoveryCompleted, new EventRecoveryCompletedEventArgs(requestId, eventId), "EventRecoveryCompleted");
         }
@@ -415,7 +415,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <param name="producerStatusChange">The <see cref="IProducerStatusChange"/> instance to be dispatched</param>
         void IGlobalEventDispatcher.DispatchProducerDown(IProducerStatusChange producerStatusChange)
         {
-            Guard.Argument(producerStatusChange).NotNull();
+            Guard.Argument(producerStatusChange, nameof(producerStatusChange)).NotNull();
 
             var eventArgs = new ProducerStatusChangeEventArgs(producerStatusChange);
             Dispatch(ProducerDown, eventArgs, "ProducerDown");
@@ -427,7 +427,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <param name="producerStatusChange">The <see cref="IProducerStatusChange"/> instance to be dispatched</param>
         void IGlobalEventDispatcher.DispatchProducerUp(IProducerStatusChange producerStatusChange)
         {
-            Guard.Argument(producerStatusChange).NotNull();
+            Guard.Argument(producerStatusChange, nameof(producerStatusChange)).NotNull();
 
             var eventArgs = new ProducerStatusChangeEventArgs(producerStatusChange);
             Dispatch(ProducerUp, eventArgs, "ProducerUp");

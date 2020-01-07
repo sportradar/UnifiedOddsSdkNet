@@ -98,7 +98,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal CompetitionDTO(matchSummaryEndpoint matchSummary)
             : this(matchSummary.sport_event)
         {
-            Guard.Argument(matchSummary).NotNull();
+            Guard.Argument(matchSummary, nameof(matchSummary)).NotNull();
 
             Conditions = matchSummary.sport_event_conditions == null
                 ? Conditions
@@ -128,7 +128,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal CompetitionDTO(stageSummaryEndpoint stageSummary)
             : this(stageSummary.sport_event)
         {
-            Guard.Argument(stageSummary).NotNull();
+            Guard.Argument(stageSummary, nameof(stageSummary)).NotNull();
 
             SportEventStatus = stageSummary.sport_event_status == null
                 ? null

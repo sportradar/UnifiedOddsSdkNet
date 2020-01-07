@@ -30,8 +30,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <param name="sectionProvider">A <see cref="IConfigurationSectionProvider"/> used to access <see cref="IOddsFeedConfigurationSection"/></param>
         internal EnvironmentSelector(string accessToken, IConfigurationSectionProvider sectionProvider)
         {
-            Guard.Argument(accessToken).NotNull().NotEmpty();
-            Guard.Argument(sectionProvider).NotNull();
+            Guard.Argument(accessToken, nameof(accessToken)).NotNull().NotEmpty();
+            Guard.Argument(sectionProvider, nameof(sectionProvider)).NotNull();
 
             _accessToken = accessToken;
             _sectionProvider = sectionProvider;

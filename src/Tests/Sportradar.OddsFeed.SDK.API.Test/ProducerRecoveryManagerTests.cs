@@ -318,7 +318,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             //start the recovery
             _producerRecoveryManager.ProcessSystemMessage(_messageBuilder.BuildAlive());
             Assert.AreEqual(_producerRecoveryManager.Status, ProducerRecoveryStatus.Started);
-            //make sure that after the the recoveryOperationMock IsRunning returns true
+            //make sure that after the recoveryOperationMock IsRunning returns true
             recoveryOperationMock.Setup(x => x.IsRunning).Returns(true);
 
             //let's go over few normal cycles without user messages
@@ -346,7 +346,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             //start the recovery
             _producerRecoveryManager.ProcessSystemMessage(_messageBuilder.BuildAlive());
             Assert.AreEqual(_producerRecoveryManager.Status, ProducerRecoveryStatus.Started);
-            //make sure that after the the recoveryOperationMock IsRunning returns true
+            //make sure that after the recoveryOperationMock IsRunning returns true
             recoveryOperationMock.Setup(x => x.IsRunning).Returns(true);
 
             //let's go over few normal cycles without user messages

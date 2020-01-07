@@ -1,7 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-
 using System;
 using System.Collections.Generic;
 using Dawn;
@@ -23,7 +22,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         public SportEventStatusDTO SportEventStatus { get; }
 
-
         /// <summary>
         /// Gets the <see cref="DateTime"/> specifying when the associated message was generated (on the server side)
         /// </summary>
@@ -32,8 +30,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         internal MatchTimelineDTO(matchTimelineEndpoint timeline)
         {
-            Guard.Argument(timeline).NotNull();
-            Guard.Argument(timeline.sport_event).NotNull();
+            Guard.Argument(timeline, nameof(timeline)).NotNull();
+            Guard.Argument(timeline.sport_event, nameof(timeline.sport_event)).NotNull();
 
             SportEvent = RestMapperHelper.MapSportEvent(timeline.sport_event);
 

@@ -34,7 +34,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="dto">The <see cref="WeatherInfoDTO"/> used to create new instance</param>
         internal WeatherInfoCI(WeatherInfoDTO dto)
         {
-            Guard.Argument(dto).NotNull();
+            Guard.Argument(dto, nameof(dto)).NotNull();
 
             TemperatureCelsius = dto.TemperatureCelsius;
             Wind = dto.Wind;

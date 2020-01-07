@@ -48,8 +48,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
         public static void RegisterBaseTypes(this IUnityContainer container, IOddsFeedConfiguration userConfig)
         {
-            Guard.Argument(container).NotNull();
-            Guard.Argument(userConfig).NotNull();
+            Guard.Argument(container, nameof(container)).NotNull();
+            Guard.Argument(userConfig, nameof(userConfig)).NotNull();
 
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
 
@@ -113,8 +113,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
         public static void RegisterTypes(this IUnityContainer container, IGlobalEventDispatcher dispatcher)
         {
-            Guard.Argument(container).NotNull();
-            Guard.Argument(dispatcher).NotNull();
+            Guard.Argument(container, nameof(container)).NotNull();
+            Guard.Argument(dispatcher, nameof(dispatcher)).NotNull();
 
             container.RegisterInstance(dispatcher, new ExternallyControlledLifetimeManager());
 
@@ -626,7 +626,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
         private static void RegisterSessionTypes(IUnityContainer container, IOddsFeedConfigurationInternal config)
         {
-            Guard.Argument(container).NotNull();
+            Guard.Argument(container, nameof(container)).NotNull();
 
             container.RegisterType<IDeserializer<FeedMessage>, Deserializer<FeedMessage>>(new HierarchicalLifetimeManager());
             container.RegisterType<IRoutingKeyParser, RegexRoutingKeyParser>(new HierarchicalLifetimeManager());
@@ -651,7 +651,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
         private static void RegisterSessionMessageProcessor(IUnityContainer container)
         {
-            Guard.Argument(container).NotNull();
+            Guard.Argument(container, nameof(container)).NotNull();
 
             container.RegisterType<IFeedMessageProcessor>(
                 "SessionMessageManager",
@@ -661,7 +661,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
         private static void RegisterCacheMessageProcessor(IUnityContainer container)
         {
-            Guard.Argument(container).NotNull();
+            Guard.Argument(container, nameof(container)).NotNull();
 
             container.RegisterInstance(
                 "FixtureChangeCache_Cache",
@@ -714,7 +714,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
         private static void RegisterSportEventCache(IUnityContainer container, IEnumerable<CultureInfo> cultures)
         {
-            Guard.Argument(container).NotNull();
+            Guard.Argument(container, nameof(container)).NotNull();
 
             container.RegisterInstance(
                 "SportEventCache_Cache",
@@ -757,7 +757,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
         private static void RegisterSportDataCache(IUnityContainer container, IEnumerable<CultureInfo> cultures)
         {
-            Guard.Argument(container).NotNull();
+            Guard.Argument(container, nameof(container)).NotNull();
 
             container.RegisterType<ITimer, SdkTimer>(
                 "SportDataCacheTimer",

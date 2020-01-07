@@ -33,8 +33,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="dataFetcher">A <see cref="IDataFetcher"/> instance used to execute http requests</param>
         public ConnectionValidator(IOddsFeedConfigurationInternal config, IDataFetcher dataFetcher)
         {
-            Guard.Argument(config).NotNull();
-            Guard.Argument(dataFetcher).NotNull();
+            Guard.Argument(config, nameof(config)).NotNull();
+            Guard.Argument(dataFetcher, nameof(dataFetcher)).NotNull();
 
             _config = config;
             _dataFetcher = dataFetcher;

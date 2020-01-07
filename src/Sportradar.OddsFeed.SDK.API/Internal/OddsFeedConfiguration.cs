@@ -142,12 +142,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             bool adjustAfterAge,
             IOddsFeedConfigurationSection section){
 
-            Guard.Argument(accessToken).NotNull().NotEmpty();
-            Guard.Argument(requiredLanguages).NotNull().NotEmpty();
-            Guard.Argument(inactivitySeconds).InRange(SdkInfo.MinInactivitySeconds, SdkInfo.MaxInactivitySeconds);
-            Guard.Argument(maxRecoveryTimeInSeconds).Min(SdkInfo.MinRecoveryExecutionInSeconds);
-            Guard.Argument(apiHost).NotNull().NotEmpty();
-            Guard.Argument(host).NotNull().NotEmpty();
+            Guard.Argument(accessToken, nameof(accessToken)).NotNull().NotEmpty();
+            Guard.Argument(requiredLanguages, nameof(requiredLanguages)).NotNull().NotEmpty();
+            Guard.Argument(inactivitySeconds, nameof(inactivitySeconds)).InRange(SdkInfo.MinInactivitySeconds, SdkInfo.MaxInactivitySeconds);
+            Guard.Argument(maxRecoveryTimeInSeconds, nameof(maxRecoveryTimeInSeconds)).Min(SdkInfo.MinRecoveryExecutionInSeconds);
+            Guard.Argument(apiHost, nameof(apiHost)).NotNull().NotEmpty();
+            Guard.Argument(host, nameof(host)).NotNull().NotEmpty();
 
             AccessToken = accessToken;
             InactivitySeconds = inactivitySeconds;
@@ -213,10 +213,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             bool adjustAfterAge,
             IOddsFeedConfigurationSection section)
         {
-            Guard.Argument(accessToken).NotNull().NotEmpty();
-            Guard.Argument(defaultCulture).NotNull();
-            Guard.Argument(inactivitySeconds).InRange(SdkInfo.MinInactivitySeconds, SdkInfo.MaxInactivitySeconds);
-            Guard.Argument(maxRecoveryExecutionInSeconds).Min(SdkInfo.MinRecoveryExecutionInSeconds);
+            Guard.Argument(accessToken, nameof(accessToken)).NotNull().NotEmpty();
+            Guard.Argument(defaultCulture, nameof(defaultCulture)).NotNull();
+            Guard.Argument(inactivitySeconds, nameof(inactivitySeconds)).InRange(SdkInfo.MinInactivitySeconds, SdkInfo.MaxInactivitySeconds);
+            Guard.Argument(maxRecoveryExecutionInSeconds, nameof(maxRecoveryExecutionInSeconds)).Min(SdkInfo.MinRecoveryExecutionInSeconds);
 
             AccessToken = accessToken;
             Environment = environment;

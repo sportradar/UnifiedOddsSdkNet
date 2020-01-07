@@ -111,11 +111,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                             CultureInfo defaultCulture,
                             ObjectCache fixtureTimestampCache)
         {
-            Guard.Argument(id).NotNull();
-            Guard.Argument(dataRouterManager).NotNull();
-            Guard.Argument(defaultCulture).NotNull();
-            Guard.Argument(semaphorePool).NotNull();
-            Guard.Argument(fixtureTimestampCache).NotNull();
+            Guard.Argument(id, nameof(id)).NotNull();
+            Guard.Argument(dataRouterManager, nameof(dataRouterManager)).NotNull();
+            Guard.Argument(defaultCulture, nameof(defaultCulture)).NotNull();
+            Guard.Argument(semaphorePool, nameof(semaphorePool)).NotNull();
+            Guard.Argument(fixtureTimestampCache, nameof(fixtureTimestampCache)).NotNull();
 
             Id = id;
             DataRouterManager = dataRouterManager;
@@ -141,8 +141,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                             ObjectCache fixtureTimestampCache)
             : this(eventSummary.Id, dataRouterManager, semaphorePool, defaultCulture, fixtureTimestampCache)
         {
-            Guard.Argument(eventSummary).NotNull();
-            Guard.Argument(currentCulture).NotNull();
+            Guard.Argument(eventSummary, nameof(eventSummary)).NotNull();
+            Guard.Argument(currentCulture, nameof(currentCulture)).NotNull();
 
             Merge(eventSummary, currentCulture);
         }
@@ -150,7 +150,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <summary>
         /// Initializes a new instance of the <see cref="SportEventCI" /> class
         /// </summary>
-        /// <param name="exportable">A <see cref="ExportableSportEventCI" /> representing the the sport event</param>
+        /// <param name="exportable">A <see cref="ExportableSportEventCI" /> representing the sport event</param>
         /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to obtain summary and fixture</param>
         /// <param name="semaphorePool">A <see cref="ISemaphorePool" /> instance used to obtain sync objects</param>
         /// <param name="defaultCulture">A <see cref="CultureInfo" /> specifying the language used when fetching info which is not translatable (e.g. Scheduled, ..)</param>
@@ -308,7 +308,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <returns>A <see cref="Task" /> representing the async operation</returns>
         protected async Task FetchMissingSummary(IEnumerable<CultureInfo> cultures, bool forceFetch)
         {
-            Guard.Argument(cultures).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
 
             // to improve performance check if anything is missing without acquiring a lock
             var cultureInfos = cultures as IList<CultureInfo> ?? cultures.ToList();
@@ -401,7 +401,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <returns>A <see cref="Task" /> representing the async operation</returns>
         protected async Task FetchMissingFixtures(IEnumerable<CultureInfo> cultures)
         {
-            Guard.Argument(cultures).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
 
             // to improve performance check if anything is missing without acquiring a lock
             var cultureInfos = cultures as IList<CultureInfo> ?? cultures.ToList();
@@ -501,8 +501,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
 
         private void Merge(SportEventSummaryDTO eventSummary, CultureInfo culture)
         {
-            Guard.Argument(eventSummary).NotNull();
-            Guard.Argument(culture).NotNull();
+            Guard.Argument(eventSummary, nameof(eventSummary)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             lock (MergeLock)
             {

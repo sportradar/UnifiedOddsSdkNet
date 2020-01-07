@@ -31,10 +31,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             ISingleTypeMapperFactory<tournamentSchedule, EntityList<SportEventSummaryDTO>> mapperFactory)
             : base(dateScheduleUriFormat, fetcher, deserializer, mapperFactory)
         {
-            Guard.Argument(dateScheduleUriFormat).NotNull().NotEmpty();
-            Guard.Argument(fetcher).NotNull();
-            Guard.Argument(deserializer).NotNull();
-            Guard.Argument(mapperFactory).NotNull();
+            Guard.Argument(dateScheduleUriFormat, nameof(dateScheduleUriFormat)).NotNull().NotEmpty();
+            Guard.Argument(fetcher, nameof(fetcher)).NotNull();
+            Guard.Argument(deserializer, nameof(deserializer)).NotNull();
+            Guard.Argument(mapperFactory, nameof(mapperFactory)).NotNull();
         }
     }
 }

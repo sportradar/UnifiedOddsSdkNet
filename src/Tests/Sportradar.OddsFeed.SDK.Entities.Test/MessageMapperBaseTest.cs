@@ -63,7 +63,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
         [TestMethod]
         public void DefaultValueIsReturned()
         {
-            var active = MessageMapperHelper.GetEnumValue<MarketStatus>(false, 99, MarketStatus.ACTIVE);
+            var active = MessageMapperHelper.GetEnumValue(false, 99, MarketStatus.ACTIVE);
             Assert.AreEqual(active, MarketStatus.ACTIVE, "Value of active must be MarketStatus.ACTIVE");
         }
 

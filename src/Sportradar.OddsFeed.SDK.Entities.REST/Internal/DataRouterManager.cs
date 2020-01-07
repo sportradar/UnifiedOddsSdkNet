@@ -225,32 +225,32 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                                  IDataProvider<EntityList<SportEventSummaryDTO>> listSportEventProvider,
                                  IDataProvider<EntityList<TournamentInfoDTO>> availableSportTournamentsProvider)
         {
-            Guard.Argument(cacheManager).NotNull();
-            Guard.Argument(sportEventSummaryProvider).NotNull();
-            Guard.Argument(sportEventFixtureProvider).NotNull();
-            Guard.Argument(sportEventFixtureChangeFixtureProvider).NotNull();
-            Guard.Argument(allTournamentsForAllSportsProvider).NotNull();
-            Guard.Argument(allSportsProvider).NotNull();
-            Guard.Argument(sportEventsForDateProvider).NotNull();
-            Guard.Argument(sportEventsForTournamentProvider).NotNull();
-            Guard.Argument(playerProfileProvider).NotNull();
-            Guard.Argument(competitorProvider).NotNull();
-            Guard.Argument(simpleTeamProvider).NotNull();
-            Guard.Argument(tournamentSeasonsProvider).NotNull();
-            Guard.Argument(ongoingSportEventProvider).NotNull();
-            Guard.Argument(sportCategoriesProvider).NotNull();
-            Guard.Argument(invariantMarketDescriptionsProvider).NotNull();
-            Guard.Argument(variantMarketDescriptionProvider).NotNull();
-            Guard.Argument(variantDescriptionsProvider).NotNull();
-            Guard.Argument(drawSummaryProvider).NotNull();
-            Guard.Argument(drawFixtureProvider).NotNull();
-            Guard.Argument(lotteryScheduleProvider).NotNull();
-            Guard.Argument(lotteryListProvider).NotNull();
-            Guard.Argument(availableSelectionsProvider).NotNull();
-            Guard.Argument(calculateProbabilityProvider).NotNull();
-            Guard.Argument(fixtureChangesProvider).NotNull();
-            Guard.Argument(listSportEventProvider).NotNull();
-            Guard.Argument(availableSelectionsProvider).NotNull();
+            Guard.Argument(cacheManager, nameof(cacheManager)).NotNull();
+            Guard.Argument(sportEventSummaryProvider, nameof(sportEventSummaryProvider)).NotNull();
+            Guard.Argument(sportEventFixtureProvider, nameof(sportEventFixtureProvider)).NotNull();
+            Guard.Argument(sportEventFixtureChangeFixtureProvider, nameof(sportEventFixtureChangeFixtureProvider)).NotNull();
+            Guard.Argument(allTournamentsForAllSportsProvider, nameof(allTournamentsForAllSportsProvider)).NotNull();
+            Guard.Argument(allSportsProvider, nameof(allSportsProvider)).NotNull();
+            Guard.Argument(sportEventsForDateProvider, nameof(sportEventsForDateProvider)).NotNull();
+            Guard.Argument(sportEventsForTournamentProvider, nameof(sportEventsForTournamentProvider)).NotNull();
+            Guard.Argument(playerProfileProvider, nameof(playerProfileProvider)).NotNull();
+            Guard.Argument(competitorProvider, nameof(competitorProvider)).NotNull();
+            Guard.Argument(simpleTeamProvider, nameof(simpleTeamProvider)).NotNull();
+            Guard.Argument(tournamentSeasonsProvider, nameof(tournamentSeasonsProvider)).NotNull();
+            Guard.Argument(ongoingSportEventProvider, nameof(ongoingSportEventProvider)).NotNull();
+            Guard.Argument(sportCategoriesProvider, nameof(sportCategoriesProvider)).NotNull();
+            Guard.Argument(invariantMarketDescriptionsProvider, nameof(invariantMarketDescriptionsProvider)).NotNull();
+            Guard.Argument(variantMarketDescriptionProvider, nameof(variantMarketDescriptionProvider)).NotNull();
+            Guard.Argument(variantDescriptionsProvider, nameof(variantDescriptionsProvider)).NotNull();
+            Guard.Argument(drawSummaryProvider, nameof(drawSummaryProvider)).NotNull();
+            Guard.Argument(drawFixtureProvider, nameof(drawFixtureProvider)).NotNull();
+            Guard.Argument(lotteryScheduleProvider, nameof(lotteryScheduleProvider)).NotNull();
+            Guard.Argument(lotteryListProvider, nameof(lotteryListProvider)).NotNull();
+            Guard.Argument(availableSelectionsProvider, nameof(availableSelectionsProvider)).NotNull();
+            Guard.Argument(calculateProbabilityProvider, nameof(calculateProbabilityProvider)).NotNull();
+            Guard.Argument(fixtureChangesProvider, nameof(fixtureChangesProvider)).NotNull();
+            Guard.Argument(listSportEventProvider, nameof(listSportEventProvider)).NotNull();
+            Guard.Argument(availableSportTournamentsProvider, nameof(availableSportTournamentsProvider)).NotNull();
 
             _cacheManager = cacheManager;
             var wnsProducer = producerManager.Get(7);
@@ -927,7 +927,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="variant">The variant URN</param>
         /// <param name="culture">The culture to be fetched</param>
         /// <returns>Task</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         public async Task GetVariantMarketDescriptionAsync(int id, string variant, CultureInfo culture)
         {
             Metric.Context("DataRouterManager").Meter("GetVariantMarketDescriptionAsync", Unit.Calls);
@@ -967,7 +967,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// </summary>
         /// <param name="culture">The culture to be fetched</param>
         /// <returns>Task</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         public async Task GetVariantDescriptionsAsync(CultureInfo culture)
         {
             Metric.Context("DataRouterManager").Meter("GetVariantDescriptionsAsync", Unit.Calls);
@@ -1009,7 +1009,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="culture">The language to be fetched</param>
         /// <param name="requester">The cache item which invoked request</param>
         /// <returns>Task</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         /// <remarks>This gets called only if WNS is available</remarks>
         public async Task GetDrawSummaryAsync(URN drawId, CultureInfo culture, ISportEventCI requester)
         {
@@ -1057,7 +1057,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="culture">The language to be fetched</param>
         /// <param name="requester">The cache item which invoked request</param>
         /// <returns>Task</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         /// <remarks>This gets called only if WNS is available</remarks>
         public async Task GetDrawFixtureAsync(URN drawId, CultureInfo culture, ISportEventCI requester)
         {
@@ -1105,7 +1105,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="culture">The culture to be fetched</param>
         /// <param name="requester">The cache item which invoked request</param>
         /// <returns>The lottery with its schedule</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         /// <remarks>This gets called only if WNS is available</remarks>
         public async Task GetLotteryScheduleAsync(URN lotteryId, CultureInfo culture, ISportEventCI requester)
         {
@@ -1151,7 +1151,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// </summary>
         /// <param name="culture">The culture to be fetched</param>
         /// <returns>The list of all lotteries ids</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         /// <remarks>This gets called only if WNS is available</remarks>
         public async Task<IEnumerable<URN>> GetAllLotteriesAsync(CultureInfo culture)
         {

@@ -68,9 +68,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                         IEnumerable<CultureInfo> cultures,
                         ExceptionHandlingStrategy exceptionStrategy)
         {
-            Guard.Argument(id).NotNull();
-            Guard.Argument(sportEventCache).NotNull();
-            Guard.Argument(cultures).NotNull().NotEmpty();
+            Guard.Argument(id, nameof(id)).NotNull();
+            Guard.Argument(sportEventCache, nameof(sportEventCache)).NotNull();
+            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
 
             Id = id;
             SportId = sportId;
@@ -87,7 +87,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <returns>An error message for errors which occur while retrieving cached values</returns>
         protected string GetFetchErrorMessage(string propertyName)
         {
-            Guard.Argument(propertyName).NotNull().NotEmpty();
+            Guard.Argument(propertyName, nameof(propertyName)).NotNull().NotEmpty();
 
             return $"Error occurred while attempting to get {propertyName} for sport event with Id={Id} from cache";
         }

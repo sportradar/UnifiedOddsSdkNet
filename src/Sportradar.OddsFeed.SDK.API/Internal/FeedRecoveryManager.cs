@@ -115,11 +115,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                                    IProducerManager producerManager,
                                    IFeedSystemSession systemSession)
         {
-            Guard.Argument(producerRecoveryManagerFactory).NotNull();
-            Guard.Argument(config).NotNull();
-            Guard.Argument(timer).NotNull();
-            Guard.Argument(producerManager).NotNull();
-            Guard.Argument(systemSession).NotNull();
+            Guard.Argument(producerRecoveryManagerFactory, nameof(producerRecoveryManagerFactory)).NotNull();
+            Guard.Argument(config, nameof(config)).NotNull();
+            Guard.Argument(timer, nameof(timer)).NotNull();
+            Guard.Argument(producerManager, nameof(producerManager)).NotNull();
+            Guard.Argument(systemSession, nameof(systemSession)).NotNull();
 
             _producerRecoveryManagerFactory = producerRecoveryManagerFactory;
             _inactivityTimer = timer;
@@ -228,7 +228,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="interests">The interests for which to open trackers</param>
         public void Open(IEnumerable<MessageInterest> interests)
         {
-            Guard.Argument(interests).NotNull().NotEmpty();
+            Guard.Argument(interests, nameof(interests)).NotNull().NotEmpty();
 
             var interestList = interests as List<MessageInterest> ?? interests.ToList();
 

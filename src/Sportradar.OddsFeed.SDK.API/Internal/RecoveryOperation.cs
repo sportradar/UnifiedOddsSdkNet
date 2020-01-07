@@ -94,9 +94,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public RecoveryOperation(Producer producer, IRecoveryRequestIssuer recoveryRequestIssuer, IEnumerable<MessageInterest> allInterests, int nodeId, bool adjustAfterAge)
         {
-            Guard.Argument(producer).NotNull();
-            Guard.Argument(recoveryRequestIssuer).NotNull();
-            Guard.Argument(allInterests).NotNull().NotEmpty();
+            Guard.Argument(producer, nameof(producer)).NotNull();
+            Guard.Argument(recoveryRequestIssuer, nameof(recoveryRequestIssuer)).NotNull();
+            Guard.Argument(allInterests, nameof(allInterests)).NotNull().NotEmpty();
 
             _producer = producer;
             _recoveryRequestIssuer = recoveryRequestIssuer;
@@ -245,7 +245,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         }
 
         /// <summary>
-        /// Stops the the recovery operation if all snapshots were received
+        /// Stops the recovery operation if all snapshots were received
         /// </summary>
         /// <param name="interest">The <see cref="MessageInterest"/> of the session which received the snapshot message</param>
         /// <param name="result">If the operation was successfully completed, it contains the results of the completed recovery</param>

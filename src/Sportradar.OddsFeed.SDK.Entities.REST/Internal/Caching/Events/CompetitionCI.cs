@@ -86,8 +86,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                              ObjectCache fixtureTimestampCache)
             : base(eventSummary, dataRouterManager, semaphorePool, currentCulture, defaultCulture, fixtureTimestampCache)
         {
-            Guard.Argument(eventSummary).NotNull();
-            Guard.Argument(currentCulture).NotNull();
+            Guard.Argument(eventSummary, nameof(eventSummary)).NotNull();
+            Guard.Argument(currentCulture, nameof(currentCulture)).NotNull();
 
             Merge(eventSummary, currentCulture, true);
         }
@@ -109,8 +109,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                             ObjectCache fixtureTimestampCache)
             : base(eventSummary, dataRouterManager, semaphorePool, currentCulture, defaultCulture, fixtureTimestampCache)
         {
-            Guard.Argument(eventSummary).NotNull();
-            Guard.Argument(currentCulture).NotNull();
+            Guard.Argument(eventSummary, nameof(eventSummary)).NotNull();
+            Guard.Argument(currentCulture, nameof(currentCulture)).NotNull();
 
             Merge(eventSummary, currentCulture, true);
         }
@@ -118,7 +118,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <summary>
         /// Initializes a new instance of the <see cref="CompetitionCI" /> class
         /// </summary>
-        /// <param name="exportable">A <see cref="ExportableSportEventCI" /> representing the the sport event</param>
+        /// <param name="exportable">A <see cref="ExportableSportEventCI" /> representing the sport event</param>
         /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to obtain summary and fixture</param>
         /// <param name="semaphorePool">A <see cref="ISemaphorePool" /> instance used to obtain sync objects</param>
         /// <param name="defaultCulture">A <see cref="CultureInfo" /> specifying the language used when fetching info which is not translatable (e.g. Scheduled, ..)</param>

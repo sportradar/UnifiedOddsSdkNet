@@ -48,9 +48,9 @@ namespace Sportradar.OddsFeed.SDK.API.EventArguments
         /// <param name="rawMessage">A raw message received from the feed</param>
         internal BetSettlementEventArgs(IFeedMessageMapper messageMapper, bet_settlement feedMessage, IEnumerable<CultureInfo> cultures, byte[] rawMessage)
         {
-            Guard.Argument(messageMapper).NotNull();
-            Guard.Argument(feedMessage).NotNull();
-            Guard.Argument(cultures).NotNull().NotEmpty();
+            Guard.Argument(messageMapper, nameof(messageMapper)).NotNull();
+            Guard.Argument(feedMessage, nameof(feedMessage)).NotNull();
+            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
 
             _messageMapper = messageMapper;
             _feedMessage = feedMessage;

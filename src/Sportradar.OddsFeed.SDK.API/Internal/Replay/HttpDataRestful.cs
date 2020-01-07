@@ -40,11 +40,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
         public HttpDataRestful(HttpClient client, string accessToken, IDeserializer<response> responseDeserializer, int connectionFailureLimit = 5, int connectionFailureTimeout = 15)
             : base(client, accessToken, responseDeserializer, connectionFailureLimit, connectionFailureTimeout)
         {
-            Guard.Argument(client).NotNull();
-            Guard.Argument(client.DefaultRequestHeaders).NotNull();
-            Guard.Argument(accessToken).NotNull().NotEmpty();
-            Guard.Argument(connectionFailureLimit).Positive();
-            Guard.Argument(connectionFailureTimeout).Positive();
+            Guard.Argument(client, nameof(client)).NotNull();
+            Guard.Argument(client.DefaultRequestHeaders, nameof(client.DefaultRequestHeaders)).NotNull();
+            Guard.Argument(accessToken, nameof(accessToken)).NotNull().NotEmpty();
+            Guard.Argument(connectionFailureLimit, nameof(connectionFailureLimit)).Positive();
+            Guard.Argument(connectionFailureTimeout, nameof(connectionFailureTimeout)).Positive();
 
             _client = client;
             if (_client.DefaultRequestHeaders != null && !_client.DefaultRequestHeaders.Contains("x-access-token"))

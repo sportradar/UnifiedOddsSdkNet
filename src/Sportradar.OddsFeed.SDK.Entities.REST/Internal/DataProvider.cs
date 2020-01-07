@@ -62,10 +62,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="mapperFactory">A <see cref="ISingleTypeMapperFactory{T, T1}" /> used to construct instances of <see cref="ISingleTypeMapper{T}" /></param>
         public DataProvider(string uriFormat, IDataFetcher fetcher, IDeserializer<TIn> deserializer, ISingleTypeMapperFactory<TIn, TOut> mapperFactory)
         {
-            Guard.Argument(uriFormat).NotNull().NotEmpty();
-            Guard.Argument(fetcher).NotNull();
-            Guard.Argument(deserializer).NotNull();
-            Guard.Argument(mapperFactory).NotNull();
+            Guard.Argument(uriFormat, nameof(uriFormat)).NotNull().NotEmpty();
+            Guard.Argument(fetcher, nameof(fetcher)).NotNull();
+            Guard.Argument(deserializer, nameof(deserializer)).NotNull();
+            Guard.Argument(mapperFactory, nameof(mapperFactory)).NotNull();
 
             _uriFormat = uriFormat;
             _fetcher = fetcher;
@@ -80,7 +80,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <returns>A <see cref="Task{T}"/> representing the ongoing operation</returns>
         protected async Task<TOut> GetDataAsyncInternal(Uri uri)
         {
-            Guard.Argument(uri).NotNull();
+            Guard.Argument(uri, nameof(uri)).NotNull();
 
             var stream = await _fetcher.GetDataAsync(uri).ConfigureAwait(false);
             var item = _deserializer.Deserialize(stream);
@@ -95,7 +95,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <returns>A <see cref="Task{T}"/> representing the ongoing operation</returns>
         protected TOut GetDataInternal(Uri uri)
         {
-            Guard.Argument(uri).NotNull();
+            Guard.Argument(uri, nameof(uri)).NotNull();
 
             var stream = _fetcher.GetData(uri);
             var item = _deserializer.Deserialize(stream);
@@ -110,7 +110,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <returns>an <see cref="Uri"/> instance used to retrieve resource with specified <code>identifiers</code></returns>
         protected virtual Uri GetRequestUri(params object[] identifiers)
         {
-            Guard.Argument(identifiers).NotNull().NotEmpty();
+            Guard.Argument(identifiers, nameof(identifiers)).NotNull().NotEmpty();
 
             return new Uri(string.Format(_uriFormat, identifiers));
         }

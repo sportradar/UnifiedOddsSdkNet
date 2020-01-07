@@ -23,7 +23,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 
         public CarCI(CarDTO item)
         {
-            Guard.Argument(item).NotNull();
+            Guard.Argument(item, nameof(item)).NotNull();
 
             Name = item.Name;
             Chassis = item.Chassis;
@@ -33,7 +33,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public CarCI(ExportableCarCI exportable)
         {
             if (exportable == null)
+            {
                 throw new ArgumentNullException(nameof(exportable));
+            }
             Name = exportable.Name;
             Chassis = exportable.Chassis;
             EngineName = exportable.EngineName;

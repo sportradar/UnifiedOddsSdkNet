@@ -147,7 +147,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <param name="stageResultCompetitor">The stage result competitor</param>
         public EventResultDTO(stageResultCompetitor stageResultCompetitor)
         {
-            Guard.Argument(stageResultCompetitor).NotNull();
+            Guard.Argument(stageResultCompetitor, nameof(stageResultCompetitor)).NotNull();
 
             Id = stageResultCompetitor.id;
             Position = stageResultCompetitor.positionSpecified ? stageResultCompetitor.position : (int?) null;

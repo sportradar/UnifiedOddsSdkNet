@@ -81,8 +81,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="defaultCultures">A <see cref="IEnumerable{CultureInfo}"/> specifying the default languages as specified in the configuration</param>
         internal EntityDispatcher(IFeedMessageMapper messageMapper, IEnumerable<CultureInfo> defaultCultures)
         {
-            Guard.Argument(messageMapper).NotNull();
-            Guard.Argument(defaultCultures).NotNull().NotEmpty();
+            Guard.Argument(messageMapper, nameof(messageMapper)).NotNull();
+            Guard.Argument(defaultCultures, nameof(defaultCultures)).NotNull().NotEmpty();
 
             MessageMapper = messageMapper;
             DefaultCultures = defaultCultures as IReadOnlyCollection<CultureInfo>;

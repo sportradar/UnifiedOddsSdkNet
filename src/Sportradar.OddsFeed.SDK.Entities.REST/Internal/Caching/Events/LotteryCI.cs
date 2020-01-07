@@ -40,7 +40,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <summary>
         /// Gets the scheduled draws
         /// </summary>
-        /// <value>The the scheduled draws</value>
+        /// <value>the scheduled draws</value>
         private IEnumerable<URN> _scheduledDraws;
 
         /// <summary>
@@ -77,8 +77,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                          ObjectCache fixtureTimestampCache)
             : base(eventSummary, dataRouterManager, semaphorePool, currentCulture, defaultCulture, fixtureTimestampCache)
         {
-            Guard.Argument(eventSummary).NotNull();
-            Guard.Argument(currentCulture).NotNull();
+            Guard.Argument(eventSummary, nameof(eventSummary)).NotNull();
+            Guard.Argument(currentCulture, nameof(currentCulture)).NotNull();
 
             Merge(eventSummary, currentCulture);
         }

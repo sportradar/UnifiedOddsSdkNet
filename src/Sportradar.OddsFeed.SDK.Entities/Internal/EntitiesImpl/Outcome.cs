@@ -59,8 +59,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <param name="outcomeDefinition"></param>
         protected Outcome(string id, INameProvider nameProvider, IMarketMappingProvider mappingProvider, IEnumerable<CultureInfo> cultures, IOutcomeDefinition outcomeDefinition)
         {
-            Guard.Argument(nameProvider).NotNull();
-            Guard.Argument(cultures).NotNull().NotEmpty();
+            Guard.Argument(nameProvider, nameof(nameProvider)).NotNull();
+            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
 
             Id = id;
             _nameProvider = nameProvider;

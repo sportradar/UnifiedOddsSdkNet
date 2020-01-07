@@ -36,7 +36,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 
         internal BonusInfoCI(BonusInfoDTO dto)
         {
-            Guard.Argument(dto).NotNull();
+            Guard.Argument(dto, nameof(dto)).NotNull();
 
             BonusBalls = dto.BonusBalls;
             BonusDrumType = dto.BonusDrumType;
@@ -46,7 +46,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         internal BonusInfoCI(ExportableBonusInfoCI exportable)
         {
             if (exportable == null)
+            {
                 throw new ArgumentNullException(nameof(exportable));
+            }
 
             BonusBalls = exportable.BonusBalls;
             BonusDrumType = exportable.BonusDrumType;

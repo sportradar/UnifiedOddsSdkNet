@@ -44,8 +44,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to fetch missing data</param>
         internal GroupCI(GroupDTO group, CultureInfo culture, IDataRouterManager dataRouterManager)
         {
-            Guard.Argument(group).NotNull();
-            Guard.Argument(culture).NotNull();
+            Guard.Argument(group, nameof(group)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             _dataRouterManager = dataRouterManager;
             Id = group.Id;
@@ -78,8 +78,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the provided group information</param>
         internal void Merge(GroupDTO group, CultureInfo culture)
         {
-            Guard.Argument(group).NotNull();
-            Guard.Argument(culture).NotNull();
+            Guard.Argument(group, nameof(group)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             var tempCompetitors = new List<CompetitorCI>(Competitors);
 

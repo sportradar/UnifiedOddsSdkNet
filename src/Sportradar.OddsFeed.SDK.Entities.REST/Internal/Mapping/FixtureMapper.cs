@@ -26,7 +26,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping
         /// <param name="data">A <see cref="fixturesEndpoint"/> instance containing fixture data</param>
         internal FixtureMapper(fixturesEndpoint data)
         {
-            Guard.Argument(data).NotNull();
+            Guard.Argument(data, nameof(data)).NotNull();
 
             _data = data;
         }

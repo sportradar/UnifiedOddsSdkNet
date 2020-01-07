@@ -42,9 +42,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// </summary>
         /// <param name="venue">A <see cref="venue"/> instance containing venue related information</param>
         internal VenueDTO(venue venue)
-            :base(venue.id, venue.name)
+            : base(venue.id, venue.name)
         {
-            Guard.Argument(venue).NotNull();
+            Guard.Argument(venue, nameof(venue)).NotNull();
 
             Capacity = venue.capacitySpecified
                 ? (int?) venue.capacity

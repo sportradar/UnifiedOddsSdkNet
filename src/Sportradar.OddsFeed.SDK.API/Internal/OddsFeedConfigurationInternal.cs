@@ -193,8 +193,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="bookmakerDetailsProvider">A <see cref="BookmakerDetailsProvider"/> used to get bookmaker info</param>
         public OddsFeedConfigurationInternal(IOddsFeedConfiguration publicConfig, BookmakerDetailsProvider bookmakerDetailsProvider)
         {
-            Guard.Argument(publicConfig).NotNull();
-            Guard.Argument(bookmakerDetailsProvider).NotNull();
+            Guard.Argument(publicConfig, nameof(publicConfig)).NotNull();
+            Guard.Argument(bookmakerDetailsProvider, nameof(bookmakerDetailsProvider)).NotNull();
 
             _publicConfig = publicConfig;
             _bookmakerDetailsProvider = bookmakerDetailsProvider;
@@ -222,7 +222,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>True if data was successfully retrieved. False otherwise. May throw <see cref="CommunicationException"/></returns>
         private bool LoadWhoamiData(string hostName, bool useSsl, bool rethrow)
         {
-            Guard.Argument(hostName).NotNull().NotEmpty();
+            Guard.Argument(hostName, nameof(hostName)).NotNull().NotEmpty();
 
             var hostUrl = useSsl
                               ? "https://" + hostName

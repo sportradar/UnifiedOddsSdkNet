@@ -78,8 +78,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                         IMarketDefinition marketDefinition,
                         IEnumerable<CultureInfo> cultures)
         {
-            Guard.Argument(nameProvider).NotNull();
-            Guard.Argument(cultures).NotNull().NotEmpty();
+            Guard.Argument(nameProvider, nameof(nameProvider)).NotNull();
+            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
 
             Id = id;
             Specifiers = specifiers;
@@ -91,9 +91,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         }
 
         /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// Returns a <see cref="string" /> that represents this instance.
         /// </summary>
-        /// <returns>A <see cref="System.String" /> that represents this instance</returns>
+        /// <returns>A <see cref="string" /> that represents this instance</returns>
         public override string ToString()
         {
             var sb = new StringBuilder();

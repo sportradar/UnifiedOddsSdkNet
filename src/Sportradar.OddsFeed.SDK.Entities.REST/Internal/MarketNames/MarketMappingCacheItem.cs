@@ -36,7 +36,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
         protected MarketMappingCacheItem(MarketMappingDTO dto, IMappingValidator validator, CultureInfo culture)
         {
-            Guard.Argument(dto).NotNull();
+            Guard.Argument(dto, nameof(dto)).NotNull();
 
             ProducerId = dto.ProducerId;
             ProducerIds = dto.ProducerIds;
@@ -64,8 +64,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <exception cref="InvalidOperationException">The format of <see cref="MarketMappingDTO.ValidFor"/> is not correct</exception>
         public static MarketMappingCacheItem Build(MarketMappingDTO dto, IMappingValidatorFactory factory, CultureInfo culture)
         {
-            Guard.Argument(dto).NotNull();
-            Guard.Argument(factory).NotNull();
+            Guard.Argument(dto, nameof(dto)).NotNull();
+            Guard.Argument(factory, nameof(factory)).NotNull();
 
             return string.IsNullOrEmpty(dto.ValidFor)
                 ? new MarketMappingCacheItem(dto, null, culture)

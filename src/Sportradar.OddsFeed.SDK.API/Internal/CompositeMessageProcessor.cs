@@ -32,7 +32,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="processors">The list of processors.</param>
         public CompositeMessageProcessor(IEnumerable<IFeedMessageProcessor> processors)
         {
-            Guard.Argument(processors).NotNull().NotEmpty().Require(processors.All(p => p != null));
+            Guard.Argument(processors, nameof(processors)).NotNull().NotEmpty().Require(processors.All(p => p != null));
 
             ProcessorId = Guid.NewGuid().ToString().Substring(0,4);
 
@@ -77,8 +77,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="rawMessage">A raw message received from the feed</param>
         public void ProcessMessage(FeedMessage message, MessageInterest interest, byte[] rawMessage)
         {
-            Guard.Argument(message).NotNull();
-            Guard.Argument(interest).NotNull();
+            Guard.Argument(message, nameof(message)).NotNull();
+            Guard.Argument(interest, nameof(interest)).NotNull();
 
             _processors.First().ProcessMessage(message, interest, rawMessage);
         }

@@ -26,7 +26,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="bookmakerDetailsProvider">A <see cref="IDataProvider{BookmakerDetailsDTO}"/> used to get <see cref="BookmakerDetailsDTO"/></param>
         public BookmakerDetailsFetcher(IDataProvider<BookmakerDetailsDTO> bookmakerDetailsProvider)
         {
-            Guard.Argument(bookmakerDetailsProvider).NotNull();
+            Guard.Argument(bookmakerDetailsProvider, nameof(bookmakerDetailsProvider)).NotNull();
 
             _bookmakerDetailsProvider = bookmakerDetailsProvider;
         }

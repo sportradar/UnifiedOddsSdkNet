@@ -67,7 +67,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>The <see cref="MessageType"/> member specifying the type of the provided xml message.</returns>
         private static MessageType ExtractMessageName(string message)
         {
-            Guard.Argument(message).NotNull().NotEmpty();
+            Guard.Argument(message, nameof(message)).NotNull().NotEmpty();
 
             foreach (var messageName in MessageTypes)
             {
@@ -90,8 +90,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>The value of the specified attribute or a null reference if value could not be determined</returns>
         private static string ExtractAttributeValue(string message, string attributeName)
         {
-            Guard.Argument(message).NotNull().NotEmpty();
-            Guard.Argument(attributeName).NotNull().NotEmpty();
+            Guard.Argument(message, nameof(message)).NotNull().NotEmpty();
+            Guard.Argument(attributeName, nameof(attributeName)).NotNull().NotEmpty();
 
             var startIndex = message.IndexOf(attributeName, StringComparison.Ordinal);
             if (startIndex < 0)
@@ -135,7 +135,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// </summary>
         /// <param name="message">A <see cref="FeedMessage" /> instance whose type is to be determined.</param>
         /// <returns>A <see cref="MessageType" /> enum member specifying the type of the provided <see cref="FeedMessage" /></returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         public MessageType GetMessageTypeFromMessage(FeedMessage message)
         {
             var messageTypeName = message.GetType().Name;

@@ -79,8 +79,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                         ICacheManager cacheManager)
             : base(cacheManager)
         {
-            Guard.Argument(cache).NotNull();
-            Guard.Argument(dataRouterManager).NotNull();
+            Guard.Argument(cache, nameof(cache)).NotNull();
+            Guard.Argument(dataRouterManager, nameof(dataRouterManager)).NotNull();
 
             _cache = cache;
             _dataRouterManager = dataRouterManager;
@@ -126,8 +126,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         /// <exception cref="CacheItemNotFoundException">The requested item was not found in cache and could not be obtained from the API</exception>
         public async Task<PlayerProfileCI> GetPlayerProfileAsync(URN playerId, IEnumerable<CultureInfo> cultures)
         {
-            Guard.Argument(playerId).NotNull();
-            Guard.Argument(cultures).NotNull().NotEmpty();
+            Guard.Argument(playerId, nameof(playerId)).NotNull();
+            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
 
             Metric.Context("CACHE").Meter("ProfileCache->GetPlayerProfileAsync", Unit.Calls);
 
@@ -212,8 +212,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         /// <exception cref="CacheItemNotFoundException">The requested item was not found in cache and could not be obtained from the API</exception>
         public async Task<CompetitorCI> GetCompetitorProfileAsync(URN competitorId, IEnumerable<CultureInfo> cultures)
         {
-            Guard.Argument(competitorId).NotNull();
-            Guard.Argument(cultures).NotNull().NotEmpty();
+            Guard.Argument(competitorId, nameof(competitorId)).NotNull();
+            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
 
             Metric.Context("CACHE").Meter("ProfileCache->GetCompetitorProfileAsync", Unit.Calls);
 

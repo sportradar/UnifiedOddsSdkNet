@@ -105,14 +105,14 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                                  ILocalizedNamedValueCache matchStatusCache,
                                  IDataRouterManager dataRouterManager)
         {
-            Guard.Argument(sportEntityFactory).NotNull();
-            Guard.Argument(sportEventCache).NotNull();
-            Guard.Argument(profileCache).NotNull();
-            Guard.Argument(sportDataCache).NotNull();
-            Guard.Argument(defaultCultures).NotNull().NotEmpty();
-            Guard.Argument(cacheManager).NotNull();
-            Guard.Argument(matchStatusCache).NotNull();
-            Guard.Argument(dataRouterManager).NotNull();
+            Guard.Argument(sportEntityFactory, nameof(sportEntityFactory)).NotNull();
+            Guard.Argument(sportEventCache, nameof(sportEventCache)).NotNull();
+            Guard.Argument(profileCache, nameof(profileCache)).NotNull();
+            Guard.Argument(sportDataCache, nameof(sportDataCache)).NotNull();
+            Guard.Argument(defaultCultures, nameof(defaultCultures)).NotNull().NotEmpty();
+            Guard.Argument(cacheManager, nameof(cacheManager)).NotNull();
+            Guard.Argument(matchStatusCache, nameof(matchStatusCache)).NotNull();
+            Guard.Argument(dataRouterManager, nameof(dataRouterManager)).NotNull();
 
             _sportEntityFactory = sportEntityFactory;
             _sportEventCache = sportEventCache;

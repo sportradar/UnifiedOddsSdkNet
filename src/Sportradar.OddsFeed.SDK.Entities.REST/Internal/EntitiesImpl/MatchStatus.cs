@@ -81,8 +81,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public MatchStatus(SportEventStatusCI ci, ILocalizedNamedValueCache matchStatusesCache)
             : base(ci, matchStatusesCache)
         {
-            Guard.Argument(ci).NotNull();
-            Guard.Argument(matchStatusesCache).NotNull();
+            Guard.Argument(ci, nameof(ci)).NotNull();
+            Guard.Argument(matchStatusesCache, nameof(matchStatusesCache)).NotNull();
 
             if (ci.EventClock != null)
             {

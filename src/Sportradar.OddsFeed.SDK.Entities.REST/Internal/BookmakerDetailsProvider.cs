@@ -53,10 +53,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             : base(bookmakerDetailsUriFormat, fetcher, deserializer, mapperFactory)
         {
 
-            Guard.Argument(bookmakerDetailsUriFormat).NotNull().NotEmpty();
-            Guard.Argument(fetcher).NotNull();
-            Guard.Argument(deserializer).NotNull();
-            Guard.Argument(mapperFactory).NotNull();
+            Guard.Argument(bookmakerDetailsUriFormat, nameof(bookmakerDetailsUriFormat)).NotNull().NotEmpty();
+            Guard.Argument(fetcher, nameof(fetcher)).NotNull();
+            Guard.Argument(deserializer, nameof(deserializer)).NotNull();
+            Guard.Argument(mapperFactory, nameof(mapperFactory)).NotNull();
 
             _uriFormat = bookmakerDetailsUriFormat;
             _fetcher = fetcher;

@@ -11,8 +11,8 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
     {
         public static Stream OpenFile(string dirPath, string fileName)
         {
-            Guard.Argument(dirPath).NotNull().NotEmpty();
-            Guard.Argument(fileName).NotNull().NotEmpty();
+            Guard.Argument(dirPath, nameof(dirPath)).NotNull().NotEmpty();
+            Guard.Argument(fileName, nameof(fileName)).NotNull().NotEmpty();
 
             var filePath = dirPath.TrimEnd('/') + "/" + fileName.TrimStart('/');
             return OpenFile(filePath);
@@ -20,22 +20,22 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         public static Stream OpenFile(string filePath)
         {
-            Guard.Argument(filePath).NotNull().NotEmpty();
+            Guard.Argument(filePath, nameof(filePath)).NotNull().NotEmpty();
 
             return File.OpenRead(filePath);
         }
 
         public static Task<Stream> OpenFileAsync(string filePath)
         {
-            Guard.Argument(filePath).NotNull().NotEmpty();
+            Guard.Argument(filePath, nameof(filePath)).NotNull().NotEmpty();
 
             return Task.Factory.StartNew(() => OpenFile(filePath));
         }
 
         public static string ReadFile(string dirPath, string fileName)
         {
-            Guard.Argument(dirPath).NotNull().NotEmpty();
-            Guard.Argument(fileName).NotNull().NotEmpty();
+            Guard.Argument(dirPath, nameof(dirPath)).NotNull().NotEmpty();
+            Guard.Argument(fileName, nameof(fileName)).NotNull().NotEmpty();
 
             var stream = OpenFile(dirPath, fileName);
             var reader = new StreamReader(stream);

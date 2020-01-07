@@ -38,7 +38,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <param name="item">The item</param>
         internal TournamentSeasonsDTO(tournamentSeasons item)
         {
-            Guard.Argument(item).NotNull();
+            Guard.Argument(item, nameof(item)).NotNull();
 
             Tournament = new TournamentInfoDTO(item.tournament);
 

@@ -12,7 +12,6 @@ using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
 using Sportradar.OddsFeed.SDK.Messages.Feed;
 
-
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
     /// <summary>
@@ -93,11 +92,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             IFeedMessageValidator messageValidator,
             IMessageDataExtractor messageDataExtractor)
         {
-            Guard.Argument(globalEventDispatcher).NotNull();
-            Guard.Argument(messageReceiver).NotNull();
-            Guard.Argument(messageMapper).NotNull();
-            Guard.Argument(messageValidator).NotNull();
-            Guard.Argument(messageDataExtractor).NotNull();
+            Guard.Argument(globalEventDispatcher, nameof(globalEventDispatcher)).NotNull();
+            Guard.Argument(messageReceiver, nameof(messageReceiver)).NotNull();
+            Guard.Argument(messageMapper, nameof(messageMapper)).NotNull();
+            Guard.Argument(messageValidator, nameof(messageValidator)).NotNull();
+            Guard.Argument(messageDataExtractor, nameof(messageDataExtractor)).NotNull();
 
             _globalEventDispatcher = globalEventDispatcher;
             _messageReceiver = messageReceiver;
@@ -230,7 +229,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <summary>
         /// Opens the current instance
         /// </summary>
-        /// <exception cref="System.InvalidOperationException">Current FeedSystemSession is already opened</exception>
+        /// <exception cref="InvalidOperationException">Current FeedSystemSession is already opened</exception>
         public void Open()
         {
             if (Interlocked.CompareExchange(ref _isOpened, 1, 0) == 1)
@@ -246,7 +245,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <summary>
         /// Closes the current instance
         /// </summary>
-        /// <exception cref="System.InvalidOperationException">Current FeedSystemSession is already closed</exception>
+        /// <exception cref="InvalidOperationException">Current FeedSystemSession is already closed</exception>
         public void Close()
         {
             if (Interlocked.CompareExchange(ref _isOpened, 0, 1) == 0)

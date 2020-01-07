@@ -107,7 +107,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Example
         /// <param name="oddsFeed">A <see cref="IOddsFeed"/> instance </param>
         private void AttachToFeedEvents(IOddsFeed oddsFeed)
         {
-            Guard.Argument(oddsFeed).NotNull();
+            Guard.Argument(oddsFeed, nameof(oddsFeed)).NotNull();
 
             _log.Info("Attaching to feed events");
             oddsFeed.ProducerUp += OnProducerUp;
@@ -122,7 +122,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Example
         /// <param name="oddsFeed">A <see cref="IOddsFeed"/> instance</param>
         private void DetachFromFeedEvents(IOddsFeed oddsFeed)
         {
-            Guard.Argument(oddsFeed).NotNull();
+            Guard.Argument(oddsFeed, nameof(oddsFeed)).NotNull();
 
             _log.Info("Detaching from feed events");
             oddsFeed.ProducerUp -= OnProducerUp;
@@ -142,7 +142,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Example
         }
 
         /// <summary>
-        /// Invoked when the the feed is closed
+        /// Invoked when the feed is closed
         /// </summary>
         /// <param name="sender">The instance raising the event</param>
         /// <param name="e">The event arguments</param>

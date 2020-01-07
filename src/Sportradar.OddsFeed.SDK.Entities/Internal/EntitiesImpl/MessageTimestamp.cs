@@ -37,7 +37,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <param name="timestamp">The timestamp</param>
         public MessageTimestamp(long timestamp)
         {
-            Guard.Argument(timestamp).Positive();
+            Guard.Argument(timestamp, nameof(timestamp)).Positive();
 
             Created = timestamp;
             Sent = timestamp;
@@ -54,9 +54,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <param name="dispatched">The dispatched</param>
         public MessageTimestamp(long generated, long sent, long received, long dispatched)
         {
-            Guard.Argument(generated).Positive();
+            Guard.Argument(generated, nameof(generated)).Positive();
             //Guard.Argument(sent).Positive();
-            Guard.Argument(received).Positive();
+            Guard.Argument(received, nameof(received)).Positive();
             //Guard.Argument(dispatched).Positive();
 
             Created = generated;

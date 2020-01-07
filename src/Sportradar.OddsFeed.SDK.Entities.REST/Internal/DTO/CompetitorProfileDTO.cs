@@ -56,8 +56,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <param name="record">A <see cref="competitorProfileEndpoint"/> containing information about the profile</param>
         public CompetitorProfileDTO(competitorProfileEndpoint record)
         {
-            Guard.Argument(record).NotNull();
-            Guard.Argument(record.competitor).NotNull();
+            Guard.Argument(record, nameof(record)).NotNull();
+            Guard.Argument(record.competitor, nameof(record.competitor)).NotNull();
 
             Competitor = new CompetitorDTO(record.competitor);
             if (record.players != null && record.players.Any())

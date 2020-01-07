@@ -45,8 +45,8 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// <param name="marketWriter">A <see cref="MarketWriter"/> used to write market and outcome data</param>
         public SpecificEntityProcessor(ILog log, ISpecificEntityDispatcher<T> dispatcher, SportEntityWriter sportEntityWriter = null, MarketWriter marketWriter = null)
         {
-            Guard.Argument(dispatcher).NotNull();
-            Guard.Argument(log).NotNull();
+            Guard.Argument(dispatcher, nameof(dispatcher)).NotNull();
+            Guard.Argument(log, nameof(log)).NotNull();
 
             _log = log;
             _dispatcher = dispatcher;
@@ -73,7 +73,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         /// <param name="e">The event arguments</param>
         protected virtual void OnOddsChangeReceived(object sender, OddsChangeEventArgs<T> e)
         {
-            Guard.Argument(e).NotNull();
+            Guard.Argument(e, nameof(e)).NotNull();
 
             var oddsChange = e.GetOddsChange();
             _log.Info($"OddsChange received. EventId:{oddsChange.Event.Id} Producer:{oddsChange.Producer} RequestId:{oddsChange.RequestId}");

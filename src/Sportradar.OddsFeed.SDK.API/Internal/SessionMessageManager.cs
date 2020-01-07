@@ -65,7 +65,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// </summary>
         public SessionMessageManager(IFeedMessageMapper messageMapper)
         {
-            Guard.Argument(messageMapper).NotNull();
+            Guard.Argument(messageMapper, nameof(messageMapper)).NotNull();
 
             ProcessorId = Guid.NewGuid().ToString().Substring(0, 4);
 
@@ -120,8 +120,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="rawMessage">A raw message received from the feed</param>
         public void ProcessMessage(FeedMessage message, MessageInterest interest, byte[] rawMessage)
         {
-            Guard.Argument(message).NotNull();
-            Guard.Argument(interest).NotNull();
+            Guard.Argument(message, nameof(message)).NotNull();
+            Guard.Argument(interest, nameof(interest)).NotNull();
 
             var alive = message as alive;
             if (alive != null)
@@ -147,7 +147,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="requestId">The request identifier</param>
         public void StashMessages(IProducer producer, long requestId)
         {
-            Guard.Argument(producer).NotNull();
+            Guard.Argument(producer, nameof(producer)).NotNull();
 
             var stashedItem = GetStashedItem(producer.Id);
             if (stashedItem != null)
@@ -165,7 +165,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="requestId">The request identifier</param>
         public void ReleaseMessages(IProducer producer, long requestId)
         {
-            Guard.Argument(producer).NotNull();
+            Guard.Argument(producer, nameof(producer)).NotNull();
 
             ReleaseMessagesTask(producer, requestId).ConfigureAwait(false);
         }

@@ -52,8 +52,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the sport event conditions</param>
         internal SportEventConditionsCI(SportEventConditionsDTO dto, CultureInfo culture)
         {
-            Guard.Argument(dto).NotNull();
-            Guard.Argument(culture).NotNull();
+            Guard.Argument(dto, nameof(dto)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             Merge(dto, culture);
         }
@@ -81,8 +81,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the sport event conditions</param>
         internal void Merge(SportEventConditionsDTO dto, CultureInfo culture)
         {
-            Guard.Argument(dto).NotNull();
-            Guard.Argument(culture).NotNull();
+            Guard.Argument(dto, nameof(dto)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             Attendance = dto.Attendance;
             EventMode = dto.EventMode;

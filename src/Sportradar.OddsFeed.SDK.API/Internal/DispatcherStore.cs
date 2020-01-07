@@ -13,7 +13,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
     /// <summary>
     /// A store used to manage <see cref="IEntityDispatcherInternal"/> instances
     /// </summary>
-    /// <seealso cref="Sportradar.OddsFeed.SDK.API.Internal.IDispatcherStore" />
+    /// <seealso cref="IDispatcherStore" />
     internal class DispatcherStore : IDispatcherStore
     {
         /// <summary>
@@ -42,7 +42,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="typeMapper">The <see cref="IEntityTypeMapper"/> used to determine the SDK type used to represent a specific sport entity.</param>
         public DispatcherStore(IEntityTypeMapper typeMapper)
         {
-            Guard.Argument(typeMapper).NotNull();
+            Guard.Argument(typeMapper, nameof(typeMapper)).NotNull();
 
             _typeMapper = typeMapper;
         }
@@ -70,7 +70,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>A <see cref="List{Type}"/> representing the implemented interfaces</returns>
         private List<Type> GetHierarchy(Type type)
         {
-            Guard.Argument(type).NotNull();
+            Guard.Argument(type, nameof(type)).NotNull();
 
             var key = type.Name;
             List<Type> hierarchies;
@@ -92,7 +92,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="dispatcher">The <see cref="ISpecificEntityDispatcherInternal"/> instance to be added.</param>
         public void Add(ISpecificEntityDispatcherInternal dispatcher)
         {
-            Guard.Argument(dispatcher).NotNull();
+            Guard.Argument(dispatcher, nameof(dispatcher)).NotNull();
 
             var key = dispatcher.GetType().GetGenericArguments().First().Name;
             lock (_syncLock)

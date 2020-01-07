@@ -30,7 +30,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <param name="timeProvider"></param>
         public static void SetTimeProvider(ITimeProvider timeProvider)
         {
-            Guard.Argument(timeProvider).NotNull();
+            Guard.Argument(timeProvider, nameof(timeProvider)).NotNull();
 
             Current = timeProvider;
         }
