@@ -286,7 +286,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         {
             if (Interlocked.CompareExchange(ref _isOpened, 0, 1) == 0)
             {
-                throw new InvalidOperationException("Current FeedRecoveryManager is already closed");
+                return;
             }
 
             _inactivityTimer.Stop();

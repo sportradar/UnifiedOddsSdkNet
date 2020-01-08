@@ -511,11 +511,18 @@ namespace Sportradar.OddsFeed.SDK.API
                 return;
             }
 
-            _connection.ConnectionShutdown -= OnConnectionShutdown;
-            _feedRecoveryManager.ProducerDown -= MarkProducerAsDown;
-            _feedRecoveryManager.ProducerUp -= MarkProducerAsUp;
-            _feedRecoveryManager.CloseFeed -= OnCloseFeed;
-            _feedRecoveryManager.Close();
+            if (_connection != null)
+            {
+                _connection.ConnectionShutdown -= OnConnectionShutdown;
+            }
+
+            if (_feedRecoveryManager != null)
+            {
+                _feedRecoveryManager.ProducerDown -= MarkProducerAsDown;
+                _feedRecoveryManager.ProducerUp -= MarkProducerAsUp;
+                _feedRecoveryManager.CloseFeed -= OnCloseFeed;
+                _feedRecoveryManager.Close();
+            }
 
             foreach (var session in Sessions)
             {
