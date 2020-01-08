@@ -9,7 +9,7 @@ using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 using Sportradar.OddsFeed.SDK.Test.Shared;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
@@ -142,7 +142,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             _assertHelper.AreEqual(() => dto.Conditions.WeatherInfo.WeatherConditions, record.sport_event_conditions.weather_info.weather_conditions);
             _assertHelper.AreEqual(() => dto.Conditions.WeatherInfo.Wind, record.sport_event_conditions.weather_info.wind);
             _assertHelper.AreEqual(() => dto.Conditions.WeatherInfo.WindAdvantage, record.sport_event_conditions.weather_info.wind_advantage);
-            _assertHelper.AreEqual(() => dto.Conditions.WeatherInfo.TemperatureCelsius, record.sport_event_conditions.weather_info.temperature_celsiusSpecified ? (int?)record.sport_event_conditions.weather_info.temperature_celsius : null);
+            _assertHelper.AreEqual(() => dto.Conditions.WeatherInfo.TemperatureCelsius,
+                                   record.sport_event_conditions.weather_info.temperature_celsiusSpecified
+                                       ? (int?) record.sport_event_conditions.weather_info.temperature_celsius
+                                       : null);
 
             MappingVenueTest(dto, record);
         }
@@ -156,6 +159,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 var m = dto.Competitors.FirstOrDefault(x => x.Id.ToString() == c.id);
                 Assert.IsNotNull(m, $"Missing ITeamCompetitor with id: {c.id}.");
                 _assertHelper.AreEqual(() => m.Qualifier, c.qualifier);
+                if (c.divisionSpecified)
+                {
+                    _assertHelper.AreEqual(() => m.Division.Value, c.division);
+                }
+                else
+                {
+                    _assertHelper.AreEqual(() => m.Division.HasValue, false);
+                }
             }
 
             TestCompetitors(dto.Competitors.ToList(), record.sport_event.competitors, _assertHelper);

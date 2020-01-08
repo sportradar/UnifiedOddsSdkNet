@@ -6,8 +6,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
+using Sportradar.OddsFeed.SDK.Entities.REST.Market;
+using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
 using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
@@ -119,7 +120,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <returns>a list of valid market mappings</returns>
         public IEnumerable<IMarketMappingData> GetValidMappings()
         {
-            return _producer.Id == 5
+            return _producer.Id == 5 || _marketDescription?.Mappings == null
                 ? Enumerable.Empty<IMarketMappingData>()
                 : _marketDescription.Mappings.Where(m => m.CanMap(_producer, _sportId, _specifiers));
         }

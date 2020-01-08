@@ -1,11 +1,16 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
+using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 {
@@ -35,6 +40,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public string Group { get; private set; }
 
         /// <summary>
+        /// Gets the id of the group associated with the current round.
+        /// </summary>
+        public URN GroupId { get; private set; }
+
+        /// <summary>
         /// Gets the id of the other match
         /// </summary>
         public string OtherMatchId { get; private set; }
@@ -62,18 +72,48 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public int? BetradarId { get; private set; }
 
         /// <summary>
+        /// Gets the phase
+        /// </summary>
+        /// <value>The phase</value>
+        public string Phase { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RoundCI"/> class
         /// </summary>
         /// <param name="dto">The <see cref="RoundDTO"/> used to create new instance</param>
         /// <param name="culture">The culture of the input <see cref="RoundDTO"/></param>
         internal RoundCI(RoundDTO dto, CultureInfo culture)
         {
-            Contract.Requires(dto != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(dto, nameof(dto)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             _names = new Dictionary<CultureInfo, string>();
             _phaseOrGroupLongName = new Dictionary<CultureInfo, string>();
             Merge(dto, culture);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RoundCI"/> class
+        /// </summary>
+        /// <param name="exportable">The <see cref="ExportableRoundCI"/> used to create new instance</param>
+        internal RoundCI(ExportableRoundCI exportable)
+        {
+            if (exportable == null)
+            {
+                throw new ArgumentNullException(nameof(exportable));
+            }
+
+            _names = new Dictionary<CultureInfo, string>(exportable.Names);
+            _phaseOrGroupLongName = new Dictionary<CultureInfo, string>(exportable.PhaseOrGroupLongName);
+            Type = exportable.Type;
+            Group = exportable.Group;
+            GroupId = exportable.GroupId != null ? URN.Parse(exportable.GroupId) : null;
+            OtherMatchId = exportable.OtherMatchId;
+            Number = exportable.Number;
+            CupRoundMatches = exportable.CupRoundMatches;
+            CupRoundMatchNumber = exportable.CupRoundMatchNumber;
+            BetradarId = exportable.BetradarId;
+            Phase = exportable.Phase;
         }
 
         /// <summary>
@@ -83,10 +123,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">The culture of the input <see cref="RoundDTO"/></param>
         internal void Merge(RoundDTO dto, CultureInfo culture)
         {
-            Contract.Requires(dto != null);
+            Guard.Argument(dto, nameof(dto)).NotNull();
 
             Type = dto.Type;
             Group = dto.Group;
+            GroupId = dto.GroupId;
             OtherMatchId = dto.OtherMatchId;
             Number = dto.Number;
             CupRoundMatches = dto.CupRoundMatches;
@@ -94,6 +135,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             BetradarId = dto.BetradarId;
             _names[culture] = dto.Name;
             _phaseOrGroupLongName[culture] = dto.PhaseOrGroupLongName;
+            Phase = dto.Phase;
         }
 
         /// <summary>
@@ -103,7 +145,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <returns>Return the Name if exists, or null</returns>
         public string GetName(CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             return _names == null || !_names.ContainsKey(culture)
                 ? null
@@ -117,7 +159,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <returns>Return the phase or group long name if exists, or null</returns>
         public string GetPhaseOrGroupLongName(CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             return _phaseOrGroupLongName == null || !_phaseOrGroupLongName.ContainsKey(culture)
                 ? null
@@ -132,6 +174,28 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public virtual bool HasTranslationsFor(IEnumerable<CultureInfo> cultures)
         {
             return cultures.All(c => _names.ContainsKey(c));
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableRoundCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportableRoundCI
+            {
+                Names = new Dictionary<CultureInfo, string>(_names),
+                Type = Type,
+                GroupId = GroupId?.ToString(),
+                Group = Group,
+                OtherMatchId = OtherMatchId,
+                Number = Number,
+                BetradarId = BetradarId,
+                PhaseOrGroupLongName = new Dictionary<CultureInfo, string>(_phaseOrGroupLongName ?? new Dictionary<CultureInfo, string>()),
+                Phase = Phase,
+                CupRoundMatchNumber = CupRoundMatchNumber,
+                CupRoundMatches = CupRoundMatches
+            });
         }
     }
 }

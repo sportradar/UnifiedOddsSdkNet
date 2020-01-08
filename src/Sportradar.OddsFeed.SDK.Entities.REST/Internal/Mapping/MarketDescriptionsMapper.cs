@@ -1,10 +1,10 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping
 {
@@ -21,7 +21,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping
         /// <param name="data">A <see cref="market_descriptions"/> instance containing data used to construct <see cref="EntityList{MarketDescriptionDTO}"/> instance</param>
         internal MarketDescriptionsMapper(market_descriptions data)
         {
-            Contract.Requires(data != null);
+            Guard.Argument(data, nameof(data)).NotNull();
 
             _data = data;
         }

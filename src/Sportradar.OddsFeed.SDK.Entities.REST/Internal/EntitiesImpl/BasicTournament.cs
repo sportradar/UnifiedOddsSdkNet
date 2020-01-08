@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,7 +22,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// </summary>
     /// <seealso cref="SportEvent" />
     /// <seealso cref="IBasicTournament" />
-    internal class BasicTournament : SportEvent, IBasicTournament
+    internal class BasicTournament : SportEvent, IBasicTournamentV1
     {
         /// <summary>
         /// This <see cref="ILog"/> should not be used since it is also exposed by the base class
@@ -58,8 +58,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                                ExceptionHandlingStrategy exceptionStrategy)
             : base(id, sportId, ExecutionLogPrivate, sportEventCache, cultures, exceptionStrategy)
         {
-            Contract.Requires(sportDataCache != null);
-            Contract.Requires(sportEntityFactory != null);
+            Guard.Argument(sportDataCache, nameof(sportDataCache)).NotNull();
+            Guard.Argument(sportEntityFactory, nameof(sportEntityFactory)).NotNull();
 
             _sportEntityFactory = sportEntityFactory;
             _sportDataCache = sportDataCache;
@@ -169,6 +169,26 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             var competitorsReferences = await tournamentInfoCI.GetCompetitorsReferencesAsync().ConfigureAwait(false);
 
             return item?.Select(s => _sportEntityFactory.BuildCompetitor(s, Cultures, competitorsReferences));
+        }
+
+        /// <summary>
+        /// Asynchronously gets a <see cref="bool"/> specifying if the tournament is exhibition game
+        /// </summary>
+        /// <returns>A <see cref="bool"/> specifying if the tournament is exhibition game</returns>
+        public async Task<bool?> GetExhibitionGamesAsync()
+        {
+            var tournamentInfoCI = (TournamentInfoCI)SportEventCache.GetEventCacheItem(Id);
+            if (tournamentInfoCI == null)
+            {
+                ExecutionLogPrivate.Debug($"Missing data. No tournament cache item for id={Id}.");
+                return null;
+            }
+
+            var exhibitionGames = ExceptionStrategy == ExceptionHandlingStrategy.THROW
+                ? await tournamentInfoCI.GetExhibitionGamesAsync().ConfigureAwait(false)
+                : await new Func<Task<bool?>>(tournamentInfoCI.GetExhibitionGamesAsync).SafeInvokeAsync(ExecutionLog, GetFetchErrorMessage("ExhibitionGames")).ConfigureAwait(false);
+
+            return exhibitionGames;
         }
     }
 }

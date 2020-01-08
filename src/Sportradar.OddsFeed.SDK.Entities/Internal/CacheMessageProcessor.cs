@@ -2,7 +2,8 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using System.Collections.Generic;
+using Dawn;
 using System.Globalization;
 using System.Threading.Tasks;
 using Common.Logging;
@@ -14,7 +15,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal
 {
@@ -65,10 +66,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                                      ICacheManager cacheManager,
                                      IFeedMessageHandler feedMessageHandler)
         {
-            Contract.Requires(mapperFactory != null);
-            Contract.Requires(sportEventCache != null);
-            Contract.Requires(cacheManager != null);
-            Contract.Requires(feedMessageHandler != null);
+            Guard.Argument(mapperFactory, nameof(mapperFactory)).NotNull();
+            Guard.Argument(sportEventCache, nameof(sportEventCache)).NotNull();
+            Guard.Argument(cacheManager, nameof(cacheManager)).NotNull();
+            Guard.Argument(feedMessageHandler, nameof(feedMessageHandler)).NotNull();
 
             ProcessorId = "CMP" + Guid.NewGuid().ToString().Substring(0, 4);
 
@@ -79,18 +80,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         }
 
         /// <summary>
-        /// Defines object invariants as required by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_mapperFactory != null);
-            Contract.Invariant(_sportEventCache != null);
-            Contract.Invariant(_cacheManager != null);
-            Contract.Invariant(_feedMessageHandler != null);
-        }
-
-        /// <summary>
         /// Processes and dispatches the provided <see cref="FeedMessage" /> instance
         /// </summary>
         /// <param name="message">A <see cref="FeedMessage" /> instance to be processed</param>
@@ -98,6 +87,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="rawMessage">A raw message received from the feed</param>
         public void ProcessMessage(FeedMessage message, MessageInterest interest, byte[] rawMessage)
         {
+            Guard.Argument(message, nameof(message)).NotNull();
+            Guard.Argument(interest, nameof(interest)).NotNull();
+
             // process odds_change
             var oddsChange = message as odds_change;
             if (oddsChange?.sport_event_status != null)
@@ -154,7 +146,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 var cache = _sportEventCache as SportEventCache;
                 if (cache != null)
                 {
-                    Task.Run(async () => await cache.GetEventIdsAsync(urn, null)).ConfigureAwait(false);
+                    Task.Run(async () => await cache.GetEventIdsAsync(urn, (IEnumerable<CultureInfo>) null)).ConfigureAwait(false);
                 }
             }
             catch (Exception e)

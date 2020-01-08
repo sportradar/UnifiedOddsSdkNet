@@ -96,5 +96,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// </summary>
         /// <returns>A <see cref="Task{T}"/> representing an async operation</returns>
         Task<IDictionary<URN, ReferenceIdCI>> GetCompetitorsReferencesAsync();
+
+        /// <summary>
+        /// Asynchronously gets a <see cref="bool"/> specifying if the tournament is exhibition game
+        /// </summary>
+        /// <returns>A <see cref="bool"/> specifying if the tournament is exhibition game</returns>
+        Task<bool?> GetExhibitionGamesAsync();
     }
 }

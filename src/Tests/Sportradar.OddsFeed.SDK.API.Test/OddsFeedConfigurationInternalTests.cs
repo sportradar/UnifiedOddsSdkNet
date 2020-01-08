@@ -12,7 +12,7 @@ using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 using Sportradar.OddsFeed.SDK.Test.Shared;
 
 namespace Sportradar.OddsFeed.SDK.API.Test
@@ -142,6 +142,8 @@ namespace Sportradar.OddsFeed.SDK.API.Test
                           .SetAccessToken(TestData.AccessToken)
                           .SelectCustom()
                           .SetDefaultLanguage(TestData.Culture)
+                          .SetMessagingHost(_testSection.Host)
+                          .SetApiHost(_testSection.ApiHost)
                           .Build();
             internalConfig = new OddsFeedConfigurationInternal(publicConfig, _defaultBookmakerDetailsProvider);
             Assert.AreEqual(publicConfig.Environment, internalConfig.Environment);
@@ -153,8 +155,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         [TestMethod]
         public void host_has_correct_value()
         {
-            var builder = new TokenSetter(new TestSectionProvider(_testSection))
-                         .SetAccessTokenFromConfigFile();
+            var builder = new TokenSetter(new TestSectionProvider(_testSection)).SetAccessTokenFromConfigFile();
 
             var publicConfig = builder.SelectIntegration().SetDefaultLanguage(TestData.Culture).Build();
             var internalConfig = new OddsFeedConfigurationInternal(publicConfig, _defaultBookmakerDetailsProvider);
@@ -202,6 +203,8 @@ namespace Sportradar.OddsFeed.SDK.API.Test
                           .SelectCustom()
                           .SetVirtualHost("virtual_host")
                           .SetDefaultLanguage(TestData.Culture)
+                          .SetMessagingHost(_testSection.Host)
+                          .SetApiHost(_testSection.ApiHost)
                           .Build();
             internalConfig = new OddsFeedConfigurationInternal(publicConfig, _defaultBookmakerDetailsProvider);
             internalConfig.Load();
@@ -235,12 +238,13 @@ namespace Sportradar.OddsFeed.SDK.API.Test
                           .SetAccessToken(TestData.AccessToken)
                           .SelectCustom()
                           .SetDefaultLanguage(TestData.Culture)
+                          .SetMessagingHost(_testSection.Host)
+                          .SetApiHost(_testSection.ApiHost)
                           .Build();
             internalConfig = new OddsFeedConfigurationInternal(publicConfig, _defaultBookmakerDetailsProvider);
             internalConfig.EnableReplayServer();
             internalConfig.Load();
             Assert.AreEqual(SdkInfo.IntegrationApiHost, internalConfig.ApiHost);
-
 
             publicConfig = new TokenSetter(new TestSectionProvider(null))
                           .SetAccessToken(TestData.AccessToken)

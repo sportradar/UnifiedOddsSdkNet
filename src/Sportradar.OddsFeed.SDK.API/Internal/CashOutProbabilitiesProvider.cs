@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +16,7 @@ using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -57,9 +57,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public CashOutProbabilitiesProvider(IDataProvider<cashout> dataProvider, IFeedMessageMapper messageMapper, IEnumerable<CultureInfo> defaultCultures, ExceptionHandlingStrategy exceptionStrategy)
         {
-            Contract.Requires(dataProvider != null);
-            Contract.Requires(messageMapper != null);
-            Contract.Requires(defaultCultures != null && defaultCultures.Any());
+            Guard.Argument(dataProvider, nameof(dataProvider)).NotNull();
+            Guard.Argument(messageMapper, nameof(messageMapper)).NotNull();
+            Guard.Argument(defaultCultures, nameof(defaultCultures)).NotNull().NotEmpty();
 
             _dataProvider = dataProvider;
             _messageMapper = messageMapper;
@@ -76,11 +76,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         private async Task<ICashOutProbabilities<T>> GetProbabilitiesInternalAsync<T>(string param, CultureInfo culture = null) where T : ISportEvent
         {
             var data = _exceptionStrategy == ExceptionHandlingStrategy.THROW
-                ? await _dataProvider.GetDataAsync(param)
+                ? await _dataProvider.GetDataAsync(param).ConfigureAwait(false)
                 : await new Func<string, Task<cashout>>(_dataProvider.GetDataAsync).SafeInvokeAsync(
                     param,
                     ExecutionLog,
-                    "Error occurred while fetching probabilities for " + param);
+                    "Error occurred while fetching probabilities for " + param).ConfigureAwait(false);
 
             return data == null
                 ? null
@@ -96,6 +96,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>A <see cref="Task{T}" /> representing the asynchronous operation</returns>
         public Task<ICashOutProbabilities<T>> GetCashOutProbabilitiesAsync<T>(URN eventId, CultureInfo culture = null) where T : ISportEvent
         {
+            Guard.Argument(eventId, nameof(eventId)).NotNull();
+
             return GetProbabilitiesInternalAsync<T>(eventId.ToString(), culture);
         }
 
@@ -110,6 +112,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>A <see cref="Task{T}" /> representing the asynchronous operation</returns>
         public Task<ICashOutProbabilities<T>> GetCashOutProbabilitiesAsync<T>(URN eventId, int marketId, IReadOnlyDictionary<string, string> specifiers, CultureInfo culture = null) where T : ISportEvent
         {
+            Guard.Argument(eventId, nameof(eventId)).NotNull();
+
             var param = $"{eventId}/{marketId}";
             if (specifiers != null && specifiers.Any())
             {

@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.API.Internal;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities;
@@ -317,7 +318,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             //start the recovery
             _producerRecoveryManager.ProcessSystemMessage(_messageBuilder.BuildAlive());
             Assert.AreEqual(_producerRecoveryManager.Status, ProducerRecoveryStatus.Started);
-            //make sure that after the the recoveryOperationMock IsRunning returns true
+            //make sure that after the recoveryOperationMock IsRunning returns true
             recoveryOperationMock.Setup(x => x.IsRunning).Returns(true);
 
             //let's go over few normal cycles without user messages
@@ -345,7 +346,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             //start the recovery
             _producerRecoveryManager.ProcessSystemMessage(_messageBuilder.BuildAlive());
             Assert.AreEqual(_producerRecoveryManager.Status, ProducerRecoveryStatus.Started);
-            //make sure that after the the recoveryOperationMock IsRunning returns true
+            //make sure that after the recoveryOperationMock IsRunning returns true
             recoveryOperationMock.Setup(x => x.IsRunning).Returns(true);
 
             //let's go over few normal cycles without user messages
@@ -386,6 +387,38 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             var oddsChange = _messageBuilder.BuildOddsChange();
             _producerRecoveryManager.ProcessUserMessage(oddsChange, DefaultInterest);
             timestampTrackerMock.Verify(x => x.ProcessUserMessage(DefaultInterest, oddsChange), Times.Once);
+        }
+
+        [TestMethod]
+        public void event_recovery_completed_is_called_with_right_args()
+        {
+            EventRecoveryCompletedEventArgs eventArgs = null;
+            var eventId = URN.Parse("sr:match:1");
+
+            _producerRecoveryManager.EventRecoveryCompleted += (sender, args) => eventArgs = args;
+            _producer.EventRecoveries.TryAdd(9, eventId);
+
+            _producerRecoveryManager.ProcessUserMessage(_messageBuilder.BuildSnapshotComplete(9), DefaultInterest);
+            Assert.IsNotNull(eventArgs);
+            Assert.AreEqual(9, eventArgs.GetRequestId());
+            Assert.AreEqual(eventId, eventArgs.GetEventId());
+
+            Assert.IsTrue(_producer.EventRecoveries.IsEmpty);
+        }
+
+        [TestMethod]
+        public void event_recovery_completed_is_not_called_if_the_request_is_missing()
+        {
+            EventRecoveryCompletedEventArgs eventArgs = null;
+            var eventId = URN.Parse("sr:match:1");
+
+            _producerRecoveryManager.EventRecoveryCompleted += (sender, args) => eventArgs = args;
+            _producer.EventRecoveries.TryAdd(9, eventId);
+
+            _producerRecoveryManager.ProcessUserMessage(_messageBuilder.BuildSnapshotComplete(1), DefaultInterest);
+            Assert.IsNull(eventArgs);
+
+            Assert.IsFalse(_producer.EventRecoveries.IsEmpty);
         }
     }
 }

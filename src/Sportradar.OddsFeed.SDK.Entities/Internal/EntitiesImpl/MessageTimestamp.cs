@@ -1,7 +1,7 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Diagnostics.Contracts;
+using Dawn;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
 {
@@ -37,7 +37,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <param name="timestamp">The timestamp</param>
         public MessageTimestamp(long timestamp)
         {
-            Contract.Requires(timestamp > 0);
+            Guard.Argument(timestamp, nameof(timestamp)).Positive();
 
             Created = timestamp;
             Sent = timestamp;
@@ -54,10 +54,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <param name="dispatched">The dispatched</param>
         public MessageTimestamp(long generated, long sent, long received, long dispatched)
         {
-            Contract.Requires(generated > 0);
-            //Contract.Requires(sent > 0);
-            Contract.Requires(received > 0);
-            //Contract.Requires(dispatched > 0);
+            Guard.Argument(generated, nameof(generated)).Positive();
+            //Guard.Argument(sent).Positive();
+            Guard.Argument(received, nameof(received)).Positive();
+            //Guard.Argument(dispatched).Positive();
 
             Created = generated;
             Sent = sent;

@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -29,21 +29,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="specifierValue">The required value of the specifier.</param>
         public SpecificValueMappingValidator(string specifierName, string specifierValue)
         {
-            Contract.Requires(!string.IsNullOrEmpty(specifierName));
-            Contract.Requires(!string.IsNullOrEmpty(specifierValue));
+            Guard.Argument(specifierName, nameof(specifierName)).NotNull().NotEmpty();
+            Guard.Argument(specifierValue, nameof(specifierValue)).NotNull().NotEmpty();
 
-            this._specifierName = specifierName;
-            this._specifierValue = specifierValue;
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(!string.IsNullOrEmpty(_specifierValue));
-            Contract.Invariant(!string.IsNullOrEmpty(_specifierName));
+            _specifierName = specifierName;
+            _specifierValue = specifierValue;
         }
 
         /// <summary>
@@ -54,8 +44,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <exception cref="InvalidOperationException">Validation cannot be performed against the provided specifiers</exception>
         public bool Validate(IReadOnlyDictionary<string, string> specifiers)
         {
-            string specifierValue;
-            if (!specifiers.TryGetValue(_specifierName, out specifierValue))
+            if (!specifiers.TryGetValue(_specifierName, out _))
             {
                 throw new InvalidOperationException($"Required specifier[{_specifierName}] does not exist in the provided specifiers");
             }
@@ -63,9 +52,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         }
 
         /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// Returns a <see cref="string" /> that represents this instance.
         /// </summary>
-        /// <returns>A <see cref="System.String" /> that represents this instance.</returns>
+        /// <returns>A <see cref="string" /> that represents this instance.</returns>
         public override string ToString()
         {
             return $"{_specifierName}={_specifierValue}";

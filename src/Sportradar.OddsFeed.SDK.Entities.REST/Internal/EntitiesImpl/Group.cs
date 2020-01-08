@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
@@ -17,12 +17,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// Represents a competition group
     /// </summary>
     /// <seealso cref="IGroup" />
-    internal class Group : EntityPrinter, IGroup
+    internal class Group : EntityPrinter, IGroupV1
     {
         /// <summary>
         /// The <see cref="Competitors"/> property backing field
         /// </summary>
         private readonly IReadOnlyCollection<ICompetitor> _competitors;
+
+        /// <summary>
+        /// Gets the id of the group represented by the current <see cref="IGroup"/> instance
+        /// </summary>
+        public string Id { get; }
 
         /// <summary>
         /// Gets the name of the group represented by the current <see cref="IGroup" /> instance
@@ -41,6 +46,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <param name="competitors">the <see cref="IEnumerable{ICompetitor}" /> representing group competitors</param>
         public Group(string name, IEnumerable<ICompetitor> competitors)
         {
+            Id = string.Empty;
             Name = name;
             if (competitors != null)
             {
@@ -61,8 +67,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                      ISportEntityFactory sportEntityFactory,
                      IDictionary<URN, ReferenceIdCI> competitorsReferenceIds)
         {
-            Contract.Requires(ci != null);
+            Guard.Argument(ci, nameof(ci)).NotNull();
 
+            Id = ci.Id;
             Name = ci.Name;
             if (ci.Competitors != null)
             {

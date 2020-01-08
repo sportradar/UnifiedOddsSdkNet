@@ -9,7 +9,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST
     /// <summary>
     /// Specifies a contract implemented by classes representing values with localized / translatable descriptions
     /// </summary>
-    /// <seealso cref="Sportradar.OddsFeed.SDK.Entities.REST.INamedValue" />
+    /// <seealso cref="INamedValue" />
     public interface ILocalizedNamedValue : INamedValue
     {
         /// <summary>

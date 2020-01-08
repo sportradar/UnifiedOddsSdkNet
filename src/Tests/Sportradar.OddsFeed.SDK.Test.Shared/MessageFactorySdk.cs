@@ -12,7 +12,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 using MFR = Sportradar.OddsFeed.SDK.Test.Shared.MessageFactoryRest;
 using SR = Sportradar.OddsFeed.SDK.Test.Shared.StaticRandom;
 // ReSharper disable UnusedMember.Local
@@ -77,7 +77,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         public static IFixture GetFixture(int id = 0, int subItemCount = 0)
         {
-            return new Fixture(new FixtureDTO(MFR.GetFixture(id, subItemCount)));
+            return new Fixture(new FixtureDTO(MFR.GetFixture(id, subItemCount), null));
         }
 
         public static IGroup GetGroup()
@@ -113,7 +113,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         internal static IPlayerProfile GetPlayerProfile(int id = 0)
         {
-            return new PlayerProfile(new PlayerProfileCI(new PlayerProfileDTO(MFR.GetPlayerExtended(id)), TestData.Culture, new TestDataRouterManager(new CacheManager())), TestData.Cultures3);
+            return new PlayerProfile(new PlayerProfileCI(new PlayerProfileDTO(MFR.GetPlayerExtended(id), null), null, TestData.Culture, new TestDataRouterManager(new CacheManager())), TestData.Cultures3);
         }
 
         internal static IProductInfo GetProductInfo(int subItemCount = 0)
@@ -192,7 +192,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         internal static TvChannel GetTvChannel(bool startTimeSpecified = true)
         {
-            return new TvChannel("Name " + SR.S1000, DateTime.Now);
+            return new TvChannel("Name " + SR.S1000, DateTime.Now, "Url:" + SR.S10000P);
         }
 
         public static IVenue GetVenue(int id = 0)

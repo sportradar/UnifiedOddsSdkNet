@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -91,9 +91,9 @@ namespace Sportradar.OddsFeed.SDK.Messages
         /// <param name="id">The numerical identifier of the resource associated with the URN</param>
         public URN(string prefix, string type, long id)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefix));
-            Contract.Requires(!string.IsNullOrEmpty(type));
-            Contract.Requires(id > 0);
+            Guard.Argument(prefix, nameof(prefix)).NotNull().NotEmpty();
+            Guard.Argument(type, nameof(prefix)).NotNull().NotEmpty();
+            Guard.Argument(id, nameof(id)).Positive();
 
             var tuple = Types.FirstOrDefault(t => t.Item1 == type);
 
@@ -104,15 +104,22 @@ namespace Sportradar.OddsFeed.SDK.Messages
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="URN"/> class.
+        /// </summary>
+        /// <param name="urn">The urn to be used as a template</param>
+        public URN(URN urn) : this(urn?.Prefix, urn?.Type, urn?.Id ?? 0)
+        {
+        }
+
+        /// <summary>
         /// Constructs a <see cref="URN"/> instance by parsing the provided <see cref="string"/>
         /// </summary>
         /// <param name="urnString">The <see cref="string"/> representation of the URN</param>
         /// <returns>A <see cref="URN"/> constructed by parsing the provided string representation</returns>
-        /// <exception cref="System.FormatException">The format of the provided representation is not correct</exception>
+        /// <exception cref="FormatException">The format of the provided representation is not correct</exception>
         public static URN Parse(string urnString)
         {
-            Contract.Requires(!string.IsNullOrEmpty(urnString));
-            Contract.Ensures(Contract.Result<URN>() != null);
+            Guard.Argument(urnString, nameof(urnString)).NotNull().NotEmpty();
 
             var match = Regex.Match(urnString, RegexPattern);
             if (!match.Success)
@@ -140,7 +147,7 @@ namespace Sportradar.OddsFeed.SDK.Messages
         /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         public static bool TryParse(string urnString, out URN urn)
         {
-            Contract.Requires(!string.IsNullOrEmpty(urnString));
+            Guard.Argument(urnString, nameof(urnString)).NotNull().NotEmpty();
 
             var success = false;
 
@@ -157,19 +164,19 @@ namespace Sportradar.OddsFeed.SDK.Messages
         }
 
         /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// Returns a <see cref="string" /> that represents this instance.
         /// </summary>
-        /// <returns>A <see cref="System.String" /> that represents this instance.</returns>
+        /// <returns>A <see cref="string" /> that represents this instance.</returns>
         public override string ToString()
         {
             return $"{Prefix}:{Type}:{Id}";
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="System.Object" /> is equal to this instance.
+        /// Determines whether the specified <see cref="object" /> is equal to this instance.
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.</returns>
+        /// <returns><c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.</returns>
         public override bool Equals(object obj)
         {
             if (obj == null)

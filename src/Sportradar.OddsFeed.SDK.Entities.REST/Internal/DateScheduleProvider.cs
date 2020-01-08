@@ -2,11 +2,11 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -40,24 +40,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             :base(dateScheduleUriFormat, fetcher, deserializer, mapperFactory)
         {
 
-            Contract.Requires(!string.IsNullOrEmpty(liveScheduleUriFormat));
-            Contract.Requires(!string.IsNullOrWhiteSpace(dateScheduleUriFormat));
-            Contract.Requires(fetcher != null);
-            Contract.Requires(deserializer != null);
-            Contract.Requires(mapperFactory != null);
+            Guard.Argument(liveScheduleUriFormat, nameof(liveScheduleUriFormat)).NotNull().NotEmpty();
+            Guard.Argument(dateScheduleUriFormat, nameof(dateScheduleUriFormat)).NotNull().NotEmpty();
+            Guard.Argument(fetcher, nameof(fetcher)).NotNull();
+            Guard.Argument(deserializer, nameof(deserializer)).NotNull();
+            Guard.Argument(mapperFactory, nameof(mapperFactory)).NotNull();
 
             _liveScheduleUriFormat = liveScheduleUriFormat;
         }
-
-        /// <summary>
-        /// Defines object invariants used by the code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(!string.IsNullOrWhiteSpace(_liveScheduleUriFormat));
-        }
-
 
         /// <summary>
         /// Constructs and returns an <see cref="Uri"/> instance used to retrieve resource with specified <code>id</code>

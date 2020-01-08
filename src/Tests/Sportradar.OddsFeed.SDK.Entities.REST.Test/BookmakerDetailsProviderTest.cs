@@ -9,7 +9,7 @@ using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 using Sportradar.OddsFeed.SDK.Test.Shared;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
@@ -21,6 +21,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
         public static IDataProvider<BookmakerDetailsDTO> BuildProvider(string apiKey)
         {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+
             var fetcher = string.IsNullOrEmpty(apiKey)
                 ? new TestDataFetcher()
                 : (IDataFetcher) new HttpDataFetcher(new HttpClient(), apiKey, new Deserializer<response>());

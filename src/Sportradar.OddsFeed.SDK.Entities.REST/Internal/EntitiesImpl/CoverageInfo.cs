@@ -1,9 +1,13 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
@@ -57,6 +61,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public CoverageInfo(CoverageInfoDTO dto)
             :this(dto.Level, dto.IsLive, dto.Includes, dto.CoveredFrom)
         { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CoverageInfo"/> class.
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableCoverageInfoCI" /> specifying the current item</param>
+        public CoverageInfo(ExportableCoverageInfoCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            _level = exportable.Level;
+            _isLive = exportable.IsLive;
+            _includes = exportable.Includes != null ? new List<string>(exportable.Includes) : null;
+            _coveredFrom = exportable.CoveredFrom;
+        }
 
         /// <summary>
         /// Gets a <see cref="string" /> describing the level of the available coverage
@@ -114,6 +133,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         protected override string PrintJ()
         {
             return PrintJ(GetType(), this);
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableCoverageInfoCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportableCoverageInfoCI
+            {
+                Includes = new List<string>(_includes ?? new List<string>()),
+                IsLive = _isLive,
+                CoveredFrom = _coveredFrom,
+                Level = _level
+            });
         }
     }
 }

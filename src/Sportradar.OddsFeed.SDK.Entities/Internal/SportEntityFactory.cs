@@ -3,10 +3,11 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Logging;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl;
 using Sportradar.OddsFeed.SDK.Entities.REST;
@@ -24,10 +25,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
     /// <summary>
     /// A factory used to construct <see cref="ISportEvent" /> and <see cref="ITournament" /> instances
     /// </summary>
-    /// <seealso cref="Sportradar.OddsFeed.SDK.Entities.REST.Internal.ISportEntityFactory" />
     /// <seealso cref="ISportEntityFactory" />
     internal class SportEntityFactory : ISportEntityFactory
     {
+        protected readonly ILog ExecutionLog = SdkLoggerFactory.GetLoggerForExecution(typeof(SportEntityFactory));
         /// <summary>
         /// A <see cref="ISportDataCache"/> instance used to retrieve sport related info
         /// </summary>
@@ -68,11 +69,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             ILocalizedNamedValueCache matchStatusCache,
             IProfileCache profileCache)
         {
-            Contract.Requires(sportDataCache != null);
-            Contract.Requires(sportEventCache != null);
-            Contract.Requires(eventStatusCache != null);
-            Contract.Requires(matchStatusCache != null);
-            Contract.Requires(profileCache != null);
+            Guard.Argument(sportDataCache, nameof(sportDataCache)).NotNull();
+            Guard.Argument(sportEventCache, nameof(sportEventCache)).NotNull();
+            Guard.Argument(eventStatusCache, nameof(eventStatusCache)).NotNull();
+            Guard.Argument(matchStatusCache, nameof(matchStatusCache)).NotNull();
+            Guard.Argument(profileCache, nameof(profileCache)).NotNull();
 
             _sportDataCache = sportDataCache;
             _sportEventCache = sportEventCache;
@@ -90,8 +91,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <returns>The constructed <see cref="ISport"/> instance</returns>
         private ISport BuildSportInternal(SportData sportData, IEnumerable<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy)
         {
-            Contract.Requires(sportData != null);
-            Contract.Requires(cultures != null && cultures.Any());
+            Guard.Argument(sportData, nameof(sportData)).NotNull();
+            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
 
             var categories = sportData.Categories?.Select(categoryData => new Category(
                 categoryData.Id,
@@ -116,9 +117,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
 
             var sportsData = await _sportDataCache.GetSportsAsync(cultureList).ConfigureAwait(false);
-            return sportsData == null
-                ? null
-                : sportsData.Select(data => BuildSportInternal(data, cultureList, exceptionStrategy)).ToList();
+            return sportsData?.Select(data => BuildSportInternal(data, cultureList, exceptionStrategy)).ToList();
         }
 
         /// <summary>
@@ -210,7 +209,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="sportId">The sport identifier</param>
         /// <param name="cultures">The cultures used for returned instance</param>
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how the build instance will handle potential exceptions</param>
-        /// <returns>The constructed <see cref="ICompetition"/> derived instance.</returns>
+        /// <returns>The constructed <see cref="ICompetition"/> derived instance</returns>
         public T BuildSportEvent<T>(URN id, URN sportId, IEnumerable<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy) where T : ISportEvent
         {
             ISportEvent sportEvent;
@@ -279,9 +278,70 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             return new Competitor(ci, _profileCache, cultures, this, competitorsReferences);
         }
 
-        public ITeamCompetitor BuildTeamCompetitor(TeamCompetitorCI ci, IEnumerable<CultureInfo> culture, ICompetitionCI rootCompetitionCI)
+        public ITeamCompetitor BuildTeamCompetitor(TeamCompetitorCI ci, IEnumerable<CultureInfo> cultures, ICompetitionCI rootCompetitionCI)
         {
-            return new TeamCompetitor(ci, culture, this, _profileCache, rootCompetitionCI);
+            return new TeamCompetitor(ci, cultures, this, _profileCache, rootCompetitionCI);
+        }
+
+        /// <summary>
+        /// Builds the instance of the <see cref="ICompetitor"/> class
+        /// </summary>
+        /// <param name="competitorId">A <see cref="URN"/> of the <see cref="CompetitorCI"/> used to create new instance</param>
+        /// <param name="cultures">A cultures of the current instance of <see cref="CompetitorCI"/></param>
+        /// <param name="rootCompetitionCI">A root <see cref="CompetitionCI"/> to which this competitor belongs to</param>
+        /// <returns>The constructed <see cref="ICompetitor"/> instance</returns>
+        public async Task<ICompetitor> BuildCompetitorAsync(URN competitorId, IEnumerable<CultureInfo> cultures, ICompetitionCI rootCompetitionCI)
+        {
+            var cultureInfos = cultures.ToList();
+            var competitorCI = await _profileCache.GetCompetitorProfileAsync(competitorId, cultureInfos).ConfigureAwait(false);
+            if (competitorCI != null)
+            {
+                return BuildCompetitor(competitorCI, cultureInfos, rootCompetitionCI);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Builds the instance of the <see cref="ICompetitor"/> class
+        /// </summary>
+        /// <param name="competitorId">A <see cref="URN"/> of the <see cref="CompetitorCI"/> used to create new instance</param>
+        /// <param name="cultures">A cultures of the current instance of <see cref="CompetitorCI"/></param>
+        /// <param name="competitorsReferences">The dictionary of competitor references (associated with specific match)</param>
+        /// <returns>The constructed <see cref="ICompetitor"/> instance</returns>
+        public async Task<ICompetitor> BuildCompetitorAsync(URN competitorId, IEnumerable<CultureInfo> cultures, IDictionary<URN, ReferenceIdCI> competitorsReferences)
+        {
+            var cultureInfos = cultures.ToList();
+            var competitorCI = await _profileCache.GetCompetitorProfileAsync(competitorId, cultureInfos).ConfigureAwait(false);
+            if (competitorCI != null)
+            {
+                return BuildCompetitor(competitorCI, cultureInfos, competitorsReferences);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Builds the instance of the <see cref="ITeamCompetitor"/> class
+        /// </summary>
+        /// <param name="teamCompetitorId">A <see cref="URN"/> of the <see cref="TeamCompetitorCI"/> used to create new instance</param>
+        /// <param name="cultures">A culture of the current instance of <see cref="TeamCompetitorCI"/></param>
+        /// <param name="rootCompetitionCI">A root <see cref="CompetitionCI"/> to which this competitor belongs to</param>
+        /// <returns>The constructed <see cref="ITeamCompetitor"/> instance</returns>
+        public async Task<ITeamCompetitor> BuildTeamCompetitorAsync(URN teamCompetitorId, IEnumerable<CultureInfo> cultures, ICompetitionCI rootCompetitionCI)
+        {
+            var cultureInfos = cultures.ToList();
+            var competitorCI = await _profileCache.GetCompetitorProfileAsync(teamCompetitorId, cultureInfos).ConfigureAwait(false);
+            var teamCompetitorCI = competitorCI as TeamCompetitorCI;
+            if (teamCompetitorCI != null)
+            {
+                return BuildTeamCompetitor(teamCompetitorCI, cultureInfos, rootCompetitionCI);
+            }
+            if (competitorCI != null)
+            {
+                ExecutionLog.Warn($"Transforming CompetitorCI to TeamCompetitorCI for {teamCompetitorId}");
+                var teamCI = new TeamCompetitorCI(competitorCI);
+                return BuildTeamCompetitor(teamCI, cultureInfos, rootCompetitionCI);
+            }
+            return null;
         }
     }
 }

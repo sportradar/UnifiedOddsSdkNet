@@ -7,7 +7,7 @@ using System.Linq;
 using System.Net;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
@@ -58,6 +58,36 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                     {
                         return new SportEventSummaryDTO(item);
                     }
+                default:
+                    throw new ArgumentException($"ResourceTypeGroup: {id.TypeGroup} is not supported", nameof(id));
+            }
+        }
+
+        /// <summary>
+        /// Maps the <see cref="tournamentExtended"/> instance to the one of the derived types of <see cref="SportEventSummaryDTO"/>
+        /// </summary>
+        /// <param name="item">The item to be mapped</param>
+        /// <returns>A <see cref="SportEventSummaryDTO"/> derived instance</returns>
+        /// <exception cref="ArgumentException">id</exception>
+        public static SportEventSummaryDTO MapSportEvent(tournamentExtended item)
+        {
+            if (item == null)
+            {
+                return null;
+            }
+            var id = URN.Parse(item.id);
+
+            switch (id.TypeGroup)
+            {
+                case ResourceTypeGroup.BASIC_TOURNAMENT:
+                {
+                    return new BasicTournamentDTO(item);
+                }
+                case ResourceTypeGroup.TOURNAMENT:
+                case ResourceTypeGroup.SEASON:
+                {
+                    return new TournamentInfoDTO(item);
+                }
                 default:
                     throw new ArgumentException($"ResourceTypeGroup: {id.TypeGroup} is not supported", nameof(id));
             }

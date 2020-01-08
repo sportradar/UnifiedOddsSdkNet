@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -13,7 +13,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
     /// <summary>
     /// A store used to manage <see cref="IEntityDispatcherInternal"/> instances
     /// </summary>
-    /// <seealso cref="Sportradar.OddsFeed.SDK.API.Internal.IDispatcherStore" />
+    /// <seealso cref="IDispatcherStore" />
     internal class DispatcherStore : IDispatcherStore
     {
         /// <summary>
@@ -42,7 +42,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="typeMapper">The <see cref="IEntityTypeMapper"/> used to determine the SDK type used to represent a specific sport entity.</param>
         public DispatcherStore(IEntityTypeMapper typeMapper)
         {
-            Contract.Requires(typeMapper != null);
+            Guard.Argument(typeMapper, nameof(typeMapper)).NotNull();
 
             _typeMapper = typeMapper;
         }
@@ -70,8 +70,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>A <see cref="List{Type}"/> representing the implemented interfaces</returns>
         private List<Type> GetHierarchy(Type type)
         {
-            Contract.Requires(type != null);
-            Contract.Ensures(Contract.Result<List<Type>>() != null);
+            Guard.Argument(type, nameof(type)).NotNull();
 
             var key = type.Name;
             List<Type> hierarchies;
@@ -88,23 +87,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         }
 
         /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_typeMapper != null);
-            Contract.Invariant(_dispatchers != null);
-            Contract.Invariant(_syncLock != null);
-            Contract.Invariant(_cachedHierarchies != null);
-        }
-
-        /// <summary>
         /// Adds the provided <see cref="ISpecificEntityDispatcherInternal"/> to the current store.
         /// </summary>
         /// <param name="dispatcher">The <see cref="ISpecificEntityDispatcherInternal"/> instance to be added.</param>
         public void Add(ISpecificEntityDispatcherInternal dispatcher)
         {
+            Guard.Argument(dispatcher, nameof(dispatcher)).NotNull();
+
             var key = dispatcher.GetType().GetGenericArguments().First().Name;
             lock (_syncLock)
             {

@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -84,8 +84,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how potential exceptions should be handled</param>
         public LocalizedNamedValueCache(IDataProvider<EntityList<NamedValueDTO>> dataProvider, IEnumerable<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy)
         {
-            Contract.Requires(dataProvider != null);
-            Contract.Requires(cultures != null && cultures.Any());
+            Guard.Argument(dataProvider, nameof(dataProvider)).NotNull();
+            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
 
             _dataProvider = dataProvider;
             _defaultCultures = cultures;
@@ -96,26 +96,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         }
 
         /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_dataProvider != null);
-            Contract.Invariant(_defaultCultures != null && _defaultCultures.Any());
-            Contract.Invariant(_namedValues != null);
-            Contract.Invariant(_semaphore != null);
-            Contract.Invariant(_loadedCultures != null);
-        }
-
-        /// <summary>
         /// Asynchronously gets a match stats descriptions specified by the language specified by <code>culture</code>
         /// </summary>
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the retrieved match statuses</param>
         /// <returns>A <see cref="Task" /> representing the retrieval operation</returns>
         private async Task FetchAndMerge(CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             Metric.Context("CACHE").Meter("LocalizedNamedValueCache->FetchAndMerge", Unit.Calls);
             var record = await _dataProvider.GetDataAsync(culture.TwoLetterISOLanguageName).ConfigureAwait(false);
@@ -189,7 +176,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// </summary>
         /// <param name="id">The id to be tested.</param>
         /// <returns>True if the value is defined in the cache; False otherwise.</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         public bool IsValueDefined(int id)
         {
             _semaphore.Wait(-1);

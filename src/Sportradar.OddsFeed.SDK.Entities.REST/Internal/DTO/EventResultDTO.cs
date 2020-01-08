@@ -2,9 +2,9 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Dawn;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
@@ -147,7 +147,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <param name="stageResultCompetitor">The stage result competitor</param>
         public EventResultDTO(stageResultCompetitor stageResultCompetitor)
         {
-            Contract.Requires(stageResultCompetitor != null);
+            Guard.Argument(stageResultCompetitor, nameof(stageResultCompetitor)).NotNull();
 
             Id = stageResultCompetitor.id;
             Position = stageResultCompetitor.positionSpecified ? stageResultCompetitor.position : (int?) null;

@@ -3,12 +3,12 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -32,31 +32,17 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="processors">The list of processors.</param>
         public CompositeMessageProcessor(IEnumerable<IFeedMessageProcessor> processors)
         {
-            Contract.Requires(processors != null);
-            Contract.Requires(processors.Any());
-            Contract.Requires(processors.All(p => p != null));
+            Guard.Argument(processors, nameof(processors)).NotNull().NotEmpty().Require(processors.All(p => p != null));
 
             ProcessorId = Guid.NewGuid().ToString().Substring(0,4);
 
             _processors = processors as IReadOnlyList<IFeedMessageProcessor>;
-            Contract.Assume(_processors != null);
 
             foreach (var processor in _processors)
             {
                 //Debug.WriteLine($"{ProcessorId} - CompositeMessageProcessor has processor {processor.ProcessorId}");
                 processor.MessageProcessed += OnProcessorMessageProcessedEvent;
             }
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_processors != null);
-            Contract.Invariant(_processors.Any());
-            Contract.Invariant(_processors.All(p => p != null));
         }
 
         private void OnProcessorMessageProcessedEvent(object sender, FeedMessageReceivedEventArgs e)
@@ -91,6 +77,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="rawMessage">A raw message received from the feed</param>
         public void ProcessMessage(FeedMessage message, MessageInterest interest, byte[] rawMessage)
         {
+            Guard.Argument(message, nameof(message)).NotNull();
+            Guard.Argument(interest, nameof(interest)).NotNull();
+
             _processors.First().ProcessMessage(message, interest, rawMessage);
         }
     }

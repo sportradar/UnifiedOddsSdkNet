@@ -6,7 +6,7 @@ using System.Globalization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 using Sportradar.OddsFeed.SDK.Test.Shared;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Test
@@ -37,7 +37,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
 
         private void TestEntityValues(IFixtureChange<ICompetition> entity, fixture_change record, AssertHelper assertHelper)
         {
-            TestEventMessageProperties(assertHelper, entity, record.timestamp, record.product, record.event_id, record.RequestId);;
+            TestEventMessageProperties(assertHelper, entity, record.timestamp, record.product, record.event_id, record.RequestId);
             assertHelper.AreEqual(() => (int)entity.ChangeType, record.change_typeSpecified
                                                                 ? (int?)record.change_type
                                                                 : (int)FixtureChangeType.OTHER);

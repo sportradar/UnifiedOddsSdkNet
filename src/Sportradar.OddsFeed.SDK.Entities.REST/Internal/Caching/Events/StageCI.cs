@@ -3,14 +3,13 @@
 */
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -118,6 +117,27 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="StageCI"/> class
+        /// </summary>
+        /// <param name="exportable">The exportable cache item</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to obtain summary and fixture</param>
+        /// <param name="semaphorePool">The semaphore pool</param>
+        /// <param name="defaultCulture">The default culture</param>
+        /// <param name="fixtureTimestampCache">A <see cref="ObjectCache"/> used to cache the sport events fixture timestamps</param>
+        public StageCI(ExportableStageCI exportable,
+            IDataRouterManager dataRouterManager,
+            ISemaphorePool semaphorePool,
+            CultureInfo defaultCulture,
+            ObjectCache fixtureTimestampCache)
+            : base(exportable, dataRouterManager, semaphorePool, defaultCulture, fixtureTimestampCache)
+        {
+            _categoryId = URN.Parse(exportable.CategoryId);
+            _parentStage = exportable.ParentStage != null ? new StageCI(exportable.ParentStage, dataRouterManager, semaphorePool, defaultCulture, fixtureTimestampCache) : null;
+            _childStages = exportable.ChildStages?.Select(s => new StageCI(s, dataRouterManager, semaphorePool, defaultCulture, fixtureTimestampCache));
+            _stageType = exportable.StageType;
+        }
+
+        /// <summary>
         /// get category identifier as an asynchronous operation.
         /// </summary>
         /// <returns>A <see cref="Task{URN}" /> representing the asynchronous operation</returns>
@@ -127,7 +147,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _categoryId;
             }
-            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             return _categoryId;
         }
 
@@ -143,7 +163,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 return _parentStage;
             }
             ////the requested data does not contain translatable values - fetch just for default language
-            await FetchMissingSummary(cultures).ConfigureAwait(false);
+            await FetchMissingSummary(cultures, false).ConfigureAwait(false);
             return _parentStage;
         }
 
@@ -159,7 +179,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 return _childStages;
             }
             ////the requested data does not contain translatable values - fetch just for default language
-            await FetchMissingSummary(cultures).ConfigureAwait(false);
+            await FetchMissingSummary(cultures, false).ConfigureAwait(false);
             return _childStages;
         }
 
@@ -169,7 +189,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <returns>A <see cref="Task{URN}" /> representing the asynchronous operation</returns>
         public async Task<StageType> GetTypeAsync()
         {
-            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             return _stageType;
         }
 
@@ -280,14 +300,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
 
             if (eventSummary.Competitors != null)
             {
-                if (Competitors == null)
-                {
-                    Competitors = new List<TeamCompetitorCI>(eventSummary.Competitors.Select(t => new TeamCompetitorCI(t, culture, DataRouterManager)));
-                }
-                else
-                {
-                    MergeCompetitors(eventSummary.Competitors, culture);
-                }
+                Competitors = new List<URN>(eventSummary.Competitors.Select(t => t.Id));
             }
 
             if (eventSummary.Category != null)
@@ -333,37 +346,24 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             }
         }
 
-        /// <summary>
-        /// Merges the competitors
-        /// </summary>
-        /// <param name="competitors">The competitors</param>
-        /// <param name="culture">The culture</param>
-        private void MergeCompetitors(IEnumerable<CompetitorDTO> competitors, CultureInfo culture)
+        protected override async Task<T> CreateExportableCIAsync<T>()
         {
-            Contract.Requires(culture != null);
+            var exportable = await base.CreateExportableCIAsync<T>();
+            var stage = exportable as ExportableStageCI;
 
-            if (competitors == null)
-            {
-                return;
-            }
+            stage.CategoryId = _categoryId?.ToString();
+            stage.ParentStage = _parentStage != null ? await _parentStage.ExportAsync().ConfigureAwait(false) as ExportableStageCI : null;
+            var childTasks = _childStages?.Select(async s => await s.ExportAsync().ConfigureAwait(false) as ExportableStageCI);
+            stage.ChildStages = childTasks != null ? await Task.WhenAll(childTasks) : null;
+            stage.StageType = _stageType;
 
-            var tempCompetitors = Competitors == null
-                ? new List<TeamCompetitorCI>()
-                : new List<TeamCompetitorCI>(Competitors);
-
-            foreach (var competitor in competitors)
-            {
-                var tempCompetitor = tempCompetitors.FirstOrDefault(c => c.Id.Equals(competitor.Id));
-                if (tempCompetitor == null)
-                {
-                    tempCompetitors.Add(new TeamCompetitorCI(competitor, culture, DataRouterManager));
-                }
-                else
-                {
-                    tempCompetitor.Merge(competitor, culture);
-                }
-            }
-            Competitors = new ReadOnlyCollection<TeamCompetitorCI>(tempCompetitors);
+            return exportable;
         }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public override async Task<ExportableCI> ExportAsync() => await CreateExportableCIAsync<ExportableStageCI>().ConfigureAwait(false);
     }
 }

@@ -2,17 +2,14 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
-using Sportradar.OddsFeed.SDK.Entities.Contracts;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal
 {
     /// <summary>
     /// Defines a contract implemented by classes capable of processing feed messages
     /// </summary>
-    [ContractClass(typeof(FeedMessageProcessorContract))]
     public interface IFeedMessageProcessor
     {
         /// <summary>

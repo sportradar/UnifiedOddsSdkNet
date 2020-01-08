@@ -1,9 +1,13 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
@@ -30,10 +34,23 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">The culture of the <see cref="DrawResultDTO"/> used to create new instance</param>
         public DrawResultCI(DrawResultDTO dto, CultureInfo culture)
         {
-            Contract.Requires(dto != null);
+            Guard.Argument(dto, nameof(dto)).NotNull();
 
             Names = new Dictionary<CultureInfo, string>();
             Merge(dto, culture);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DrawInfoCI"/> class
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableDrawResultCI"/> instance containing information about the draw result</param>
+        public DrawResultCI(ExportableDrawResultCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            Value = exportable.Value;
+            Names = exportable.Names != null ? new Dictionary<CultureInfo, string>(exportable.Names) : null;
         }
 
         /// <summary>
@@ -43,8 +60,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">The culture of the <see cref="DrawResultDTO"/> used to merge</param>
         internal void Merge(DrawResultDTO dto, CultureInfo culture)
         {
-            Contract.Requires(dto != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(dto, nameof(dto)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             if (dto.Value.HasValue)
             {
@@ -60,11 +77,24 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <returns>The name of the player in the specified language if it exists. Null otherwise.</returns>
         public string GetName(CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             return Names.ContainsKey(culture)
                 ? Names[culture]
                 : null;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableDrawResultCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportableDrawResultCI
+            {
+                Value = Value,
+                Names = new Dictionary<CultureInfo, string>(Names ?? new Dictionary<CultureInfo, string>())
+            });
         }
     }
 }

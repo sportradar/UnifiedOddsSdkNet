@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.Common;
@@ -94,26 +94,15 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public RecoveryOperation(Producer producer, IRecoveryRequestIssuer recoveryRequestIssuer, IEnumerable<MessageInterest> allInterests, int nodeId, bool adjustAfterAge)
         {
-            Contract.Requires(producer != null);
-            Contract.Requires(recoveryRequestIssuer != null);
-            Contract.Requires(allInterests != null && allInterests.Any());
+            Guard.Argument(producer, nameof(producer)).NotNull();
+            Guard.Argument(recoveryRequestIssuer, nameof(recoveryRequestIssuer)).NotNull();
+            Guard.Argument(allInterests, nameof(allInterests)).NotNull().NotEmpty();
 
             _producer = producer;
             _recoveryRequestIssuer = recoveryRequestIssuer;
             _allInterests = allInterests as List<MessageInterest> ?? new List<MessageInterest>(allInterests);
             _nodeId = nodeId;
             _adjustedAfterAge = adjustAfterAge;
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_producer != null);
-            Contract.Invariant(_allInterests != null);
-            Contract.Invariant(_snapshotReceivedSessions != null);
         }
 
         /// <summary>
@@ -148,8 +137,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             }
             // if all interests are a combination of different message scopes, use the producer
             // scopes to determine whether all snapshots were received
-            else if (_allInterests.Count <= MessageInterest.MessageScopes.Length &&
-                     _allInterests.All(MessageInterest.MessageScopes.Contains))
+            else if (_allInterests.Count <= MessageInterest.MessageScopes.Length && _allInterests.All(MessageInterest.MessageScopes.Contains))
             {
                 done = _producer.Scope
                     .Select(MessageInterest.FromScope)
@@ -206,10 +194,14 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     _requestId = _recoveryRequestIssuer.RequestRecoveryAfterTimestampAsync(_producer, after, _nodeId).Result;
                 }
             }
-            catch (AggregateException ex)
+            catch (Exception ex)
             {
                 var actualException = ex.InnerException ?? ex;
                 ExecutionLog.Error($"{_producer.Name} There was an error requesting recovery. Exception: {actualException.Message}");
+                if (ex is RecoveryInitiationException)
+                {
+                    throw;
+                }
                 return false;
             }
 
@@ -253,7 +245,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         }
 
         /// <summary>
-        /// Stops the the recovery operation if all snapshots were received
+        /// Stops the recovery operation if all snapshots were received
         /// </summary>
         /// <param name="interest">The <see cref="MessageInterest"/> of the session which received the snapshot message</param>
         /// <param name="result">If the operation was successfully completed, it contains the results of the completed recovery</param>

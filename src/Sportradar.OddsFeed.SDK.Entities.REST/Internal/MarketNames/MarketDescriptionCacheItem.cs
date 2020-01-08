@@ -4,11 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.Common;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
@@ -39,6 +40,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
         internal IEnumerable<string> Groups { get; private set; }
 
+        internal DateTime LastDataReceived { get; private set; }
+
+        internal string SourceCache { get; private set; }
+
         /// <summary>
         /// A <see cref="object" /> instance used for thread synchronization
         /// </summary>
@@ -55,12 +60,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             IEnumerable<MarketSpecifierCacheItem> specifiers,
             IEnumerable<MarketAttributeCacheItem> attributes,
             IEnumerable<string> groups,
-            CultureInfo culture)
+            CultureInfo culture,
+            string source)
         {
 
-            Contract.Requires(culture != null);
-            Contract.Requires(names != null);
-            Contract.Requires(descriptions != null);
+            Guard.Argument(culture, nameof(culture)).NotNull();
+            Guard.Argument(names, nameof(names)).NotNull();
+            Guard.Argument(descriptions, nameof(descriptions)).NotNull();
 
             Id = id;
             _names = names;
@@ -73,6 +79,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             Variant = variant;
             OutcomeType = outcomeType;
             Groups = groups;
+            SourceCache = source;
+            LastDataReceived = DateTime.Now;
         }
 
         /// <summary>
@@ -81,13 +89,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <param name="dto">The <see cref="MarketDescriptionDTO"/> containing market description data.</param>
         /// <param name="factory">The <see cref="IMappingValidatorFactory"/> instance used to build market mapping validators .</param>
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the provided DTO.</param>
+        /// <param name="source">The source cache where <see cref="MarketDescriptionCacheItem"/> is built</param>
         /// <returns>The constructed <see cref="MarketDescriptionCacheItem"/>.</returns>
         /// <exception cref="InvalidOperationException">The cache item could not be build from the provided DTO</exception>
-        public static MarketDescriptionCacheItem Build(MarketDescriptionDTO dto, IMappingValidatorFactory factory, CultureInfo culture)
+        public static MarketDescriptionCacheItem Build(MarketDescriptionDTO dto, IMappingValidatorFactory factory, CultureInfo culture, string source)
         {
-            Contract.Requires(dto != null);
-            Contract.Requires(factory != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(dto, nameof(dto)).NotNull();
+            Guard.Argument(factory, nameof(factory)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             var names = new Dictionary<CultureInfo, string> { { culture, dto.Name } };
             var descriptions = string.IsNullOrEmpty(dto.Description)
@@ -112,12 +121,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
             var groups = dto.Groups == null ? null : new ReadOnlyCollection<string>(dto.Groups.ToList());
 
-            return new MarketDescriptionCacheItem(dto.Id, names, descriptions, dto.Variant, dto.OutcomeType, outcomes, mappings, specifiers, attributes, groups, culture);
+            return new MarketDescriptionCacheItem(dto.Id, names, descriptions, dto.Variant, dto.OutcomeType, outcomes, mappings, specifiers, attributes, groups, culture, source);
         }
 
         internal string GetName(CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             string name;
             return _names.TryGetValue(culture, out name) ? name : null;
@@ -125,7 +134,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
         internal string GetDescription(CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             string description;
             if (_descriptions.TryGetValue(culture, out description))
@@ -140,10 +149,24 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             return FetchedLanguages.Contains(culture);
         }
 
+        internal bool CanBeFetched()
+        {
+            return (DateTime.Now - LastDataReceived).TotalSeconds > SdkInfo.MarketDescriptionMinFetchInterval;
+        }
+
+        public void SetFetchInfo(string source, DateTime lastDataReceived)
+        {
+            if (!string.IsNullOrEmpty(source))
+            {
+                SourceCache = source;
+            }
+            LastDataReceived = lastDataReceived;
+        }
+
         internal void Merge(MarketDescriptionDTO dto, CultureInfo culture)
         {
-            Contract.Requires(dto != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(dto, nameof(dto)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             lock (_lock)
             {
@@ -193,6 +216,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 Groups = dto.Groups == null ? null : new ReadOnlyCollection<string>(dto.Groups.ToList());
 
                 FetchedLanguages.Add(culture);
+
+                LastDataReceived = DateTime.Now;
             }
         }
 

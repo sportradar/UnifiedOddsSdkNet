@@ -1,11 +1,11 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
@@ -22,12 +22,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         public SportEventStatusDTO SportEventStatus { get; }
 
+        /// <summary>
+        /// Gets the <see cref="DateTime"/> specifying when the associated message was generated (on the server side)
+        /// </summary>
+        public DateTime? GeneratedAt { get; }
         public IEnumerable<BasicEventDTO> BasicEvents { get; }
 
         internal MatchTimelineDTO(matchTimelineEndpoint timeline)
         {
-            Contract.Requires(timeline != null);
-            Contract.Requires(timeline.sport_event != null);
+            Guard.Argument(timeline, nameof(timeline)).NotNull();
+            Guard.Argument(timeline.sport_event, nameof(timeline.sport_event)).NotNull();
 
             SportEvent = RestMapperHelper.MapSportEvent(timeline.sport_event);
 
@@ -50,6 +54,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 BasicEvents = timeline.timeline.Select(s => new BasicEventDTO(s));
             }
+
+            GeneratedAt = timeline.generated_atSpecified ? timeline.generated_at : (DateTime?) null;
         }
     }
 }

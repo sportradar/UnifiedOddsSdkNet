@@ -3,9 +3,9 @@
 */
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
@@ -18,7 +18,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <summary>
         /// Gets the competitor's abbreviation
         /// </summary>
-        /// <value>The abbreviation.</value>
+        /// <value>The abbreviation</value>
         public string Abbreviation { get; }
 
         /// <summary>
@@ -49,13 +49,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public IEnumerable<PlayerCompetitorDTO> Players { get; }
 
         /// <summary>
+        /// Gets the gender
+        /// </summary>
+        /// <value>The gender</value>
+        public string Gender { get; }
+
+        /// <summary>
+        /// Gets the age group
+        /// </summary>
+        /// <value>The gender</value>
+        public string AgeGroup { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CompetitorDTO"/> class from the <see cref="team"/> instance
         /// </summary>
         /// <param name="record">A <see cref="team"/> containing information about a team</param>
         internal CompetitorDTO(team record)
             :base(new player {id = record.id, name = record.name })
         {
-            Contract.Requires(record != null);
+            Guard.Argument(record, nameof(record)).NotNull();
 
             Abbreviation = record.abbreviation;
             CountryName = record.country;
@@ -70,6 +82,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 Players = record.players.Select(s => new PlayerCompetitorDTO(s));
             }
+            Gender = record.gender;
+            AgeGroup = record.age_group;
         }
     }
 }

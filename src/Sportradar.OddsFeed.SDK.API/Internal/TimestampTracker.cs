@@ -4,13 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -97,10 +97,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="maxMessageAgeInSeconds">The maximum latency of the user messages</param>
         public TimestampTracker(Producer producer, IEnumerable<MessageInterest> allInterests, int maxInactivitySeconds, int maxMessageAgeInSeconds)
         {
-            Contract.Requires(producer != null);
-            Contract.Requires(maxInactivitySeconds > 0);
-            Contract.Requires(maxMessageAgeInSeconds > 0);
-            Contract.Requires(allInterests != null);
+            Guard.Argument(producer, nameof(producer)).NotNull();
+            Guard.Argument(maxInactivitySeconds, nameof(maxInactivitySeconds)).Positive();
+            Guard.Argument(maxMessageAgeInSeconds, nameof(maxMessageAgeInSeconds)).Positive();
+            Guard.Argument(allInterests, nameof(allInterests)).NotNull().NotEmpty();
 
             _producer = producer;
             _maxInactivitySeconds = maxInactivitySeconds;
@@ -110,9 +110,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             var aliveMessagesTimingInfo = new Dictionary<MessageInterest, MessageTimingInfo>();
             var nonAliveMessagesTimingInfo = new Dictionary<MessageInterest, MessageTimingInfo>();
 
-            var allInterestsList = allInterests as IList<MessageInterest> ?? allInterests.ToList();
             var producerScopes = producer.Scope.Select(MessageInterest.FromScope).ToList();
-            foreach (var interest in allInterestsList)
+            foreach (var interest in allInterests)
             {
                 if (!interest.IsScopeInterest || producerScopes.Contains(interest))
                 {
@@ -125,19 +124,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         }
 
         /// <summary>
-        /// Defines object invariants used by the code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_producer != null);
-            Contract.Invariant(_aliveMessagesTimingInfo != null);
-            Contract.Invariant(_nonAliveMessagesTimingInfo != null);
-            Contract.Invariant(_systemAliveTimingInfo != null);
-        }
-
-
-        /// <summary>
         /// Updates the timing info in the provided dictionary
         /// </summary>
         /// <param name="dictionary">The <see cref="IReadOnlyDictionary{TKey,TValue}"/> to modify</param>
@@ -145,9 +131,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="message">The received <see cref="FeedMessage"/></param>
         private static void UpdateTimingInfo(IReadOnlyDictionary<MessageInterest, MessageTimingInfo> dictionary, MessageInterest interest, FeedMessage message)
         {
-            Contract.Requires(dictionary != null);
-            Contract.Requires(interest != null);
-            Contract.Requires(message != null);
+            Guard.Argument(dictionary, nameof(dictionary)).NotNull();
+            Guard.Argument(interest, nameof(interest)).NotNull();
+            Guard.Argument(message, nameof(message)).NotNull();
 
             MessageTimingInfo timingInfo;
             if (dictionary.TryGetValue(interest, out timingInfo))
@@ -160,10 +146,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 {
                     ExecutionLog.Error($"Message timing info for message type:{message.GetType().Name} and interest:{interest.Name} does not exist in this scope:{string.Join(",", dictionary.Keys)}.");
                 }
-                //else
-                //{
-                //    ExecutionLog.Debug($"Message timing info for message type:{message.GetType().Name} and interest:{interest.Name} does not exist in this scope:{string.Join(",", dictionary.Keys)}.");
-                //}
             }
         }
 
@@ -175,9 +157,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="message">The received <see cref="FeedMessage"/></param>
         private static void UpdateTimingInfoIfLatencyLower(IReadOnlyDictionary<MessageInterest, MessageTimingInfo> dictionary, MessageInterest interest, FeedMessage message)
         {
-            Contract.Requires(dictionary != null);
-            Contract.Requires(interest != null);
-            Contract.Requires(message != null);
+            Guard.Argument(dictionary, nameof(dictionary)).NotNull();
+            Guard.Argument(interest, nameof(interest)).NotNull();
+            Guard.Argument(message, nameof(message)).NotNull();
 
             MessageTimingInfo timingInfo;
             if (dictionary.TryGetValue(interest, out timingInfo))
@@ -255,7 +237,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             public DateTime GeneratedAt { get; private set; }
 
             /// <summary>
-            /// Gets <see cref="TimeSpan"/> specifying the latency between message generation and receival
+            /// Gets <see cref="TimeSpan"/> specifying the latency between message generation and receival 
             /// </summary>
             public TimeSpan Latency { get; private set; }
 

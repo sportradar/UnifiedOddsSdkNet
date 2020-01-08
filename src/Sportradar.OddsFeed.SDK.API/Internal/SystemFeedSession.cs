@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using System.Threading;
 using Common.Logging;
@@ -10,8 +10,7 @@ using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
-
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -93,30 +92,17 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             IFeedMessageValidator messageValidator,
             IMessageDataExtractor messageDataExtractor)
         {
-            Contract.Requires(globalEventDispatcher != null);
-            Contract.Requires(messageReceiver != null);
-            Contract.Requires(messageMapper != null);
-            Contract.Requires(messageValidator != null);
-            Contract.Requires(messageDataExtractor != null);
+            Guard.Argument(globalEventDispatcher, nameof(globalEventDispatcher)).NotNull();
+            Guard.Argument(messageReceiver, nameof(messageReceiver)).NotNull();
+            Guard.Argument(messageMapper, nameof(messageMapper)).NotNull();
+            Guard.Argument(messageValidator, nameof(messageValidator)).NotNull();
+            Guard.Argument(messageDataExtractor, nameof(messageDataExtractor)).NotNull();
 
             _globalEventDispatcher = globalEventDispatcher;
             _messageReceiver = messageReceiver;
             _messageValidator = messageValidator;
             _messageMapper = messageMapper;
             _messageDataExtractor = messageDataExtractor;
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_globalEventDispatcher != null);
-            Contract.Invariant(_messageReceiver != null);
-            Contract.Invariant(_messageValidator != null);
-            Contract.Invariant(_messageMapper != null);
-            Contract.Invariant(_messageDataExtractor != null);
         }
 
         /// <summary>
@@ -196,8 +182,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="eventName">The name of the event</param>
         private void Dispatch<T>(EventHandler<T> handler, T eventArgs, string eventName)
         {
-            Contract.Assume(_log != null);
-
             if (handler == null)
             {
                 _log.Warn($"No event listeners attached to event {eventName}.");
@@ -245,7 +229,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <summary>
         /// Opens the current instance
         /// </summary>
-        /// <exception cref="System.InvalidOperationException">Current FeedSystemSession is already opened</exception>
+        /// <exception cref="InvalidOperationException">Current FeedSystemSession is already opened</exception>
         public void Open()
         {
             if (Interlocked.CompareExchange(ref _isOpened, 1, 0) == 1)
@@ -261,7 +245,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <summary>
         /// Closes the current instance
         /// </summary>
-        /// <exception cref="System.InvalidOperationException">Current FeedSystemSession is already closed</exception>
+        /// <exception cref="InvalidOperationException">Current FeedSystemSession is already closed</exception>
         public void Close()
         {
             if (Interlocked.CompareExchange(ref _isOpened, 0, 1) == 0)
@@ -274,5 +258,3 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         }
     }
 }
-
-

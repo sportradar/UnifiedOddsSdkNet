@@ -3,7 +3,7 @@
 */
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
@@ -61,8 +61,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <param name="cultures">A culture of the current instance of <see cref="VenueCI"/></param>
         public Venue(VenueCI ci, IEnumerable<CultureInfo> cultures)
         {
-            Contract.Requires(ci != null);
-            Contract.Requires(cultures != null && cultures.Any());
+            Guard.Argument(ci, nameof(ci)).NotNull();
+            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
 
             var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
 

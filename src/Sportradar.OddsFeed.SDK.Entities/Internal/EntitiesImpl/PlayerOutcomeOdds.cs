@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST;
@@ -24,7 +24,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         private readonly int _teamFlag;
 
         /// <summary>
-        /// A <see cref="IMatch"/> representing the the match associated with the outcome / market
+        /// A <see cref="IMatch"/> representing the match associated with the outcome / market
         /// </summary>
         private readonly IMatch _match;
 
@@ -40,9 +40,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <param name="probabilities">the probabilities for the current <see cref="OutcomeOdds" /> instance</param>
         /// <param name="nameProvider">A <see cref="INameProvider"/> used to generate the outcome name(s)</param>
         /// <param name="mappingProvider">A <see cref="IMarketMappingProvider"/> instance used for providing mapping ids of markets and outcomes</param>
-        /// <param name="match">A <see cref="IMatch"/> representing the the match associated with the outcome / market</param>
+        /// <param name="match">A <see cref="IMatch"/> representing the match associated with the outcome / market</param>
         /// <param name="teamFlag">A value indicating whether the player is associated with home or away team - 1 : HomeTeam, 2 : AwayTeam</param>
         /// <param name="cultures">A <see cref="IEnumerable{CultureInfo}"/> specifying languages the current instance supports</param>
+        /// <param name="outcomeDefinition">The associated <see cref="IOutcomeDefinition"/></param>
+        /// <param name="additionalProbabilities">Additional probability attributes for markets which potentially will be (partly) refunded</param>
         internal PlayerOutcomeOdds(string id,
                                    bool? active,
                                    double odds,
@@ -51,11 +53,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                                    IMarketMappingProvider mappingProvider,
                                    IMatch match,
                                    int teamFlag,
-                                   IEnumerable<CultureInfo> cultures)
-            : base(id, active, odds, probabilities, nameProvider, mappingProvider, cultures)
+                                   IEnumerable<CultureInfo> cultures,
+                                   IOutcomeDefinition outcomeDefinition,
+                                   IAdditionalProbabilities additionalProbabilities)
+            : base(id, active, odds, probabilities, nameProvider, mappingProvider, cultures, outcomeDefinition, additionalProbabilities)
         {
-            Contract.Requires(match != null);
-            Contract.Requires(teamFlag >= 1 && teamFlag <= 2);
+            Guard.Argument(match, nameof(match)).NotNull();
+            Guard.Argument(teamFlag, nameof(teamFlag)).InRange(1, 2);
 
             _teamFlag = teamFlag;
             _match = match;

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
@@ -80,6 +80,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// </summary>
         /// <value>The tournament information for the season</value>
         public TournamentInfoDTO TournamentInfo { get; }
+
+        /// <summary>
+        /// Gets the <see cref="DateTime"/> specifying when the associated message was generated (on the server side)
+        /// </summary>
+        public DateTime? GeneratedAt { get; }
+
+        /// <summary>
+        /// Gets the <see cref="bool"/> specifying if the tournament is exhibition game
+        /// </summary>
+        public bool? ExhibitionGames { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TournamentInfoDTO"/> class
@@ -171,6 +181,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             Year = null;
 
             TournamentInfo = null;
+
+            ExhibitionGames = tournament.exhibition_gamesSpecified ? tournament.exhibition_games : (bool?) null;
         }
 
         /// <summary>
@@ -256,6 +268,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                         : new CurrentSeasonInfoDTO(tournament.tournament.current_season)
                 };
             }
+
+            GeneratedAt = tournament.generated_atSpecified ? tournament.generated_at : (DateTime?) null;
+
+            ExhibitionGames = tournament.tournament.exhibition_gamesSpecified
+                ? tournament.tournament.exhibition_games
+                : (bool?) null;
         }
 
         /// <summary>
@@ -376,7 +394,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                     id = fixture.Tournament?.Sport.Id.ToString(),
                     name = fixture.Tournament?.Sport.Name
                 }
-            }
+            },
+            status = fixture.StatusOnEvent
         })
         {
             TournamentCoverage = fixture.CoverageInfo == null
@@ -455,7 +474,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                         id = tournament.Sport.Id.ToString(),
                         name = tournament.Sport.Name
                     }
-                }
+                },
+                status = tournament.StatusOnEvent
             })
         {
             TournamentCoverage = tournament.TournamentCoverage;
@@ -485,6 +505,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                     : tournament.Year;
 
             TournamentInfo = tournament.TournamentInfo;
+
+            GeneratedAt = tournament.GeneratedAt;
+
+            ExhibitionGames = tournament.ExhibitionGames;
         }
 
         private static bool IsTournamentScheduleSpecified(tournament tournament, bool useStartTime)

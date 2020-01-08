@@ -3,13 +3,14 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.IO;
 using RabbitMQ.Client.Events;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
+
 // ReSharper disable UnusedMember.Local
 // ReSharper disable UnassignedGetOnlyAutoProperty
 // ReSharper disable UnusedMember.Global
@@ -26,9 +27,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
 
         public FakeRabbitMqChannel(IDataFetcher dataFetcher, IDeserializer<FeedMessage> deserializer, string dirPath)
         {
-            Contract.Requires(deserializer != null);
-            Contract.Requires(_dataFetcher != null);
-            Contract.Requires(!string.IsNullOrEmpty(dirPath));
+            Guard.Argument(deserializer, nameof(deserializer)).NotNull();
+            Guard.Argument(dataFetcher, nameof(dataFetcher)).NotNull();
+            Guard.Argument(dirPath, nameof(dirPath)).NotNull().NotEmpty();
 
             if (!Directory.Exists(dirPath))
             {

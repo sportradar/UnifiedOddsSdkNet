@@ -14,7 +14,7 @@ using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.Test.Shared
 {
@@ -40,6 +40,14 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         public static List<CultureInfo> Cultures => Cultures3;
         public static readonly List<CultureInfo> Cultures3 = new List<CultureInfo>(new[] { new CultureInfo("en"), new CultureInfo("de"), new CultureInfo("hu") });
         public static readonly List<CultureInfo> Cultures4 = new List<CultureInfo>(new[] { new CultureInfo("en"), new CultureInfo("de"), new CultureInfo("hu") , new CultureInfo("nl") });
+
+
+        public static readonly CultureInfo CultureNl = new CultureInfo("nl");
+
+        public const int CacheSportCount = 136;
+        public const int CacheCategoryCount = 391;
+        public const int CacheCategoryCountPlus = 408;
+        public const int CacheTournamentCount = 8455;
 
         public const string SdkTestLogRepositoryName = "SdkTestLogRepositoryName";
         public const ExceptionHandlingStrategy ThrowingStrategy = ExceptionHandlingStrategy.THROW;
@@ -73,8 +81,9 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                 Task.Run(async () =>
                          {
                              date = await ci.GetScheduledAsync();
-                             competitors = (await ci.GetCompetitorsAsync(checkCulture)).ToList();
-                             comp = competitors.FirstOrDefault();
+                             //competitors = (await ci.GetCompetitorsAsync(checkCulture)).ToList();
+                             // ReSharper disable once AssignNullToNotNullAttribute
+                             //comp = competitors.FirstOrDefault();
                              round = await ci.GetTournamentRoundAsync(checkCulture);
                              season = await ci.GetSeasonAsync(checkCulture);
                          }).GetAwaiter().GetResult();
@@ -82,8 +91,9 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                 Debug.Assert(date != null, "date != null");
                 Assert.AreEqual(new DateTime(2016, 08, 10), new DateTime(date.Value.Year, date.Value.Month, date.Value.Day));
 
-                Assert.AreEqual(2, competitors.Count);
+                //Assert.AreEqual(2, competitors.Count);
 
+                //TODO - this was removed
                 if (comp != null)
                 {
                     Assert.AreEqual("sr:competitor:66390", comp.Id.ToString());

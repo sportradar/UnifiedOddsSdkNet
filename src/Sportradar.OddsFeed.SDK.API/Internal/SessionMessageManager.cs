@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Threading.Tasks;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
@@ -12,7 +12,7 @@ using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 // ReSharper disable UnusedMember.Local
 
@@ -65,7 +65,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// </summary>
         public SessionMessageManager(IFeedMessageMapper messageMapper)
         {
-            Contract.Requires(messageMapper != null);
+            Guard.Argument(messageMapper, nameof(messageMapper)).NotNull();
 
             ProcessorId = Guid.NewGuid().ToString().Substring(0, 4);
 
@@ -90,7 +90,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             await Task.Run(() =>
             {
                 ReleaseMessagesFromStashedItem(stashedItem);
-            });
+            }).ConfigureAwait(false);
         }
 
         private void ReleaseMessagesFromStashedItem(StashedItem stashedItem)
@@ -120,6 +120,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="rawMessage">A raw message received from the feed</param>
         public void ProcessMessage(FeedMessage message, MessageInterest interest, byte[] rawMessage)
         {
+            Guard.Argument(message, nameof(message)).NotNull();
+            Guard.Argument(interest, nameof(interest)).NotNull();
+
             var alive = message as alive;
             if (alive != null)
             {
@@ -144,6 +147,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="requestId">The request identifier</param>
         public void StashMessages(IProducer producer, long requestId)
         {
+            Guard.Argument(producer, nameof(producer)).NotNull();
+
             var stashedItem = GetStashedItem(producer.Id);
             if (stashedItem != null)
             {
@@ -160,6 +165,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="requestId">The request identifier</param>
         public void ReleaseMessages(IProducer producer, long requestId)
         {
+            Guard.Argument(producer, nameof(producer)).NotNull();
+
             ReleaseMessagesTask(producer, requestId).ConfigureAwait(false);
         }
 

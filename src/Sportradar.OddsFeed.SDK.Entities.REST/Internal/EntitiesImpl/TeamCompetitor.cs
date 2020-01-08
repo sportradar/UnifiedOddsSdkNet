@@ -14,7 +14,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// </summary>
     /// <seealso cref="Competitor" />
     /// <seealso cref="ITeamCompetitor" />
-    internal class TeamCompetitor : Competitor, ITeamCompetitor
+    internal class TeamCompetitor : Competitor, ITeamCompetitorV1
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TeamCompetitor"/> class
@@ -31,6 +31,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                               ICompetitionCI rootCompetitionCI)
             : base(ci, profileCache, culture, sportEntityFactory, rootCompetitionCI)
         {
+            Division = ci.Division;
         }
 
         /// <summary>
@@ -46,12 +47,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         }
 
         /// <summary>
+        /// Gets the division
+        /// </summary>
+        public int? Division { get; }
+
+        /// <summary>
         /// Constructs and return a <see cref="string"/> containing details of the current instance
         /// </summary>
         /// <returns>A <see cref="string"/> containing details of the current instance.</returns>
         protected override string PrintF()
         {
-            var res = base.PrintF() + $", Qualifier={Qualifier}";
+            var res = base.PrintF() + $", Qualifier={Qualifier}, Division={Division}";
             return res;
         }
 

@@ -1,8 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Diagnostics.Contracts;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Dawn;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
@@ -19,9 +19,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         internal OutcomeDescriptionDTO(desc_outcomesOutcome outcome)
         {
-            Contract.Requires(outcome != null);
-            Contract.Requires(!string.IsNullOrEmpty(outcome.id));
-            Contract.Requires(!string.IsNullOrEmpty(outcome.name));
+            Guard.Argument(outcome, nameof(outcome)).NotNull();
+            Guard.Argument(outcome.id, nameof(outcome.id)).NotNull().NotEmpty();
+            Guard.Argument(outcome.name, nameof(outcome.name)).NotNull().NotEmpty();
 
             Id = outcome.id;
             Name = outcome.name;
@@ -30,9 +30,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         internal OutcomeDescriptionDTO(desc_variant_outcomesOutcome outcome)
         {
-            Contract.Requires(outcome != null);
-            Contract.Requires(!string.IsNullOrEmpty(outcome.id));
-            Contract.Requires(!string.IsNullOrEmpty(outcome.name));
+            Guard.Argument(outcome, nameof(outcome)).NotNull();
+            Guard.Argument(outcome.id, nameof(outcome.id)).NotNull().NotEmpty();
+            Guard.Argument(outcome.name, nameof(outcome.name)).NotNull().NotEmpty();
 
             Id = outcome.id;
             Name = outcome.name;

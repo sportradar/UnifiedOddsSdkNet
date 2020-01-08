@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.API;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
@@ -54,7 +54,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Example
             var seasonDispatcher = session.CreateSportSpecificMessageDispatcher<ISeason>();
 
             _log.Info("Creating event processors");
-            var defaultEventsProcessor = new EntityProcessor(session);
+            var defaultEventsProcessor = new EntityProcessor<ISportEvent>(session);
             var matchEventsProcessor = new SpecificEntityProcessor<IMatch>(_log, matchDispatcher);
             var stageEventsProcessor = new SpecificEntityProcessor<IStage>(_log, stageDispatcher);
             var tournamentEventsProcessor = new SpecificEntityProcessor<ITournament>(_log, tournamentDispatcher);
@@ -97,7 +97,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Example
         /// <param name="oddsFeed">A <see cref="IOddsFeed"/> instance </param>
         private void AttachToFeedEvents(IOddsFeed oddsFeed)
         {
-            Contract.Requires(oddsFeed != null);
+            Guard.Argument(oddsFeed, nameof(oddsFeed)).NotNull();
 
             _log.Info("Attaching to feed events");
             oddsFeed.ProducerUp += OnProducerUp;
@@ -112,7 +112,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Example
         /// <param name="oddsFeed">A <see cref="IOddsFeed"/> instance</param>
         private void DetachFromFeedEvents(IOddsFeed oddsFeed)
         {
-            Contract.Requires(oddsFeed != null);
+            Guard.Argument(oddsFeed, nameof(oddsFeed)).NotNull();
 
             _log.Info("Detaching from feed events");
             oddsFeed.ProducerUp -= OnProducerUp;
@@ -132,7 +132,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Example
         }
 
         /// <summary>
-        /// Invoked when the the feed is closed
+        /// Invoked when the feed is closed
         /// </summary>
         /// <param name="sender">The instance raising the event</param>
         /// <param name="e">The event arguments</param>

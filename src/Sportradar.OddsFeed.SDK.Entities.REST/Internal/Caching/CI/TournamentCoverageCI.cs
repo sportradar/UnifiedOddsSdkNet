@@ -1,7 +1,11 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Diagnostics.Contracts;
+
+using System;
+using Dawn;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
@@ -23,9 +27,35 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="tournamentCoverage">The tournament coverage.</param>
         internal TournamentCoverageCI(TournamentCoverageDTO tournamentCoverage)
         {
-            Contract.Requires(tournamentCoverage != null);
+            Guard.Argument(tournamentCoverage, nameof(tournamentCoverage)).NotNull();
 
             LiveCoverage = tournamentCoverage.LiveCoverage;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TournamentCoverageCI"/> class.
+        /// </summary>
+        /// <param name="exportable">The tournament coverage.</param>
+        internal TournamentCoverageCI(ExportableTournamentCoverageCI exportable)
+        {
+            if (exportable == null)
+            {
+                throw new ArgumentNullException(nameof(exportable));
+            }
+
+            LiveCoverage = exportable.LiveCoverage;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableTournamentCoverageCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportableTournamentCoverageCI
+            {
+                LiveCoverage = LiveCoverage
+            });
         }
     }
 }

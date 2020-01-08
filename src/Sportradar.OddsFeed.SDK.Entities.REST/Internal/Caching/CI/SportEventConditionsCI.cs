@@ -1,10 +1,14 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
 
@@ -48,10 +52,26 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the sport event conditions</param>
         internal SportEventConditionsCI(SportEventConditionsDTO dto, CultureInfo culture)
         {
-            Contract.Requires(dto != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(dto, nameof(dto)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             Merge(dto, culture);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SportEventConditions"/> class
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableSportEventConditionsCI"/> used to create new instance</param>
+        internal SportEventConditionsCI(ExportableSportEventConditionsCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            Attendance = exportable.Attendance;
+            EventMode = exportable.EventMode;
+            Referee = exportable.Referee != null ? new RefereeCI(exportable.Referee) : null;
+            WeatherInfo = exportable.WeatherInfo != null ? new WeatherInfoCI(exportable.WeatherInfo) : null;
+            Pitchers = exportable.Pitchers?.Select(p => new PitcherCI(p)).ToList();
         }
 
         /// <summary>
@@ -61,8 +81,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the sport event conditions</param>
         internal void Merge(SportEventConditionsDTO dto, CultureInfo culture)
         {
-            Contract.Requires(dto != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(dto, nameof(dto)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             Attendance = dto.Attendance;
             EventMode = dto.EventMode;
@@ -87,6 +107,24 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             {
                 Pitchers = dto.Pitchers.Select(s => new PitcherCI(s, culture));
             }
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public async Task<ExportableSportEventConditionsCI> ExportAsync()
+        {
+            var pitcherTasks = Pitchers?.Select(async p => await p.ExportAsync().ConfigureAwait(false));
+
+            return new ExportableSportEventConditionsCI
+            {
+                Attendance = Attendance,
+                EventMode = EventMode,
+                Referee = Referee != null ? await Referee.ExportAsync().ConfigureAwait(false) : null,
+                WeatherInfo = WeatherInfo != null ? await WeatherInfo.ExportAsync().ConfigureAwait(false) as ExportableWeatherInfoCI : null,
+                Pitchers = pitcherTasks != null ? await Task.WhenAll(pitcherTasks) : null
+            };
         }
     }
 }

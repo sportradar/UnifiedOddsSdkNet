@@ -1,9 +1,13 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
@@ -81,6 +85,23 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ProductInfo"/> class.
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableProductInfoCI" /> representing the current item</param>
+        public ProductInfo(ExportableProductInfoCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            _isAutoTraded = exportable.IsAutoTraded;
+            _isInHostedStatistics = exportable.IsInHostedStatistics;
+            _isInLiveCenterSoccer = exportable.IsInLiveCenterSoccer;
+            _isInLiveScore = exportable.IsInLiveScore;
+            _links = exportable.Links?.Select(l => new ProductInfoLink(l)).ToList();
+            _channels = exportable.Channels?.Select(c => new StreamingChannel(c)).ToList();
+        }
+
+        /// <summary>
         /// TODO: Add comments
         /// </summary>
         /// <value><c>true</c> if this instance is automatic traded; otherwise, <c>false</c>.</value>
@@ -133,6 +154,26 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         protected override string PrintJ()
         {
             return PrintJ(GetType(), this);
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public async Task<ExportableProductInfoCI> ExportAsync()
+        {
+            var linkTasks = _links?.Select(async l => await ((ProductInfoLink) l).ExportAsync().ConfigureAwait(false));
+            var channeltasks = _channels?.Select(async c => await ((StreamingChannel) c).ExportAsync().ConfigureAwait(false));
+
+            return new ExportableProductInfoCI
+            {
+                IsInLiveCenterSoccer = _isInLiveCenterSoccer,
+                IsAutoTraded = _isAutoTraded,
+                IsInHostedStatistics = _isInHostedStatistics,
+                Links = linkTasks != null ? await Task.WhenAll(linkTasks) : null,
+                Channels = channeltasks != null ? await Task.WhenAll(channeltasks) : null,
+                IsInLiveScore = _isInLiveScore
+            };
         }
     }
 }

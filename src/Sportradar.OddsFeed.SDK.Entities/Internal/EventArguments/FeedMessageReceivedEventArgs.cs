@@ -2,8 +2,8 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Dawn;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments
 {
@@ -36,7 +36,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments
         /// <param name="rawMessage">The raw message</param>
         public FeedMessageReceivedEventArgs(FeedMessage message, MessageInterest interest, byte[] rawMessage)
         {
-            Contract.Requires(message != null);
+            Guard.Argument(message, nameof(message)).NotNull();
 
             Message = message;
             Interest = interest;

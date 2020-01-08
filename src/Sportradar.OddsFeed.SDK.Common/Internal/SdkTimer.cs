@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 using Timer = System.Threading.Timer;
 
 namespace Sportradar.OddsFeed.SDK.Common.Internal
@@ -44,25 +44,13 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <param name="period">A <see cref="TimeSpan"/> specifying a period between subsequent raises of the <see cref="Elapsed"/> event.</param>
         public SdkTimer(TimeSpan dueTime, TimeSpan period)
         {
-//            Contract.Requires(dueTime >= TimeSpan.Zero);
-//            Contract.Requires(period > TimeSpan.Zero);
-            Contract.Ensures(_timer != null);
+            Guard.Argument(dueTime, nameof(dueTime)).Require(dueTime >= TimeSpan.Zero);
+            Guard.Argument(period, nameof(period)).Require(period > TimeSpan.Zero);
             // Create the timer which is stopped - pass -1 for dueTime and period
 
             _dueTime = dueTime;
             _period = period;
             _timer = new Timer(OnTick, null, -1, -1);
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_timer != null);
-            Contract.Invariant(_dueTime >= TimeSpan.Zero);
-            Contract.Invariant(_period > TimeSpan.Zero);
         }
 
         /// <summary>
@@ -121,10 +109,13 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <param name="period">A <see cref="TimeSpan"/> specifying a period between subsequent raises of the <see cref="Elapsed"/> event.</param>
         public void Start(TimeSpan dueTime, TimeSpan period)
         {
+            Guard.Argument(dueTime, nameof(dueTime)).Require(dueTime >= TimeSpan.Zero);
+            Guard.Argument(period, nameof(period)).Require(period > TimeSpan.Zero);
+
             _dueTime = dueTime;
             _period = period;
 
-            _timer.Change(_dueTime, _period);
+            _timer?.Change(_dueTime, _period);
         }
 
         /// <summary>
@@ -134,7 +125,9 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <param name="dueTime">The due time.</param>
         public void FireOnce(TimeSpan dueTime)
         {
-            _timer.Change(dueTime, TimeSpan.FromMilliseconds(-1));
+            Guard.Argument(dueTime, nameof(dueTime)).Require(dueTime >= TimeSpan.Zero);
+
+            _timer?.Change(dueTime, TimeSpan.FromMilliseconds(-1));
         }
 
         /// <summary>
@@ -143,13 +136,16 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// </summary>
         public void Stop()
         {
-            _timer.Change(-1, -1);
+            if (!_isDisposed)
+            {
+                _timer?.Change(-1, -1);
+            }
         }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         public void Dispose()
         {
             Dispose(true);

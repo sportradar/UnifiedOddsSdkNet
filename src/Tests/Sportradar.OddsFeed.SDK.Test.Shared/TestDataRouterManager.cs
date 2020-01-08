@@ -3,12 +3,14 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST;
+using Sportradar.OddsFeed.SDK.Entities.REST.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
@@ -16,13 +18,17 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping.Lottery;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.EventArguments;
+using Sportradar.OddsFeed.SDK.Messages.REST;
+
 // ReSharper disable UnusedMember.Local
 
 namespace Sportradar.OddsFeed.SDK.Test.Shared
 {
     public class TestDataRouterManager : IDataRouterManager
     {
+        public event EventHandler<RawApiDataEventArgs> RawApiDataReceived;
+
         private static readonly string DirPath = Directory.GetCurrentDirectory() + @"\REST XMLs\";
 
         private const string FixtureXml = "fixtures.{culture}.xml";
@@ -50,7 +56,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         internal TestDataRouterManager(ICacheManager cacheManager)
         {
-            Contract.Requires(cacheManager != null);
+            Guard.Argument(cacheManager, nameof(cacheManager)).NotNull();
 
             _cacheManager = cacheManager;
             RestCalls = new Dictionary<string, int>();
@@ -461,6 +467,44 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             }
 
             return null;
+        }
+
+        public Task<IAvailableSelections> GetAvailableSelectionsAsync(URN id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ICalculation> CalculateProbability(IEnumerable<ISelection> selections)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<IFixtureChange>> GetFixtureChangesAsync(CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Gets the list of almost all events we are offering prematch odds for.
+        /// </summary>
+        /// <param name="startIndex">Starting record (this is an index, not time)</param>
+        /// <param name="limit">How many records to return (max: 1000)</param>
+        /// <param name="culture">The culture</param>
+        /// <returns>The list of the sport event ids with the sportId it belongs to</returns>
+        public Task<IEnumerable<Tuple<URN, URN>>> GetListOfSportEventsAsync(int startIndex, int limit, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Gets the list of all the available tournaments for a specific sport
+        /// </summary>
+        /// <param name="sportId">The specific sport id</param>
+        /// <param name="culture">The culture</param>
+        /// <returns>The list of the available tournament ids with the sportId it belongs to</returns>
+        public Task<IEnumerable<Tuple<URN, URN>>> GetSportAvailableTournamentsAsync(URN sportId, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

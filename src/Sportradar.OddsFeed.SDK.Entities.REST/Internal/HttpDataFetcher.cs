@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -60,12 +60,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="saveResponseHeader">Indicates if the response header should be obtained</param>
         public HttpDataFetcher(HttpClient client, string accessToken, IDeserializer<response> responseDeserializer, int connectionFailureLimit = 5, int connectionFailureTimeout = 15, bool saveResponseHeader = true)
         {
-            Contract.Requires(client != null);
-            Contract.Requires(client.DefaultRequestHeaders != null);
-            Contract.Requires(!string.IsNullOrWhiteSpace(accessToken));
-            Contract.Requires(connectionFailureLimit >= 1);
-            Contract.Requires(connectionFailureTimeout >= 1);
-            Contract.Requires(responseDeserializer != null);
+            Guard.Argument(client, nameof(client)).NotNull();
+            Guard.Argument(client.DefaultRequestHeaders, nameof(client.DefaultRequestHeaders)).NotNull();
+            Guard.Argument(accessToken, nameof(accessToken)).NotNull().NotEmpty();
+            Guard.Argument(connectionFailureLimit, nameof(connectionFailureLimit)).Positive();
+            Guard.Argument(connectionFailureTimeout, nameof(connectionFailureTimeout)).Positive();
+            Guard.Argument(responseDeserializer, nameof(responseDeserializer)).NotNull();
 
             _client = client;
             if (!_client.DefaultRequestHeaders.Contains("x-access-token"))
@@ -92,7 +92,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             var responseMessage = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
             try
             {
-                responseMessage = await _client.GetAsync(uri);
+                responseMessage = await _client.GetAsync(uri).ConfigureAwait(false);
                 RecordSuccess();
                 if (!responseMessage.IsSuccessStatusCode)
                 {
@@ -127,7 +127,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                     }
                     ResponseHeaders = responseHeaders;
                 }
-                return await responseMessage.Content.ReadAsStreamAsync();
+                return await responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -217,7 +217,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             var responseMessage = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
             try
             {
-                responseMessage = await _client.PostAsync(uri, content ?? new StringContent(string.Empty));
+                responseMessage = await _client.PostAsync(uri, content ?? new StringContent(string.Empty)).ConfigureAwait(false);
                 RecordSuccess();
 
                 if (_saveResponseHeaders)

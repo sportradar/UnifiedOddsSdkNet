@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
@@ -15,7 +15,9 @@ using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Common.Internal.Metrics;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
@@ -28,7 +30,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
     /// A implementation of the interface <see cref="ISportEventCache"/>
     /// </summary>
     /// <seealso cref="ISportEventCache" />
-    internal class SportEventCache : SdkCache, ISportEventCache, IHealthStatusProvider, IDisposable
+    internal class SportEventCache : SdkCache, ISportEventCache, IHealthStatusProvider, IDisposable, IExportableSdkCache
     {
         /// <summary>
         /// A <see cref="ILog"/> instance used for logging
@@ -97,11 +99,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                                ICacheManager cacheManager)
             : base(cacheManager)
         {
-            Contract.Requires(cache != null);
-            Contract.Requires(dataRouterManager != null);
-            Contract.Requires(sportEventCacheItemFactory != null);
-            Contract.Requires(timer != null);
-            Contract.Requires(cultures.Any());
+            Guard.Argument(cache, nameof(cache)).NotNull();
+            Guard.Argument(dataRouterManager, nameof(dataRouterManager)).NotNull();
+            Guard.Argument(sportEventCacheItemFactory, nameof(sportEventCacheItemFactory)).NotNull();
+            Guard.Argument(timer, nameof(timer)).NotNull();
+            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
 
             Cache = cache;
             _dataRouterManager = dataRouterManager;
@@ -117,18 +119,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             _timer = timer;
             _timer.Elapsed += OnTimerElapsed;
             _timer.Start();
-        }
-
-        /// <summary>
-        /// Defines object invariants as required by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(Cache != null);
-            Contract.Invariant(_dataRouterManager != null);
-            Contract.Invariant(_sportEventCacheItemFactory != null);
-            Contract.Invariant(SpecialTournaments != null);
         }
 
         /// <summary>
@@ -158,7 +148,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             }
 
             if (!datesToFetch.Any())
+            {
                 return;
+            }
 
             var culturesToFetch = _cultures.ToDictionary(ci => ci, ci => datesToFetch);
 
@@ -204,7 +196,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <returns>A <see cref="Task" /> representing the retrieval operation</returns>
         private async Task GetScheduleAsync(DateTime date, CultureInfo culture)
         {
-            Contract.Requires(date != null && date > DateTime.MinValue);
+            Guard.Argument(date, nameof(date)).Require(date > DateTime.MinValue);
 
             Metric.Context("CACHE").Meter("SportEventCache->GetScheduleAsync", Unit.Calls);
 
@@ -256,15 +248,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// Asynchronous gets a <see cref="IEnumerable{URN}"/> containing id's of sport events, which belong to the specified tournament
         /// </summary>
         /// <param name="tournamentId">A <see cref="URN"/> representing the tournament identifier</param>
+        /// <param name="culture">The culture to fetch the data</param>
         /// <returns>A <see cref="Task{T}"/> representing an asynchronous operation</returns>
-        public async Task<IEnumerable<Tuple<URN, URN>>> GetEventIdsAsync(URN tournamentId)
+        public async Task<IEnumerable<Tuple<URN, URN>>> GetEventIdsAsync(URN tournamentId, CultureInfo culture)
         {
             Metric.Context("CACHE").Meter("SportEventCache->GetEventIdsAsync by tournamentId", Unit.Calls);
 
-            Contract.Assume(_cultures.Any());
-
-            var ci = _cultures.FirstOrDefault();
-            Contract.Assume(ci != null);
+            var ci = culture ?? _cultures.FirstOrDefault();
 
             var schedule = await _dataRouterManager.GetSportEventsForTournamentAsync(tournamentId, ci, null).ConfigureAwait(false);
 
@@ -291,19 +281,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// Asynchronous gets a <see cref="IEnumerable{URN}"/> containing id's of sport events, which are scheduled for specified date
         /// </summary>
         /// <param name="date">The date for which to retrieve the schedule, or a null reference to get currently live events</param>
+        /// <param name="culture">The culture to fetch the data</param>
         /// <returns>A <see cref="Task{T}"/> representing an asynchronous operation</returns>
-        public async Task<IEnumerable<Tuple<URN, URN>>> GetEventIdsAsync(DateTime? date)
+        public async Task<IEnumerable<Tuple<URN, URN>>> GetEventIdsAsync(DateTime? date, CultureInfo culture)
         {
             Metric.Context("CACHE").Meter("SportEventCache->GetEventIdsAsync by date", Unit.Calls);
 
-            Contract.Assume(_cultures.Any());
-
-            var culture = _cultures.FirstOrDefault();
-            Contract.Assume(culture != null);
+            var ci = culture ?? _cultures.FirstOrDefault();
 
             var schedule = date == null
-                ? await _dataRouterManager.GetLiveSportEventsAsync(culture).ConfigureAwait(false)
-                : await _dataRouterManager.GetSportEventsForDateAsync(date.Value, culture).ConfigureAwait(false);
+                ? await _dataRouterManager.GetLiveSportEventsAsync(ci).ConfigureAwait(false)
+                : await _dataRouterManager.GetSportEventsForDateAsync(date.Value, ci).ConfigureAwait(false);
 
             return schedule;
         }
@@ -318,6 +306,81 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             cache.Set(id.ToString(), id, DateTimeOffset.Now.AddMinutes(2));
         }
 
+        /// <summary>
+        /// Asynchronously gets a list of active <see cref="IEnumerable{TournamentInfoCI}"/>
+        /// </summary>
+        /// <remarks>Lists all <see cref="TournamentInfoCI"/> that are cached (once schedule is loaded)</remarks>
+        /// <param name="culture">A <see cref="CultureInfo"/> specifying the language or a null reference to use the languages specified in the configuration</param>
+        /// <returns>A <see cref="Task{T}"/> representing the async operation</returns>
+        public Task<IEnumerable<TournamentInfoCI>> GetActiveTournamentsAsync(CultureInfo culture = null)
+        {
+            OnTimerElapsed(null, null); // this can be async
+            var tourKeys = Cache.Select(s => s.Key).Where(w => w.Contains("tournament") || w.Contains("stage") || w.Contains("outright"));
+
+            var tours = new List<TournamentInfoCI>();
+            var error = string.Empty;
+            foreach (var key in tourKeys)
+            {
+                try
+                {
+                    tours.Add((TournamentInfoCI) _sportEventCacheItemFactory.Get(Cache.Get(key)));
+                }
+                catch (Exception)
+                {
+                    error += $",{key}";
+                }
+            }
+            if (!string.IsNullOrEmpty(error))
+            {
+                error = error.Substring(1);
+            }
+            ExecutionLog.Debug($"Found {tours.Count} tournaments. Errors: {error}");
+
+            return Task.FromResult<IEnumerable<TournamentInfoCI>>(tours);
+        }
+
+        /// <summary>
+        /// Deletes the sport events from cache which are scheduled before specific DateTime
+        /// </summary>
+        /// <param name="before">The scheduled DateTime used to delete sport events from cache</param>
+        /// <returns>Number of deleted items</returns>
+        public int DeleteSportEventsFromCache(DateTime before)
+        {
+            lock (_addLock)
+            {
+                var startCount = Cache.Count();
+                foreach (var keyValuePair in Cache)
+                {
+                    try
+                    {
+
+                        var ci = (SportEventCI) keyValuePair.Value;
+                        if (ci.Scheduled != null)
+                        {
+                            if (ci.Scheduled < before)
+                            {
+                                Cache.Remove(keyValuePair.Key);
+                            }
+                        }
+                        else if (ci.ScheduledEnd != null)
+                        {
+                            if (ci.ScheduledEnd < before)
+                            {
+                                Cache.Remove(keyValuePair.Key);
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
+                }
+                var endCount = Cache.Count();
+                ExecutionLog.Info($"Deleted {startCount - endCount} items from cache.");
+                return startCount - endCount;
+            }
+        }
+
         private void CacheItemRemovedCallback(CacheEntryRemovedArguments arguments)
         {
             if (arguments?.CacheItem == null)
@@ -325,7 +388,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 return;
             }
 
-            if (arguments.RemovedReason != CacheEntryRemovedReason.CacheSpecificEviction)
+            if (arguments.RemovedReason != CacheEntryRemovedReason.CacheSpecificEviction && arguments.RemovedReason != CacheEntryRemovedReason.Removed)
             {
                 CacheLog.Debug($"SportEventCI {arguments.CacheItem.Key} removed from cache. Reason={arguments.RemovedReason}.");
             }
@@ -451,16 +514,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     }
                     break;
                 case DtoType.SportEventStatus:
-                    var statusDTO = item as SportEventStatusDTO;
-                    if (statusDTO != null)
-                    {
-                        AddSportEventStatus(id, statusDTO);
-                        saved = true;
-                    }
-                    else
-                    {
-                        LogSavingDtoConflict(id, typeof(SportEventStatusDTO), item.GetType());
-                    }
                     break;
                 case DtoType.SportEventSummary:
                     var tourInfo = item as TournamentInfoDTO;
@@ -611,6 +664,23 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     break;
                 case DtoType.SportCategories:
                     break;
+                case DtoType.AvailableSelections:
+                    break;
+                case DtoType.TournamentInfoList:
+                    var ts = item as EntityList<TournamentInfoDTO>;
+                    if (ts != null)
+                    {
+                        foreach (var t1 in ts.Items)
+                        {
+                            AddSportEvent(id, t1, culture, requester, dtoType);
+                        }
+                        saved = true;
+                    }
+                    else
+                    {
+                        LogSavingDtoConflict(id, typeof(EntityList<TournamentDTO>), item.GetType());
+                    }
+                    break;
                 default:
                     ExecutionLog.Warn($"Trying to add unchecked dto type:{dtoType} for id: {id}.");
                     break;
@@ -640,7 +710,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                                      DtoType.LotteryDraw,
                                      DtoType.LotteryList,
                                      DtoType.BookingStatus,
-                                     DtoType.SportEventStatus
+                                     DtoType.TournamentInfoList
                                  };
         }
 
@@ -687,7 +757,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// </summary>
         public void RegisterHealthCheck()
         {
-            HealthChecks.RegisterHealthCheck("SportEventCache", new Func<HealthCheckResult>(StartHealthCheck));
+            HealthChecks.RegisterHealthCheck("SportEventCache", StartHealthCheck);
         }
 
         /// <summary>
@@ -749,7 +819,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             if (secondId != null && !Equals(tournamentDto.Id, secondId))
             {
                 var tourInfoDto = new TournamentInfoDTO(tournamentDto);
-                var newTournamentDto = new TournamentInfoDTO(tourInfoDto, tourInfoDto.Season != null, tourInfoDto.CurrentSeason != null);
+                var newTournamentDto = new TournamentInfoDTO(tourInfoDto, tourInfoDto.Season != null, tourInfoDto.CurrentSeason!= null);
                 CacheAddDtoItem(secondId, newTournamentDto, culture, DtoType.TournamentInfo, null);
             }
         }
@@ -760,7 +830,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
 
             if (secondId != null && !Equals(tournamentDto.Id, secondId))
             {
-                var newTournamentDto = new TournamentInfoDTO(tournamentDto, tournamentDto.Season != null, tournamentDto.CurrentSeason != null);
+                var newTournamentDto = new TournamentInfoDTO(tournamentDto, tournamentDto.Season != null, tournamentDto.CurrentSeason!= null);
                 CacheAddDtoItem(secondId, newTournamentDto, culture, DtoType.TournamentInfo, null);
             }
         }
@@ -980,7 +1050,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                             var tInfo = item as TournamentInfoDTO;
                             if (tInfo != null)
                             {
-                                var newTournamentDto = new TournamentInfoDTO(tInfo, tInfo.Season != null, tInfo.CurrentSeason != null);
+                                var newTournamentDto = new TournamentInfoDTO(tInfo, tInfo.Season != null, tInfo.CurrentSeason!= null);
                                 var ci2 = _sportEventCacheItemFactory.Build(newTournamentDto, culture);
                                 AddNewCacheItem(ci2);
                             }
@@ -1046,32 +1116,74 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             matchCI?.MergeTimeline(item, culture, true);
         }
 
-        private void AddSportEventStatus(URN id, SportEventStatusDTO item)
+        private void AddNewCacheItem(SportEventCI item)
+        {
+            Cache.Add(item.Id.ToString(), item, new CacheItemPolicy { RemovedCallback = CacheItemRemovedCallback });
+        }
+
+        /// <summary>
+        /// Exports current items in the cache
+        /// </summary>
+        /// <returns>Collection of <see cref="ExportableCI"/> containing all the items currently in the cache</returns>
+        public async Task<IEnumerable<ExportableCI>> ExportAsync()
+        {
+            IEnumerable<IExportableCI> exportables;
+            lock (_addLock)
+            {
+                exportables = Cache.ToList().Select(i => (IExportableCI) i.Value);
+            }
+
+            var tasks = exportables.Select(e =>
+            {
+                var task = e.ExportAsync();
+                task.ConfigureAwait(false);
+                return task;
+            });
+
+            return await Task.WhenAll(tasks).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Imports provided items into the cache
+        /// </summary>
+        /// <param name="items">Collection of <see cref="ExportableCI"/> to be inserted into the cache</param>
+        public async Task ImportAsync(IEnumerable<ExportableCI> items)
         {
             lock (_addLock)
             {
-                try
+                foreach (var exportable in items)
                 {
-                    var cacheItem = _sportEventCacheItemFactory.Get(Cache.Get(id.ToString()));
-                    if (cacheItem != null)
-                    {
-                        var competitionCI = cacheItem as CompetitionCI;
-                        if (competitionCI != null)
-                        {
-                            competitionCI.EventStatus = item.Status;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ExecutionLog.Error($"Error adding sportEventStatus for id={id}.", ex);
+                    if (exportable is ExportableSportEventCI)
+                        AddNewCacheItem(_sportEventCacheItemFactory.Build(exportable));
                 }
             }
         }
 
-        private void AddNewCacheItem(SportEventCI item)
+        /// <summary>
+        /// Returns current cache status
+        /// </summary>
+        /// <returns>A <see cref="IReadOnlyDictionary{K, V}"/> containing all cache item types in the cache and their counts</returns>
+        public IReadOnlyDictionary<string, int> CacheStatus()
         {
-            Cache.Add(item.Id.ToString(), item, new CacheItemPolicy { RemovedCallback = CacheItemRemovedCallback });
+            var types = new[] {
+                typeof(SportEventCI), typeof(CompetitionCI), typeof(DrawCI), typeof(LotteryCI),
+                typeof(TournamentInfoCI), typeof(MatchCI), typeof(StageCI)
+            };
+
+            List<KeyValuePair<string, object>> items;
+            lock (_addLock)
+            {
+                items = Cache.ToList();
+            }
+
+            var status = items.GroupBy(i => i.Value.GetType().Name).ToDictionary(g => g.Key, g => g.Count());
+
+            foreach (var type in types.Select(t => t.Name))
+            {
+                if (!status.ContainsKey(type))
+                    status[type] = 0;
+            }
+            return status;
         }
     }
 }

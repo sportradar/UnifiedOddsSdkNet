@@ -10,7 +10,7 @@ using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 using Sportradar.OddsFeed.SDK.Test.Shared;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
@@ -172,6 +172,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 assertHelper.AreEqual(() => m.Abbreviation, c.abbreviation);
                 assertHelper.AreEqual(() => m.CountryName, c.country);
                 assertHelper.AreEqual(() => m.IsVirtual, c.virtualSpecified && c.@virtual);
+
+                if (c.divisionSpecified)
+                {
+                    assertHelper.AreEqual(() => m.Division.Value, c.division);
+                }
+                else
+                {
+                    assertHelper.AreEqual(() => m.Division.HasValue, false);
+                }
             }
         }
     }

@@ -119,12 +119,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             Assert.IsNotNull(sport);
             Assert.IsNotNull(tournamentCoverage);
-            Assert.IsNull(competitors);
+            Assert.IsNotNull(competitors);
             Assert.IsNotNull(round);
             Assert.IsNotNull(groups);
             var enumerable = groups.ToList();
             Assert.IsTrue(enumerable.Any());
             Assert.AreEqual(20, enumerable.First().Competitors.Count());
+            Assert.AreEqual(20, competitors.Count());
             Assert.IsNotNull(schedule);
             Assert.AreEqual(241, schedule.Count());
             Assert.IsNull(seasonCoverage);
@@ -169,7 +170,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
                 for (var i = -1; i < 3; i++)
                 {
-                    tasks.Add(_sef.SportEventCache.GetEventIdsAsync(DateTime.Now.AddDays(i)));
+                    tasks.Add(_sef.SportEventCache.GetEventIdsAsync(DateTime.Now.AddDays(i), TestData.Culture));
                 }
 
                 IEnumerable<IEnumerable<Tuple<URN, URN>>> results = null;

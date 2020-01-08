@@ -2,10 +2,13 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
+using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 {
@@ -33,11 +36,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         internal RefereeCI(RefereeDTO referee, CultureInfo culture)
             : base(referee)
         {
-            Contract.Requires(referee != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(referee, nameof(referee)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             _nationality = new Dictionary<CultureInfo, string>();
             Merge(referee, culture);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RefereeCI"/> class.
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableRefereeCI"/> containing information about the referee</param>
+        internal RefereeCI(ExportableRefereeCI exportable)
+            : base(URN.Parse(exportable.Id))
+        {
+            _nationality = new Dictionary<CultureInfo, string>(exportable.Nationality);
+            Name = exportable.Name;
         }
 
         /// <summary>
@@ -47,7 +61,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <returns>The nationality of the referee in the specified language.</returns>
         internal string GetNationality(CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             return _nationality.ContainsKey(culture)
                 ? _nationality[culture]
@@ -61,8 +75,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the referee info.</param>
         internal void Merge(RefereeDTO referee, CultureInfo culture)
         {
-            Contract.Requires(referee != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(referee, nameof(referee)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             Name = referee.Name;
             _nationality[culture] = referee.Nationality;
@@ -76,6 +90,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public bool HasTranslationsFor(IEnumerable<CultureInfo> cultures)
         {
             return cultures.All(c => _nationality.ContainsKey(c));
+        }
+
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableRefereeCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportableRefereeCI
+            {
+                Id = Id.ToString(),
+                Nationality = new Dictionary<CultureInfo, string>(_nationality ?? new Dictionary<CultureInfo, string>()),
+                Name = Name
+            });
         }
     }
 }

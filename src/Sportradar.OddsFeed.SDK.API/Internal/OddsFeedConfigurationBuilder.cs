@@ -3,7 +3,6 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Common;
@@ -80,16 +79,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         }
 
         /// <summary>
-        /// Defines object invariants used by the code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_locales != null);
-            Contract.Invariant(_inactivitySeconds >= SdkInfo.MinInactivitySeconds && _inactivitySeconds <= SdkInfo.MaxInactivitySeconds);
-        }
-
-        /// <summary>
         /// Sets local fields to values read from the <see cref="OddsFeedConfigurationSection"/>
         /// </summary>
         private void Init()
@@ -126,11 +115,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
 
         /// <summary>
-        /// Sets the access token.
+        /// Sets the access token
         /// </summary>
         /// <param name="accessToken">The access token</param>
         /// <returns>OddsFeedConfigurationBuilder</returns>
-        /// <exception cref="System.ArgumentException">Value cannot be a null reference or empty string</exception>
+        /// <exception cref="ArgumentException">Value cannot be a null reference or empty string</exception>
         public IConfigurationInactivitySecondsSetter SetAccessToken(string accessToken)
         {
             if (string.IsNullOrEmpty(accessToken))
@@ -142,7 +131,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         }
 
         /// <summary>
-        /// Sets the inactivity seconds.
+        /// Sets the inactivity seconds
         /// </summary>
         /// <param name="inactivitySeconds">The inactivity seconds</param>
         /// <returns>OddsFeedConfigurationBuilder</returns>
@@ -191,11 +180,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         }
 
         /// <summary>
-        /// Sets the API host.
+        /// Sets the API host
         /// </summary>
         /// <param name="apiHost">The API host</param>
         /// <returns>OddsFeedConfigurationBuilder</returns>
-        /// <exception cref="System.ArgumentException"><code>apiHost</code> is a a null reference or an empty string</exception>
+        /// <exception cref="ArgumentException"><code>apiHost</code> is a a null reference or an empty string</exception>
         public IOddsFeedConfigurationBuilder SetApiHost(string apiHost)
         {
             _apiHost = apiHost;
@@ -207,7 +196,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// </summary>
         /// <param name="host">The URL of the messaging host</param>
         /// <returns>The <see cref="IOddsFeedConfigurationBuilder" /> instance used to set additional values</returns>
-        /// <exception cref="System.ArgumentException"><code>host</code> is a null reference or an empty string</exception>
+        /// <exception cref="ArgumentException"><code>host</code> is a null reference or an empty string</exception>
         public IOddsFeedConfigurationBuilder SetHost(string host)
         {
             _host = host;
@@ -219,7 +208,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// </summary>
         /// <param name="virtualHost">The name virtual host</param>
         /// <returns>The <see cref="IOddsFeedConfigurationBuilder" /> instance used to set additional values</returns>
-        /// <exception cref="System.ArgumentException">Value cannot be a null reference or an empty string</exception>
+        /// <exception cref="ArgumentException">Value cannot be a null reference or an empty string</exception>
         public IOddsFeedConfigurationBuilder SetVirtualHost(string virtualHost)
         {
             _virtualHost = virtualHost;

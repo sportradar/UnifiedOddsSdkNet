@@ -1,13 +1,15 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
@@ -22,7 +24,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// Gets the sport event status
         /// </summary>
         /// <value>The sport event status</value>
-        public SportEventStatusDTO Status { get; }
+        public SportEventStatusDTO SportEventStatus { get; }
 
         /// <summary>
         /// Gets a <see cref="BookingStatus"/> enum member specifying the booking status of the associated sport event
@@ -50,6 +52,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// </summary>
         /// <value>The home away competitors</value>
         internal IDictionary<HomeAway, URN> HomeAwayCompetitors { get; }
+
+        /// <summary>
+        /// Gets the <see cref="DateTime"/> specifying when the associated message was generated (on the server side)
+        /// </summary>
+        public DateTime? GeneratedAt { get; protected set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CompetitionDTO"/> class
@@ -91,13 +98,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal CompetitionDTO(matchSummaryEndpoint matchSummary)
             : this(matchSummary.sport_event)
         {
-            Contract.Requires(matchSummary != null);
+            Guard.Argument(matchSummary, nameof(matchSummary)).NotNull();
 
             Conditions = matchSummary.sport_event_conditions == null
                 ? Conditions
                 : new SportEventConditionsDTO(matchSummary.sport_event_conditions);
 
-            Status = matchSummary.sport_event_status == null
+            SportEventStatus = matchSummary.sport_event_status == null
                 ? null
                 : new SportEventStatusDTO(matchSummary.sport_event_status, matchSummary.statistics, HomeAwayCompetitors);
 
@@ -109,6 +116,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 Venue = new VenueDTO(matchSummary.venue);
             }
+            GeneratedAt = matchSummary.generated_atSpecified
+                              ? matchSummary.generated_at.ToLocalTime()
+                              : (DateTime?) null;
         }
 
         /// <summary>
@@ -118,11 +128,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal CompetitionDTO(stageSummaryEndpoint stageSummary)
             : this(stageSummary.sport_event)
         {
-            Contract.Requires(stageSummary != null);
+            Guard.Argument(stageSummary, nameof(stageSummary)).NotNull();
 
-            Status = stageSummary.sport_event_status == null
+            SportEventStatus = stageSummary.sport_event_status == null
                 ? null
                 : new SportEventStatusDTO(stageSummary.sport_event_status);
+
+            GeneratedAt = stageSummary.generated_atSpecified
+                              ? stageSummary.generated_at.ToLocalTime()
+                              : (DateTime?) null;
         }
     }
 }

@@ -14,8 +14,8 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 using Sportradar.OddsFeed.SDK.Test.Shared;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Test
@@ -46,7 +46,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
             namedValuesProviderMock.Setup(x => x.BetStopReasons).Returns(namedValuesCacheMock.Object);
             namedValuesProviderMock.Setup(x => x.BettingStatuses).Returns(namedValuesCacheMock.Object);
 
-            _mapper = new FeedMessageMapper(new TestSportEventFactory(), nameProviderFactoryMock.Object, mappingProviderFactoryMock.Object, namedValuesProviderMock.Object, ExceptionHandlingStrategy.THROW, TestProducerManager.Create(), new Mock<IMarketCacheProvider>().Object, namedValuesCacheMock.Object);
+            _mapper = new FeedMessageMapper(new TestSportEventFactory(),
+                                            nameProviderFactoryMock.Object,
+                                            mappingProviderFactoryMock.Object,
+                                            namedValuesProviderMock.Object,
+                                            ExceptionHandlingStrategy.THROW,
+                                            TestProducerManager.Create(),
+                                            new Mock<IMarketCacheProvider>().Object,
+                                            namedValuesCacheMock.Object);
             _deserializer = new Deserializer<FeedMessage>();
             _validator = new TestFeedMessageValidator();
         }

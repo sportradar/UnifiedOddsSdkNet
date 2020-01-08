@@ -3,10 +3,10 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Common.Internal;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
@@ -37,8 +37,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         internal MarketDescriptionDTO(desc_market description)
         {
-            Contract.Requires(description != null);
-            Contract.Requires(!string.IsNullOrEmpty(description.name));
+            Guard.Argument(description, nameof(description)).NotNull();
+            Guard.Argument(description.name, nameof(description.name)).NotNull().NotEmpty();
 
             Id = description.id;
             Name = description.name;

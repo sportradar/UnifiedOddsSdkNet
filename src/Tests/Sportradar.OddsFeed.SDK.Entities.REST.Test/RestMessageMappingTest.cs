@@ -7,14 +7,14 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
-using RMF = Sportradar.OddsFeed.SDK.Test.Shared.MessageFactoryRest;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 using Sportradar.OddsFeed.SDK.Test.Shared;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
+using RMF = Sportradar.OddsFeed.SDK.Test.Shared.MessageFactoryRest;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 {
@@ -102,7 +102,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         public void FixtureDTOMappingTest()
         {
             var msg = RMF.GetFixture();
-            var dto = new FixtureDTO(msg);
+            var dto = new FixtureDTO(msg, null);
 
             Assert.AreEqual(msg.id, dto.Id.ToString());
             Assert.AreEqual(msg.name, dto.Name);
@@ -199,7 +199,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         public void PlayerProfileDTOTest()
         {
             var msg = RMF.GetPlayerExtended();
-            var dto = new PlayerProfileDTO(msg);
+            var dto = new PlayerProfileDTO(msg, null);
 
             ValidatePlayerExtended(msg, dto);
         }
@@ -329,7 +329,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
         private static void ValidateMapping(mappingsMapping msg, MarketMappingDTO dto)
         {
-            var dtoMarketId = dto.MarketSubTypeId == 0 ? dto.MarketTypeId.ToString() : $"{dto.MarketTypeId}:{dto.MarketSubTypeId}";
+            var dtoMarketId = dto.MarketSubTypeId == null ? dto.MarketTypeId.ToString() : $"{dto.MarketTypeId}:{dto.MarketSubTypeId}";
             Assert.AreEqual(msg.market_id, dtoMarketId);
             Assert.AreEqual(msg.product_id, dto.ProducerId);
             Assert.AreEqual(msg.sport_id, dto.SportId.ToString());
@@ -425,6 +425,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(msg.country, ci.GetCountry(culture));
             Assert.AreEqual(msg.@virtual, ci.IsVirtual);
             Assert.AreEqual(msg.qualifier, ci.Qualifier);
+            Assert.AreEqual(msg.divisionSpecified, ci.Division.HasValue);
+            Assert.AreEqual(msg.division, ci.Division);
         }
 
         private static void ValidatePlayerExtended(playerExtended msg, PlayerProfileDTO dto)
@@ -436,6 +438,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(msg.nationality, dto.Nationality);
             Assert.AreEqual(msg.type, dto.Type);
             Assert.AreEqual(msg.weight, dto.Weight); //TODO: missing jersey size
+            if (msg.jersey_numberSpecified)
+                Assert.AreEqual(msg.jersey_number, dto.JerseyNumber.Value);
+            else
+                Assert.IsFalse(dto.JerseyNumber.HasValue);
+            Assert.AreEqual(msg.gender, dto.Gender);
         }
 
         private static void ValidateSeasonCoverageInfo(seasonCoverageInfo msg, SeasonCoverageDTO dto)

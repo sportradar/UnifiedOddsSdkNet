@@ -1,9 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
@@ -34,7 +33,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         private readonly decimal _awayScore;
 
         /// <summary>
-        /// The <see cref="PeriodScore.Type"/> property backing field
+        /// The <see cref="Type"/> property backing field
         /// </summary>
         private readonly PeriodType? _type;
 
@@ -52,7 +51,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <param name="matchStatusesCache">The match statuses cache</param>
         public PeriodScore(PeriodScoreDTO dto, ILocalizedNamedValueCache matchStatusesCache)
         {
-            Contract.Requires(dto != null);
+            Guard.Argument(dto, nameof(dto)).NotNull();
 
             _homeScore = dto.HomeScore;
             _awayScore = dto.AwayScore;
@@ -86,7 +85,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// Gets the match status code
         /// </summary>
         /// <value>The match status code</value>
-        [Obsolete("Use GetMatchStatusAsync method instead")]
         public int? MatchStatusCode => _matchStatusCode;
 
         /// <summary>
@@ -98,7 +96,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         {
             return _matchStatusCode == null || _matchStatusesCache == null
                 ? null
-                : await _matchStatusesCache?.GetAsync(_matchStatusCode.Value, new List<CultureInfo> { culture });
+                : await _matchStatusesCache.GetAsync(_matchStatusCode.Value, new List<CultureInfo> { culture }).ConfigureAwait(false);
         }
 
         /// <summary>

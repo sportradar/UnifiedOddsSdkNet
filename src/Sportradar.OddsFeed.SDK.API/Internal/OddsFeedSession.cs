@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using Common.Logging;
@@ -15,7 +15,7 @@ using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -32,7 +32,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <summary>
         /// A <see cref="IMessageReceiver"/> used to provide feed messages
         /// </summary>
-        private readonly IMessageReceiver _messageReceiver;
+        internal readonly IMessageReceiver MessageReceiver;
 
         /// <summary>
         /// A <see cref="IFeedMessageProcessor"/> instance used to process received messages
@@ -98,14 +98,14 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             Func<OddsFeedSession, IEnumerable<string>> getRoutingKeys)
             :base(messageMapper, defaultCultures)
         {
-            Contract.Requires(messageReceiver != null);
-            Contract.Requires(messageInterest != null);
-            Contract.Requires(messageProcessor != null);
-            Contract.Requires(messageValidator != null);
-            Contract.Requires(messageDataExtractor != null);
-            Contract.Requires(dispatcherStore != null);
+            Guard.Argument(messageReceiver, nameof(messageReceiver)).NotNull();
+            Guard.Argument(messageInterest, nameof(messageInterest)).NotNull();
+            Guard.Argument(messageProcessor, nameof(messageProcessor)).NotNull();
+            Guard.Argument(messageValidator, nameof(messageValidator)).NotNull();
+            Guard.Argument(messageDataExtractor, nameof(messageDataExtractor)).NotNull();
+            Guard.Argument(dispatcherStore, nameof(dispatcherStore)).NotNull();
 
-            _messageReceiver = messageReceiver;
+            MessageReceiver = messageReceiver;
             _messageProcessor = messageProcessor;
             _messageValidator = messageValidator;
             _messageDataExtractor = messageDataExtractor;
@@ -183,8 +183,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>a <see cref="IEntityDispatcherInternal"/> which should be used to dispatch the provided <see cref="FeedMessage"/></returns>
         private IEntityDispatcherInternal SelectDispatcher(FeedMessage message)
         {
-            Contract.Requires(message != null);
-            Contract.Ensures(Contract.Result<IEntityDispatcherInternal>() != null);
+            Guard.Argument(message, nameof(message)).NotNull();
 
             if (!message.IsEventRelated)
             {
@@ -204,6 +203,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="rawMessage"></param>
         public override void Dispatch(FeedMessage feedMessage, byte[] rawMessage)
         {
+            Guard.Argument(feedMessage, nameof(feedMessage)).NotNull();
+
             var alive = feedMessage as alive;
             if (alive != null)
             {
@@ -225,27 +226,27 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <summary>
         /// It executes steps needed when opening the instance
         /// </summary>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         protected override void OnOpening()
         {
-            _messageReceiver.FeedMessageReceived += OnMessageReceived;
-            _messageReceiver.FeedMessageDeserializationFailed += OnMessageDeserializationFailed;
+            MessageReceiver.FeedMessageReceived += OnMessageReceived;
+            MessageReceiver.FeedMessageDeserializationFailed += OnMessageDeserializationFailed;
             _messageProcessor.MessageProcessed += OnMessageProcessed;
 
             var routingKeys = _getRoutingKeys.Invoke(this);
-            _messageReceiver.Open(MessageInterest, routingKeys);
+            MessageReceiver.Open(MessageInterest, routingKeys);
         }
 
         /// <summary>
         /// It executes steps needed when closing the instance
         /// </summary>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         protected override void OnClosing()
         {
-            _messageReceiver.FeedMessageReceived -= OnMessageReceived;
-            _messageReceiver.FeedMessageDeserializationFailed -= OnMessageDeserializationFailed;
+            MessageReceiver.FeedMessageReceived -= OnMessageReceived;
+            MessageReceiver.FeedMessageDeserializationFailed -= OnMessageDeserializationFailed;
             _messageProcessor.MessageProcessed -= OnMessageProcessed;
-            _messageReceiver.Close();
+            MessageReceiver.Close();
         }
 
         /// <summary>

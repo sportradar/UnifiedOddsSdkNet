@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,7 +15,8 @@ using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.EventArguments;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal
 {
@@ -54,6 +55,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// </summary>
         private readonly IRoutingKeyParser _keyParser;
 
+        /// <summary>
+        /// The <see cref="IProducerManager"/> used to get the available <see cref="IProducer"/>
+        /// </summary>
         private readonly IProducerManager _producerManager;
 
         /// <summary>
@@ -72,23 +76,35 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         public event EventHandler<MessageDeserializationFailedEventArgs> FeedMessageDeserializationFailed;
 
         /// <summary>
+        /// Event raised when the <see cref="IMessageReceiver" /> receives the message
+        /// </summary>
+        public event EventHandler<RawFeedMessageEventArgs> RawFeedMessageReceived;
+
+        /// <summary>
+        /// Is connected to the replay server
+        /// </summary>
+        private readonly bool _useReplay;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RabbitMqMessageReceiver"/> class
         /// </summary>
         /// <param name="channel">A <see cref="IRabbitMqChannel"/> representing a channel to the RabbitMQ broker</param>
         /// <param name="deserializer">A <see cref="IDeserializer{T}"/> instance used for de-serialization of messages received from the feed</param>
         /// <param name="keyParser">A <see cref="IRoutingKeyParser"/> used to parse the rabbit's routing key</param>
         /// <param name="producerManager">An <see cref="IProducerManager"/> used to get <see cref="IProducer"/></param>
-        public RabbitMqMessageReceiver(IRabbitMqChannel channel, IDeserializer<FeedMessage> deserializer, IRoutingKeyParser keyParser, IProducerManager producerManager)
+        /// <param name="usedReplay">Is connected to the replay server</param>
+        public RabbitMqMessageReceiver(IRabbitMqChannel channel, IDeserializer<FeedMessage> deserializer, IRoutingKeyParser keyParser, IProducerManager producerManager, bool usedReplay)
         {
-            Contract.Requires(channel != null);
-            Contract.Requires(deserializer != null);
-            Contract.Requires(keyParser != null);
-            Contract.Requires(producerManager != null);
+            Guard.Argument(channel, nameof(channel)).NotNull();
+            Guard.Argument(deserializer, nameof(deserializer)).NotNull();
+            Guard.Argument(keyParser, nameof(keyParser)).NotNull();
+            Guard.Argument(producerManager, nameof(producerManager)).NotNull();
 
             _channel = channel;
             _deserializer = deserializer;
             _keyParser = keyParser;
             _producerManager = producerManager;
+            _useReplay = usedReplay;
         }
 
         /// <summary>
@@ -107,6 +123,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             var receivedAt =  SdkInfo.ToEpochTime(DateTime.Now);
 
             // NOT used for GetRawMessage()
+            var sessionName = _interest == null ? "system" : _interest.Name;
             string messageBody = null;
             FeedMessage feedMessage;
             try
@@ -114,7 +131,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 if (FeedLog.IsDebugEnabled)
                 {
                     messageBody = Encoding.UTF8.GetString(eventArgs.Body);
-                    var sessionName = _interest == null ? "system" : _interest.Name;
                     FeedLog.Debug($"<~> {sessionName} <~> {eventArgs.RoutingKey} <~> {messageBody}");
                 }
                 else
@@ -138,6 +154,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 return;
             }
 
+            // send RawFeedMessage if needed
+            try
+            {
+                //ExecutionLog.Debug($"Raw msg [{_interest}]: {feedMessage.GetType().Name} for event {feedMessage.EventId}.");
+                var args = new RawFeedMessageEventArgs(eventArgs.RoutingKey, feedMessage, sessionName);
+                RawFeedMessageReceived?.Invoke(this, args);
+            }
+            catch (Exception e)
+            {
+                ExecutionLog.Error($"Error dispatching raw message for {feedMessage.EventId}", e);
+            } 
+            // continue normal processing
+
             if (!_producerManager.Exists(feedMessage.ProducerId))
             {
                 ExecutionLog.Warn($"A message for producer which is not defined was received. Producer={feedMessage.ProducerId}");
@@ -147,7 +176,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             var producer = _producerManager.Get(feedMessage.ProducerId);
             var messageName = feedMessage.GetType().Name;
 
-            if (!producer.IsAvailable || producer.IsDisabled)
+            if (!_useReplay && (!producer.IsAvailable || producer.IsDisabled))
             {
                 ExecutionLog.Debug($"A message for producer which is disabled was received. Producer={producer}, MessageType={messageName}");
                 return;
@@ -187,7 +216,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="rawMessage">A raw message received from the broker</param>
         private void RaiseMessageReceived(FeedMessage message, byte[] rawMessage)
         {
-            Contract.Requires(message != null);
+            Guard.Argument(message, nameof(message)).NotNull();
 
             FeedMessageReceived?.Invoke(this, new FeedMessageReceivedEventArgs(message, null, rawMessage));
         }

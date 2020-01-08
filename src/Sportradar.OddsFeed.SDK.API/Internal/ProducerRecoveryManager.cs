@@ -4,14 +4,15 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Threading.Tasks;
 using Common.Logging;
+using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -60,6 +61,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         public event EventHandler<TrackerStatusChangeEventArgs> StatusChanged;
 
         /// <summary>
+        /// Occurs when a requested event recovery completes
+        /// </summary>
+        public event EventHandler<EventRecoveryCompletedEventArgs> EventRecoveryCompleted;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ProducerRecoveryManager"/> class
         /// </summary>
         /// <param name="producer">A <see cref="IProducer"/> for which status is tracked</param>
@@ -67,9 +73,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="timestampTracker">A <see cref="ITimestampTracker"/> used to track message timings</param>
         internal ProducerRecoveryManager(IProducer producer, IRecoveryOperation recoveryOperation, ITimestampTracker timestampTracker)
         {
-            Contract.Requires(producer != null);
-            Contract.Requires(recoveryOperation != null);
-            Contract.Requires(timestampTracker != null);
+            Guard.Argument(producer, nameof(producer)).NotNull();
+            Guard.Argument(recoveryOperation, nameof(recoveryOperation)).NotNull();
+            Guard.Argument(timestampTracker, nameof(timestampTracker)).NotNull();
 
             Producer = producer;
             _producer = (Producer)producer;
@@ -77,18 +83,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             _timestampTracker = timestampTracker;
 
             Status = ProducerRecoveryStatus.NotStarted;
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(Producer != null);
-            Contract.Invariant(_producer != null);
-            Contract.Invariant(_recoveryOperation != null);
-            Contract.Invariant(_timestampTracker != null);
         }
 
         /// <summary>
@@ -125,6 +119,14 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>A <see cref="ProducerRecoveryStatus"/> specifying the new status of the manager or null reference if no change is needed</returns>
         private ProducerRecoveryStatus? ProcessSnapshotCompleteMessage(snapshot_complete snapshotCompleted, MessageInterest interest)
         {
+            URN eventId;
+            if (_producer.EventRecoveries.TryRemove(snapshotCompleted.request_id, out eventId))
+            {
+                ExecutionLog.Info($"Recovery with requestId={snapshotCompleted.request_id} for producer={Producer.Id}, eventId={eventId} completed.");
+                EventRecoveryCompleted?.Invoke(this, new EventRecoveryCompletedEventArgs(snapshotCompleted.request_id, eventId));
+                return null;
+            }
+
             //The snapshot message not for us
             if (!_recoveryOperation.IsRunning || !_recoveryOperation.RequestId.HasValue || _recoveryOperation.RequestId.Value != snapshotCompleted.RequestId)
             {
@@ -217,9 +219,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// </remarks>
         /// <param name="message">The <see cref="IMessage" /> message to be processed</param>
         /// <param name="interest">The <see cref="MessageInterest"/> describing the session from which the message originates </param>
-        /// <exception cref="System.ArgumentException">The Producer.Id of the message and the Producer associated with this manager do not match</exception>
+        /// <exception cref="ArgumentException">The Producer.Id of the message and the Producer associated with this manager do not match</exception>
         public void ProcessUserMessage(FeedMessage message, MessageInterest interest)
         {
+            Guard.Argument(message, nameof(message)).NotNull();
+            Guard.Argument(interest, nameof(interest)).NotNull();
+
             if (message.ProducerId != Producer.Id)
             {
                 throw new ArgumentException("The producer.Id of the message and the Producer associated with this manager do not match", nameof(message));
@@ -284,7 +289,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="message">A <see cref="FeedMessage"/> received on the system session</param>
         public void ProcessSystemMessage(FeedMessage message)
         {
-            Contract.Requires(message != null);
+            Guard.Argument(message, nameof(message)).NotNull();
 
             var alive = message as alive;
 

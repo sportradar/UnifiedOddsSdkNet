@@ -199,14 +199,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal.Log
                 var exceptionMsg = "EXCEPTION: ";
                 if (task.Exception != null)
                 {
-                    if (task.Exception.InnerExceptions != null)
-                    {
-                        exceptionMsg += task.Exception.InnerExceptions[0].ToString();
-                    }
-                    else
-                    {
-                        exceptionMsg += task.Exception.ToString();
-                    }
+                    exceptionMsg += task.Exception.InnerExceptions[0].ToString();
                 }
                 FinishExecution(logEnabled: perm.LogEnabled,
                                 methodCall: perm.MethodCall,

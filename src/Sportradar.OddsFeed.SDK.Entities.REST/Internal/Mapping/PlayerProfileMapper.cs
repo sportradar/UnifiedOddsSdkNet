@@ -1,9 +1,11 @@
 /*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Diagnostics.Contracts;
+
+using System;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping
 {
@@ -24,7 +26,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping
         /// <param name="data">A <see cref="playerProfileEndpoint"/> instance containing player profile data</param>
         internal PlayerProfileMapper(playerProfileEndpoint data)
         {
-            Contract.Requires(data != null);
+            Guard.Argument(data, nameof(data)).NotNull();
 
             _data = data;
         }
@@ -35,7 +37,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping
         /// <returns>The created <see cref="PlayerProfileDTO"/> instance </returns>
         public PlayerProfileDTO Map()
         {
-            return new PlayerProfileDTO(_data.player);
+            return new PlayerProfileDTO(_data.player, _data.generated_atSpecified ? _data.generated_at : (DateTime?) null);
         }
     }
 }

@@ -2,10 +2,11 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
+using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
 {
@@ -13,7 +14,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// Provides basic tournament round information
     /// </summary>
     /// <seealso cref="IRound" />
-    internal class Round : EntityPrinter, IRound
+    internal class Round : EntityPrinter, IRoundV2
     {
         /// <summary>
         /// Gets the type of the round
@@ -31,9 +32,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public IDictionary<CultureInfo, string> Name { get; }
 
         /// <summary>
-        /// Gets the name of the group associated with the current round.
+        /// Gets the name of the group associated with the current round
         /// </summary>
         public string GroupName { get; }
+
+        /// <summary>
+        /// Gets the id of the group associated with the current round
+        /// </summary>
+        public URN GroupId { get; }
 
         /// <summary>
         /// Gets the id of the other match
@@ -63,17 +69,23 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public IDictionary<CultureInfo, string> PhaseOrGroupLongName { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Round"/> class.
+        /// Gets the phase of the associated round
+        /// </summary>
+        public string Phase { get; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Round"/> class
         /// </summary>
         /// <param name="ci">A <see cref="RoundCI"/> used to create new instance</param>
         /// <param name="cultures">A cultures of the current instance of <see cref="RoundCI"/></param>
         public Round(RoundCI ci, IEnumerable<CultureInfo> cultures)
         {
-            Contract.Requires(ci != null);
+            Guard.Argument(ci, nameof(ci)).NotNull();
 
             Type = ci.Type;
             Number = ci.Number;
             GroupName = ci.Group;
+            GroupId = ci.GroupId;
             OtherMatchId = ci.OtherMatchId;
             CupRoundMatches = ci.CupRoundMatches;
             CupRoundMatchNumber = ci.CupRoundMatchNumber;
@@ -85,13 +97,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 PhaseOrGroupLongName.Add(c, ci.GetPhaseOrGroupLongName(c));
             }
             BetradarId = ci.BetradarId ?? 0;
+            Phase = ci.Phase;
         }
 
         /// <summary>
         /// Gets the name for specific locale
         /// </summary>
-        /// <param name="culture">The cultures.</param>
-        /// <returns>Return the Name if exists, or null.</returns>
+        /// <param name="culture">The cultures</param>
+        /// <returns>Return the Name if exists, or null</returns>
         public string GetName(CultureInfo culture)
         {
             return Name.ContainsKey(culture) ? Name[culture] : null;
@@ -110,7 +123,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <summary>
         /// Constructs and returns a <see cref="string" /> containing the id of the current instance
         /// </summary>
-        /// <returns>A <see cref="string" /> containing the id of the current instance.</returns>
+        /// <returns>A <see cref="string" /> containing the id of the current instance</returns>
         protected override string PrintI()
         {
             return $"Name={Name.FirstOrDefault()}";
@@ -119,18 +132,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <summary>
         /// Constructs and returns a <see cref="string" /> containing compacted representation of the current instance
         /// </summary>
-        /// <returns>A <see cref="string" /> containing compacted representation of the current instance.</returns>
+        /// <returns>A <see cref="string" /> containing compacted representation of the current instance</returns>
         protected override string PrintC()
         {
             var names = string.Join(", ", Name.Keys.Select(k => $"{k}={GetName(k)}"));
             var phase = string.Join(", ", PhaseOrGroupLongName.Keys.Select(k => $"{k}={GetPhaseOrGroupLongName(k)}"));
-            return $"Name=[{names}], Type={Type}, Number={Number}, CupRoundMatches={CupRoundMatches}, CupRoundMatchNumber={CupRoundMatchNumber}, BetradarId={BetradarId}, PhaseOrGroupLongName={phase}";
+            return $"Name=[{names}], Type={Type}, Number={Number}, CupRoundMatches={CupRoundMatches}, CupRoundMatchNumber={CupRoundMatchNumber}, BetradarId={BetradarId}, PhaseOrGroupLongName={phase}, Phase={Phase}";
         }
 
         /// <summary>
         /// Constructs and return a <see cref="string" /> containing details of the current instance
         /// </summary>
-        /// <returns>A <see cref="string" /> containing details of the current instance.</returns>
+        /// <returns>A <see cref="string" /> containing details of the current instance</returns>
         protected override string PrintF()
         {
             return PrintC();
@@ -139,7 +152,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <summary>
         /// Constructs and returns a <see cref="string" /> containing a JSON representation of the current instance
         /// </summary>
-        /// <returns>a <see cref="string" /> containing a JSON representation of the current instance.</returns>
+        /// <returns>a <see cref="string" /> containing a JSON representation of the current instance</returns>
         protected override string PrintJ()
         {
             return PrintJ(GetType(), this);

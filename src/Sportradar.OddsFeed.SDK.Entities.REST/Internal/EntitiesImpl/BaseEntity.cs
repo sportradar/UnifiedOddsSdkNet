@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -26,14 +26,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// Gets the list of translated names
         /// </summary>
         /// <value>The list of translated names</value>
-        public IReadOnlyDictionary<CultureInfo, string> Names { get; }
+        public virtual IReadOnlyDictionary<CultureInfo, string> Names { get; }
 
         /// <summary>
         /// Gets the name
         /// </summary>
         /// <param name="culture">The culture</param>
         /// <returns>System.String</returns>
-        public string GetName(CultureInfo culture)
+        public virtual string GetName(CultureInfo culture)
         {
             return Names == null || !Names.ContainsKey(culture)
                 ? null
@@ -47,7 +47,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <param name="names">The names</param>
         public BaseEntity(URN id, IReadOnlyDictionary<CultureInfo, string> names)
         {
-            Contract.Requires(id != null);
+            Guard.Argument(id, nameof(id)).NotNull();
 
             Id = id;
             Names = names;

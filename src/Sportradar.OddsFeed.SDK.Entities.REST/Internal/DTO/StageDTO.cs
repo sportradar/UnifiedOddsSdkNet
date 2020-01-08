@@ -2,9 +2,8 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
@@ -45,8 +44,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             }
             if (sportEvent.tournament != null)
             {
-                Contract.Assume(!string.IsNullOrEmpty(sportEvent.tournament.id));
-                Contract.Assume(!string.IsNullOrEmpty(sportEvent.tournament.name));
                 Tournament = new TournamentDTO(sportEvent.tournament);
             }
         }
@@ -56,7 +53,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// </summary>
         /// <param name="stageEvent">A <see cref="stageSummaryEndpoint"/> containing basic information about the event</param>
         internal StageDTO(stageSummaryEndpoint stageEvent)
-            :base(stageEvent)
+            : base(stageEvent)
         {
             if (stageEvent.sport_event.parent != null)
             {
@@ -68,8 +65,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             }
             if (stageEvent.sport_event?.tournament != null)
             {
-                Contract.Assume(!string.IsNullOrEmpty(stageEvent.sport_event.tournament.id));
-                Contract.Assume(!string.IsNullOrEmpty(stageEvent.sport_event.tournament.name));
                 Tournament = new TournamentDTO(stageEvent.sport_event.tournament);
             }
         }

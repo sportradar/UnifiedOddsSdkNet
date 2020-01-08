@@ -2,10 +2,10 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
@@ -47,20 +47,37 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public SportEventType? Type { get; }
 
         /// <summary>
+        /// Gets a <see cref="bool"/> specifying if the start time to be determined is set for the associated sport event
+        /// </summary>
+        public bool? StartTimeTbd { get; }
+
+        /// <summary>
+        /// Gets a <see cref="URN"/> specifying the replacement sport event
+        /// for the associated sport event
+        /// </summary>
+        public URN ReplacedBy { get; }
+
+        /// <summary>
+        /// Gets the status (directly from sportEvent)
+        /// </summary>
+        /// <value>The status (directly from sportEvent)</value>
+        public string StatusOnEvent { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SportEventSummaryDTO"/> class
         /// </summary>
         /// <param name="sportEvent">A <see cref="sportEvent"/> containing basic information about the event</param>
         internal SportEventSummaryDTO(sportEvent sportEvent)
         {
-            Contract.Requires(sportEvent != null);
-            Contract.Requires(!string.IsNullOrEmpty(sportEvent.id));
+            Guard.Argument(sportEvent, nameof(sportEvent)).NotNull();
+            Guard.Argument(sportEvent.id, nameof(sportEvent.id)).NotNull().NotEmpty();
 
             Id = URN.Parse(sportEvent.id);
             Scheduled = sportEvent.scheduledSpecified
-                ? (DateTime?)sportEvent.scheduled
+                ? (DateTime?)sportEvent.scheduled.ToLocalTime()
                 : null;
             ScheduledEnd = sportEvent.scheduled_endSpecified
-                ? (DateTime?)sportEvent.scheduled_end
+                ? (DateTime?)sportEvent.scheduled_end.ToLocalTime()
                 : null;
             if (sportEvent.tournament?.sport != null)
             {
@@ -76,6 +93,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 Type = type;
             }
+            if (!string.IsNullOrEmpty(sportEvent.replaced_by))
+            {
+                URN replacedBy;
+                if (URN.TryParse(sportEvent.replaced_by, out replacedBy))
+                {
+                    ReplacedBy = replacedBy;
+                }
+            }
+            StartTimeTbd = sportEvent.start_time_tbdSpecified ? (bool?)sportEvent.start_time_tbd : null;
+
+            StatusOnEvent = sportEvent.status;
         }
 
         /// <summary>
@@ -84,16 +112,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <param name="parentStage">A <see cref="parentStage"/> containing basic information about the event</param>
         protected SportEventSummaryDTO(parentStage parentStage)
         {
-            Contract.Requires(parentStage != null);
-            Contract.Requires(!string.IsNullOrEmpty(parentStage.id));
+            Guard.Argument(parentStage, nameof(parentStage)).NotNull();
+            Guard.Argument(parentStage.id, nameof(parentStage.id)).NotNull().NotEmpty();
 
             Id = URN.Parse(parentStage.id);
             Scheduled = parentStage.scheduledSpecified
-                ? (DateTime?)parentStage.scheduled
-                : null;
+                            ? (DateTime?) parentStage.scheduled.ToLocalTime()
+                            : null;
             ScheduledEnd = parentStage.scheduled_endSpecified
-                ? (DateTime?)parentStage.scheduled_end
-                : null;
+                               ? (DateTime?) parentStage.scheduled_end.ToLocalTime()
+                               : null;
             //URN sportId;
             //if (URN.TryParse(parentStage.tournament?.sport?.id, out sportId))
             //{
@@ -105,6 +133,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 Type = type;
             }
+            if (!string.IsNullOrEmpty(parentStage.replaced_by))
+            {
+                URN replacedBy;
+                if (URN.TryParse(parentStage.replaced_by, out replacedBy))
+                {
+                    ReplacedBy = replacedBy;
+                }
+            }
+            StartTimeTbd = parentStage.start_time_tbdSpecified ? (bool?)parentStage.start_time_tbd : null;
+
+            StatusOnEvent = null;
         }
 
         /// <summary>
@@ -113,16 +152,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <param name="childStage">A <see cref="sportEventChildrenSport_event"/> containing basic information about the event</param>
         protected SportEventSummaryDTO(sportEventChildrenSport_event childStage)
         {
-            Contract.Requires(childStage != null);
-            Contract.Requires(!string.IsNullOrEmpty(childStage.id));
+            Guard.Argument(childStage, nameof(childStage)).NotNull();
+            Guard.Argument(childStage.id, nameof(childStage.id)).NotNull().NotEmpty();
 
             Id = URN.Parse(childStage.id);
             Scheduled = childStage.scheduledSpecified
-                ? (DateTime?)childStage.scheduled
-                : null;
+                            ? (DateTime?) childStage.scheduled.ToLocalTime()
+                            : null;
             ScheduledEnd = childStage.scheduled_endSpecified
-                ? (DateTime?)childStage.scheduled_end
-                : null;
+                               ? (DateTime?) childStage.scheduled_end.ToLocalTime()
+                               : null;
             //URN sportId;
             //if (URN.TryParse(childStage.tournament?.sport?.id, out sportId))
             //{
@@ -134,6 +173,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 Type = type;
             }
+            if (!string.IsNullOrEmpty(childStage.replaced_by))
+            {
+                URN replacedBy;
+                if (URN.TryParse(childStage.replaced_by, out replacedBy))
+                {
+                    ReplacedBy = replacedBy;
+                }
+            }
+            StartTimeTbd = childStage.start_time_tbdSpecified ? (bool?)childStage.start_time_tbd : null;
+
+            StatusOnEvent = null;
         }
     }
 }

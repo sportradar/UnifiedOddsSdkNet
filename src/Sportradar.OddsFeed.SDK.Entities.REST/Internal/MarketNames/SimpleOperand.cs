@@ -3,8 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
+using Dawn;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 
@@ -33,21 +32,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <param name="operandString">The <see cref="string"/> representation of the operand - i.e. name of the specifier.</param>
         public SimpleOperand(IReadOnlyDictionary<string, string> specifiers, string operandString)
         {
-            Contract.Requires(specifiers != null && specifiers.Any());
-            Contract.Requires(!string.IsNullOrEmpty(operandString));
+            Guard.Argument(specifiers, nameof(specifiers)).NotNull().NotEmpty();
+            Guard.Argument(operandString, nameof(operandString)).NotNull().NotEmpty();
 
             _specifiers = specifiers;
             _operandString = operandString;
-        }
-
-        /// <summary>
-        /// Specifies invariants as needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariants()
-        {
-            Contract.Invariant(_specifiers != null && _specifiers.Any());
-            Contract.Invariant(!string.IsNullOrEmpty(_operandString));
         }
 
         /// <summary>
@@ -90,11 +79,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// Gets the value of the operand as a <see cref="string" />
         /// </summary>
         /// <returns>A <see cref="Task{String}" /> containing the value of the operand as a <see cref="string" />.</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         public Task<string> GetStringValue()
         {
-            string name;
-            if (!_specifiers.TryGetValue(_operandString, out name))
+            if (!_specifiers.TryGetValue(_operandString, out var name))
             {
                 throw new NameExpressionException($"Market specifiers do not contain a specifier with key={_operandString}", null);
             }

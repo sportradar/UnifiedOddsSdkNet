@@ -3,6 +3,7 @@
 */
 using System.Globalization;
 using System.Runtime.Caching;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -36,6 +37,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="currentCulture">A <see cref="CultureInfo"/> of the input <see cref="FixtureDTO"/> data</param>
         /// <returns>A new instance of <see cref="SportEventCI"/> instance</returns>
         SportEventCI Build(FixtureDTO fixture, CultureInfo currentCulture);
+
+        /// <summary>
+        /// Builds a <see cref="SportEventCI"/> instance from the provided exportable cache item
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableCI"/> representing the sport event</param>
+        /// <returns>a new instance of <see cref="SportEventCI"/> instance</returns>
+        SportEventCI Build(ExportableCI exportable);
 
         /// <summary>
         /// Gets a derived <see cref="SportEventCI"/> instance from the cache object

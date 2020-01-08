@@ -1,10 +1,14 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
@@ -28,6 +32,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         {
             _fetchedCultures = new List<CultureInfo>();
             Merge(dto, culture);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventTimelineCI"/> class.
+        /// </summary>
+        /// <param name="exportable">The events.</param>
+        public EventTimelineCI(ExportableEventTimelineCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            _timeline = exportable.Timeline?.Select(t => new TimelineEventCI(t)).ToList();
+            _isFinalized = exportable.IsFinalized;
+            _fetchedCultures = new List<CultureInfo>(exportable.FetchedCultures ?? new List<CultureInfo>());
         }
 
         /// <summary>
@@ -55,7 +73,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">The culture</param>
         public void Merge(MatchTimelineDTO dto, CultureInfo culture)
         {
-            Contract.Requires(dto != null);
+            Guard.Argument(dto, nameof(dto)).NotNull();
 
             if (dto.BasicEvents != null && dto.BasicEvents.Any())
             {
@@ -90,6 +108,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             }
 
             _fetchedCultures.Add(culture);
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public async Task<ExportableEventTimelineCI> ExportAsync()
+        {
+            var timelineTasks = _timeline?.Select(async t => await t.ExportAsync().ConfigureAwait(false));
+
+            return new ExportableEventTimelineCI
+            {
+                FetchedCultures = new List<CultureInfo>(_fetchedCultures ?? new List<CultureInfo>()),
+                Timeline = timelineTasks != null ? await Task.WhenAll(timelineTasks) : null,
+                IsFinalized = _isFinalized
+            };
         }
     }
 }

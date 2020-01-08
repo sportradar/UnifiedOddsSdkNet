@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal.Config
 {
@@ -23,18 +23,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <param name="configurationSectionProvider">A <see cref="IConfigurationSectionProvider"/> instance used to access <see cref="IOddsFeedConfigurationSection"/></param>
         internal TokenSetter(IConfigurationSectionProvider configurationSectionProvider)
         {
-            Contract.Requires(configurationSectionProvider != null);
+            Guard.Argument(configurationSectionProvider, nameof(configurationSectionProvider)).NotNull();
 
             _configurationSectionProvider = configurationSectionProvider;
-        }
-
-        /// <summary>
-        /// Defines object invariants as required by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_configurationSectionProvider != null);
         }
 
         /// <summary>
@@ -42,7 +33,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// </summary>
         /// <param name="accessToken">The access token used to access feed resources</param>
         /// <returns>The <see cref="IEnvironmentSelectorV1" /> instance allowing the selection of target environment</returns>
-        /// <exception cref="System.ArgumentException">Value cannot be a null reference or empty string - accessToken</exception>
+        /// <exception cref="ArgumentException">Value cannot be a null reference or empty string - accessToken</exception>
         public IEnvironmentSelectorV1 SetAccessToken(string accessToken)
         {
             if (string.IsNullOrEmpty(accessToken))

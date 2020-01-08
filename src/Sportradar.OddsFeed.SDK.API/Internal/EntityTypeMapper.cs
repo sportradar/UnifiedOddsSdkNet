@@ -2,6 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Messages;
 // ReSharper disable RedundantCaseLabel
@@ -19,9 +20,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="id">A <see cref="URN" /> representing the entity identifier.</param>
         /// <param name="sportId">A <see cref="int" /> representing the id of the sport to which the entity belongs</param>
         /// <returns>A <see cref="Type" /> used to represent the specified entity.</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         public virtual Type Map(URN id, int sportId)
         {
+            Guard.Argument(id, nameof(id)).NotNull();
+            Guard.Argument(sportId, nameof(sportId)).Positive();
+
             switch (id.TypeGroup)
             {
                 case ResourceTypeGroup.MATCH:
@@ -55,7 +59,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 case ResourceTypeGroup.OTHER:
                 case ResourceTypeGroup.UNKNOWN:
                 default:
+                {
                     throw new ArgumentException($"ResourceTypeGroup:{id.TypeGroup} is not supported", nameof(id));
+                }
             }
         }
     }

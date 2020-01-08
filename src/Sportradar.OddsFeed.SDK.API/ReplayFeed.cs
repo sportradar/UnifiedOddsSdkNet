@@ -1,8 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using Microsoft.Practices.Unity;
 using Sportradar.OddsFeed.SDK.API.Internal;
+using Microsoft.Practices.Unity;
 
 namespace Sportradar.OddsFeed.SDK.API
 {
@@ -14,17 +14,27 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <summary>
         /// The replay manager for interaction with xReplay Server
         /// </summary>
-        public readonly IReplayManagerV1 ReplayManager;
+        public IReplayManagerV1 ReplayManager;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReplayFeed"/> class.
+        /// Initializes a new instance of the <see cref="ReplayFeed"/> class
         /// </summary>
         /// <param name="config">A <see cref="IOddsFeedConfiguration" /> instance representing feed configuration.</param>
         public ReplayFeed(IOddsFeedConfiguration config)
             : base(config, true)
         {
+        }
+
+        /// <inheritdoc />
+        protected override void InitFeed()
+        {
+            if (FeedInitialized)
+            {
+                return;
+            }
+            base.InitFeed();
             ReplayManager = UnityContainer.Resolve<IReplayManagerV1>();
-            ((ProducerManager)ProducerManager).SetIgnoreRecovery(0);
+            ((ProducerManager) ProducerManager).SetIgnoreRecovery(0);
         }
     }
 }

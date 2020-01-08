@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,12 +11,17 @@ using Common.Logging;
 using Metrics;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
+using Sportradar.OddsFeed.SDK.Messages.EventArguments;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -26,6 +31,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
     /// <seealso cref="IDataRouterManager" />
     internal class DataRouterManager : IDataRouterManager
     {
+        /// <summary>
+        /// Occurs when data from Sports API arrives
+        /// </summary>
+        public event EventHandler<RawApiDataEventArgs> RawApiDataReceived;
+
         /// <summary>
         /// The execution log
         /// </summary>
@@ -69,7 +79,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <summary>
         /// The simple team profile provider
         /// </summary>
-        private IDataProvider<SimpleTeamProfileDTO> _simpleTeamProvider;
+        private readonly IDataProvider<SimpleTeamProfileDTO> _simpleTeamProvider;
         /// <summary>
         /// The tournament seasons provider
         /// </summary>
@@ -110,6 +120,28 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// The lotter list provider
         /// </summary>
         private readonly IDataProvider<EntityList<LotteryDTO>> _lotteryListProvider;
+        /// <summary>
+        /// The available selections provider
+        /// </summary>
+        private readonly IDataProvider<AvailableSelectionsDTO> _availableSelectionsProvider;
+        /// <summary>
+        /// The calculate probability provider
+        /// </summary>
+        private readonly ICalculateProbabilityProvider _calculateProbabilityProvider;
+        /// <summary>
+        /// The fixture changes provider
+        /// </summary>
+        private readonly IDataProvider<IEnumerable<FixtureChangeDTO>> _fixtureChangesProvider;
+
+        /// <summary>
+        /// The list sport events provider
+        /// </summary>
+        private readonly IDataProvider<EntityList<SportEventSummaryDTO>> _listSportEventProvider;
+
+        /// <summary>
+        /// The list sport available tournaments provider
+        /// </summary>
+        private readonly IDataProvider<EntityList<TournamentInfoDTO>> _availableSportTournamentsProvider;
 
         /// <summary>
         /// The cache manager
@@ -127,11 +159,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         internal readonly ExceptionHandlingStrategy ExceptionHandlingStrategy;
 
         /// <summary>
+        /// The exception handling strategy
+        /// </summary>
+        private readonly CultureInfo _defaultLocale;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DataRouterManager"/> class
         /// </summary>
         /// <param name="cacheManager">A <see cref="ICacheManager"/> used to interact among caches</param>
         /// <param name="producerManager">A <see cref="IProducerManager"/> used to get WNS producer</param>
         /// <param name="exceptionHandlingStrategy">An <see cref="Common.ExceptionHandlingStrategy"/> used to handle exception when fetching data</param>
+        /// <param name="defaultLocale">An <see cref="CultureInfo"/> representing the default locale</param>
         /// <param name="sportEventSummaryProvider">The sport event summary provider</param>
         /// <param name="sportEventFixtureProvider">The sport event fixture provider</param>
         /// <param name="sportEventFixtureChangeFixtureProvider">The sport event fixture provider without cache</param>
@@ -152,9 +190,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="drawFixtureProvider">Lottery draw fixture provider</param>
         /// <param name="lotteryScheduleProvider">Lottery schedule provider (single lottery with schedule)</param>
         /// <param name="lotteryListProvider">Lottery list provider</param>
+        /// <param name="availableSelectionsProvider">Available selections provider</param>
+        /// <param name="calculateProbabilityProvider">The probability calculation provider</param>
+        /// <param name="fixtureChangesProvider">Fixture changes provider</param>
+        /// <param name="listSportEventProvider">List sport events provider</param>
+        /// <param name="availableSportTournamentsProvider">The sports available tournaments provider</param>
         public DataRouterManager(ICacheManager cacheManager,
                                  IProducerManager producerManager,
                                  ExceptionHandlingStrategy exceptionHandlingStrategy,
+                                 CultureInfo defaultLocale,
                                  IDataProvider<SportEventSummaryDTO> sportEventSummaryProvider,
                                  IDataProvider<FixtureDTO> sportEventFixtureProvider,
                                  IDataProvider<FixtureDTO> sportEventFixtureChangeFixtureProvider,
@@ -174,34 +218,45 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                                  IDataProvider<DrawDTO> drawSummaryProvider,
                                  IDataProvider<DrawDTO> drawFixtureProvider,
                                  IDataProvider<LotteryDTO> lotteryScheduleProvider,
-                                 IDataProvider<EntityList<LotteryDTO>> lotteryListProvider)
+                                 IDataProvider<EntityList<LotteryDTO>> lotteryListProvider,
+                                 IDataProvider<AvailableSelectionsDTO> availableSelectionsProvider,
+                                 ICalculateProbabilityProvider calculateProbabilityProvider,
+                                 IDataProvider<IEnumerable<FixtureChangeDTO>> fixtureChangesProvider,
+                                 IDataProvider<EntityList<SportEventSummaryDTO>> listSportEventProvider,
+                                 IDataProvider<EntityList<TournamentInfoDTO>> availableSportTournamentsProvider)
         {
-            Contract.Requires(cacheManager != null);
-            Contract.Requires(sportEventSummaryProvider != null);
-            Contract.Requires(sportEventFixtureProvider != null);
-            Contract.Requires(sportEventFixtureChangeFixtureProvider != null);
-            Contract.Requires(allTournamentsForAllSportsProvider != null);
-            Contract.Requires(allSportsProvider != null);
-            Contract.Requires(sportEventsForDateProvider != null);
-            Contract.Requires(sportEventsForTournamentProvider != null);
-            Contract.Requires(playerProfileProvider != null);
-            Contract.Requires(competitorProvider != null);
-            Contract.Requires(simpleTeamProvider != null);
-            Contract.Requires(tournamentSeasonsProvider != null);
-            Contract.Requires(ongoingSportEventProvider != null);
-            Contract.Requires(sportCategoriesProvider != null);
-            Contract.Requires(invariantMarketDescriptionsProvider != null);
-            Contract.Requires(variantMarketDescriptionProvider != null);
-            Contract.Requires(variantDescriptionsProvider != null);
-            Contract.Requires(drawSummaryProvider != null);
-            Contract.Requires(drawFixtureProvider != null);
-            Contract.Requires(lotteryScheduleProvider != null);
-            Contract.Requires(lotteryListProvider != null);
+            Guard.Argument(cacheManager, nameof(cacheManager)).NotNull();
+            Guard.Argument(sportEventSummaryProvider, nameof(sportEventSummaryProvider)).NotNull();
+            Guard.Argument(sportEventFixtureProvider, nameof(sportEventFixtureProvider)).NotNull();
+            Guard.Argument(sportEventFixtureChangeFixtureProvider, nameof(sportEventFixtureChangeFixtureProvider)).NotNull();
+            Guard.Argument(allTournamentsForAllSportsProvider, nameof(allTournamentsForAllSportsProvider)).NotNull();
+            Guard.Argument(allSportsProvider, nameof(allSportsProvider)).NotNull();
+            Guard.Argument(sportEventsForDateProvider, nameof(sportEventsForDateProvider)).NotNull();
+            Guard.Argument(sportEventsForTournamentProvider, nameof(sportEventsForTournamentProvider)).NotNull();
+            Guard.Argument(playerProfileProvider, nameof(playerProfileProvider)).NotNull();
+            Guard.Argument(competitorProvider, nameof(competitorProvider)).NotNull();
+            Guard.Argument(simpleTeamProvider, nameof(simpleTeamProvider)).NotNull();
+            Guard.Argument(tournamentSeasonsProvider, nameof(tournamentSeasonsProvider)).NotNull();
+            Guard.Argument(ongoingSportEventProvider, nameof(ongoingSportEventProvider)).NotNull();
+            Guard.Argument(sportCategoriesProvider, nameof(sportCategoriesProvider)).NotNull();
+            Guard.Argument(invariantMarketDescriptionsProvider, nameof(invariantMarketDescriptionsProvider)).NotNull();
+            Guard.Argument(variantMarketDescriptionProvider, nameof(variantMarketDescriptionProvider)).NotNull();
+            Guard.Argument(variantDescriptionsProvider, nameof(variantDescriptionsProvider)).NotNull();
+            Guard.Argument(drawSummaryProvider, nameof(drawSummaryProvider)).NotNull();
+            Guard.Argument(drawFixtureProvider, nameof(drawFixtureProvider)).NotNull();
+            Guard.Argument(lotteryScheduleProvider, nameof(lotteryScheduleProvider)).NotNull();
+            Guard.Argument(lotteryListProvider, nameof(lotteryListProvider)).NotNull();
+            Guard.Argument(availableSelectionsProvider, nameof(availableSelectionsProvider)).NotNull();
+            Guard.Argument(calculateProbabilityProvider, nameof(calculateProbabilityProvider)).NotNull();
+            Guard.Argument(fixtureChangesProvider, nameof(fixtureChangesProvider)).NotNull();
+            Guard.Argument(listSportEventProvider, nameof(listSportEventProvider)).NotNull();
+            Guard.Argument(availableSportTournamentsProvider, nameof(availableSportTournamentsProvider)).NotNull();
 
             _cacheManager = cacheManager;
             var wnsProducer = producerManager.Get(7);
             _isWnsAvailable = wnsProducer.IsAvailable && !wnsProducer.IsDisabled;
             ExceptionHandlingStrategy = exceptionHandlingStrategy;
+            _defaultLocale = defaultLocale;
             _sportEventSummaryProvider = sportEventSummaryProvider;
             _sportEventFixtureProvider = sportEventFixtureProvider;
             _sportEventFixtureChangeFixtureProvider = sportEventFixtureChangeFixtureProvider;
@@ -222,39 +277,46 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             _lotteryDrawFixtureProvider = drawFixtureProvider;
             _lotteryScheduleProvider = lotteryScheduleProvider;
             _lotteryListProvider = lotteryListProvider;
+            _availableSelectionsProvider = availableSelectionsProvider;
+            _calculateProbabilityProvider = calculateProbabilityProvider;
+            _fixtureChangesProvider = fixtureChangesProvider;
+            _listSportEventProvider = listSportEventProvider;
+            _availableSportTournamentsProvider = availableSportTournamentsProvider;
+
+            _sportEventSummaryProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _sportEventFixtureProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _sportEventFixtureChangeFixtureProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _allTournamentsForAllSportsProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _allSportsProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _sportEventsForDateProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _sportEventsForTournamentProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _playerProfileProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _competitorProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _simpleTeamProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _tournamentSeasonsProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _ongoingSportEventProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _sportCategoriesProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _invariantMarketDescriptionsProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _variantMarketDescriptionProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _variantDescriptionsProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _lotteryDrawSummaryProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _lotteryDrawFixtureProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _lotteryScheduleProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _lotteryListProvider.RawApiDataReceived += OnRawApiDataReceived;
+            //_availableSelectionsProvider.RawApiDataReceived += OnRawApiDataReceived;
+            //_calculateProbabilityProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _fixtureChangesProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _listSportEventProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _availableSportTournamentsProvider.RawApiDataReceived += OnRawApiDataReceived;
         }
 
-        /// <summary>
-        /// Lists the invariants members as required by the code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
+        private void OnRawApiDataReceived(object sender, RawApiDataEventArgs e)
         {
-            Contract.Invariant(_cacheManager != null);
-            Contract.Invariant(_sportEventSummaryProvider != null);
-            Contract.Invariant(_sportEventFixtureProvider != null);
-            Contract.Invariant(_sportEventFixtureChangeFixtureProvider != null);
-            Contract.Invariant(_allTournamentsForAllSportsProvider != null);
-            Contract.Invariant(_allSportsProvider != null);
-            Contract.Invariant(_sportEventsForDateProvider != null);
-            Contract.Invariant(_sportEventsForTournamentProvider != null);
-            Contract.Invariant(_playerProfileProvider != null);
-            Contract.Invariant(_competitorProvider != null);
-            Contract.Invariant(_simpleTeamProvider != null);
-            Contract.Invariant(_tournamentSeasonsProvider != null);
-            Contract.Invariant(_ongoingSportEventProvider != null);
-            Contract.Invariant(_sportCategoriesProvider != null);
-            Contract.Invariant(_invariantMarketDescriptionsProvider != null);
-            Contract.Invariant(_variantMarketDescriptionProvider != null);
-            Contract.Invariant(_variantDescriptionsProvider != null);
-            Contract.Invariant(_lotteryDrawSummaryProvider != null);
-            Contract.Invariant(_lotteryDrawFixtureProvider != null);
-            Contract.Invariant(_lotteryScheduleProvider != null);
-            Contract.Invariant(_lotteryListProvider != null);
+           RawApiDataReceived?.Invoke(sender, e);
         }
 
         /// <summary>
-        /// get sport event summary as an asynchronous operation
+        /// Get sport event summary as an asynchronous operation
         /// </summary>
         /// <param name="id">The id of the sport event to be fetched</param>
         /// <param name="culture">The language to be fetched</param>
@@ -295,7 +357,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         }
 
         /// <summary>
-        /// get sport event fixture as an asynchronous operation
+        /// Get sport event fixture as an asynchronous operation
         /// </summary>
         /// <param name="id">The id of the sport event to be fetched</param>
         /// <param name="culture">The language to be fetched</param>
@@ -314,9 +376,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 int restCallTime;
                 try
                 {
-                    var provider = useCachedProvider ? _sportEventFixtureProvider : _sportEventFixtureChangeFixtureProvider;
+                    var provider = useCachedProvider
+                                       ? _sportEventFixtureProvider
+                                       : _sportEventFixtureChangeFixtureProvider;
                     result = await provider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
-                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)
                 {
@@ -338,7 +402,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         }
 
         /// <summary>
-        /// get all tournaments for sport as an asynchronous operation.
+        /// Get all tournaments for sport as an asynchronous operation.
         /// </summary>
         /// <param name="culture">The culture to be fetched</param>
         /// <returns>Task</returns>
@@ -394,11 +458,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 try
                 {
                     result = await _sportCategoriesProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
-                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)
                 {
-                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
                     _executionLog.Error($"Error getting sport categories for id={id} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
                     if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
@@ -416,7 +480,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         }
 
         /// <summary>
-        /// get all sports as an asynchronous operation.
+        /// Get all sports as an asynchronous operation.
         /// </summary>
         /// <param name="culture">The culture to be fetched</param>
         /// <returns>Task</returns>
@@ -433,11 +497,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 try
                 {
                     result = await _allSportsProvider.GetDataAsync(culture.TwoLetterISOLanguageName).ConfigureAwait(false);
-                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)
                 {
-                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
                     _executionLog.Error($"Error getting all sports for lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
                     if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
@@ -604,7 +668,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         }
 
         /// <summary>
-        /// get player profile as an asynchronous operation.
+        /// Get player profile as an asynchronous operation.
         /// </summary>
         /// <param name="id">The id of the player</param>
         /// <param name="culture">The culture to be fetched</param>
@@ -666,9 +730,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 {
                     if (id.Type.Equals(SdkInfo.SimpleTeamIdentifier, StringComparison.InvariantCultureIgnoreCase)
                         || id.ToString().StartsWith(SdkInfo.OutcometextVariantValue, StringComparison.InvariantCultureIgnoreCase))
+                    {
                         simpleTeamResult = await _simpleTeamProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
+                    }
                     else
+                    {
                         competitorResult = await _competitorProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
+                    }
                     restCallTime = (int) t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)
@@ -859,7 +927,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="variant">The variant URN</param>
         /// <param name="culture">The culture to be fetched</param>
         /// <returns>Task</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         public async Task GetVariantMarketDescriptionAsync(int id, string variant, CultureInfo culture)
         {
             Metric.Context("DataRouterManager").Meter("GetVariantMarketDescriptionAsync", Unit.Calls);
@@ -899,7 +967,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// </summary>
         /// <param name="culture">The culture to be fetched</param>
         /// <returns>Task</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         public async Task GetVariantDescriptionsAsync(CultureInfo culture)
         {
             Metric.Context("DataRouterManager").Meter("GetVariantDescriptionsAsync", Unit.Calls);
@@ -941,7 +1009,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="culture">The language to be fetched</param>
         /// <param name="requester">The cache item which invoked request</param>
         /// <returns>Task</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         /// <remarks>This gets called only if WNS is available</remarks>
         public async Task GetDrawSummaryAsync(URN drawId, CultureInfo culture, ISportEventCI requester)
         {
@@ -989,7 +1057,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="culture">The language to be fetched</param>
         /// <param name="requester">The cache item which invoked request</param>
         /// <returns>Task</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         /// <remarks>This gets called only if WNS is available</remarks>
         public async Task GetDrawFixtureAsync(URN drawId, CultureInfo culture, ISportEventCI requester)
         {
@@ -1037,7 +1105,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="culture">The culture to be fetched</param>
         /// <param name="requester">The cache item which invoked request</param>
         /// <returns>The lottery with its schedule</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         /// <remarks>This gets called only if WNS is available</remarks>
         public async Task GetLotteryScheduleAsync(URN lotteryId, CultureInfo culture, ISportEventCI requester)
         {
@@ -1083,7 +1151,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// </summary>
         /// <param name="culture">The culture to be fetched</param>
         /// <returns>The list of all lotteries ids</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         /// <remarks>This gets called only if WNS is available</remarks>
         public async Task<IEnumerable<URN>> GetAllLotteriesAsync(CultureInfo culture)
         {
@@ -1128,6 +1196,219 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                     return urns;
                 }
                 WriteLog($"Executing GetAllLotteriesAsync for culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms. {SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)} No data.");
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Get available selections as an asynchronous operation.
+        /// </summary>
+        /// <param name="id">The id of the event</param>
+        /// <returns>The available selections for event</returns>
+        public async Task<IAvailableSelections> GetAvailableSelectionsAsync(URN id)
+        {
+            Metric.Context("DataRouterManager").Meter("GetAvailableSelectionsAsync", Unit.Calls);
+            var timer = Metric.Context("DataRouterManager").Timer("GetAvailableSelectionsAsync", Unit.Requests);
+            using (var t = timer.NewContext($"{id}"))
+            {
+                WriteLog($"Executing GetAvailableSelectionsAsync for id={id}.", true);
+
+                AvailableSelectionsDTO result = null;
+                int restCallTime;
+                try
+                {
+                    result = await _availableSelectionsProvider.GetDataAsync(id.ToString()).ConfigureAwait(false);
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                }
+                catch (Exception e)
+                {
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    var message = e.InnerException?.Message ?? e.Message;
+                    _executionLog.Error($"Error getting available selections for id={id}. Message={message}", e.InnerException ?? e);
+                    if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                    {
+                        throw;
+                    }
+                }
+
+                if (result != null)
+                {
+                    await _cacheManager.SaveDtoAsync(id, result, _defaultLocale, DtoType.AvailableSelections, null).ConfigureAwait(false);
+                }
+                WriteLog($"Executing GetAvailableSelectionsAsync for id={id} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
+                return new AvailableSelections(result);
+            }
+        }
+
+        public async Task<ICalculation> CalculateProbability(IEnumerable<ISelection> selections)
+        {
+            Metric.Context("DataRouterManager").Meter("CalculateProbability", Unit.Calls);
+            var timer = Metric.Context("DataRouterManager").Timer("CalculateProbability", Unit.Requests);
+            using (var t = timer.NewContext())
+            {
+                WriteLog("Executing CalculateProbability.", true);
+
+                CalculationDTO result = null;
+                int restCallTime;
+                try
+                {
+                    result = await _calculateProbabilityProvider.GetDataAsync(selections).ConfigureAwait(false);
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                }
+                catch (Exception e)
+                {
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    var message = e.InnerException?.Message ?? e.Message;
+                    _executionLog.Error($"Error calculating probabilities. Message={message}", e.InnerException ?? e);
+                    if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                    {
+                        throw;
+                    }
+                }
+
+                WriteLog($"Executing CalculateProbability took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
+                return new Calculation(result);
+            }
+        }
+
+        public async Task<IEnumerable<IFixtureChange>> GetFixtureChangesAsync(CultureInfo culture)
+        {
+            Metric.Context("DataRouterManager").Meter("GetFixtureChangesAsync", Unit.Calls);
+            var timer = Metric.Context("DataRouterManager").Timer("GetFixtureChangesAsync", Unit.Requests);
+            using (var t = timer.NewContext())
+            {
+                WriteLog("Executing GetFixtureChangesAsync.", true);
+
+                IEnumerable<FixtureChangeDTO> result = null;
+                int restCallTime;
+                try
+                {
+                    result = await _fixtureChangesProvider.GetDataAsync(culture.TwoLetterISOLanguageName).ConfigureAwait(false);
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                }
+                catch (Exception e)
+                {
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    var message = e.InnerException?.Message ?? e.Message;
+                    _executionLog.Error($"Error getting fixture changes. Message={message}", e.InnerException ?? e);
+                    if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                    {
+                        throw;
+                    }
+                }
+
+                WriteLog($"Executing GetFixtureChangesAsync took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
+                return result?.Select(f => new FixtureChange(f)).ToList();
+            }
+        }
+
+        /// <summary>
+        /// Gets the list of almost all events we are offering prematch odds for.
+        /// </summary>
+        /// <param name="startIndex">Starting record (this is an index, not time)</param>
+        /// <param name="limit">How many records to return (max: 1000)</param>
+        /// <param name="culture">The culture</param>
+        /// <returns>The list of the sport event ids with the sportId it belongs to</returns>
+        public async Task<IEnumerable<Tuple<URN, URN>>> GetListOfSportEventsAsync(int startIndex, int limit, CultureInfo culture)
+        {
+            Metric.Context("DataRouterManager").Meter("GetListOfSportEventsAsync", Unit.Calls);
+            var timer = Metric.Context("DataRouterManager").Timer("GetListOfSportEventsAsync", Unit.Requests);
+            using (var t = timer.NewContext($"{startIndex} [{culture.TwoLetterISOLanguageName}]"))
+            {
+                WriteLog($"Executing GetListOfSportEventsAsync with startIndex={startIndex}, limit={limit} and culture={culture.TwoLetterISOLanguageName}.", true);
+
+                EntityList<SportEventSummaryDTO> result = null;
+                int restCallTime;
+                try
+                {
+                    result = await _listSportEventProvider.GetDataAsync(culture.TwoLetterISOLanguageName, startIndex.ToString(), limit.ToString()).ConfigureAwait(false);
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                }
+                catch (Exception e)
+                {
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    if (e.Message.Contains("NotFound"))
+                    {
+                        var message = e.InnerException?.Message ?? e.Message;
+                        _executionLog.Debug($"Error getting list of sport events for startIndex={startIndex}, limit={limit} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
+                    }
+                    else
+                    {
+                        var message = e.InnerException?.Message ?? e.Message;
+                        _executionLog.Error($"Error getting list of sport events for startIndex={startIndex}, limit={limit} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
+                        if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                        {
+                            throw;
+                        }
+                    }
+                }
+
+                if (result != null && result.Items.Any())
+                {
+                    await _cacheManager.SaveDtoAsync(URN.Parse($"sr:sportevents:{result.Items.Count()}"), result, culture, DtoType.SportEventSummaryList, null).ConfigureAwait(false);
+                    var urns = new List<Tuple<URN, URN>>();
+                    foreach (var item in result.Items)
+                    {
+                        urns.Add(new Tuple<URN, URN>(item.Id, item.SportId));
+                    }
+                    WriteLog($"Executing ListOfSportEventsAsync with startIndex={startIndex}, limit={limit} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
+                    return urns;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the list of all the available tournaments for a specific sport
+        /// </summary>
+        /// <param name="sportId">The specific sport id</param>
+        /// <param name="culture">The culture</param>
+        /// <returns>The list of the available tournament ids with the sportId it belongs to</returns>
+        public async Task<IEnumerable<Tuple<URN, URN>>> GetSportAvailableTournamentsAsync(URN sportId, CultureInfo culture)
+        {
+            Metric.Context("DataRouterManager").Meter("GetSportAvailableTournamentsAsync", Unit.Calls);
+            var timer = Metric.Context("DataRouterManager").Timer("GetSportAvailableTournamentsAsync", Unit.Requests);
+            using (var t = timer.NewContext($"{sportId} [{culture.TwoLetterISOLanguageName}]"))
+            {
+                WriteLog($"Executing GetSportAvailableTournamentsAsync with sportId={sportId} and culture={culture.TwoLetterISOLanguageName}.", true);
+
+                EntityList<TournamentInfoDTO> result = null;
+                int restCallTime;
+                try
+                {
+                    result = await _availableSportTournamentsProvider.GetDataAsync(culture.TwoLetterISOLanguageName, sportId.ToString()).ConfigureAwait(false);
+                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
+                }
+                catch (Exception e)
+                {
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    if (e.Message.Contains("NotFound"))
+                    {
+                        var message = e.InnerException?.Message ?? e.Message;
+                        _executionLog.Debug($"Error getting sport available tournaments for sportId={sportId} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
+                    }
+                    else
+                    {
+                        var message = e.InnerException?.Message ?? e.Message;
+                        _executionLog.Error($"Error getting sport available tournaments for sportId={sportId} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
+                        if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                        {
+                            throw;
+                        }
+                    }
+                }
+
+                if (result != null && result.Items.Any())
+                {
+                    await _cacheManager.SaveDtoAsync(URN.Parse($"sr:tournaments:{result.Items.Count()}"), result, culture, DtoType.TournamentInfoList, null).ConfigureAwait(false);
+                    var urns = new List<Tuple<URN, URN>>();
+                    foreach (var item in result.Items)
+                    {
+                        urns.Add(new Tuple<URN, URN>(item.Id, item.Sport.Id));
+                    }
+                    WriteLog($"Executing GetSportAvailableTournamentsAsync with sportId={sportId} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
+                    return urns;
+                }
             }
             return null;
         }

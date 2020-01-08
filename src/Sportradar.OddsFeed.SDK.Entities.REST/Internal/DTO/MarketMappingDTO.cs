@@ -3,11 +3,11 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
@@ -16,9 +16,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
     /// </summary>
     public class MarketMappingDTO
     {
-        private readonly int _typeId;
-        private readonly int _subTypeId;
-
         [Obsolete("Changed with ProducerIds property")]
         internal int ProducerId { get; }
 
@@ -26,9 +23,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         internal URN SportId { get; }
 
-        internal int MarketTypeId => _typeId;
+        internal int MarketTypeId { get; }
 
-        internal int? MarketSubTypeId => _subTypeId;
+        internal int? MarketSubTypeId { get; }
 
         internal string SovTemplate { get; }
 
@@ -40,10 +37,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         internal MarketMappingDTO(mappingsMapping mapping)
         {
-            Contract.Requires(mapping != null);
-            Contract.Requires(mapping.product_id > 0);
-            Contract.Requires(!string.IsNullOrEmpty(mapping.sport_id));
-            Contract.Requires(!string.IsNullOrEmpty(mapping.market_id));
+            Guard.Argument(mapping, nameof(mapping)).NotNull();
+            Guard.Argument(mapping.product_id, nameof(mapping.product_id)).Positive();
+            Guard.Argument(mapping.sport_id, nameof(mapping.sport_id)).NotNull().NotEmpty();
+            Guard.Argument(mapping.market_id, nameof(mapping.market_id)).NotNull().NotEmpty();
 
             ProducerId = mapping.product_id;
             ProducerIds = string.IsNullOrEmpty(mapping.product_ids)
@@ -52,10 +49,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             SportId = mapping.sport_id == "all" ? null : URN.Parse(mapping.sport_id);
             OrgMarketId = null;
             var marketId = mapping.market_id.Split(':'); // legacy
-            int.TryParse(marketId[0], out _typeId);
+            int typeId;
+            int.TryParse(marketId[0], out typeId);
+            MarketTypeId = typeId;
             if (marketId.Length == 2)
             {
-                int.TryParse(marketId[1], out _subTypeId);
+                int subTypeId;
+                MarketSubTypeId = int.TryParse(marketId[1], out subTypeId) ? subTypeId : (int?) null;
             }
             SovTemplate = mapping.sov_template;
             ValidFor = mapping.valid_for;
@@ -68,10 +68,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         internal MarketMappingDTO(variant_mappingsMapping mapping)
         {
-            Contract.Requires(mapping != null);
-            Contract.Requires(mapping.product_id > 0);
-            Contract.Requires(!string.IsNullOrEmpty(mapping.sport_id));
-            Contract.Requires(!string.IsNullOrEmpty(mapping.market_id));
+            Guard.Argument(mapping, nameof(mapping)).NotNull();
+            Guard.Argument(mapping.product_id, nameof(mapping.product_id)).Positive();
+            Guard.Argument(mapping.sport_id, nameof(mapping.sport_id)).NotNull().NotEmpty();
+            Guard.Argument(mapping.market_id, nameof(mapping.market_id)).NotNull().NotEmpty();
 
             ProducerId = mapping.product_id;
             ProducerIds = string.IsNullOrEmpty(mapping.product_ids)
@@ -82,17 +82,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             var marketId = string.IsNullOrEmpty(mapping.product_market_id)
                                ? mapping.market_id.Split(':')
                                : mapping.product_market_id.Split(':');
-            int.TryParse(marketId[0], out _typeId);
+            int typeId;
+            int.TryParse(marketId[0], out typeId);
+            MarketTypeId = typeId;
             if (marketId.Length == 2)
             {
-                int.TryParse(marketId[1], out _subTypeId);
+                int subTypeId;
+                MarketSubTypeId = int.TryParse(marketId[1], out subTypeId) ? subTypeId : (int?) null;
             }
             SovTemplate = mapping.sov_template;
             ValidFor = mapping.valid_for;
 
             if (mapping.mapping_outcome != null)
             {
-                OutcomeMappings = mapping.mapping_outcome.Select(o => new OutcomeMappingDTO(o, mapping.market_id));
+                OutcomeMappings = mapping.mapping_outcome.Select(o => new OutcomeMappingDTO(o, string.IsNullOrEmpty(mapping.product_market_id) ? mapping.market_id : mapping.product_market_id));
             }
         }
     }

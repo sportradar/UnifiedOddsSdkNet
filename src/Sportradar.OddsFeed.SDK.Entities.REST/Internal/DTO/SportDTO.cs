@@ -3,9 +3,9 @@
 */
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
@@ -33,8 +33,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal SportDTO(string id, string name, IEnumerable<tournamentExtended> tournaments)
             :base(id, name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(id));
-            Contract.Requires(!string.IsNullOrEmpty(name));
+            Guard.Argument(id, nameof(id)).NotNull().NotEmpty();
+            Guard.Argument(name, nameof(name)).NotNull().NotEmpty();
 
             if (tournaments == null)
             {
@@ -64,8 +64,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal SportDTO(string id, string name, IEnumerable<CategoryDTO> categories)
             : base(id, name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(id));
-            Contract.Requires(!string.IsNullOrEmpty(name));
+            Guard.Argument(id, nameof(id)).NotNull().NotEmpty();
+            Guard.Argument(name, nameof(name)).NotNull().NotEmpty();
 
             Categories = new ReadOnlyCollection<CategoryDTO>(categories.ToList());
         }

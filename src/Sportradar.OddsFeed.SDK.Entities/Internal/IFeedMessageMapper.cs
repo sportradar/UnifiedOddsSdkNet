@@ -2,19 +2,16 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Globalization;
-using Sportradar.OddsFeed.SDK.Entities.Contracts;
 using Sportradar.OddsFeed.SDK.Entities.REST;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal
 {
     /// <summary>
     /// Defines a contract implemented by classes used to map (convert) feed message to those used by the SDK
     /// </summary>
-    [ContractClass(typeof(FeedMessageMapperContract))]
     internal interface IFeedMessageMapper
     {
         /// <summary>

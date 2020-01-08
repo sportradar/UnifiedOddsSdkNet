@@ -3,9 +3,11 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -75,7 +77,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public CurrentSeasonInfoCI(CurrentSeasonInfoDTO dto, CultureInfo culture, IDataRouterManager dataRouterManager)
             : base(dto.Id, dto.Name, culture)
         {
-            Contract.Requires(dto != null);
+            Guard.Argument(dto, nameof(dto)).NotNull();
 
             _dataRouterManager = dataRouterManager;
             Year = dto.Year;
@@ -90,13 +92,32 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="CurrentSeasonInfoCI"/> class
+        /// </summary>
+        /// <param name="exportable">The exportable</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to fetch missing data</param>
+        public CurrentSeasonInfoCI(ExportableCurrentSeasonInfoCI exportable, IDataRouterManager dataRouterManager)
+            : base(exportable)
+        {
+            _dataRouterManager = dataRouterManager;
+            Year = exportable.Year;
+            StartDate = exportable.StartDate;
+            EndDate = exportable.EndDate;
+            SeasonCoverage = exportable.SeasonCoverage == null ? null : new SeasonCoverageCI(exportable.SeasonCoverage);
+            Groups = exportable.Groups?.Select(g => new GroupCI(g, dataRouterManager)).ToList();
+            CurrentRound = exportable.CurrentRound == null ? null : new RoundCI(exportable.CurrentRound);
+            Competitors = exportable.Competitors?.Select(c => new CompetitorCI(c, dataRouterManager)).ToList();
+            Schedule = exportable.Schedule?.Select(URN.Parse).ToList();
+        }
+
+        /// <summary>
         /// Merges the specified dto
         /// </summary>
         /// <param name="dto">The dto</param>
         /// <param name="culture">The culture</param>
         public void Merge(CurrentSeasonInfoDTO dto, CultureInfo culture)
         {
-            Contract.Requires(dto != null);
+            Guard.Argument(dto, nameof(dto)).NotNull();
 
             base.Merge(dto, culture);
 
@@ -124,6 +145,29 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             {
                 Schedule = dto.Schedule.Select(s => s.Id);
             }
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public async Task<ExportableCurrentSeasonInfoCI> ExportAsync()
+        {
+            var groupsTask = Groups?.Select(async g => await g.ExportAsync().ConfigureAwait(false));
+            var competitorsTask = Competitors?.Select(async c => await c.ExportAsync().ConfigureAwait(false) as ExportableCompetitorCI);
+            return new ExportableCurrentSeasonInfoCI
+            {
+                Id = Id.ToString(),
+                Name = new Dictionary<CultureInfo, string>(Name),
+                Year = Year,
+                StartDate = StartDate,
+                EndDate = EndDate,
+                SeasonCoverage = SeasonCoverage != null ? await SeasonCoverage.ExportAsync().ConfigureAwait(false) : null,
+                Groups = groupsTask != null ? await Task.WhenAll(groupsTask) : null,
+                CurrentRound = CurrentRound != null ? await CurrentRound.ExportAsync().ConfigureAwait(false) : null,
+                Competitors = competitorsTask != null ? await Task.WhenAll(competitorsTask) : null,
+                Schedule = Schedule?.Select(s => s.ToString()).ToList()
+            };
         }
     }
 }

@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using System.Threading;
 using Common.Logging;
@@ -87,6 +87,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         public event EventHandler<FeedCloseEventArgs> CloseFeed;
 
         /// <summary>
+        /// Occurs when a requested event recovery completes
+        /// </summary>
+        public event EventHandler<EventRecoveryCompletedEventArgs> EventRecoveryCompleted;
+
+        /// <summary>
         /// The <see cref="IProducerManager"/> with all available <see cref="IProducer"/>
         /// </summary>
         private readonly IProducerManager _producerManager;
@@ -110,27 +115,16 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                                    IProducerManager producerManager,
                                    IFeedSystemSession systemSession)
         {
-            Contract.Requires(producerRecoveryManagerFactory != null);
-            Contract.Requires(config != null);
-            Contract.Requires(timer != null);
-            Contract.Requires(producerManager != null);
-            Contract.Requires(systemSession != null);
+            Guard.Argument(producerRecoveryManagerFactory, nameof(producerRecoveryManagerFactory)).NotNull();
+            Guard.Argument(config, nameof(config)).NotNull();
+            Guard.Argument(timer, nameof(timer)).NotNull();
+            Guard.Argument(producerManager, nameof(producerManager)).NotNull();
+            Guard.Argument(systemSession, nameof(systemSession)).NotNull();
 
             _producerRecoveryManagerFactory = producerRecoveryManagerFactory;
             _inactivityTimer = timer;
             _producerManager = producerManager;
             _systemSession = systemSession;
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_producerRecoveryManagerFactory != null);
-            Contract.Invariant(_inactivityTimer != null);
-            Contract.Invariant(_executionLog != null);
         }
 
         /// <summary>
@@ -219,12 +213,22 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         }
 
         /// <summary>
+        /// Handles the event recovery completion of a specific recovery manager
+        /// </summary>
+        /// <param name="sender">An <see cref="object"/> representation of a <see cref="IProducerRecoveryManager"/> instance whose status has changed.</param>
+        /// <param name="e">The <see cref="EventRecoveryCompletedEventArgs"/>Additional information about the event.</param>
+        private void OnRecoveryTrackerEventRecoveryCompleted(object sender, EventRecoveryCompletedEventArgs e)
+        {
+            EventRecoveryCompleted?.Invoke(this, e);
+        }
+
+        /// <summary>
         /// Opens the current instance
         /// </summary>
         /// <param name="interests">The interests for which to open trackers</param>
         public void Open(IEnumerable<MessageInterest> interests)
         {
-            Contract.Requires(interests != null);
+            Guard.Argument(interests, nameof(interests)).NotNull().NotEmpty();
 
             var interestList = interests as List<MessageInterest> ?? interests.ToList();
 
@@ -258,6 +262,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             foreach (var recoveryTracker in trackers)
             {
                 recoveryTracker.StatusChanged += OnRecoveryTrackerStatusChanged;
+                recoveryTracker.EventRecoveryCompleted += OnRecoveryTrackerEventRecoveryCompleted;
             }
 
             _producerRecoveryManagers = trackers.ToDictionary(t => t.Producer, t => t);
@@ -293,6 +298,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             foreach (var recoveryTracker in _producerRecoveryManagers)
             {
                 recoveryTracker.Value.StatusChanged -= OnRecoveryTrackerStatusChanged;
+                recoveryTracker.Value.EventRecoveryCompleted -= OnRecoveryTrackerEventRecoveryCompleted;
             }
 
             foreach (var sessionMessageManager in _sessionMessageManagers)

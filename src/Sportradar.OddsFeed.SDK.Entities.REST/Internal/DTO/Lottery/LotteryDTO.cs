@@ -3,9 +3,9 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery
 {
@@ -44,6 +44,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery
         /// <value>The draw events</value>
         public IEnumerable<DrawDTO> DrawEvents { get; }
 
+        /// <summary>
+        /// Gets the <see cref="DateTime"/> specifying when the associated message was generated (on the server side)
+        /// </summary>
+        public DateTime? GeneratedAt { get; }
+
         internal LotteryDTO(lottery item)
             : base(new sportEvent
             {
@@ -59,7 +64,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery
                     }
             })
         {
-            Contract.Requires(item != null);
+            Guard.Argument(item, nameof(item)).NotNull();
 
             if (item.sport!=null)
             {
@@ -82,12 +87,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery
         internal LotteryDTO(lottery_schedule item)
             : this(item.lottery)
         {
-            Contract.Requires(item != null);
+            Guard.Argument(item, nameof(item)).NotNull();
 
             if (item.draw_events != null && item.draw_events.Any())
             {
                 DrawEvents = item.draw_events.Select(draw => new DrawDTO(draw)).ToList();
             }
+
+            GeneratedAt = item.generated_atSpecified ? item.generated_at : (DateTime?) null;
         }
     }
 }

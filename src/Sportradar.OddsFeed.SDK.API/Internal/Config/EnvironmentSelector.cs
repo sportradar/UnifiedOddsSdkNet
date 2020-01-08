@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal.Config
@@ -10,7 +10,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
     /// <summary>
     /// Class EnvironmentSelector
     /// </summary>
-    /// <seealso cref="Sportradar.OddsFeed.SDK.API.IEnvironmentSelector" />
+    /// <seealso cref="IEnvironmentSelector" />
     internal class EnvironmentSelector : IEnvironmentSelectorV1
     {
         /// <summary>
@@ -30,21 +30,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <param name="sectionProvider">A <see cref="IConfigurationSectionProvider"/> used to access <see cref="IOddsFeedConfigurationSection"/></param>
         internal EnvironmentSelector(string accessToken, IConfigurationSectionProvider sectionProvider)
         {
-            Contract.Requires(!string.IsNullOrEmpty(accessToken));
-            Contract.Requires(sectionProvider != null);
+            Guard.Argument(accessToken, nameof(accessToken)).NotNull().NotEmpty();
+            Guard.Argument(sectionProvider, nameof(sectionProvider)).NotNull();
 
             _accessToken = accessToken;
             _sectionProvider = sectionProvider;
-        }
-
-        /// <summary>
-        /// Defines object invariants as required by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(!string.IsNullOrEmpty(_accessToken));
-            Contract.Invariant(_sectionProvider != null);
         }
 
         /// <summary>
@@ -63,10 +53,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <returns>A <see cref="IConfigurationBuilder" /> with properties set to values needed to access integration environment</returns>
         public IConfigurationBuilder SelectIntegration()
         {
-            return new ConfigurationBuilder(
-                _accessToken,
-                _sectionProvider,
-                SdkEnvironment.Integration);
+            return new ConfigurationBuilder(_accessToken, _sectionProvider, SdkEnvironment.Integration);
         }
 
         /// <summary>
@@ -75,9 +62,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <returns>A <see cref="IConfigurationBuilder" /> with properties set to values needed to access production environment</returns>
         public IConfigurationBuilder SelectProduction()
         {
-            return new ConfigurationBuilder(_accessToken,
-                _sectionProvider,
-                SdkEnvironment.Production);
+            return new ConfigurationBuilder(_accessToken, _sectionProvider, SdkEnvironment.Production);
         }
 
         /// <summary>
@@ -86,9 +71,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <returns>A <see cref="IReplayConfigurationBuilder" /> with properties set to values needed to access replay server</returns>
         public IReplayConfigurationBuilder SelectReplay()
         {
-            return new ReplayConfigurationBuilder(
-                _accessToken,
-                _sectionProvider);
+            return new ReplayConfigurationBuilder(_accessToken, _sectionProvider);
         }
 
         /// <summary>
@@ -97,9 +80,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <returns>A <see cref="ICustomConfigurationBuilder" /> with properties set to values needed to access replay server</returns>
         public ICustomConfigurationBuilder SelectCustom()
         {
-            return new CustomConfigurationBuilder(
-                _accessToken,
-                _sectionProvider);
+            return new CustomConfigurationBuilder(_accessToken, _sectionProvider);
         }
     }
 }

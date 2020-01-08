@@ -2,11 +2,9 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
-using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
@@ -16,7 +14,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
     public class SportCategoriesDTO
     {
         /// <summary>
-        /// Gets the <see cref="SportEntityDTO"/> specifying the the parent sport
+        /// Gets the <see cref="SportEntityDTO"/> specifying the parent sport
         /// </summary>
         public SportEntityDTO Sport { get; }
 
@@ -27,8 +25,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         internal SportCategoriesDTO(sportCategoriesEndpoint categoriesEndpoint)
         {
-            Contract.Requires(categoriesEndpoint != null);
-            Contract.Requires(categoriesEndpoint.sport != null);
+            Guard.Argument(categoriesEndpoint, nameof(categoriesEndpoint)).NotNull();
+            Guard.Argument(categoriesEndpoint.sport, nameof(categoriesEndpoint.sport)).NotNull();
 
             Sport = new SportEntityDTO(categoriesEndpoint.sport.id, categoriesEndpoint.sport.name);
             Categories = categoriesEndpoint.categories?.Select(c => new CategoryDTO(c.id, c.name, c.country_code, new List<tournamentExtended>())).ToList();

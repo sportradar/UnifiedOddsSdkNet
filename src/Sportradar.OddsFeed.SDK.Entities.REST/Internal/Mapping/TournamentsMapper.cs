@@ -4,10 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping
 {
@@ -34,7 +34,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping
         /// <param name="data">A <see cref="tournamentsEndpoint"/> instance containing tournaments data</param>
         protected TournamentsMapper(tournamentsEndpoint data)
         {
-            Contract.Requires(data != null);
+            Guard.Argument(data, nameof(data)).NotNull();
 
             _data = data;
         }

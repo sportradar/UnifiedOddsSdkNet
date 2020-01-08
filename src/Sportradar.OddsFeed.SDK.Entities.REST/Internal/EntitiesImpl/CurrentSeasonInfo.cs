@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Common;
@@ -22,8 +22,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public DateTime EndDate { get; }
         public string GetName(CultureInfo culture)
         {
-            string result;
-            Names.TryGetValue(culture, out result);
+            Names.TryGetValue(culture, out var result);
             return result;
         }
         public ISeasonCoverage Coverage { get; }
@@ -38,8 +37,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                                  ExceptionHandlingStrategy exceptionHandlingStrategy,
                                  IDictionary<URN, ReferenceIdCI> competitorsReferenceIds)
         {
-            Contract.Requires(cacheItem != null);
-            //Contract.Requires(sportEntityFactory != null);
+            Guard.Argument(cacheItem, nameof(cacheItem)).NotNull();
+            //Guard.Argument(sportEntityFactory, nameof(sportEntityFactory)).NotNull();
 
             var cultureInfos = cultures as IList<CultureInfo> ?? cultures.ToList();
             Id = cacheItem.Id;
@@ -66,7 +65,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
 
         public CurrentSeasonInfo(ITournamentInfoCI currentSeasonCI,
                                  IEnumerable<CultureInfo> cultures,
-                                 ISportEntityFactory _sportEntityFactory,
+                                 ISportEntityFactory sportEntityFactory,
                                  ExceptionHandlingStrategy exceptionStrategy,
                                  IDictionary<URN, ReferenceIdCI> competitorsReferenceIds)
         {
@@ -81,16 +80,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 : new SeasonCoverage(currentSeasonCI.GetSeasonCoverageAsync().Result);
             Groups = currentSeasonCI.GetGroupsAsync(cultureInfos).Result == null
                 ? null
-                : currentSeasonCI.GetGroupsAsync(cultureInfos).Result.Select(s => new Group(s, cultureInfos, _sportEntityFactory, competitorsReferenceIds));
+                : currentSeasonCI.GetGroupsAsync(cultureInfos).Result.Select(s => new Group(s, cultureInfos, sportEntityFactory, competitorsReferenceIds));
             CurrentRound = currentSeasonCI.GetCurrentRoundAsync(cultureInfos).Result == null
                 ? null
                 : new Round(currentSeasonCI.GetCurrentRoundAsync(cultureInfos).Result, cultureInfos);
             Competitors = currentSeasonCI.GetCompetitorsAsync(cultureInfos).Result == null
                 ? null
-                : currentSeasonCI.GetCompetitorsAsync(cultureInfos).Result.Select(s => _sportEntityFactory.BuildCompetitor(s, cultureInfos, competitorsReferenceIds));
+                : currentSeasonCI.GetCompetitorsAsync(cultureInfos).Result.Select(s => sportEntityFactory.BuildCompetitor(s, cultureInfos, competitorsReferenceIds));
             Schedule = currentSeasonCI.GetScheduleAsync(cultureInfos).Result == null
                 ? null
-                : currentSeasonCI.GetScheduleAsync(cultureInfos).Result.Select(s => _sportEntityFactory.BuildSportEvent<ISportEvent>(s, null, cultureInfos, exceptionStrategy));
+                : currentSeasonCI.GetScheduleAsync(cultureInfos).Result.Select(s => sportEntityFactory.BuildSportEvent<ISportEvent>(s, null, cultureInfos, exceptionStrategy));
         }
     }
 }

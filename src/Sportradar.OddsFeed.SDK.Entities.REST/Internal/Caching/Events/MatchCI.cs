@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
@@ -105,6 +106,29 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="MatchCI"/> class
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableMatchCI" /> specifying the current instance</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to obtain summary and fixture</param>
+        /// <param name="semaphorePool">A <see cref="ISemaphorePool" /> instance used to obtain sync objects</param>
+        /// <param name="defaultCulture">A <see cref="CultureInfo" /> specifying the language used when fetching info which is not translatable (e.g. Scheduled, ..)</param>
+        /// <param name="fixtureTimestampCache">A <see cref="ObjectCache"/> used to cache the sport events fixture timestamps</param>
+        public MatchCI(ExportableMatchCI exportable,
+            IDataRouterManager dataRouterManager,
+            ISemaphorePool semaphorePool,
+            CultureInfo defaultCulture,
+            ObjectCache fixtureTimestampCache)
+            : base(exportable, dataRouterManager, semaphorePool, defaultCulture, fixtureTimestampCache)
+        {
+            _season = exportable.Season != null ? new CacheItem(exportable.Season) : null;
+            _tournamentRound = exportable.TournamentRound != null ? new RoundCI(exportable.TournamentRound) : null;
+            _tournamentId = exportable.TournamentId != null ? URN.Parse(exportable.TournamentId) : null;
+            _fixture = exportable.Fixture != null ? new Fixture(exportable.Fixture) : null;
+            _eventTimeline = exportable.EventTimeline != null ? new EventTimelineCI(exportable.EventTimeline) : null;
+            _delayedInfo = exportable.DelayedInfo != null ? new DelayedInfoCI(exportable.DelayedInfo) : null;
+        }
+
+        /// <summary>
         /// Get season as an asynchronous operation
         /// </summary>
         /// <param name="cultures">A <see cref="IEnumerable{CultureInfo}" /> specifying the languages to which the returned instance should be translated</param>
@@ -116,7 +140,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _season;
             }
-            await FetchMissingSummary(wantedCultures).ConfigureAwait(false);
+            await FetchMissingSummary(wantedCultures, false).ConfigureAwait(false);
             return _season;
         }
 
@@ -132,7 +156,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _tournamentRound;
             }
-            await FetchMissingSummary(cultureInfos).ConfigureAwait(false);
+            await FetchMissingSummary(cultureInfos, false).ConfigureAwait(false);
             return _tournamentRound;
         }
 
@@ -146,7 +170,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _tournamentId;
             }
-            await FetchMissingSummary(new List<CultureInfo> { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new List<CultureInfo> { DefaultCulture }, false).ConfigureAwait(false);
             return _tournamentId;
         }
 
@@ -338,5 +362,34 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 _eventTimeline.Merge(timelineDTO, culture);
             }
         }
+
+        protected override async Task<T> CreateExportableCIAsync<T>()
+        {
+            var exportable = await base.CreateExportableCIAsync<T>();
+            var match = exportable as ExportableMatchCI;
+
+            match.Season = _season != null
+                ? new ExportableCI
+                {
+                    Id = _season.Id.ToString(),
+                    Name = new Dictionary<CultureInfo, string>(_season.Name ?? new Dictionary<CultureInfo, string>())
+                }
+                : null;
+            match.TournamentRound = _tournamentRound != null
+                ? await _tournamentRound.ExportAsync().ConfigureAwait(false)
+                : null;
+            match.TournamentId = _tournamentId?.ToString();
+            match.Fixture = _fixture != null ? await ((Fixture) _fixture).ExportAsync().ConfigureAwait(false) : null;
+            match.EventTimeline = _eventTimeline != null ? await _eventTimeline.ExportAsync().ConfigureAwait(false) : null;
+            match.DelayedInfo = _delayedInfo != null ? await _delayedInfo.ExportAsync().ConfigureAwait(false) : null;
+
+            return exportable;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public override async Task<ExportableCI> ExportAsync() => await CreateExportableCIAsync<ExportableMatchCI>().ConfigureAwait(false);
     }
 }

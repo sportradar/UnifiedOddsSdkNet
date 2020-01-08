@@ -4,11 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 // ReSharper disable InconsistentNaming
 
@@ -104,7 +105,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// Gets the sport event statistics
         /// </summary>
         /// <value>The sport event statistics</value>
-        public SportEventStatisticsDTO SportEventStatistics { get; }
+        public SportEventStatisticsDTO SportEventStatistics { get; internal set; }
 
         /// <summary>
         /// Gets the indicator for competitors if there are home or away
@@ -123,13 +124,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public int? AwayPenaltyScore { get; }
 
         /// <summary>
+        /// Gets the indicator wither the event is decided by fed
+        /// </summary>
+        public bool? DecidedByFed { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SportEventStatusDTO"/> class
         /// </summary>
         /// <param name="record">A <see cref="restSportEventStatus" /> instance containing status data about the associated sport event</param>
         /// <param name="homeAwayCompetitors">The list of competitors with the indicator if it is a home or away team</param>
-        public SportEventStatusDTO(Messages.Internal.Feed.sportEventStatus record, IDictionary<HomeAway, URN> homeAwayCompetitors)
+        public SportEventStatusDTO(sportEventStatus record, IDictionary<HomeAway, URN> homeAwayCompetitors)
         {
-            Contract.Requires(record != null);
+            Guard.Argument(record, nameof(record)).NotNull();
 
             _homeAwayCompetitors = homeAwayCompetitors;
 
@@ -267,6 +273,26 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 AwayPenaltyScore = record.away_penalty_score;
             }
+
+            // load home and away penalty score from the penalty period score
+            if (HomePenaltyScore == null && AwayPenaltyScore == null && PeriodScores != null && PeriodScores.Any())
+            {
+                try
+                {
+                    foreach (var periodScoreDTO in PeriodScores)
+                    {
+                        if (periodScoreDTO.Type.HasValue && periodScoreDTO.Type.Value == PeriodType.Penalties)
+                        {
+                            HomePenaltyScore = (int) periodScoreDTO.HomeScore;
+                            AwayPenaltyScore = (int) periodScoreDTO.AwayScore;
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    //ignored
+                }
+            }
         }
 
         /// <summary>
@@ -277,7 +303,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <param name="homeAwayCompetitors"></param>
         public SportEventStatusDTO(restSportEventStatus record, matchStatistics statistics, IDictionary<HomeAway, URN> homeAwayCompetitors)
         {
-            Contract.Requires(record != null);
+            Guard.Argument(record, nameof(record)).NotNull();
 
             _homeAwayCompetitors = homeAwayCompetitors;
 
@@ -382,15 +408,37 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 SportEventStatistics = new SportEventStatisticsDTO(statistics, _homeAwayCompetitors);
             }
+
+            DecidedByFed = record.decided_by_fedSpecified ? record.decided_by_fed : (bool?) null;
+
+            // load home and away penalty score from the penalty period score
+            if (HomePenaltyScore == null && AwayPenaltyScore == null && PeriodScores != null && PeriodScores.Any())
+            {
+                try
+                {
+                    foreach (var periodScoreDTO in PeriodScores)
+                    {
+                        if (periodScoreDTO.Type.HasValue && periodScoreDTO.Type.Value == PeriodType.Penalties)
+                        {
+                            HomePenaltyScore = (int) periodScoreDTO.HomeScore;
+                            AwayPenaltyScore = (int) periodScoreDTO.AwayScore;
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    //ignored
+                }
+            }
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RoundDTO"/> class.
+        /// Initializes a new instance of the <see cref="SportEventStatusDTO"/> class.
         /// </summary>
         /// <param name="record">A <see cref="restSportEventStatus" /> instance containing status data about the associated sport event</param>
         public SportEventStatusDTO(stageSportEventStatus record)
         {
-            Contract.Requires(record != null);
+            Guard.Argument(record, nameof(record)).NotNull();
 
             var tempProperties = new Dictionary<string, object>(0);
 
@@ -418,24 +466,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
             Status = MessageMapperHelper.GetEnumValue(record.status, EventStatus.Unknown);
             ApplyPropertyValue(true, "Status", (int) Status, tempProperties);
-            //IsReported = record.reportingSpecified
-            //    ? (int?)record.reporting
-            //    : null;
-
-            //HomeScore = record.home_scoreSpecified
-            //    ? (decimal?)record.home_score
-            //    : null;
-
-            //AwayScore = record.away_scoreSpecified
-            //    ? (decimal?)record.away_score
-            //    : null;
-
-            //if (!string.IsNullOrEmpty(record.status))
-            //{
-            //    int statusId;
-            //    int.TryParse(record.status, out statusId);
-            //    MatchStatusId = statusId;
-            //}
 
             MatchStatusId = -1;
 

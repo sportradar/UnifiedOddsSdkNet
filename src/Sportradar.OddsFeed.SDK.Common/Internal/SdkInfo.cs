@@ -117,10 +117,14 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// </summary>
         public const string NameProviderCompositeIdSeparator = ",";
         /// <summary>
-        /// The is o8601 24 h full format
+        /// The iso8601 24h full format
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public const string ISO8601_24H_FullFormat = "yyyy-MM-dd’T’HH:mm:ssXXX";
+        /// <summary>
+        /// The market description minimum fetch interval in seconds
+        /// </summary>
+        public const int MarketDescriptionMinFetchInterval = 30;
 
         /// <summary>
         /// Gets the assembly version number
@@ -184,11 +188,11 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
             string result;
             if (input > 0)
             {
-                result = $"+{input}";
+                result = $"+{input.ToString(CultureInfo.InvariantCulture)}";
             }
             else if (input < 0)
             {
-                result = $"{input}";
+                result = $"{input.ToString(CultureInfo.InvariantCulture)}";
             }
             else
             {
@@ -209,9 +213,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
                 return null;
             }
 
-            DateTime date;
-
-            if (DateTime.TryParse(input, out date))
+            if (DateTime.TryParse(input, out var date))
             {
                 return date;
             }

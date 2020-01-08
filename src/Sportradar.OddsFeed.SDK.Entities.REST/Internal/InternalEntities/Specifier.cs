@@ -1,8 +1,9 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Diagnostics.Contracts;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
+using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
 {
@@ -26,7 +27,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
         /// <param name="cacheItem">The cache item.</param>
         internal Specifier(MarketSpecifierCacheItem cacheItem)
         {
-            Contract.Requires(cacheItem != null);
+            Guard.Argument(cacheItem, nameof(cacheItem)).NotNull();
 
             Name = cacheItem.Name;
             Type = cacheItem.Type;

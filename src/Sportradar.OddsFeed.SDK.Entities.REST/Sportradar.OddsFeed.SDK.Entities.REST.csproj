@@ -83,6 +83,9 @@
       <HintPath>..\packages\Common.Logging.Core.3.4.1\lib\net40\Common.Logging.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Dawn.Guard, Version=1.10.0.0, Culture=neutral, PublicKeyToken=234740ae15f786ce, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dawn.Guard.1.10.0\lib\netstandard1.0\Dawn.Guard.dll</HintPath>
+    </Reference>
     <Reference Include="Humanizer, Version=2.1.0.0, Culture=neutral, PublicKeyToken=979442b78dfc278e, processorArchitecture=MSIL">
       <HintPath>..\packages\Humanizer.Core.2.1.0\lib\netstandard1.0\Humanizer.dll</HintPath>
       <Private>True</Private>
@@ -91,14 +94,20 @@
       <HintPath>..\packages\Metrics.NET.0.5.5\lib\net45\Metrics.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Sportradar.OddsFeed.SDK.Messages.XmlSerializers">
-      <HintPath>..\..\libs\Sportradar.OddsFeed.SDK.Messages.XmlSerializers.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -107,6 +116,49 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Caching\Exportable\ExportableCarCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableCompetitionCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableBonusInfoCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableCoverageInfoCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableEventTimelineCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableEventPlayerAssistCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableDelayedInfoCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableTimelineEventCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableScheduledStartTimeChangeCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableProductInfoLinkCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableStreamingChannelCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableProductInfoCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableTvChannelCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableFixtureCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableMatchCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableTournamentInfoBasicCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableRoundCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableGroupCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableSeasonCoverageCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableCurrentSeasonInfoCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableTournamentCoverageCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableTournamentInfoCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableDrawInfoCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableDrawCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableDrawResultCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableLotteryCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableStageCI.cs" />
+    <Compile Include="Caching\Exportable\ExportablePitcherCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableWeatherInfoCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableRefereeCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableSportEventConditionsCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableSportEventCI.cs" />
+    <Compile Include="Caching\Exportable\ExportablePlayerProfileCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableTeamCompetitorCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableRaceDriverProfileCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableVenueCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableManagerCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableJerseyCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableCompetitorCI.cs" />
+    <Compile Include="CustomBet\ICalculation.cs" />
+    <Compile Include="CustomBet\ISelection.cs" />
+    <Compile Include="CustomBet\IMarket.cs" />
+    <Compile Include="CustomBet\IAvailableSelections.cs" />
     <Compile Include="Enums\CoveredFrom.cs" />
     <Compile Include="Enums\DrawStatus.cs" />
     <Compile Include="Enums\PlayerHand.cs" />
@@ -114,17 +166,31 @@
     <Compile Include="Enums\DrawType.cs" />
     <Compile Include="Enums\BonusDrumType.cs" />
     <Compile Include="Enums\BookingStatus.cs" />
-    <Compile Include="Contracts\MarketDescriptionCacheContract.cs" />
-    <Compile Include="Contracts\NamedValueProviderContract.cs" />
-    <Compile Include="Contracts\SportEventStatusCacheContract.cs" />
-    <Compile Include="Contracts\NameExpressionContract.cs" />
-    <Compile Include="Contracts\MappingValidatorFactoryContract.cs" />
     <Compile Include="Enums\EventStatus.cs" />
     <Compile Include="Enums\HomeAway.cs" />
     <Compile Include="IAssist.cs" />
+    <Compile Include="IBasicTournamentV1.cs" />
     <Compile Include="IBasicTournament.cs" />
     <Compile Include="IBonusInfo.cs" />
     <Compile Include="IBookmakerDetails.cs" />
+    <Compile Include="ICompetitorV3.cs" />
+    <Compile Include="IGroupV1.cs" />
+    <Compile Include="IMatchStatusV2.cs" />
+    <Compile Include="Caching\Exportable\ExportableCategoryCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableSportCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableCI.cs" />
+    <Compile Include="Internal\Caching\Exportable\IExportableCI.cs" />
+    <Compile Include="Internal\Caching\Exportable\IExportableSdkCache.cs" />
+    <Compile Include="Internal\EntitiesImpl\Car.cs" />
+    <Compile Include="Internal\EntitiesImpl\RaceDriverProfile.cs" />
+    <Compile Include="ICar.cs" />
+    <Compile Include="Internal\ListSportAvailableTournamentProvider.cs" />
+    <Compile Include="Internal\Mapping\ListSportAvailableTournamentMapper.cs" />
+    <Compile Include="Internal\Mapping\ListSportAvailableTournamentMapperFactory.cs" />
+    <Compile Include="IRaceDriverProfile.cs" />
+    <Compile Include="ICompetitorV2.cs" />
+    <Compile Include="ICompetitorV1.cs" />
+    <Compile Include="IFixtureChange.cs" />
     <Compile Include="ICategorySummary.cs" />
     <Compile Include="ICategory.cs" />
     <Compile Include="ICompetitionV1.cs" />
@@ -132,21 +198,49 @@
     <Compile Include="ICoverageInfoV1.cs" />
     <Compile Include="IDrawV1.cs" />
     <Compile Include="IEventResultV1.cs" />
+    <Compile Include="IJerseyV1.cs" />
     <Compile Include="IMatchV1.cs" />
     <Compile Include="IMatchStatusV1.cs" />
     <Compile Include="Internal\Caching\CI\PitcherCI.cs" />
+    <Compile Include="Internal\Caching\CI\CarCI.cs" />
+    <Compile Include="Internal\Caching\CI\RaceDriverProfileCI.cs" />
+    <Compile Include="Internal\CalculateProbabilityProvider.cs" />
+    <Compile Include="Internal\DTO\CustomBet\CalculationDTO.cs" />
+    <Compile Include="Internal\DTO\CustomBet\AvailableSelectionsDTO.cs" />
+    <Compile Include="Internal\DTO\CustomBet\MarketDTO.cs" />
+    <Compile Include="Internal\DTO\CarDTO.cs" />
+    <Compile Include="Internal\DTO\RaceDriverProfileDTO.cs" />
     <Compile Include="Internal\DTO\SimpleTeamProfileDTO.cs" />
+    <Compile Include="Internal\DTO\FixtureChangeDTO.cs" />
     <Compile Include="Internal\DTO\SportCategoriesDTO.cs" />
     <Compile Include="Internal\DTO\PitcherDTO.cs" />
     <Compile Include="Internal\DTO\PlayerCompetitorDTO.cs" />
+    <Compile Include="Internal\EntitiesImpl\CustomBet\Calculation.cs" />
+    <Compile Include="Internal\EntitiesImpl\CustomBet\Selection.cs" />
+    <Compile Include="Internal\EntitiesImpl\CustomBet\AvailableSelections.cs" />
+    <Compile Include="Internal\EntitiesImpl\CustomBet\Market.cs" />
+    <Compile Include="Internal\EntitiesImpl\FixtureChange.cs" />
     <Compile Include="Internal\EntitiesImpl\ScheduledStartTimeChange.cs" />
     <Compile Include="Internal\EntitiesImpl\Pitcher.cs" />
+    <Compile Include="Internal\ICalculateProbabilityProvider.cs" />
+    <Compile Include="Internal\Mapping\CalculationMapper.cs" />
+    <Compile Include="Internal\Mapping\AvailableSelectionsMapper.cs" />
+    <Compile Include="Internal\Mapping\CalculationMapperFactory.cs" />
     <Compile Include="Internal\Mapping\SimpleTeamProfileMapper.cs" />
     <Compile Include="Internal\Mapping\SimpleTeamProfileMapperFactory.cs" />
+    <Compile Include="Internal\Mapping\FixtureChangesMapper.cs" />
     <Compile Include="Internal\Mapping\SportCategoriesMapper.cs" />
+    <Compile Include="Internal\Mapping\FixtureChangesMapperFactory.cs" />
     <Compile Include="Internal\Mapping\SportCategoriesMapperFactory.cs" />
+    <Compile Include="Internal\Mapping\AvailableSelectionsMapperFactory.cs" />
+    <Compile Include="Internal\ListSportEventsProvider.cs" />
+    <Compile Include="Internal\Mapping\ListSportEventsMapper.cs" />
+    <Compile Include="Internal\Mapping\ListSportEventsMapperFactory.cs" />
     <Compile Include="IPitcher.cs" />
+    <Compile Include="IPlayerProfileV1.cs" />
     <Compile Include="IReferenceV1.cs" />
+    <Compile Include="IRoundV2.cs" />
+    <Compile Include="IRoundV1.cs" />
     <Compile Include="IScheduledStartTimeChange.cs" />
     <Compile Include="ICoverageInfo.cs" />
     <Compile Include="IDraw.cs" />
@@ -227,7 +321,6 @@
     <Compile Include="Internal\Caching\Events\StageCI.cs" />
     <Compile Include="Internal\Caching\Profiles\IProfileCache.cs" />
     <Compile Include="Internal\Caching\Profiles\ProfileCache.cs" />
-    <Compile Include="Internal\Caching\Sports\CacheItem.cs" />
     <Compile Include="Internal\Caching\Sports\CategoryCI.cs" />
     <Compile Include="Internal\Caching\Sports\CategoryData.cs" />
     <Compile Include="Internal\Caching\ISportDataCache.cs" />
@@ -285,7 +378,7 @@
     <Compile Include="Internal\Mapping\TournamentSeasonsMapperFactory.cs" />
     <Compile Include="Internal\Mapping\TournamentSeasonsMapper.cs" />
     <Compile Include="Internal\MarketNames\IMarketCacheProvider.cs" />
-    <Compile Include="Internal\MarketNames\VariantDescriptionCache.cs" />
+    <Compile Include="Internal\MarketNames\VariantDescriptionListCache.cs" />
     <Compile Include="Internal\MarketNames\IVariantDescriptionCache.cs" />
     <Compile Include="Internal\MarketNames\VariantDescriptionCacheItem.cs" />
     <Compile Include="Internal\BookmakerDetailsProvider.cs" />
@@ -357,7 +450,6 @@
     <Compile Include="Internal\EntitiesImpl\TeamStatistics.cs" />
     <Compile Include="Internal\IMappingValidatorFactory.cs" />
     <Compile Include="Internal\IMappingValidator.cs" />
-    <Compile Include="Internal\InternalEntities\IMarketAttribute.cs" />
     <Compile Include="Internal\InternalEntities\MarketAttribute.cs" />
     <Compile Include="Internal\Mapping\DateScheduleMapperFactory.cs" />
     <Compile Include="Internal\Mapping\DateScheduleMapper.cs" />
@@ -409,11 +501,13 @@
     <Compile Include="Internal\EntitiesImpl\Venue.cs" />
     <Compile Include="Internal\EntitiesImpl\WeatherInfo.cs" />
     <Compile Include="Internal\EventArguments\TournamentReceivedEventArgs.cs" />
-    <Compile Include="Internal\InternalEntities\IMarketDescription.cs" />
-    <Compile Include="Internal\InternalEntities\IMarketMappingData.cs" />
-    <Compile Include="Internal\InternalEntities\IOutcomeDescription.cs" />
-    <Compile Include="Internal\InternalEntities\IOutcomeMappingData.cs" />
-    <Compile Include="Internal\InternalEntities\ISpecifier.cs" />
+    <Compile Include="ISportEventV1.cs" />
+    <Compile Include="ITeamCompetitorV1.cs" />
+    <Compile Include="ITeamStatisticsV2.cs" />
+    <Compile Include="ITeamStatisticsV1.cs" />
+    <Compile Include="ITournamentV1.cs" />
+    <Compile Include="ITvChannelV1.cs" />
+    <Compile Include="MarketMapping\IMarketMappingData.cs" />
     <Compile Include="Internal\InternalEntities\MarketDescription.cs" />
     <Compile Include="Internal\InternalEntities\OutcomeMapping.cs" />
     <Compile Include="Internal\InternalEntities\MarketMapping.cs" />
@@ -484,6 +578,7 @@
     <Compile Include="Internal\MarketNames\InvariantMarketDescriptionCache.cs" />
     <Compile Include="Internal\MarketNames\MarketMappingProvider.cs" />
     <Compile Include="Internal\MarketNames\OutcomeMapping.cs" />
+    <Compile Include="MarketMapping\IOutcomeMappingData.cs" />
     <Compile Include="MarketMapping\LoMarketMapping.cs" />
     <Compile Include="MarketMapping\LcooMarketMapping.cs" />
     <Compile Include="Internal\MarketNames\MarketCacheProvider.cs" />
@@ -532,6 +627,10 @@
     <Compile Include="IVenue.cs" />
     <Compile Include="IWeatherInfo.cs" />
     <Compile Include="Enums\PeriodType.cs" />
+    <Compile Include="Market\IMarketAttribute.cs" />
+    <Compile Include="Market\IMarketDescription.cs" />
+    <Compile Include="Market\IOutcomeDescription.cs" />
+    <Compile Include="Market\ISpecifier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ICompetitor.cs" />
     <Compile Include="Enums\ReportingStatus.cs" />

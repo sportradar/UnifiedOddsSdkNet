@@ -2,18 +2,16 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
-using Sportradar.OddsFeed.SDK.API.Contracts;
+using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
     /// <summary>
     /// Represents contract for tracking <see cref="FeedMessage"/> per specific <see cref="IProducer"/>
     /// </summary>
-    [ContractClass(typeof(ProducerRecoveryManagerContract))]
     internal interface IProducerRecoveryManager
     {
         /// <summary>
@@ -31,6 +29,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// Occurs when status of the associated manager has changed
         /// </summary>
         event EventHandler<TrackerStatusChangeEventArgs> StatusChanged;
+
+        /// <summary>
+        /// Occurs when a requested event recovery completes
+        /// </summary>
+        event EventHandler<EventRecoveryCompletedEventArgs> EventRecoveryCompleted;
 
         /// <summary>
         /// Checks the status of the current recovery manager
@@ -62,7 +65,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// </remarks>
         /// <param name="message">The <see cref="IMessage" /> message to be processed</param>
         /// <param name="interest">The <see cref="MessageInterest"/> describing the session from which the message originates </param>
-        /// <exception cref="System.ArgumentException">The Producer.Id of the message and the Producer associated with this manager do not match</exception>
+        /// <exception cref="ArgumentException">The Producer.Id of the message and the Producer associated with this manager do not match</exception>
         void ProcessUserMessage(FeedMessage message, MessageInterest interest);
 
         /// <summary>

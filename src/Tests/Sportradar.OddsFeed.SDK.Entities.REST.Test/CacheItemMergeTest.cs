@@ -10,7 +10,8 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.Internal;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 using Sportradar.OddsFeed.SDK.Test.Shared;
 using SR = Sportradar.OddsFeed.SDK.Test.Shared.StaticRandom;
 
@@ -409,7 +410,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 name = "Team A",
                 @virtual = true,
                 virtualSpecified = true,
-                qualifier = "qua 1"
+                qualifier = "qua 1",
+                divisionSpecified = true,
+                division = 1
             };
             var teamType2 = new teamCompetitor
             {
@@ -419,7 +422,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 name = "Team A",
                 @virtual = true,
                 virtualSpecified = true,
-                qualifier = "qua 1"
+                qualifier = "qua 1",
+                divisionSpecified = true,
+                division = 1
             };
             var competitorDTO1 = new TeamCompetitorDTO(teamType1);
             var competitorDTO2 = new TeamCompetitorDTO(teamType2);
@@ -435,6 +440,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(competitorCI.Qualifier, teamType1.qualifier);
             Assert.AreEqual(teamType1.country, competitorCI.GetCountry(_cultureFirst));
             Assert.AreEqual(teamType2.country, competitorCI.GetCountry(_cultureSecond));
+            Assert.IsNotNull(competitorCI.Division);
+            Assert.AreEqual(competitorCI.Division.Value, teamType1.division);
         }
 
         [TestMethod]

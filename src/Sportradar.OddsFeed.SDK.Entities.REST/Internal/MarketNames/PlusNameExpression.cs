@@ -1,7 +1,7 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
@@ -26,18 +26,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <param name="operand">A <see cref="IOperand"/> representing part of the name expression</param>
         internal PlusNameExpression(IOperand operand)
         {
-            Contract.Requires(operand != null);
+            Guard.Argument(operand, nameof(operand)).NotNull();
 
             _operand = operand;
-        }
-
-        /// <summary>
-        /// Defines object invariants as required by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_operand != null);
         }
 
         /// <summary>
@@ -48,7 +39,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <exception cref="NameExpressionException">The specified specifier does not exist or it's value is not string representation of decimal</exception>
         public async Task<string> BuildNameAsync(CultureInfo culture)
         {
-            var value = await _operand.GetDecimalValue();
+            var value = await _operand.GetDecimalValue().ConfigureAwait(false);
             var result = SdkInfo.DecimalToStringWithSign(value);
             return result;
         }

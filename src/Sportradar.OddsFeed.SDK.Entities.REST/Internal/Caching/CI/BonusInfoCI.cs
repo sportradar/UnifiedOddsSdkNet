@@ -1,7 +1,11 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Diagnostics.Contracts;
+
+using System;
+using Dawn;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
 
@@ -32,11 +36,37 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 
         internal BonusInfoCI(BonusInfoDTO dto)
         {
-            Contract.Requires(dto != null);
+            Guard.Argument(dto, nameof(dto)).NotNull();
 
             BonusBalls = dto.BonusBalls;
             BonusDrumType = dto.BonusDrumType;
             BonusRange = dto.BonusRange;
+        }
+
+        internal BonusInfoCI(ExportableBonusInfoCI exportable)
+        {
+            if (exportable == null)
+            {
+                throw new ArgumentNullException(nameof(exportable));
+            }
+
+            BonusBalls = exportable.BonusBalls;
+            BonusDrumType = exportable.BonusDrumType;
+            BonusRange = exportable.BonusRange;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableBonusInfoCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportableBonusInfoCI
+            {
+                BonusBalls = BonusBalls,
+                BonusDrumType = BonusDrumType,
+                BonusRange = BonusRange
+            });
         }
     }
 }

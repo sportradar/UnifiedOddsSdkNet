@@ -11,7 +11,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 using Sportradar.OddsFeed.SDK.Test.Shared;
 using RMF = Sportradar.OddsFeed.SDK.Test.Shared.MessageFactoryRest;
 
@@ -55,7 +55,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             var msg1 = RMF.GetDescMarket(10);
             var msg2 = RMF.GetDescMarket(msg1);
 
-            var ci = MarketDescriptionCacheItem.Build(new MarketDescriptionDTO(msg1), _mappingValidatorFactory, FirstCulture);
+            var ci = MarketDescriptionCacheItem.Build(new MarketDescriptionDTO(msg1), _mappingValidatorFactory, FirstCulture, "test");
             ci.Merge(new MarketDescriptionDTO(msg2), SecondCulture);
 
             Assert.AreEqual(msg1.id, ci.Id);
@@ -114,7 +114,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
         private static void ValidateMapping(mappingsMapping msg, MarketMappingCacheItem ci)
         {
-            var ciMarketId = ci.MarketSubTypeId == 0 ? ci.MarketTypeId.ToString() : $"{ci.MarketTypeId}:{ci.MarketSubTypeId}";
+            var ciMarketId = ci.MarketSubTypeId == null ? ci.MarketTypeId.ToString() : $"{ci.MarketTypeId}:{ci.MarketSubTypeId}";
             Assert.AreEqual(msg.market_id, ciMarketId);
             Assert.AreEqual(msg.product_id, ci.ProducerId);
             if (!string.IsNullOrEmpty(msg.product_ids))

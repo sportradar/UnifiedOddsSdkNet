@@ -116,20 +116,23 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="BuildEventMerge.bat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None Include="app.config" />
+    <None Include="BuildEventMerge.bat" />
+    <None Include="NugetPackage.nuspec">
+      <SubType>Designer</SubType>
     </None>
-    <None Include="NugetPackage.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="DoNotInternalize.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="lib\net45\Sportradar.OddsFeed.SDK.dll" />
     <Content Include="Readme.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="lib\net45\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

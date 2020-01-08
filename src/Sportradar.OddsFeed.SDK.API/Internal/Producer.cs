@@ -2,8 +2,9 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -107,6 +108,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <value>The recovery info about last recovery attempt</value>
         public IRecoveryInfo RecoveryInfo { get; internal set; }
 
+        internal ConcurrentDictionary<long, URN> EventRecoveries { get; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Producer"/> class
         /// </summary>
@@ -120,12 +123,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="scope">The scope of the producer</param>
         public Producer(int id, string name, string description, string apiUrl, bool active, int maxInactivitySeconds, int maxRecoveryTime, string scope)
         {
-            Contract.Requires(id > 0);
-            Contract.Requires(!string.IsNullOrEmpty(name));
-            Contract.Requires(!string.IsNullOrEmpty(description));
-            Contract.Requires(!string.IsNullOrEmpty(apiUrl));
-            Contract.Requires(maxInactivitySeconds > 0);
-            Contract.Requires(maxRecoveryTime > 0);
+            Guard.Argument(id, nameof(id)).Positive();
+            Guard.Argument(name, nameof(name)).NotNull().NotEmpty();
+            Guard.Argument(description, nameof(description)).NotNull().NotEmpty();
+            Guard.Argument(apiUrl, nameof(apiUrl)).NotNull().NotEmpty();
+            Guard.Argument(maxInactivitySeconds, nameof(maxInactivitySeconds)).Positive();
+            Guard.Argument(maxRecoveryTime, nameof(maxRecoveryTime)).Positive();
 
             Id = id;
             Name = name;
@@ -145,6 +148,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             Scope = scope.Split('|');
 
             IgnoreRecovery = false;
+            EventRecoveries = new ConcurrentDictionary<long, URN>();
         }
 
         /// <summary>
@@ -184,19 +188,19 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         }
 
         /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance
+        /// Returns a <see cref="string" /> that represents this instance
         /// </summary>
-        /// <returns>A <see cref="System.String" /> that represents this instance</returns>
+        /// <returns>A <see cref="string" /> that represents this instance</returns>
         public override string ToString()
         {
             return $"{Id}({Name}):[IsUp={!IsProducerDown},Timestamp={LastTimestampBeforeDisconnect:dd.MM.yyyy-HH:mm:ss.fff}]";
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="System.Object" /> is equal to this instance
+        /// Determines whether the specified <see cref="object" /> is equal to this instance
         /// </summary>
         /// <param name="obj">The object to compare with the current object</param>
-        /// <returns><c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c></returns>
+        /// <returns><c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c></returns>
         public override bool Equals(object obj)
         {
             if (!(obj is Producer))

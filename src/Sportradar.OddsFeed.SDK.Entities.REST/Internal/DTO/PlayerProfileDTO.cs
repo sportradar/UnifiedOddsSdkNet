@@ -2,8 +2,8 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Dawn;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 // ReSharper disable FieldCanBeMadeReadOnly.Global
 
@@ -64,13 +64,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public int? JerseyNumber { get; }
 
         /// <summary>
+        /// Gets the gender
+        /// </summary>
+        /// <value>The gender</value>
+        public string Gender { get; }
+
+        /// <summary>
+        /// Gets the <see cref="DateTime"/> specifying when the associated message was generated (on the server side)
+        /// </summary>
+        public DateTime? GeneratedAt { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="PlayerProfileDTO"/> class
         /// </summary>
         /// <param name="record">A <see cref="playerExtended"/> containing information about the player</param>
-        public PlayerProfileDTO(playerExtended record)
+        /// <param name="generatedAt">The time the message this belongs to was created</param>
+        public PlayerProfileDTO(playerExtended record, DateTime? generatedAt)
             :base(record.id, record.name)
         {
-            Contract.Requires(record != null);
+            Guard.Argument(record, nameof(record)).NotNull();
 
             Type = record.type;
             DateOfBirth = string.IsNullOrEmpty(record.date_of_birth)
@@ -89,6 +101,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             JerseyNumber = record.jersey_numberSpecified
                 ? (int?) record.jersey_number
                 : null;
+            Gender = record.gender;
+            GeneratedAt = generatedAt;
         }
     }
 }

@@ -3,12 +3,13 @@
 */
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -87,6 +88,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         private IDictionary<URN, ReferenceIdCI> _competitorsReferences;
 
         /// <summary>
+        /// The indicator specifying if the tournament is exhibition game
+        /// </summary>
+        private bool? _exhibitionGames;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TournamentInfoCI"/> class
         /// </summary>
         /// <param name="id">A <see cref="URN" /> specifying the id of the sport event associated with the current instance</param>
@@ -144,16 +150,58 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         }
 
         /// <summary>
-        /// Get category identifier as an asynchronous operation
+        /// Initializes a new instance of the <see cref="TournamentInfoCI"/> class
         /// </summary>
-        /// <returns>A <see cref="Task{URN}" /> representing the asynchronous operation</returns>
-        public async Task<URN> GetCategoryIdAsync()
+        /// <param name="exportable">A <see cref="ExportableTournamentInfoCI" /> specifying the current instance</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to obtain summary and fixture</param>
+        /// <param name="semaphorePool">A <see cref="ISemaphorePool" /> instance used to obtain sync objects</param>
+        /// <param name="defaultCulture">A <see cref="CultureInfo" /> specifying the language used when fetching info which is not translatable (e.g. Scheduled, ..)</param>
+        /// <param name="fixtureTimestampCache">A <see cref="ObjectCache"/> used to cache the sport events fixture timestamps</param>
+        public TournamentInfoCI(ExportableTournamentInfoCI exportable,
+            IDataRouterManager dataRouterManager,
+            ISemaphorePool semaphorePool,
+            CultureInfo defaultCulture,
+            ObjectCache fixtureTimestampCache)
+            : base(exportable, dataRouterManager, semaphorePool, defaultCulture, fixtureTimestampCache)
+        {
+            _categoryId = URN.Parse(exportable.CategoryId);
+            _tournamentCoverage = exportable.TournamentCoverage != null
+                ? new TournamentCoverageCI(exportable.TournamentCoverage)
+                : null;
+            _competitors = exportable.Competitors?.Select(c => new CompetitorCI(c, dataRouterManager)).ToList();
+            _currentSeasonInfo = exportable.CurrentSeasonInfo != null
+                ? new CurrentSeasonInfoCI(exportable.CurrentSeasonInfo, dataRouterManager)
+                : null;
+            _groups = exportable.Groups?.Select(g => new GroupCI(g, dataRouterManager)).ToList();
+            _scheduleUrns = exportable.ScheduleUrns?.Select(URN.Parse).ToList();
+            _round = exportable.Round != null ? new RoundCI(exportable.Round) : null;
+            _year = exportable.Year;
+            _tournamentInfoBasic = exportable.TournamentInfoBasic != null
+                ? new TournamentInfoBasicCI(exportable.TournamentInfoBasic, dataRouterManager)
+                : null;
+            _referenceId = exportable.ReferenceId != null ? new ReferenceIdCI(exportable.ReferenceId) : null;
+            _seasonCoverage = exportable.SeasonCoverage != null
+                ? new SeasonCoverageCI(exportable.SeasonCoverage)
+                : null;
+            _seasons = exportable.Seasons?.Select(URN.Parse).ToList();
+            _loadedSeasons = new List<CultureInfo>(exportable.LoadedSeasons ?? new List<CultureInfo>());
+            _loadedSchedules = new List<CultureInfo>(exportable.LoadedSchedules ?? new List<CultureInfo>());
+            _competitorsReferences =
+                exportable.CompetitorsReferences?.ToDictionary(c => URN.Parse(c.Key), c => new ReferenceIdCI(c.Value));
+            _exhibitionGames = exportable.ExhibitionGames;
+        }
+
+        /// <summary>
+    /// Get category identifier as an asynchronous operation
+    /// </summary>
+    /// <returns>A <see cref="Task{URN}" /> representing the asynchronous operation</returns>
+    public async Task<URN> GetCategoryIdAsync()
         {
             if (_categoryId != null)
             {
                 return _categoryId;
             }
-            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             return _categoryId;
         }
 
@@ -167,7 +215,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _tournamentCoverage;
             }
-            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             return _tournamentCoverage;
         }
 
@@ -182,10 +230,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             wantedCultures = LanguageHelper.GetMissingCultures(wantedCultures, _competitors?.FirstOrDefault()?.Names.Keys).ToList();
             if (_competitors != null && !wantedCultures.Any())
             {
-                return _competitors;
+                return await PrepareCompetitorList(_competitors, wantedCultures);
             }
-            await FetchMissingSummary(wantedCultures).ConfigureAwait(false);
-            return _competitors;
+            await FetchMissingSummary(wantedCultures, false).ConfigureAwait(false);
+            return await PrepareCompetitorList(_competitors, wantedCultures);
+        }
+
+        private async Task<IEnumerable<CompetitorCI>> PrepareCompetitorList(IEnumerable<CompetitorCI> competitors, IEnumerable<CultureInfo> cultures)
+        {
+            if (competitors != null)
+            {
+                return competitors;
+            }
+
+            var groups = await GetGroupsAsync(cultures);
+            return groups?.SelectMany(g => g.Competitors).Distinct();
         }
 
         /// <summary>
@@ -200,7 +259,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _currentSeasonInfo;
             }
-            await FetchMissingSummary(wantedCultures).ConfigureAwait(false);
+            await FetchMissingSummary(wantedCultures, false).ConfigureAwait(false);
             return _currentSeasonInfo;
         }
 
@@ -216,7 +275,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _groups;
             }
-            await FetchMissingSummary(wantedCultures).ConfigureAwait(false);
+            await FetchMissingSummary(wantedCultures, false).ConfigureAwait(false);
             return _groups;
         }
 
@@ -236,7 +295,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 if (tasks.All(a => a.IsCompleted))
                 {
                     _loadedSchedules.AddRange(missingCultures);
-                    _scheduleUrns = tasks.First().Result.Select(s=>s.Item1);
+                    if (tasks.First().Result != null)
+                    {
+                        _scheduleUrns = tasks.First().Result.Select(s => s.Item1);
+                    }
                 }
             }
 
@@ -255,7 +317,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _round;
             }
-            await FetchMissingSummary(wantedCultures).ConfigureAwait(false);
+            await FetchMissingSummary(wantedCultures, false).ConfigureAwait(false);
             return _round;
         }
 
@@ -269,7 +331,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _year;
             }
-            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             return _year;
         }
 
@@ -283,7 +345,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _tournamentInfoBasic;
             }
-            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             return _tournamentInfoBasic;
         }
 
@@ -297,7 +359,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _referenceId;
             }
-            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             return _referenceId;
         }
 
@@ -307,7 +369,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <returns>A <see cref="Task{TResult}" /> representing an async operation</returns>
         public async Task<SeasonCoverageCI> GetSeasonCoverageAsync()
         {
-            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             return _seasonCoverage;
         }
 
@@ -343,8 +405,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _competitorsReferences;
             }
-            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+            await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             return _competitorsReferences;
+        }
+
+        /// <summary>
+        /// Asynchronously gets a <see cref="bool"/> specifying if the tournament is exhibition game
+        /// </summary>
+        /// <returns>A <see cref="bool"/> specifying if the tournament is exhibition game</returns>
+        public async Task<bool?> GetExhibitionGamesAsync()
+        {
+            await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
+            return _exhibitionGames;
         }
 
         /// <summary>
@@ -459,6 +531,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 _seasonCoverage = new SeasonCoverageCI(dto.SeasonCoverage);
             }
+
+            if (dto.ExhibitionGames != null)
+            {
+                _exhibitionGames = dto.ExhibitionGames;
+            }
         }
 
         /// <summary>
@@ -535,7 +612,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <param name="culture">The culture</param>
         private void MergeCompetitors(IEnumerable<CompetitorDTO> competitors, CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             if (competitors == null)
             {
@@ -568,7 +645,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <param name="culture">The culture</param>
         private void MergeGroups(IEnumerable<GroupDTO> groups, CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             if (groups == null)
             {
@@ -620,5 +697,38 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 }
             }
         }
+
+        protected override async Task<T> CreateExportableCIAsync<T>()
+        {
+            var exportable = await base.CreateExportableCIAsync<T>();
+            var info = exportable as ExportableTournamentInfoCI;
+
+            info.CategoryId = _categoryId.ToString();
+            info.TournamentCoverage = _tournamentCoverage != null ? await _tournamentCoverage.ExportAsync().ConfigureAwait(false) : null;
+            var competitorsTasks = _competitors?.Select(async c => await c.ExportAsync().ConfigureAwait(false) as ExportableCompetitorCI);
+            info.Competitors = competitorsTasks != null ? await Task.WhenAll(competitorsTasks) : null;
+            info.CurrentSeasonInfo = _currentSeasonInfo != null ? await _currentSeasonInfo.ExportAsync().ConfigureAwait(false) : null;
+            var groupsTasks = _groups?.Select(async g => await g.ExportAsync().ConfigureAwait(false));
+            info.Groups = groupsTasks != null ? await Task.WhenAll(groupsTasks) : null;
+            info.ScheduleUrns = _scheduleUrns?.Select(s => s.ToString()).ToList();
+            info.Round = _round != null ? await _round.ExportAsync().ConfigureAwait(false) : null;
+            info.Year = _year;
+            info.TournamentInfoBasic = _tournamentInfoBasic != null ? await _tournamentInfoBasic.ExportAsync().ConfigureAwait(false) : null;
+            info.ReferenceId = _referenceId?.ReferenceIds?.ToDictionary(r => r.Key, r => r.Value);
+            info.SeasonCoverage = _seasonCoverage != null ? await _seasonCoverage.ExportAsync().ConfigureAwait(false) : null;
+            info.Seasons = _seasons?.Select(s => s.ToString()).ToList();
+            info.LoadedSeasons = new List<CultureInfo>(_loadedSeasons ?? new List<CultureInfo>());
+            info.LoadedSchedules = new List<CultureInfo>(_loadedSchedules ?? new List<CultureInfo>());
+            info.CompetitorsReferences = _competitorsReferences?.ToDictionary(r => r.Key.ToString(), r => (IDictionary<string, string>)r.Value.ReferenceIds.ToDictionary(v => v.Key, v => v.Value));
+            info.ExhibitionGames = _exhibitionGames;
+
+            return exportable;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public override async Task<ExportableCI> ExportAsync() => await CreateExportableCIAsync<ExportableTournamentInfoCI>().ConfigureAwait(false);
     }
 }

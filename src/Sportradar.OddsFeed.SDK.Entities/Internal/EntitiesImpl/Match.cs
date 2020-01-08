@@ -66,7 +66,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         public new async Task<IMatchStatus> GetStatusAsync()
         {
             var item = await base.GetStatusAsync().ConfigureAwait(false);
-            return item == null ? null : new MatchStatus(((CompetitionStatus)item).SportEventStatusCI, MatchStatusCache);
+            return item == null ? null : new MatchStatus(((CompetitionStatus) item).SportEventStatusCI, MatchStatusCache);
         }
 
         /// <summary>
@@ -121,22 +121,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
             }
             var items = ExceptionStrategy == ExceptionHandlingStrategy.THROW
                 ? await matchCI.GetCompetitorsAsync(Cultures).ConfigureAwait(false)
-                : await new Func<IEnumerable<CultureInfo>, Task<IEnumerable<TeamCompetitorCI>>>(matchCI.GetCompetitorsAsync).SafeInvokeAsync(Cultures, ExecutionLog, GetFetchErrorMessage("Competitors")).ConfigureAwait(false);
+                : await new Func<IEnumerable<CultureInfo>, Task<IEnumerable<URN>>>(matchCI.GetCompetitorsAsync).SafeInvokeAsync(Cultures, ExecutionLog, GetFetchErrorMessage("Competitors")).ConfigureAwait(false);
 
             if (items == null)
             {
                 return null;
             }
 
-            var itemList = items as List<TeamCompetitorCI> ?? items.ToList();
-
-            if (itemList.Count == 2)
+            var competitorUrns = items.ToList();
+            if (competitorUrns.Count == 2)
             {
-                return _sportEntityFactory.BuildTeamCompetitor(itemList[0], Cultures, matchCI);
+                return await _sportEntityFactory.BuildTeamCompetitorAsync(competitorUrns[0], Cultures, matchCI).ConfigureAwait(false);
             }
 
-            ExecutionLog.Error($"Received {itemList.Count} competitors for match[Id = {Id}]. Match can have only 2 competitors");
-            throw new InvalidOperationException($"Invalid number of competitors. Match must have exactly 2 competitors, received {itemList.Count}");
+            ExecutionLog.Error($"Received {competitorUrns.Count} competitors for match[Id = {Id}]. Match can have only 2 competitors");
+            throw new InvalidOperationException($"Invalid number of competitors. Match must have exactly 2 competitors, received {competitorUrns.Count}");
         }
 
         /// <summary>
@@ -153,22 +152,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
             }
             var items = ExceptionStrategy == ExceptionHandlingStrategy.THROW
                 ? await matchCI.GetCompetitorsAsync(Cultures).ConfigureAwait(false)
-                : await new Func<IEnumerable<CultureInfo>, Task<IEnumerable<TeamCompetitorCI>>>(matchCI.GetCompetitorsAsync).SafeInvokeAsync(Cultures, ExecutionLog, GetFetchErrorMessage("Competitors")).ConfigureAwait(false);
+                : await new Func<IEnumerable<CultureInfo>, Task<IEnumerable<URN>>>(matchCI.GetCompetitorsAsync).SafeInvokeAsync(Cultures, ExecutionLog, GetFetchErrorMessage("Competitors")).ConfigureAwait(false);
 
             if (items == null)
             {
                 return null;
             }
 
-            var itemList = items as List<TeamCompetitorCI> ?? items.ToList();
-
-            if (itemList.Count == 2)
+            var competitorUrns = items.ToList();
+            if (competitorUrns.Count == 2)
             {
-                return _sportEntityFactory.BuildTeamCompetitor(itemList[1], Cultures, matchCI);
+                return await _sportEntityFactory.BuildTeamCompetitorAsync(competitorUrns[1], Cultures, matchCI).ConfigureAwait(false);
             }
 
-            ExecutionLog.Error($"Received {itemList.Count} competitors for match[Id = {Id}]. Match can have only 2 competitors.");
-            throw new InvalidOperationException($"Invalid number of competitors. Match must have exactly 2 competitors, received {itemList.Count}");
+            ExecutionLog.Error($"Received {competitorUrns.Count} competitors for match[Id = {Id}]. Match can have only 2 competitors.");
+            throw new InvalidOperationException($"Invalid number of competitors. Match must have exactly 2 competitors, received {competitorUrns.Count}");
         }
 
         /// <summary>
@@ -235,7 +233,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// Asynchronously gets the associated delayed info
         /// </summary>
         /// <returns>A <see cref="T:System.Threading.Tasks.Task`1" /> representing the retrieval operation</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         public async Task<IDelayedInfo> GetDelayedInfoAsync()
         {
             var matchCI = (MatchCI)SportEventCache.GetEventCacheItem(Id);

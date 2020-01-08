@@ -3,8 +3,6 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using Sportradar.OddsFeed.SDK.API.Contracts;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal.Metrics;
@@ -17,7 +15,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
     /// Contract for interacting with <see cref="FeedRecoveryManager" /></summary>
     /// <seealso cref="IOpenable" />
     /// <seealso cref="IHealthStatusProvider" />
-    [ContractClass(typeof(FeedRecoveryManagerContract))]
     internal interface IFeedRecoveryManager
     {
         /// <summary>
@@ -42,6 +39,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// Occurs when the specific <see cref="IProducerRecoveryManager"/> is in status <see cref="ProducerRecoveryStatus.FatalError"/> indicating the recovery request could not be invoked
         /// </summary>
         event EventHandler<FeedCloseEventArgs> CloseFeed;
+
+        /// <summary>
+        /// Occurs when a requested event recovery completes
+        /// </summary>
+        event EventHandler<EventRecoveryCompletedEventArgs> EventRecoveryCompleted;
 
         /// <summary>
         /// Gets a value indicating whether the current instance is opened

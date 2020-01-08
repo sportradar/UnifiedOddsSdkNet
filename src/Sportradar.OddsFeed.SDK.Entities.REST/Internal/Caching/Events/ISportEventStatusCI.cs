@@ -103,5 +103,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// Gets the penalty score of the away competitor competing on the associated sport event (for Ice Hockey)
         /// </summary>
         int? AwayPenaltyScore { get; }
+
+        /// <summary>
+        /// Gets the indicator wither the event is decided by fed
+        /// </summary>
+        bool? DecidedByFed { get; }
     }
 }

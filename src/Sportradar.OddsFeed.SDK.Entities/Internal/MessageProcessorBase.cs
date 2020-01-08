@@ -2,9 +2,9 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal
 {
@@ -24,7 +24,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="e">Send the <see cref="FeedMessage"/> originally received</param>
         protected void RaiseOnMessageProcessedEvent(FeedMessageReceivedEventArgs e)
         {
-            Contract.Requires(e != null);
+            Guard.Argument(e, nameof(e)).NotNull();
 
             MessageProcessed?.Invoke(this, e);
         }

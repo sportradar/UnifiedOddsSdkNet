@@ -1,10 +1,13 @@
 /*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -33,23 +36,47 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the provided data</param>
         public CacheItem(URN id, string name, CultureInfo culture)
         {
-            Contract.Requires(id != null);
-            //Contract.Requires(!string.IsNullOrEmpty(name)); // there were tournaments with empty name!
-            Contract.Requires(culture != null);
+            Guard.Argument(id, nameof(id)).NotNull();
+            //Guard.Argument(name)); // there were tournaments with empty name!
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             Id = id;
             Name = new Dictionary<CultureInfo, string> {{culture, name}};
         }
 
         /// <summary>
-        /// Defined field invariants needed by code contracts
+        /// Initializes a new instance of the <see cref="CacheItem"/> class.
         /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
+        /// <param name="exportable">A <see cref="ExportableCI"/> representing the cache item</param>
+        public CacheItem(ExportableCI exportable)
         {
-            Contract.Invariant(Id != null);
-            Contract.Invariant(Name != null);
-            Contract.Invariant(Name.Any());
+            if (exportable == null)
+            {
+                throw new ArgumentNullException(nameof(exportable));
+            }
+
+            Id = URN.Parse(exportable.Id);
+            Name = new Dictionary<CultureInfo, string>(exportable.Name);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CacheItem"/> class.
+        /// </summary>
+        /// <param name="id">A <see cref="URN"/> representing the id of the item</param>
+        /// <param name="name">The name of the item</param>
+        protected CacheItem(URN id, IDictionary<CultureInfo, string> name)
+        {
+            if (id == null)
+            {
+                throw new ArgumentNullException(nameof(id));
+            }
+
+            if (name == null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+            Id = id;
+            Name = name;
         }
 
         /// <summary>
@@ -59,10 +86,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the culture of data in the passed <see cref="CacheItem"/></param>
         public virtual void Merge(CacheItem item, CultureInfo culture)
         {
-            Contract.Requires(culture != null);
-            Contract.Requires(item != null);
-            Contract.Requires(item.Name != null);
-            Contract.Requires(item.Name.Any());
+            Guard.Argument(culture, nameof(culture)).NotNull();
+            Guard.Argument(item, nameof(item)).NotNull();
+            Guard.Argument(item.Name, nameof(item.Name)).NotNull().NotEmpty();
 
             if (item.Name.Count == 1) // must be only 1 name (received from mapper)
             {
@@ -72,7 +98,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 
             foreach (var k in item.Name.Keys)
             {
-                Name[culture] = item.Name[k];
+                Name[k] = item.Name[k];
             }
         }
 
@@ -83,7 +109,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">The culture of the input <see cref="SportEntityDTO"/></param>
         internal void Merge(SportEntityDTO dto, CultureInfo culture)
         {
-            Contract.Requires(dto != null);
+            Guard.Argument(dto, nameof(dto)).NotNull();
+
             Name[culture] = dto.Name;
         }
 
@@ -98,9 +125,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         }
 
         /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// Returns a <see cref="string" /> that represents this instance.
         /// </summary>
-        /// <returns>A <see cref="System.String" /> that represents this instance.</returns>
+        /// <returns>A <see cref="string" /> that represents this instance.</returns>
         public override string ToString()
         {
             return $"Id={Id}";

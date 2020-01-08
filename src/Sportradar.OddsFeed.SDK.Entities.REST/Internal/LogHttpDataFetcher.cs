@@ -3,7 +3,7 @@
 */
 using System;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.IO;
 using System.Net.Http;
 using System.Text;
@@ -14,7 +14,7 @@ using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Common.Internal.Metrics;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -41,9 +41,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         public LogHttpDataFetcher(HttpClient client, string accessToken, ISequenceGenerator sequenceGenerator, IDeserializer<response> responseDeserializer, int connectionFailureLimit = 5, int connectionFailureTimeout = 15)
             :base(client, accessToken, responseDeserializer, connectionFailureLimit, connectionFailureTimeout)
         {
-            Contract.Requires(sequenceGenerator != null);
-            Contract.Requires(connectionFailureLimit >= 1);
-            Contract.Requires(connectionFailureTimeout >= 1);
+            Guard.Argument(sequenceGenerator, nameof(sequenceGenerator)).NotNull();
+            Guard.Argument(connectionFailureLimit, nameof(connectionFailureLimit)).Positive();
+            Guard.Argument(connectionFailureTimeout, nameof(connectionFailureTimeout)).Positive();
 
             _sequenceGenerator = sequenceGenerator;
         }
@@ -53,7 +53,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// </summary>
         /// <param name="uri">The <see cref="Uri" /> of the resource to be fetched</param>
         /// <returns>A <see cref="Task" /> which, when completed will return a <see cref="Stream" /> containing fetched data</returns>
-        /// <exception cref="Sportradar.OddsFeed.SDK.Common.Exceptions.CommunicationException">Failed to execute http get</exception>
+        /// <exception cref="CommunicationException">Failed to execute http get</exception>
         public override async Task<Stream> GetDataAsync(Uri uri)
         {
             Metric.Context("FEED").Meter("LogHttpDataFetcher->GetDataAsync", Unit.Requests).Mark();
@@ -110,7 +110,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// </summary>
         /// <param name="uri">The <see cref="Uri" /> of the resource to be fetched</param>
         /// <returns>A <see cref="Task" /> which, when completed will return a <see cref="Stream" /> containing fetched data</returns>
-        /// <exception cref="Sportradar.OddsFeed.SDK.Common.Exceptions.CommunicationException">Failed to execute http get</exception>
+        /// <exception cref="CommunicationException">Failed to execute http get</exception>
         public override Stream GetData(Uri uri)
         {
             Metric.Context("FEED").Meter("LogHttpDataFetcher->GetData", Unit.Requests).Mark();
@@ -168,7 +168,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="uri">The <see cref="Uri"/> of the resource to be fetched</param>
         /// <param name="content">A <see cref="HttpContent"/> to be posted to the specific <see cref="Uri"/></param>
         /// <returns>A <see cref="Task"/> which, when successfully completed will return a <see cref="HttpResponseMessage"/></returns>
-        /// <exception cref="Sportradar.OddsFeed.SDK.Common.Exceptions.CommunicationException">Failed to execute http post</exception>
+        /// <exception cref="CommunicationException">Failed to execute http post</exception>
         public override async Task<HttpResponseMessage> PostDataAsync(Uri uri, HttpContent content = null)
         {
             Metric.Context("FEED").Meter("LogHttpDataFetcher->PostDataAsync", Unit.Requests).Mark();
@@ -178,8 +178,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             RestLog.Info($"Id:{dataId} Posting url: {uri.AbsoluteUri}");
             if (content != null)
             {
-                var s = await content.ReadAsStringAsync().ConfigureAwait(false);
-                RestLog.Info($"Id:{dataId} Content: {s}");
+                //var s = await content.ReadAsStringAsync().ConfigureAwait(false);
+                //RestLog.Info($"Id:{dataId} Content: {s}");
             }
 
             var watch = new Stopwatch();
@@ -188,7 +188,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             HttpResponseMessage response;
             try
             {
-                response = await base.PostDataAsync(uri, content);
+                response = await base.PostDataAsync(uri, content).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -225,7 +225,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// </summary>
         public void RegisterHealthCheck()
         {
-            HealthChecks.RegisterHealthCheck("LogHttpDataFetcher", new Func<HealthCheckResult>(StartHealthCheck));
+            HealthChecks.RegisterHealthCheck("LogHttpDataFetcher", StartHealthCheck);
         }
 
         /// <summary>

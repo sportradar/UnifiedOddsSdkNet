@@ -13,7 +13,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 using Sportradar.OddsFeed.SDK.Test.Shared;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Test
@@ -30,7 +30,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
         private MemoryCache _variantDescriptionsMemoryCache;
         private IMarketDescriptionCache _variantMdCache;
         private IMarketDescriptionCache _inVariantMdCache;
-        private IVariantDescriptionCache _variantDescriptionsCache;
+        private IVariantDescriptionCache _variantDescriptionListCache;
         private IMappingValidatorFactory _mappingValidatorFactory;
 
         private readonly TimeSpan _timerInterval = TimeSpan.FromSeconds(1);
@@ -46,13 +46,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
 
             _variantMemoryCache = new MemoryCache("VariantCache");
             _invariantMemoryCache = new MemoryCache("InVariantCache");
-            _variantDescriptionsMemoryCache = new MemoryCache("VariantDescriptionsCache");
+            _variantDescriptionsMemoryCache = new MemoryCache("VariantDescriptionListCache");
 
             _timer = new SdkTimer(_timerInterval, _timerInterval);
             _mappingValidatorFactory = new MappingValidatorFactory();
             _inVariantMdCache = new InvariantMarketDescriptionCache(_invariantMemoryCache, _dataRouterManager, _mappingValidatorFactory, _timer, TestData.Cultures, _cacheManager);
             _variantMdCache = new VariantMarketDescriptionCache(_variantMemoryCache, _dataRouterManager, _mappingValidatorFactory, _cacheManager);
-            _variantDescriptionsCache = new VariantDescriptionCache(_variantDescriptionsMemoryCache, _dataRouterManager, _mappingValidatorFactory, _timer, TestData.Cultures, _cacheManager);
+            _variantDescriptionListCache = new VariantDescriptionListCache(_variantDescriptionsMemoryCache, _dataRouterManager, _mappingValidatorFactory, _timer, TestData.Cultures, _cacheManager);
 
             var dataFetcher = new TestDataFetcher();
 
@@ -66,7 +66,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
             namedValueProviderMock.Setup(x => x.BettingStatuses).Returns(bettingStatusCache);
 
              _validator = new FeedMessageValidator(
-                 new MarketCacheProvider(_inVariantMdCache, _variantMdCache, _variantDescriptionsCache),
+                 new MarketCacheProvider(_inVariantMdCache, _variantMdCache, _variantDescriptionListCache),
                  TestData.Culture,
                  namedValueProviderMock.Object,
                  TestProducerManager.Create());
@@ -173,7 +173,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
 
             betCancel = GetMessage<bet_cancel>("bet_cancel.xml");
             betCancel.market = null;
-            Assert.AreEqual(ValidationResult.SUCCESS, _validator.Validate(betCancel), "Validation of null markets should succeed");
+            Assert.AreEqual(ValidationResult.FAILURE, _validator.Validate(betCancel), "Validation of null markets should fail");
 
             betCancel = GetMessage<bet_cancel>("bet_cancel.xml");
             betCancel.market.First().specifiers = null;
@@ -210,7 +210,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
 
             rollbackCancel = GetMessage<rollback_bet_cancel>("rollback_bet_cancel.xml");
             rollbackCancel.market = null;
-            Assert.AreEqual(ValidationResult.SUCCESS, _validator.Validate(rollbackCancel), "Validation of null markets should succeed");
+            Assert.AreEqual(ValidationResult.FAILURE, _validator.Validate(rollbackCancel), "Validation of null markets should fail");
 
             rollbackCancel = GetMessage<rollback_bet_cancel>("rollback_bet_cancel.xml");
             rollbackCancel.market.First().specifiers = null;
@@ -284,7 +284,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
 
             rollback = GetMessage<rollback_bet_settlement>("rollback_bet_settlement.xml");
             rollback.market = null;
-            Assert.AreEqual(ValidationResult.SUCCESS, _validator.Validate(rollback), "Validation of null markets should succeed");
+            Assert.AreEqual(ValidationResult.FAILURE, _validator.Validate(rollback), "Validation of null markets should fail");
 
             rollback = GetMessage<rollback_bet_settlement>("rollback_bet_settlement.xml");
             rollback.market.First().specifiers = null;

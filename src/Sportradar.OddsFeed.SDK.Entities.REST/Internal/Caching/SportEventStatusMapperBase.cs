@@ -4,7 +4,7 @@
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
 {
@@ -19,7 +19,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <returns>Returns base <see cref="SportEventStatusCI"/> instance</returns>
         public SportEventStatusCI CreateNotStarted()
         {
-            return new SportEventStatusCI(new SportEventStatusDTO(new sportEventStatus {status = (int)EventStatus.Unknown, match_status = -1}, null));
+            return new SportEventStatusCI(new SportEventStatusDTO(new sportEventStatus {status = (int)EventStatus.Unknown, match_status = -1}, null), null);
         }
     }
 }

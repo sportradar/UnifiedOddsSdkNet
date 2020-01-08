@@ -4,11 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.Common;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
@@ -25,19 +26,27 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
         internal IEnumerable<MarketOutcomeCacheItem> Outcomes { get; }
 
+        internal DateTime LastDataReceived { get; private set; }
+
+        internal string SourceCache { get; }
+
         protected VariantDescriptionCacheItem(
             string id,
             IEnumerable<MarketOutcomeCacheItem> outcomes,
             IEnumerable<MarketMappingCacheItem> mappings,
-            CultureInfo culture)
+            CultureInfo culture,
+            string source)
         {
 
-            Contract.Requires(culture != null);
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             Id = id;
             Outcomes = outcomes;
             Mappings = mappings;
             FetchedLanguages = new List<CultureInfo>(new[] {culture});
+
+            SourceCache = source;
+            LastDataReceived = DateTime.Now;
         }
 
         /// <summary>
@@ -46,13 +55,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <param name="dto">The <see cref="VariantDescriptionDTO"/> containing variant description data</param>
         /// <param name="factory">The <see cref="IMappingValidatorFactory"/> instance used to build market mapping validators</param>
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the provided DTO</param>
+        /// <param name="source">The source cache where <see cref="MarketDescriptionCacheItem"/> is built</param>
         /// <returns>The constructed <see cref="VariantDescriptionCacheItem"/></returns>
         /// <exception cref="InvalidOperationException">The cache item could not be build from the provided DTO</exception>
-        public static VariantDescriptionCacheItem Build(VariantDescriptionDTO dto, IMappingValidatorFactory factory, CultureInfo culture)
+        public static VariantDescriptionCacheItem Build(VariantDescriptionDTO dto, IMappingValidatorFactory factory, CultureInfo culture, string source)
         {
-            Contract.Requires(dto != null);
-            Contract.Requires(factory != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(dto, nameof(dto)).NotNull();
+            Guard.Argument(factory, nameof(factory)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             var outcomes = dto.Outcomes == null
                 ? null
@@ -62,7 +72,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 ? null
                 : new ReadOnlyCollection<MarketMappingCacheItem>(dto.Mappings.Select(m => MarketMappingCacheItem.Build(m, factory, culture)).ToList());
 
-            return new VariantDescriptionCacheItem(dto.Id, outcomes, mappings, culture);
+            return new VariantDescriptionCacheItem(dto.Id, outcomes, mappings, culture, source);
         }
 
         internal bool HasTranslationsFor(CultureInfo culture)
@@ -70,10 +80,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             return FetchedLanguages.Contains(culture);
         }
 
+        internal bool CanBeFetched()
+        {
+            return (DateTime.Now - LastDataReceived).TotalSeconds > SdkInfo.MarketDescriptionMinFetchInterval;
+        }
+
         internal void Merge(VariantDescriptionDTO dto, CultureInfo culture)
         {
-            Contract.Requires(dto != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(dto, nameof(dto)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             if (dto.Outcomes != null)
             {
@@ -108,6 +123,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             }
 
             FetchedLanguages.Add(culture);
+
+            LastDataReceived = DateTime.Now;
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
     /// <summary>
     ///     Represents the odds for an outcome
     /// </summary>
-    internal class OutcomeOdds : OutcomeProbabilities, IOutcomeOddsV1
+    internal class OutcomeOdds : OutcomeProbabilities, IOutcomeOddsV2
     {
         /// <summary>
         /// Gets the odds for the current <see cref="IOutcomeOdds" /> instance
@@ -18,7 +18,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         public double Odds { get; }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="OutcomeOdds" /> class
+        /// Additional probability attributes for markets which potentially will be (partly) refunded
+        /// </summary>
+        public IAdditionalProbabilities AdditionalProbabilities { get; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OutcomeOdds" /> class
         /// </summary>
         /// <param name="id">the value uniquely identifying the current <see cref="OutcomeOdds" /> instance</param>
         /// <param name="active">A value indicating whether the current <see cref="OutcomeOdds" /> is active - i.e. should bets on it be accepted </param>
@@ -27,16 +32,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <param name="nameProvider">A <see cref="INameProvider"/> used to generate the outcome name(s)</param>
         /// <param name="mappingProvider">A <see cref="IMarketMappingProvider"/> instance used for providing mapping ids of markets and outcomes</param>
         /// <param name="cultures">A <see cref="IEnumerable{CultureInfo}"/> specifying languages the current instance supports</param>
+        /// <param name="outcomeDefinition">The associated <see cref="IOutcomeDefinition"/></param>
+        /// <param name="additionalProbabilities">Additional probability attributes for markets which potentially will be (partly) refunded</param>
         internal OutcomeOdds(string id,
                              bool? active,
                              double odds,
                              double? probabilities,
                              INameProvider nameProvider,
                              IMarketMappingProvider mappingProvider,
-                             IEnumerable<CultureInfo> cultures)
-            : base(id, active, probabilities, nameProvider, mappingProvider, cultures)
+                             IEnumerable<CultureInfo> cultures,
+                             IOutcomeDefinition outcomeDefinition,
+                             IAdditionalProbabilities additionalProbabilities)
+            : base(id, active, probabilities, nameProvider, mappingProvider, cultures, outcomeDefinition)
         {
             Odds = odds;
+            AdditionalProbabilities = additionalProbabilities;
         }
 
         /// <summary>

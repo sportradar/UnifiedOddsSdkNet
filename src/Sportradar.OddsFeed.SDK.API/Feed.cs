@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -28,7 +28,7 @@ namespace Sportradar.OddsFeed.SDK.API
     /// <summary>
     /// A <see cref="IOddsFeed"/> implementation acting as an entry point to the odds feed SDK
     /// </summary>
-    public class Feed : EntityDispatcherBase, IOddsFeedV1, IGlobalEventDispatcher
+    public class Feed : EntityDispatcherBase, IOddsFeedV2, IGlobalEventDispatcher
     {
         /// <summary>
         /// A <see cref="ILog"/> instance used for execution logging
@@ -59,7 +59,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <summary>
         /// A <see cref="IList{IOpenable}"/> containing all user constructed sessions
         /// </summary>
-        private readonly IList<IOpenable> _sessions = new List<IOpenable>();
+        internal readonly IList<IOpenable> Sessions = new List<IOpenable>();
 
         /// <summary>
         /// The <see cref="IOddsFeedConfigurationInternal"/> representing internal sdk configuration
@@ -77,6 +77,11 @@ namespace Sportradar.OddsFeed.SDK.API
         public event EventHandler<FeedCloseEventArgs> Closed;
 
         /// <summary>
+        /// Occurs when a requested event recovery completes
+        /// </summary>
+        public event EventHandler<EventRecoveryCompletedEventArgs> EventRecoveryCompleted;
+
+        /// <summary>
         /// Raised when the current <see cref="IOddsFeed" /> instance determines that the <see cref="IProducer" /> associated with
         /// the odds feed went down
         /// </summary>
@@ -91,45 +96,129 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <summary>
         /// Gets a <see cref="IEventRecoveryRequestIssuer"/> instance used to issue recovery requests to the feed
         /// </summary>
-        public IEventRecoveryRequestIssuer EventRecoveryRequestIssuer { get; }
+        public IEventRecoveryRequestIssuer EventRecoveryRequestIssuer {
+            get
+            {
+                InitFeed();
+                return UnityContainer.Resolve<IEventRecoveryRequestIssuer>();
+            }
+        }
 
         /// <summary>
         /// Gets a <see cref="ISportDataProvider" /> instance used to retrieve sport related data from the feed
         /// </summary>
         /// <value>The sport data provider</value>
-        public ISportDataProvider SportDataProvider { get; }
+        public ISportDataProvider SportDataProvider {
+            get
+            {
+                InitFeed();
+                return UnityContainer.Resolve<ISportDataProvider>();
+            }
+        }
 
         /// <summary>
         /// Gets a <see cref="IProducerManager" /> instance used to retrieve producer related data
         /// </summary>
         /// <value>The producer manager</value>
-        public IProducerManager ProducerManager { get; }
+        public IProducerManager ProducerManager
+        {
+            get
+            {
+                InitFeed();
+                try
+                {
+                    var producerManager = UnityContainer.Resolve<IProducerManager>();
+                    if (InternalConfig.Environment == SdkEnvironment.Replay)
+                    {
+                        ((ProducerManager) producerManager).SetIgnoreRecovery(0);
+                    }
+                    return producerManager;
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Error getting available producers.", e);
+                    throw;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets a <see cref="IBookingManager" /> instance used to perform various booking calendar operations
         /// </summary>
         /// <value>The booking manager</value>
-        public IBookingManager BookingManager { get; }
+        public IBookingManager BookingManager
+        {
+            get
+            {
+                InitFeed();
+                return UnityContainer.Resolve<IBookingManager>();
+            }
+        }
 
         /// <summary>
         /// Gets the<see cref= "ICashOutProbabilitiesProvider" /> instance used to retrieve cash out probabilities for betting markets
         /// </summary>
-        public ICashOutProbabilitiesProvider CashOutProbabilitiesProvider { get; }
+        public ICashOutProbabilitiesProvider CashOutProbabilitiesProvider
+        {
+            get
+            {
+                InitFeed();
+                return UnityContainer.Resolve<ICashOutProbabilitiesProvider>();
+            }
+        }
 
         /// <summary>
         /// Gets a <see cref="IBookmakerDetails"/> instance used to get info about bookmaker and token used
         /// </summary>
-        public IBookmakerDetails BookmakerDetails { get; }
+        public IBookmakerDetails BookmakerDetails
+        {
+            get
+            {
+                InitFeed();
+                return InternalConfig.BookmakerDetails;
+            }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="IMarketDescriptionManager"/> instance used to get info about available markets, and to get translations for markets and outcomes including outrights
+        /// </summary>
+        public IMarketDescriptionManager MarketDescriptionManager
+        {
+            get
+            {
+                InitFeed();
+                return UnityContainer.Resolve<IMarketDescriptionManager>();
+            }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="ICustomBetManager" /> instance used to perform various custom bet operations
+        /// </summary>
+        /// <value>The custom bet manager</value>
+        public ICustomBetManager CustomBetManager
+        {
+            get
+            {
+                InitFeed();
+                return UnityContainer.Resolve<ICustomBetManager>();
+            }
+        }
 
         /// <summary>
         /// A <see cref="IFeedRecoveryManager"/> for managing recoveries and producer statuses in sessions
         /// </summary>
-        private readonly IFeedRecoveryManager _feedRecoveryManager;
+        private IFeedRecoveryManager _feedRecoveryManager;
 
         /// <summary>
         /// A <see cref="ConnectionValidator"/> used to detect potential connectivity issues
         /// </summary>
-        private readonly ConnectionValidator _connectionValidator;
+        private ConnectionValidator _connectionValidator;
+
+        /// <summary>
+        /// The feed initialized
+        /// </summary>
+        protected bool FeedInitialized;
+        private readonly object _lockInitialized = new object();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Feed"/> class
@@ -138,42 +227,46 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <param name="isReplay">Value indicating whether the constructed instance will be used to connect to replay server</param>
         protected Feed(IOddsFeedConfiguration config, bool isReplay)
         {
-            Contract.Requires(config != null);
+            Guard.Argument(config, nameof(config)).NotNull();
 
             LogInit();
 
-            var container = new UnityContainer();
-            container.RegisterBaseTypes(config);
-            var internalConfig = container.Resolve<IOddsFeedConfigurationInternal>();
-            if (isReplay || internalConfig.Environment == SdkEnvironment.Replay)
-            {
-                internalConfig.EnableReplayServer();
-            }
-            internalConfig.Load(); // loads bookmaker_details
-            container.RegisterTypes(this);
-            container.RegisterAdditionalTypes();
-            UnityContainer = container;
+            FeedInitialized = false;
 
-            EventRecoveryRequestIssuer = UnityContainer.Resolve<IEventRecoveryRequestIssuer>();
-            SportDataProvider = UnityContainer.Resolve<ISportDataProvider>();
-            CashOutProbabilitiesProvider = UnityContainer.Resolve<ICashOutProbabilitiesProvider>();
-            _feedRecoveryManager = UnityContainer.Resolve<IFeedRecoveryManager>();
-            _connectionValidator = UnityContainer.Resolve<ConnectionValidator>();
+            UnityContainer = new UnityContainer();
+            UnityContainer.RegisterBaseTypes(config);
             InternalConfig = UnityContainer.Resolve<IOddsFeedConfigurationInternal>();
-            BookingManager = UnityContainer.Resolve<IBookingManager>();
-            BookmakerDetails = InternalConfig.BookmakerDetails;
-            try
+            if (isReplay || InternalConfig.Environment == SdkEnvironment.Replay)
             {
-                ProducerManager = UnityContainer.Resolve<IProducerManager>();
-                if (isReplay || internalConfig.Environment == SdkEnvironment.Replay)
-                {
-                    ((ProducerManager)ProducerManager).SetIgnoreRecovery(0);
-                }
+                InternalConfig.EnableReplayServer();
             }
-            catch (Exception e)
+        }
+
+        /// <summary>
+        /// Initializes the feed (unity)
+        /// </summary>
+        protected virtual void InitFeed()
+        {
+            if (FeedInitialized)
             {
-                Log.Error("Error getting available producers.", e);
-                throw;
+                return;
+            }
+
+            lock (_lockInitialized)
+            {
+                if (FeedInitialized)
+                {
+                    return;
+                }
+
+                InternalConfig.Load(); // loads bookmaker_details
+                UnityContainer.RegisterTypes(this);
+                UnityContainer.RegisterAdditionalTypes();
+
+                _feedRecoveryManager = UnityContainer.Resolve<IFeedRecoveryManager>();
+                _connectionValidator = UnityContainer.Resolve<ConnectionValidator>();
+
+                FeedInitialized = true;
             }
         }
 
@@ -194,7 +287,7 @@ namespace Sportradar.OddsFeed.SDK.API
         private void OnConnectionShutdown(object sender, ShutdownEventArgs shutdownEventArgs)
         {
             _feedRecoveryManager.ConnectionShutdown();
-            ((IGlobalEventDispatcher)this).DispatchDisconnected();
+            ((IGlobalEventDispatcher) this).DispatchDisconnected();
         }
 
         /// <summary>
@@ -205,7 +298,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <param name="e">The <see cref="ProducerStatusChangeEventArgs"/> instance containing the event data</param>
         private void MarkProducerAsDown(object sender, ProducerStatusChangeEventArgs e)
         {
-            ((IGlobalEventDispatcher)this).DispatchProducerDown(e.GetProducerStatusChange());
+            ((IGlobalEventDispatcher) this).DispatchProducerDown(e.GetProducerStatusChange());
         }
 
         /// <summary>
@@ -215,7 +308,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <param name="e">The <see cref="ProducerStatusChangeEventArgs"/> instance containing the event data</param>
         private void MarkProducerAsUp(object sender, ProducerStatusChangeEventArgs e)
         {
-            ((IGlobalEventDispatcher)this).DispatchProducerUp(e.GetProducerStatusChange());
+            ((IGlobalEventDispatcher) this).DispatchProducerUp(e.GetProducerStatusChange());
         }
 
         private void OnCloseFeed(object sender, FeedCloseEventArgs e)
@@ -255,9 +348,9 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <returns>The <see cref="IEnumerable{String}"/> containing routing keys for the specified session</returns>
         private IEnumerable<string> GetSessionRoutingKeys(OddsFeedSession session)
         {
-            var interests = _sessions.Select(s => ((OddsFeedSession)s).MessageInterest);
+            var interests = Sessions.Select(s => ((OddsFeedSession)s).MessageInterest);
             var keys = FeedRoutingKeyBuilder.GenerateKeys(interests, InternalConfig.NodeId).ToList();
-            return keys[_sessions.IndexOf(session)];
+            return keys[Sessions.IndexOf(session)];
         }
 
         /// <summary>
@@ -267,8 +360,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <returns>A <see cref="IOddsFeedSession"/> instance with the specified <see cref="MessageInterest"/></returns>
         internal IOddsFeedSession CreateSession(MessageInterest msgInterest)
         {
-            Contract.Requires(msgInterest != null);
-            Contract.Ensures(Contract.Result<IOddsFeedSession>() != null);
+            Guard.Argument(msgInterest, nameof(msgInterest)).NotNull();
 
             if (_isDisposed)
             {
@@ -280,10 +372,11 @@ namespace Sportradar.OddsFeed.SDK.API
                 throw new InvalidOperationException("Cannot create session associated with already opened feed");
             }
 
+            InitFeed();
             var childContainer = UnityContainer.CreateChildContainer();
             Func<OddsFeedSession, IEnumerable<string>> func = GetSessionRoutingKeys;
             var session = (OddsFeedSession) childContainer.Resolve<IOddsFeedSession>(new ParameterOverride("messageInterest", msgInterest), new ParameterOverride("getRoutingKeys", func));
-            _sessions.Add(session);
+            Sessions.Add(session);
             return session;
         }
 
@@ -305,11 +398,25 @@ namespace Sportradar.OddsFeed.SDK.API
         }
 
         /// <summary>
+        /// Dispatches the information that the requested event recovery completed
+        /// <param name="requestId">The identifier of the recovery request</param>
+        /// <param name="eventId">The associated event identifier</param>
+        /// </summary>
+        void IGlobalEventDispatcher.DispatchEventRecoveryCompleted(long requestId, URN eventId)
+        {
+            Guard.Argument(eventId, nameof(eventId)).NotNull();
+
+            Dispatch(EventRecoveryCompleted, new EventRecoveryCompletedEventArgs(requestId, eventId), "EventRecoveryCompleted");
+        }
+
+        /// <summary>
         /// Dispatches the <see cref="IProducerStatusChange"/> message
         /// </summary>
         /// <param name="producerStatusChange">The <see cref="IProducerStatusChange"/> instance to be dispatched</param>
         void IGlobalEventDispatcher.DispatchProducerDown(IProducerStatusChange producerStatusChange)
         {
+            Guard.Argument(producerStatusChange, nameof(producerStatusChange)).NotNull();
+
             var eventArgs = new ProducerStatusChangeEventArgs(producerStatusChange);
             Dispatch(ProducerDown, eventArgs, "ProducerDown");
         }
@@ -320,6 +427,8 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <param name="producerStatusChange">The <see cref="IProducerStatusChange"/> instance to be dispatched</param>
         void IGlobalEventDispatcher.DispatchProducerUp(IProducerStatusChange producerStatusChange)
         {
+            Guard.Argument(producerStatusChange, nameof(producerStatusChange)).NotNull();
+
             var eventArgs = new ProducerStatusChangeEventArgs(producerStatusChange);
             Dispatch(ProducerUp, eventArgs, "ProducerUp");
         }
@@ -331,7 +440,6 @@ namespace Sportradar.OddsFeed.SDK.API
         [Obsolete("Use GetConfigurationBuilder")]
         public static IConfigurationAccessTokenSetter CreateConfigurationBuilder()
         {
-            Contract.Ensures(Contract.Result<IConfigurationAccessTokenSetter>() != null);
             return new OddsFeedConfigurationBuilder(null);
         }
 
@@ -344,9 +452,6 @@ namespace Sportradar.OddsFeed.SDK.API
         [Obsolete("Use GetConfigurationBuilder")]
         public static IOddsFeedConfigurationBuilder GetConfigurationBuilderFromConfig()
         {
-            Contract.Ensures(Contract.Result<IOddsFeedConfigurationBuilder>() != null);
-            //var section = OddsFeedConfigurationSection.GetSection();
-
             return new OddsFeedConfigurationBuilder(new ConfigurationSectionProvider());
         }
 
@@ -356,7 +461,6 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <returns>A <see cref="IOddsFeedConfiguration"/> instance created from provided information</returns>
         public static ITokenSetter GetConfigurationBuilder()
         {
-            Contract.Ensures(Contract.Result<ITokenSetter>() != null);
             return new TokenSetter(new ConfigurationSectionProvider());
         }
 
@@ -413,7 +517,7 @@ namespace Sportradar.OddsFeed.SDK.API
             _feedRecoveryManager.CloseFeed -= OnCloseFeed;
             _feedRecoveryManager.Close();
 
-            foreach (var session in _sessions)
+            foreach (var session in Sessions)
             {
                 session.Close();
             }
@@ -450,6 +554,8 @@ namespace Sportradar.OddsFeed.SDK.API
         /// </exception>
         public void Open()
         {
+            InitFeed();
+
             if (_isDisposed)
             {
                 throw new ObjectDisposedException(ToString());
@@ -460,14 +566,14 @@ namespace Sportradar.OddsFeed.SDK.API
                 throw new InvalidOperationException("The feed is already opened");
             }
 
-            SdkInfo.LogSdkVersion(Log);
+            //SdkInfo.LogSdkVersion(Log);
             Log.Info($"Feed configuration: [{InternalConfig}]");
 
             try
             {
                 ((ProducerManager) ProducerManager).Lock();
 
-                foreach (var session in _sessions)
+                foreach (var session in Sessions)
                 {
                     session.Open();
                 }
@@ -478,44 +584,49 @@ namespace Sportradar.OddsFeed.SDK.API
                 _feedRecoveryManager.ProducerDown += MarkProducerAsDown;
                 _feedRecoveryManager.CloseFeed += OnCloseFeed;
 
-                var interests = _sessions.Select(s => ((OddsFeedSession) s).MessageInterest).ToList();
+                var interests = Sessions.Select(s => ((OddsFeedSession) s).MessageInterest).ToList();
                 _feedRecoveryManager.Open(interests);
             }
             catch (CommunicationException ex)
             {
+                Interlocked.CompareExchange(ref _opened, 0, 1);
+
                 // this should really almost never happen
                 var result = _connectionValidator.ValidateConnection();
                 if (result == ConnectionValidationResult.Success)
                 {
-                    throw new CommunicationException(
-                        "Connection to the RESTful API failed, Probable Reason={Invalid or expired token}",
-                        $"{InternalConfig.ApiBaseUri}:443",
-                        ex.InnerException);
+                    throw new CommunicationException("Connection to the RESTful API failed, Probable Reason={Invalid or expired token}",
+                                                     $"{InternalConfig.ApiBaseUri}:443",
+                                                     ex.InnerException);
                 }
 
                 var publicIp = _connectionValidator.GetPublicIp();
-                throw new CommunicationException(
-                    $"Connection to the RESTful API failed. Probable Reason={result.Message}, Public IP={publicIp}",
-                    $"{InternalConfig.ApiBaseUri}:443",
-                    ex);
+                throw new CommunicationException($"Connection to the RESTful API failed. Probable Reason={result.Message}, Public IP={publicIp}",
+                                                 $"{InternalConfig.ApiBaseUri}:443",
+                                                 ex);
             }
             catch (BrokerUnreachableException ex)
             {
+                Interlocked.CompareExchange(ref _opened, 0, 1);
+
                 // this should really almost never happen
                 var result = _connectionValidator.ValidateConnection();
                 if (result == ConnectionValidationResult.Success)
                 {
-                    throw new CommunicationException(
-                        "Connection to the message broker failed, Probable Reason={Invalid or expired token}",
-                        $"{InternalConfig.Host}:{InternalConfig.Port}",
-                        ex.InnerException);
+                    throw new CommunicationException("Connection to the message broker failed, Probable Reason={Invalid or expired token}",
+                                                     $"{InternalConfig.Host}:{InternalConfig.Port}",
+                                                     ex.InnerException);
                 }
 
                 var publicIp = _connectionValidator.GetPublicIp();
-                throw new CommunicationException(
-                    $"Connection to the message broker failed. Probable Reason={result.Message}, Public IP={publicIp}",
-                    $"{InternalConfig.Host}:{InternalConfig.Port}",
-                    ex);
+                throw new CommunicationException($"Connection to the message broker failed. Probable Reason={result.Message}, Public IP={publicIp}",
+                                                 $"{InternalConfig.Host}:{InternalConfig.Port}",
+                                                 ex);
+            }
+            catch (Exception)
+            {
+                Interlocked.CompareExchange(ref _opened, 0, 1);
+                throw;
             }
         }
 
@@ -523,7 +634,6 @@ namespace Sportradar.OddsFeed.SDK.API
         {
             var msg = "UF SDK .NET initialization. Version: " + SdkInfo.GetVersion();
             var logger = SdkLoggerFactory.GetLoggerForFeedTraffic(typeof(Feed));
-            Contract.Assume(logger != null);
             logger.Info(msg);
             logger = SdkLoggerFactory.GetLoggerForCache(typeof(Feed));
             logger.Info(msg);

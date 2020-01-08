@@ -5,10 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
 using Sportradar.OddsFeed.SDK.Messages;
+using Sportradar.OddsFeed.SDK.Messages.EventArguments;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -17,6 +19,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
     /// </summary>
     public interface IDataRouterManager
     {
+        /// <summary>
+        /// Occurs when data from Sports API arrives
+        /// </summary>
+        event EventHandler<RawApiDataEventArgs> RawApiDataReceived;
+
         /// <summary>
         /// Gets the <see cref="SportEventSummaryDTO"/> or its derived type from the summary endpoint
         /// </summary>
@@ -161,5 +168,43 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="culture">The culture to be fetched</param>
         /// <returns>The list of ids of the seasons for specified tournament</returns>
         Task<IEnumerable<URN>> GetAllLotteriesAsync(CultureInfo culture);
+
+        /// <summary>
+        /// Gets the available selections for event
+        /// </summary>
+        /// <param name="id">The id of the event</param>
+        /// <returns>The available selections for event</returns>
+        Task<IAvailableSelections> GetAvailableSelectionsAsync(URN id);
+
+        /// <summary>
+        /// Gets the probability calculation for the specified selections
+        /// </summary>
+        /// <param name="selections">The <see cref="IEnumerable{ISelection}"/> containing selections for which the probability should be calculated</param>
+        /// <returns>The probability calculation for the specified selections</returns>
+        Task<ICalculation> CalculateProbability(IEnumerable<ISelection> selections);
+
+        /// <summary>
+        /// Gets the list of all fixtures that have changed in the last 24 hours
+        /// </summary>
+        /// <param name="culture">The culture to be fetched</param>
+        /// <returns>The list of all fixtures that have changed in the last 24 hours</returns>
+        Task<IEnumerable<IFixtureChange>> GetFixtureChangesAsync(CultureInfo culture);
+
+        /// <summary>
+        /// Gets the list of almost all events we are offering prematch odds for
+        /// </summary>
+        /// <param name="startIndex">Starting record (this is an index, not time)</param>
+        /// <param name="limit">How many records to return (max: 1000)</param>
+        /// <param name="culture">The culture</param>
+        /// <returns>The list of the sport event ids with the sportId it belongs to</returns>
+        Task<IEnumerable<Tuple<URN, URN>>> GetListOfSportEventsAsync(int startIndex, int limit, CultureInfo culture);
+
+        /// <summary>
+        /// Gets the list of all the available tournaments for a specific sport
+        /// </summary>
+        /// <param name="sportId">The specific sport id</param>
+        /// <param name="culture">The culture</param>
+        /// <returns>The list of the available tournament ids with the sportId it belongs to</returns>
+        Task<IEnumerable<Tuple<URN, URN>>> GetSportAvailableTournamentsAsync(URN sportId, CultureInfo culture);
     }
 }

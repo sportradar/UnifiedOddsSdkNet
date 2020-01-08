@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,7 +15,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// </summary>
     /// <seealso cref="CompetitionStatus" />
     /// <seealso cref="IMatchStatus" />
-    public class MatchStatus : CompetitionStatus, IMatchStatusV1
+    public class MatchStatus : CompetitionStatus, IMatchStatusV2
     {
         /// <summary>
         /// The match statuses cache
@@ -57,6 +57,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public int? AwayPenaltyScore { get; }
 
         /// <summary>
+        /// Gets the indicator wither the event is decided by fed
+        /// </summary>
+        public bool? DecidedByFed { get; }
+
+        /// <summary>
         /// Get match status as an asynchronous operation
         /// </summary>
         /// <param name="culture">The culture used to fetch status id and description</param>
@@ -65,7 +70,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         {
             return SportEventStatusCI == null || SportEventStatusCI.MatchStatusId < 0  || _matchStatusesCache == null
                 ? null
-                : await _matchStatusesCache?.GetAsync(SportEventStatusCI.MatchStatusId, new List<CultureInfo> {culture});
+                : await _matchStatusesCache.GetAsync(SportEventStatusCI.MatchStatusId, new List<CultureInfo> {culture}).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -76,8 +81,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public MatchStatus(SportEventStatusCI ci, ILocalizedNamedValueCache matchStatusesCache)
             : base(ci, matchStatusesCache)
         {
-            Contract.Requires(ci != null);
-            Contract.Requires(matchStatusesCache != null);
+            Guard.Argument(ci, nameof(ci)).NotNull();
+            Guard.Argument(matchStatusesCache, nameof(matchStatusesCache)).NotNull();
 
             if (ci.EventClock != null)
             {
@@ -92,6 +97,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             _matchStatusesCache = matchStatusesCache;
             HomePenaltyScore = ci.HomePenaltyScore;
             AwayPenaltyScore = ci.AwayPenaltyScore;
+            DecidedByFed = ci.DecidedByFed;
         }
     }
 }

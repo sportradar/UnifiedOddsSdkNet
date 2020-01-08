@@ -14,8 +14,9 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 using Sportradar.OddsFeed.SDK.Test.Shared;
+
 // ReSharper disable RedundantTypeArgumentsOfMethod
 
 namespace Sportradar.OddsFeed.SDK.API.Test
@@ -49,7 +50,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             bookmakerDetailsProviderMock.Setup(x => x.GetData(It.IsAny<string>())).Returns(TestConfigurationInternal.GetBookmakerDetails());
             var defaultBookmakerDetailsProvider = bookmakerDetailsProviderMock.Object;
             container.RegisterInstance<IDataProvider<BookmakerDetailsDTO>>(defaultBookmakerDetailsProvider, new ContainerControlledLifetimeManager());
-            container.RegisterInstance<BookmakerDetailsProvider>(defaultBookmakerDetailsProvider, new ContainerControlledLifetimeManager());
+            container.RegisterInstance(defaultBookmakerDetailsProvider, new ContainerControlledLifetimeManager());
             var newConfig = new OddsFeedConfigurationInternal(config, defaultBookmakerDetailsProvider);
             newConfig.Load();
             container.RegisterInstance<IOddsFeedConfiguration>(newConfig, new ContainerControlledLifetimeManager());
@@ -65,8 +66,8 @@ namespace Sportradar.OddsFeed.SDK.API.Test
 
             container.RegisterAdditionalTypes();
 
-            _childContainer1 = container.CreateChildContainer();
-            _childContainer2 = container.CreateChildContainer();
+            _childContainer1 = ((IUnityContainer) container).CreateChildContainer();
+            _childContainer2 = ((IUnityContainer) container).CreateChildContainer();
         }
 
         [TestMethod]

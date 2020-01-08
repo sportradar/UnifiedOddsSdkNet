@@ -19,17 +19,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{650E8DE9
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK", "Sportradar.OddsFeed.SDK\Sportradar.OddsFeed.SDK.csproj", "{D3C006AD-BB07-449F-A537-7CE7DC72A1D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.API.Test", "Tests\Sportradar.OddsFeed.SDK.API.Test\Sportradar.OddsFeed.SDK.API.Test.csproj", "{782FDD8F-E0E5-423F-95E0-26C7549EABF2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests\Sportradar.OddsFeed.SDK.API.Test", "Tests\Sportradar.OddsFeed.SDK.API.Test\Sportradar.OddsFeed.SDK.API.Test.csproj", "{782FDD8F-E0E5-423F-95E0-26C7549EABF2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.Common.Test", "Tests\Sportradar.OddsFeed.SDK.Common.Test\Sportradar.OddsFeed.SDK.Common.Test.csproj", "{CFCBD5DF-F043-4331-9D4B-FC9548ECE86F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests\Sportradar.OddsFeed.SDK.Common.Test", "Tests\Sportradar.OddsFeed.SDK.Common.Test\Sportradar.OddsFeed.SDK.Common.Test.csproj", "{CFCBD5DF-F043-4331-9D4B-FC9548ECE86F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.Entities.REST.Test", "Tests\Sportradar.OddsFeed.SDK.Entities.REST.Test\Sportradar.OddsFeed.SDK.Entities.REST.Test.csproj", "{A256B019-19C2-44BC-AAAB-D91DE5B8DD6E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests\Sportradar.OddsFeed.SDK.Entities.REST.Test", "Tests\Sportradar.OddsFeed.SDK.Entities.REST.Test\Sportradar.OddsFeed.SDK.Entities.REST.Test.csproj", "{A256B019-19C2-44BC-AAAB-D91DE5B8DD6E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.Entities.Test", "Tests\Sportradar.OddsFeed.SDK.Entities.Test\Sportradar.OddsFeed.SDK.Entities.Test.csproj", "{14AAF846-E7FC-45F1-8150-5C890854D972}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests\Sportradar.OddsFeed.SDK.Entities.Test", "Tests\Sportradar.OddsFeed.SDK.Entities.Test\Sportradar.OddsFeed.SDK.Entities.Test.csproj", "{14AAF846-E7FC-45F1-8150-5C890854D972}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.Test.Shared", "Tests\Sportradar.OddsFeed.SDK.Test.Shared\Sportradar.OddsFeed.SDK.Test.Shared.csproj", "{F3B33428-1A5D-4E42-8DC7-6E1434D94F36}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests\Sportradar.OddsFeed.SDK.Test.Shared", "Tests\Sportradar.OddsFeed.SDK.Test.Shared\Sportradar.OddsFeed.SDK.Test.Shared.csproj", "{F3B33428-1A5D-4E42-8DC7-6E1434D94F36}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.Messages.Test", "Tests\Sportradar.OddsFeed.SDK.Messages.Test\Sportradar.OddsFeed.SDK.Messages.Test.csproj", "{030F413F-F582-4838-BA8C-87B661FA405D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests\Sportradar.OddsFeed.SDK.Messages.Test", "Tests\Sportradar.OddsFeed.SDK.Messages.Test\Sportradar.OddsFeed.SDK.Messages.Test.csproj", "{030F413F-F582-4838-BA8C-87B661FA405D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -2,13 +2,13 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -24,15 +24,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
     public class CompetitionCI : SportEventCI, ICompetitionCI
     {
         /// <summary>
-        /// The sport event status cache item
-        /// </summary>
-        public SportEventStatusCI SportEventStatus { get; set; }
-        /// <summary>
-        /// Gets the event status asynchronous
-        /// </summary>
-        /// <returns>Get the event status</returns>
-        public EventStatus? EventStatus { get; set; }
-        /// <summary>
         /// The booking status
         /// </summary>
         private BookingStatus? _bookingStatus;
@@ -47,7 +38,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <summary>
         /// The competitors
         /// </summary>
-        protected IEnumerable<TeamCompetitorCI> Competitors;
+        protected IEnumerable<URN> Competitors;
         /// <summary>
         /// The reference identifier
         /// </summary>
@@ -95,8 +86,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                              ObjectCache fixtureTimestampCache)
             : base(eventSummary, dataRouterManager, semaphorePool, currentCulture, defaultCulture, fixtureTimestampCache)
         {
-            Contract.Requires(eventSummary != null);
-            Contract.Requires(currentCulture != null);
+            Guard.Argument(eventSummary, nameof(eventSummary)).NotNull();
+            Guard.Argument(currentCulture, nameof(currentCulture)).NotNull();
 
             Merge(eventSummary, currentCulture, true);
         }
@@ -118,26 +109,51 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                             ObjectCache fixtureTimestampCache)
             : base(eventSummary, dataRouterManager, semaphorePool, currentCulture, defaultCulture, fixtureTimestampCache)
         {
-            Contract.Requires(eventSummary != null);
-            Contract.Requires(currentCulture != null);
+            Guard.Argument(eventSummary, nameof(eventSummary)).NotNull();
+            Guard.Argument(currentCulture, nameof(currentCulture)).NotNull();
 
             Merge(eventSummary, currentCulture, true);
         }
 
         /// <summary>
-        /// Get sport event status as an asynchronous operation
+        /// Initializes a new instance of the <see cref="CompetitionCI" /> class
         /// </summary>
-        /// <returns>A <see cref="Task{T}" /> representing an async operation</returns>
-        public async Task<SportEventStatusCI> GetSportEventStatusAsync()
+        /// <param name="exportable">A <see cref="ExportableSportEventCI" /> representing the sport event</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to obtain summary and fixture</param>
+        /// <param name="semaphorePool">A <see cref="ISemaphorePool" /> instance used to obtain sync objects</param>
+        /// <param name="defaultCulture">A <see cref="CultureInfo" /> specifying the language used when fetching info which is not translatable (e.g. Scheduled, ..)</param>
+        /// <param name="fixtureTimestampCache">A <see cref="ObjectCache"/> used to cache the sport events fixture timestamps</param>
+        public CompetitionCI(ExportableSportEventCI exportable,
+            IDataRouterManager dataRouterManager,
+            ISemaphorePool semaphorePool,
+            CultureInfo defaultCulture,
+            ObjectCache fixtureTimestampCache)
+            : base(exportable, dataRouterManager, semaphorePool, defaultCulture, fixtureTimestampCache)
         {
-            await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
-            return SportEventStatus;
+            var exportableCompetition = exportable as ExportableCompetitionCI;
+            _bookingStatus = exportableCompetition.BookingStatus;
+            _venue = exportableCompetition.Venue != null ? new VenueCI(exportableCompetition.Venue) : null;
+            _conditions = exportableCompetition.Conditions != null ? new SportEventConditionsCI(exportableCompetition.Conditions) : null;
+            Competitors = exportableCompetition.Competitors != null ? new List<URN>(exportableCompetition.Competitors.Select(URN.Parse)) : null;
+            _referenceId = exportableCompetition.ReferenceId != null ? new ReferenceIdCI(exportableCompetition.ReferenceId) : null;
+            _competitorsQualifiers = exportableCompetition.CompetitorsQualifiers != null ? new Dictionary<URN, string>(exportableCompetition.CompetitorsQualifiers.ToDictionary(c => URN.Parse(c.Key), c => c.Value)) : null;
+            _competitorsReferences = exportableCompetition.CompetitorsReferences != null ? new Dictionary<URN, ReferenceIdCI>(exportableCompetition.CompetitorsReferences.ToDictionary(c => URN.Parse(c.Key), c => new ReferenceIdCI(c.Value))) : null;
         }
 
         /// <summary>
-        /// Get booking status as an asynchronous operation
+        /// Asynchronously fetch event summary associated with the current instance (saving done in <see cref="ISportEventStatusCache"/>)
         /// </summary>
-        /// <returns>Task&lt;System.Nullable&lt;BookingStatus&gt;&gt;</returns>
+        /// <returns>A <see cref="Task{T}"/> representing an async operation</returns>
+        public async Task<bool> FetchSportEventStatusAsync()
+        {
+            await FetchMissingSummary(new[] {DefaultCulture}, true).ConfigureAwait(false);
+            return true;
+        }
+
+        /// <summary>
+        /// Asynchronously gets a <see cref="BookingStatus"/> enum member providing booking status for the associated entity or a null reference if booking status is not known
+        /// </summary>
+        /// <returns>Asynchronously returns the <see cref="BookingStatus"/> if available</returns>
         public async Task<BookingStatus?> GetBookingStatusAsync()
         {
             if (LoadedFixtures.Any() || Id.TypeGroup == ResourceTypeGroup.STAGE || _bookingStatus != null)
@@ -160,7 +176,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _venue;
             }
-            await FetchMissingSummary(cultureInfos).ConfigureAwait(false);
+            await FetchMissingSummary(cultureInfos, false).ConfigureAwait(false);
             return _venue;
         }
 
@@ -176,7 +192,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _conditions;
             }
-            await FetchMissingSummary(cultureInfos).ConfigureAwait(false);
+            await FetchMissingSummary(cultureInfos, false).ConfigureAwait(false);
             return _conditions;
         }
 
@@ -185,16 +201,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// </summary>
         /// <param name="cultures">A <see cref="IEnumerable{CultureInfo}" /> specifying the languages to which the returned instance should be translated</param>
         /// <returns>A <see cref="Task{T}" /> representing an async operation</returns>
-        public async Task<IEnumerable<TeamCompetitorCI>> GetCompetitorsAsync(IEnumerable<CultureInfo> cultures)
+        public async Task<IEnumerable<URN>> GetCompetitorsAsync(IEnumerable<CultureInfo> cultures)
         {
-            var wantedCultures = cultures.ToList();
-            if (Competitors != null
-                && Competitors.Any()
-                && !LanguageHelper.GetMissingCultures(wantedCultures, Competitors.First().Names.Keys.ToList()).ToList().Any())
+            var cultureInfos = cultures.ToList();
+            if (Competitors != null && Competitors.Any() && HasTranslationsFor(cultureInfos))
             {
                 return Competitors;
             }
-            await FetchMissingSummary(wantedCultures).ConfigureAwait(false);
+            await FetchMissingSummary(cultureInfos, false).ConfigureAwait(false);
             return Competitors;
         }
         /// <summary>
@@ -232,7 +246,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         {
             if (!LoadedSummaries.Any())
             {
-                await FetchMissingSummary(new[] { DefaultCulture }).ConfigureAwait(false);
+                await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             }
             return _competitorsQualifiers;
         }
@@ -267,12 +281,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         {
             base.Merge(eventSummary, culture, false);
 
-            if (eventSummary.Status != null)
-            {
-                SportEventStatus = new SportEventStatusCI(eventSummary.Status);
-                EventStatus = SportEventStatus.Status;
-            }
-
             if (eventSummary.Venue != null)
             {
                 if (_venue == null)
@@ -297,14 +305,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             }
             if (eventSummary.Competitors != null)
             {
-                if (Competitors == null)
-                {
-                    Competitors = new List<TeamCompetitorCI>(eventSummary.Competitors.Select(t => new TeamCompetitorCI(t, culture, DataRouterManager)));
-                }
-                else
-                {
-                    MergeCompetitors(eventSummary.Competitors, culture);
-                }
+                Competitors = new List<URN>(eventSummary.Competitors.Select(t => t.Id));
                 GenerateMatchName(eventSummary.Competitors, culture);
                 FillCompetitorsQualifiers(eventSummary.Competitors);
                 FillCompetitorsReferences(eventSummary.Competitors);
@@ -350,44 +351,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                     _bookingStatus = fixture.BookingStatus;
                 }
             }
-        }
-
-        /// <summary>
-        /// Merges the competitors
-        /// </summary>
-        /// <param name="competitors">The competitors</param>
-        /// <param name="culture">The culture</param>
-        private void MergeCompetitors(IEnumerable<TeamCompetitorDTO> competitors, CultureInfo culture)
-        {
-            Contract.Requires(culture != null);
-
-            if (competitors == null)
-            {
-                return;
-            }
-
-            if (Competitors == null)
-            {
-                Competitors = new ReadOnlyCollection<TeamCompetitorCI>(competitors.Select(s=>new TeamCompetitorCI(s, culture, DataRouterManager)).ToList());
-                return;
-            }
-
-            var tempCompetitors = new List<TeamCompetitorCI>();
-
-            foreach (var competitor in competitors)
-            {
-                var tempCompetitor = Competitors.FirstOrDefault(c => c.Id.Equals(competitor.Id));
-                if (tempCompetitor == null)
-                {
-                    tempCompetitor = new TeamCompetitorCI(competitor, culture, DataRouterManager);
-                }
-                else
-                {
-                    tempCompetitor.Merge(competitor, culture);
-                }
-                tempCompetitors.Add(tempCompetitor);
-            }
-            Competitors = new ReadOnlyCollection<TeamCompetitorCI>(tempCompetitors);
         }
 
         private void GenerateMatchName(IEnumerable<TeamCompetitorDTO> competitors, CultureInfo culture)
@@ -468,5 +431,27 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         {
             _bookingStatus = BookingStatus.Booked;
         }
+
+        protected override async Task<T> CreateExportableCIAsync<T>()
+        {
+            var exportable = await base.CreateExportableCIAsync<T>();
+            var competition = exportable as ExportableCompetitionCI;
+
+            competition.BookingStatus = _bookingStatus;
+            competition.Venue = _venue != null ? await _venue.ExportAsync() : null;
+            competition.Conditions = _conditions != null ? await _conditions.ExportAsync() : null;
+            competition.Competitors = Competitors?.Select(c => c.ToString()).ToList();
+            competition.ReferenceId = _referenceId?.ReferenceIds?.ToDictionary(r => r.Key, r => r.Value);
+            competition.CompetitorsQualifiers = _competitorsQualifiers?.ToDictionary(q => q.Key.ToString(), q => q.Value);
+            competition.CompetitorsReferences = _competitorsReferences?.ToDictionary(r => r.Key.ToString(), r => (IDictionary<string, string>) r.Value.ReferenceIds.ToDictionary(v => v.Key, v => v.Value));
+
+            return exportable;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public override async Task<ExportableCI> ExportAsync() => await CreateExportableCIAsync<ExportableCompetitionCI>().ConfigureAwait(false);
     }
 }

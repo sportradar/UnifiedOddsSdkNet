@@ -4,10 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery
 {
@@ -44,6 +44,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery
         /// <value>The display identifier</value>
         public int? DisplayId { get; }
 
+        /// <summary>
+        /// Gets the <see cref="DateTime"/> specifying when the associated message was generated (on the server side)
+        /// </summary>
+        public DateTime? GeneratedAt { get; }
+
         internal DrawDTO(draw_summary item)
             : base(new sportEvent
             {
@@ -61,7 +66,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery
                         }
             })
         {
-            Contract.Requires(item != null);
+            Guard.Argument(item, nameof(item)).NotNull();
 
             DisplayId = null;
 
@@ -90,36 +95,41 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery
                     Results = res;
                 }
             }
+
+            GeneratedAt = item.generated_atSpecified ? item.generated_at : (DateTime?) null;
         }
 
-        internal DrawDTO(draw_fixture item)
+        internal DrawDTO(draw_fixtures item)
             : base(new sportEvent
             {
-                id = item == null ? "wns:draw:1" : item.id,
+                id = item == null ? "wns:draw:1" : item?.draw_fixture?.id,
                 name = string.Empty,
-                scheduledSpecified = item?.draw_dateSpecified ?? false,
-                scheduled = item?.draw_date ?? DateTime.MinValue,
-                tournament = item?.lottery == null
+                scheduledSpecified = item?.draw_fixture?.draw_dateSpecified ?? false,
+                scheduled = item?.draw_fixture?.draw_date ?? DateTime.MinValue,
+                tournament = item?.draw_fixture?.lottery == null
                     ? null
                     : new tournament
                     {
-                        sport = item.lottery.sport
+                        sport = item.draw_fixture?.lottery.sport
                     }
             })
         {
-            Contract.Requires(item != null);
+            Guard.Argument(item?.draw_fixture, "item.draw_fixture").NotNull();
+            var fixture = item.draw_fixture;
 
-            Debug.Assert(item != null, nameof(item) + " != null");
+            Debug.Assert(fixture != null, nameof(fixture) + " != null");
 
-            if (item.lottery != null)
+            if (fixture.lottery != null)
             {
-                Lottery = new LotteryDTO(item.lottery);
+                Lottery = new LotteryDTO(fixture.lottery);
             }
-            Status = RestMapperHelper.MapDrawStatus(item.status, item.statusSpecified);
+            Status = RestMapperHelper.MapDrawStatus(fixture.status, fixture.statusSpecified);
 
-            DisplayId = item.display_idSpecified
-                            ? item.display_id
+            DisplayId = fixture.display_idSpecified
+                            ? fixture.display_id
                             : (int?) null;
+
+            GeneratedAt = item.generated_atSpecified ? item.generated_at : (DateTime?) null;
         }
 
         internal DrawDTO(draw_event item)
@@ -131,7 +141,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery
                 scheduled = item?.scheduled ?? DateTime.MinValue
             })
         {
-            Contract.Requires(item != null);
+            Guard.Argument(item, nameof(item)).NotNull();
 
             if (item != null)
             {

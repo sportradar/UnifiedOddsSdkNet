@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Common.Logging;
 using Metrics;
@@ -61,21 +61,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how potential exceptions should be handled</param>
         public NamedValueCache(IDataProvider<EntityList<NamedValueDTO>> dataProvider, ExceptionHandlingStrategy exceptionStrategy)
         {
-            Contract.Requires(dataProvider != null);
+            Guard.Argument(dataProvider, nameof(dataProvider)).NotNull();
 
             _dataProvider = dataProvider;
             _namedValues = new Dictionary<int, string>();
             _exceptionStrategy = exceptionStrategy;
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_dataProvider != null);
-            Contract.Invariant(_namedValues != null);
         }
 
         /// <summary>
@@ -110,7 +100,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// </summary>
         /// <param name="id">The id to be tested</param>
         /// <returns>True if the value is defined in the cache; False otherwise</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         public bool IsValueDefined(int id)
         {
             lock (_lock)

@@ -17,15 +17,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
     public interface ICompetitionCI : ISportEventCI
     {
         /// <summary>
-        /// Asynchronously gets <see cref="SportEventStatusCI"/> associated with the current instance
+        /// Asynchronously fetch event summary associated with the current instance (saving done in <see cref="ISportEventStatusCache"/>)
         /// </summary>
         /// <returns>A <see cref="Task{T}"/> representing an async operation</returns>
-        Task<SportEventStatusCI> GetSportEventStatusAsync();
+        Task<bool> FetchSportEventStatusAsync();
 
         /// <summary>
         /// Asynchronously gets a <see cref="BookingStatus"/> enum member providing booking status for the associated entity or a null reference if booking status is not known
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Asynchronously returns the <see cref="BookingStatus"/> if available</returns>
         Task<BookingStatus?> GetBookingStatusAsync();
 
         /// <summary>
@@ -44,12 +44,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         Task<SportEventConditionsCI> GetConditionsAsync(IEnumerable<CultureInfo> cultures);
 
         /// <summary>
-        /// Asynchronously gets a <see cref="IEnumerable{TeamCompetitorCI}"/> providing information about competitors competing in a sport event
+        /// Asynchronously gets a <see cref="IEnumerable{URN}"/> providing information about competitors competing in a sport event
         /// associated with the current instance
         /// </summary>
         /// <param name="cultures">A <see cref="IEnumerable{CultureInfo}"/> specifying the languages to which the returned instance should be translated</param>
         /// <returns>A <see cref="Task{T}"/> representing an async operation</returns>
-        Task<IEnumerable<TeamCompetitorCI>> GetCompetitorsAsync(IEnumerable<CultureInfo> cultures);
+        Task<IEnumerable<URN>> GetCompetitorsAsync(IEnumerable<CultureInfo> cultures);
 
         /// <summary>
         /// Asynchronously gets <see cref="ReferenceIdCI"/> associated with the current instance
@@ -68,17 +68,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// </summary>
         /// <returns>A <see cref="Task{T}"/> representing an async operation</returns>
         Task<IDictionary<URN, ReferenceIdCI>> GetCompetitorsReferencesAsync();
-
-        /// <summary>
-        /// The sport event status cache item
-        /// </summary>
-        SportEventStatusCI SportEventStatus { get; set; }
-
-        /// <summary>
-        /// Gets the event status asynchronous
-        /// </summary>
-        /// <returns>Get the event status</returns>
-        EventStatus? EventStatus { get; set; }
 
         /// <summary>
         /// Merges the fixture

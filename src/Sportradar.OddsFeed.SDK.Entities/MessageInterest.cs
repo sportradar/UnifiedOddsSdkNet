@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -43,6 +43,7 @@ namespace Sportradar.OddsFeed.SDK.Entities
         /// <summary>
         /// Gets the scopes that specific message interest covers
         /// </summary>
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
         internal string Scope { get; }
 
         /// <summary>
@@ -108,11 +109,10 @@ namespace Sportradar.OddsFeed.SDK.Entities
         /// <returns>A <see cref="MessageInterest"/> indicating an interest in messages associated with specific events</returns>
         public static MessageInterest SpecificEventsOnly(IEnumerable<URN> eventIds)
         {
-            Contract.Requires(eventIds != null);
-            Contract.Requires(eventIds.Any());
+            Guard.Argument(eventIds, nameof(eventIds)).NotNull().NotEmpty();
 
             //channels using this routing key will also receive 'system' messages so they have to be manually removed in the receiver
-            return new MessageInterest("custom", -1, eventIds.Select(u => URN.Parse($"#.{u.ToString()})")));
+            return new MessageInterest("custom", -1, eventIds.Distinct());
         }
 
         /// <summary>
@@ -129,12 +129,12 @@ namespace Sportradar.OddsFeed.SDK.Entities
         /// </summary>
         public static readonly IEnumerable<MessageInterest> DefinedInterests = new[]
         {
-            MessageInterest.AllMessages,
-            MessageInterest.LiveMessagesOnly,
-            MessageInterest.PrematchMessagesOnly,
-            MessageInterest.VirtualSportMessages,
-            MessageInterest.HighPriorityMessages,
-            MessageInterest.LowPriorityMessages
+            AllMessages,
+            LiveMessagesOnly,
+            PrematchMessagesOnly,
+            VirtualSportMessages,
+            HighPriorityMessages,
+            LowPriorityMessages
         };
 
         /// <summary>
@@ -144,17 +144,16 @@ namespace Sportradar.OddsFeed.SDK.Entities
         /// <returns>The <see cref="MessageInterest"/> representing a scope specified by it's name. </returns>
         public static MessageInterest FromScope(string scopeName)
         {
-            Contract.Requires(!string.IsNullOrEmpty(scopeName));
-            Contract.Ensures(Contract.Result<MessageInterest>() != null);
+            Guard.Argument(scopeName, nameof(scopeName)).NotNull().NotEmpty();
 
             switch (scopeName)
             {
                 case "live":
-                    return MessageInterest.LiveMessagesOnly;
+                    return LiveMessagesOnly;
                 case "prematch":
-                    return MessageInterest.PrematchMessagesOnly;
+                    return PrematchMessagesOnly;
                 case "virtual":
-                    return MessageInterest.VirtualSportMessages;
+                    return VirtualSportMessages;
                 default:
                     throw new InvalidOperationException($"{scopeName} is not a valid scope name.");
             }

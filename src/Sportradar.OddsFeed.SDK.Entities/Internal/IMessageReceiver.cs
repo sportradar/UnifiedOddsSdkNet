@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
+using Sportradar.OddsFeed.SDK.Messages.EventArguments;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal
 {
@@ -26,6 +27,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// Event raised when the <see cref="IMessageReceiver"/> could not deserialize the received message
         /// </summary>
         event EventHandler<MessageDeserializationFailedEventArgs> FeedMessageDeserializationFailed;
+
+        /// <summary>
+        /// Event raised when the <see cref="IMessageReceiver"/> receives the message
+        /// </summary>
+        event EventHandler<RawFeedMessageEventArgs> RawFeedMessageReceived;
 
         /// <summary>
         /// Opens the current <see cref="IMessageReceiver"/> instance so it starts receiving messages

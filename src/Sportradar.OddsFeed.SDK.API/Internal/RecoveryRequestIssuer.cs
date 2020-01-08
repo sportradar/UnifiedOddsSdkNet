@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
@@ -63,23 +63,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="config">The <see cref="IOddsFeedConfiguration"/> used to get nodeId</param>
         public RecoveryRequestIssuer(IDataPoster dataPoster, ISequenceGenerator sequenceGenerator, IOddsFeedConfiguration config)
         {
-            Contract.Requires(dataPoster != null);
-            Contract.Requires(sequenceGenerator != null);
-            Contract.Requires(config != null);
+            Guard.Argument(dataPoster, nameof(dataPoster)).NotNull();
+            Guard.Argument(sequenceGenerator, nameof(sequenceGenerator)).NotNull();
+            Guard.Argument(config, nameof(config)).NotNull();
 
             _dataPoster = dataPoster;
             _sequenceGenerator = sequenceGenerator;
             _nodeId = config.NodeId;
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_sequenceGenerator != null);
-            Contract.Invariant(_dataPoster != null);
         }
 
         /// <summary>
@@ -90,12 +80,16 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns> <see cref="Task{HttpStatusCode}"/> representing the async operation</returns>
         public async Task<long> RecoverEventMessagesAsync(IProducer producer, URN eventId)
         {
+            Guard.Argument(producer, nameof(producer)).NotNull();
+            Guard.Argument(eventId, nameof(eventId)).NotNull();
+
             if (!producer.IsAvailable || producer.IsDisabled)
             {
                 throw new ArgumentException($"Producer {producer} is disabled in the SDK", nameof(producer));
             }
             var requestNumber = _sequenceGenerator.GetNext();
-            var url = string.Format(EventMessagesRecoveryUrlFormat, ((Producer)producer).ApiUrl, eventId, requestNumber);
+            var myProducer = (Producer) producer;
+            var url = string.Format(EventMessagesRecoveryUrlFormat, myProducer.ApiUrl, eventId, requestNumber);
             if (_nodeId != 0)
             {
                 url = $"{url}&node_id={_nodeId}";
@@ -110,6 +104,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                                                 responseMessage.StatusCode,
                                                 null);
             }
+
+            myProducer.EventRecoveries.TryAdd(requestNumber, eventId);
             return requestNumber;
         }
 
@@ -121,13 +117,17 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns> <see cref="Task{HttpStatusCode}"/> representing the async operation</returns>
         public async Task<long> RecoverEventStatefulMessagesAsync(IProducer producer, URN eventId)
         {
+            Guard.Argument(producer, nameof(producer)).NotNull();
+            Guard.Argument(eventId, nameof(eventId)).NotNull();
+
             if (!producer.IsAvailable || producer.IsDisabled)
             {
                 throw new ArgumentException($"Producer {producer} is disabled in the SDK", nameof(producer));
             }
 
             var requestNumber = _sequenceGenerator.GetNext();
-            var url = string.Format(EventStatefulMessagesRecoveryUrlFormat, ((Producer)producer).ApiUrl, eventId, requestNumber);
+            var myProducer = (Producer) producer;
+            var url = string.Format(EventStatefulMessagesRecoveryUrlFormat, myProducer.ApiUrl, eventId, requestNumber);
             if (_nodeId != 0)
             {
                 url = $"{url}&node_id={_nodeId}";
@@ -142,6 +142,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                                                 responseMessage.StatusCode,
                                                 null);
             }
+
+            myProducer.EventRecoveries.TryAdd(requestNumber, eventId);
             return requestNumber;
         }
 
@@ -156,6 +158,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <exception cref="NotImplementedException"></exception>
         public async Task<long> RequestRecoveryAfterTimestampAsync(IProducer producer, DateTime dateAfter, int nodeId)
         {
+            Guard.Argument(producer, nameof(producer)).NotNull();
+
             if (!producer.IsAvailable || producer.IsDisabled)
             {
                 throw new ArgumentException($"Producer {producer} is disabled in the SDK", nameof(producer));
@@ -190,17 +194,17 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             }
             finally
             {
-                var responseCode = responseMessage == null ? 0 : (int)responseMessage.StatusCode;
+                var responseCode = responseMessage == null ? 0 : (int) responseMessage.StatusCode;
                 var responseMsg = responseMessage == null ? string.Empty : responseMessage.ReasonPhrase;
-                var producerV1 = (Producer)producer;
+                var producerV1 = (Producer) producer;
                 producerV1.RecoveryInfo = new RecoveryInfo(timestampAfter, timestampRequested, requestNumber, nodeId, responseCode, responseMsg);
             }
 
-            if (responseMessage != null && !responseMessage.IsSuccessStatusCode)
+            if (responseMessage == null || !responseMessage.IsSuccessStatusCode)
             {
-                throw new CommunicationException($"Recovery since after timestamp for Producer={producer}, RequestId={requestNumber}, After={dateAfter} failed with StatusCode={responseMessage.StatusCode}",
+                throw new CommunicationException($"Recovery since after timestamp for Producer={producer}, RequestId={requestNumber}, After={dateAfter} failed with StatusCode={responseMessage?.StatusCode}",
                                                 url,
-                                                responseMessage.StatusCode,
+                                                responseMessage?.StatusCode ?? 0,
                                                 null);
             }
             return requestNumber;
@@ -213,9 +217,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="nodeId">The node id where recovery message will be processed</param>
         /// <returns><see cref="Task{Long}" /> representing a asynchronous method.
         /// Once the execution is complete it provides the request id associated with the recovery</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         public async Task<long> RequestFullOddsRecoveryAsync(IProducer producer, int nodeId)
         {
+            Guard.Argument(producer, nameof(producer)).NotNull();
+
             if (!producer.IsAvailable || producer.IsDisabled)
             {
                 throw new ArgumentException($"Producer {producer} is disabled in the SDK", nameof(producer));
@@ -247,11 +253,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 producerV1.RecoveryInfo = new RecoveryInfo(0, timestampRequested, requestNumber, nodeId, responseCode, responseMsg);
             }
 
-            if (responseMessage != null && !responseMessage.IsSuccessStatusCode)
+            if (responseMessage == null || !responseMessage.IsSuccessStatusCode)
             {
-                throw new CommunicationException($"Recovery since after timestamp for Producer={producer}, RequestId={requestNumber}, failed with StatusCode={responseMessage.StatusCode}",
+                throw new CommunicationException($"Recovery since after timestamp for Producer={producer}, RequestId={requestNumber}, failed with StatusCode={responseMessage?.StatusCode}",
                                                 url,
-                                                responseMessage.StatusCode,
+                                                responseMessage?.StatusCode ?? 0,
                                                 null);
             }
 

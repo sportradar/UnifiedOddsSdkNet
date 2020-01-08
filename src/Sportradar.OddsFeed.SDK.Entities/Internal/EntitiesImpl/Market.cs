@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -78,9 +78,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                         IMarketDefinition marketDefinition,
                         IEnumerable<CultureInfo> cultures)
         {
-            Contract.Requires(nameProvider != null);
-            Contract.Requires(cultures != null);
-            Contract.Requires(cultures.Any());
+            Guard.Argument(nameProvider, nameof(nameProvider)).NotNull();
+            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
 
             Id = id;
             Specifiers = specifiers;
@@ -92,9 +91,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         }
 
         /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// Returns a <see cref="string" /> that represents this instance.
         /// </summary>
-        /// <returns>A <see cref="System.String" /> that represents this instance</returns>
+        /// <returns>A <see cref="string" /> that represents this instance</returns>
         public override string ToString()
         {
             var sb = new StringBuilder();

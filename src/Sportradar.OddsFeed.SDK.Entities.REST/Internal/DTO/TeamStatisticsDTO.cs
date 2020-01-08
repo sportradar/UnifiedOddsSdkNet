@@ -2,17 +2,19 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
     public class TeamStatisticsDTO
     {
         public URN TeamId { get; }
+
+        public string Name { get; }
 
         public HomeAway? HomeOrAway { get; }
 
@@ -26,10 +28,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         public int CornerKicks { get; }
 
+        public int GreenCards { get; }
+
+
         internal TeamStatisticsDTO(teamStatistics statistics, IDictionary<HomeAway, URN> homeAwayCompetitors)
         {
-            Contract.Requires(statistics != null);
+            Guard.Argument(statistics, nameof(statistics)).NotNull();
 
+            Name = statistics.name;
             TeamId = !string.IsNullOrEmpty(statistics.id)
                 ? URN.Parse(statistics.id)
                 : null;
@@ -70,15 +76,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             }
         }
 
-        internal TeamStatisticsDTO(HomeAway? homeAway, int yellowCards, int redCards, int yellowRedCards, int cornerKicks)
+        internal TeamStatisticsDTO(HomeAway? homeAway, int yellowCards, int redCards, int yellowRedCards, int cornerKicks, int greenCards)
         {
+            Name = "";
             TeamId = null; // not available on the AMQP message
             HomeOrAway = homeAway;
             YellowCards = yellowCards;
             RedCards = redCards;
             YellowRedCards = yellowRedCards;
-            Cards = yellowCards + redCards + yellowRedCards;
+            Cards = yellowCards + redCards + yellowRedCards + greenCards;
             CornerKicks = cornerKicks;
+            GreenCards = greenCards;
         }
     }
 }

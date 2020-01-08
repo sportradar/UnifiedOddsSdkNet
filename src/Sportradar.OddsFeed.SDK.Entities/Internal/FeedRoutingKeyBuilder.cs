@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -15,6 +15,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
     public static class FeedRoutingKeyBuilder
     {
         //  hi.-.live.odds_change.5.sr:match.12329150.nodeId (.producerId)
+        // Note: there is a dot in event_id
         /// <summary>
         /// Validates input list of message interests and returns list of routing keys combination per interest
         /// </summary>
@@ -23,8 +24,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <returns></returns>
         public static IEnumerable<IEnumerable<string>> GenerateKeys(IEnumerable<MessageInterest> interests, int nodeId = 0)
         {
-            Contract.Requires(interests != null);
-            Contract.Requires(interests.Any());
+            Guard.Argument(interests, nameof(interests)).NotNull().NotEmpty();
 
             var messageInterests = interests as IList<MessageInterest> ?? interests.ToList();
             var sessionKeys = new List<List<string>>(messageInterests.Count);
@@ -35,7 +35,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
 
             foreach (var interest in messageInterests)
             {
-                Contract.Assume(interest != null);
                 if (both && interest == MessageInterest.LowPriorityMessages)
                 {
                    sessionKeys.Add(GetBaseKeys(interest, nodeId).Union(GetLiveKeys()).ToList());
@@ -140,6 +139,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             {
                 keys = VirtualSportMessages().ToList();
             }
+            else if (interest.IsEventSpecific)
+            {
+                keys = SpecificEventsOnly(interest.Events).ToList();
+            }
 
             if (keys.Any())
             {
@@ -153,10 +156,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                     }
                 }
                 keys = tmpKeys;
-            }
-            if (interest.IsEventSpecific)
-            {
-                keys = SpecificEventsOnly(interest.Events).ToList();
             }
 
             if (!keys.Any())
@@ -268,11 +267,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <returns>A <see cref="MessageInterest"/> indicating an interest in messages associated with specific events</returns>
         private static IEnumerable<string> SpecificEventsOnly(IEnumerable<URN> eventIds)
         {
-            Contract.Requires(eventIds != null);
-            Contract.Requires(eventIds.Any());
+            Guard.Argument(eventIds, nameof(eventIds)).NotNull().NotEmpty();
 
             //channels using this routing key will also receive 'system' messages so they have to be manually removed in the receiver
-            return eventIds.Select(u => $"#.{u.ToString()}");
+            return eventIds.Select(u => $"#.{u.Prefix}:{u.Type}.{u.Id}");
         }
     }
 }

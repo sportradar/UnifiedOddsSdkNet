@@ -1,10 +1,13 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
+using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 {
@@ -39,10 +42,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         internal PitcherCI(PitcherDTO pitcher, CultureInfo culture)
             : base(pitcher)
         {
-            Contract.Requires(pitcher != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(pitcher, nameof(pitcher)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             Merge(pitcher, culture);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PitcherCI"/> class
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportablePitcherCI"/> containing information about the pitcher</param>
+        internal PitcherCI(ExportablePitcherCI exportable)
+            : base(URN.Parse(exportable.Id))
+        {
+            Name = exportable.Name;
+            Hand = exportable.Hand;
+            Competitor = exportable.Competitor;
         }
 
         /// <summary>
@@ -52,12 +67,27 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the pitcher info</param>
         internal void Merge(PitcherDTO pitcher, CultureInfo culture)
         {
-            Contract.Requires(pitcher != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(pitcher, nameof(pitcher)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             Name = pitcher.Name;
             Hand = pitcher.Hand;
             Competitor = pitcher.Competitor;
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportablePitcherCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportablePitcherCI
+            {
+                Id = Id.ToString(),
+                Name = Name,
+                Hand = Hand,
+                Competitor = Competitor
+            });
         }
     }
 }

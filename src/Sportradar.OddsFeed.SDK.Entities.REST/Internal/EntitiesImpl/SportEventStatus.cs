@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
@@ -20,27 +20,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         private readonly ILocalizedNamedValueCache _matchStatusCache;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SportEventStatus"/> class.
+        /// Initializes a new instance of the <see cref="SportEventStatus"/> class
         /// </summary>
         /// <param name="cacheItem">A <see cref="SportEventStatusCI"/> containing information about sport event status, which will be used to initialize a new instance</param>
         /// <param name="matchStatusCache">A <see cref="ILocalizedNamedValueCache"/> used to retrieve event status</param>
         public SportEventStatus(SportEventStatusCI cacheItem, ILocalizedNamedValueCache matchStatusCache)
         {
-            Contract.Requires(cacheItem != null);
-            Contract.Requires(matchStatusCache != null);
+            Guard.Argument(cacheItem, nameof(cacheItem)).NotNull();
+            Guard.Argument(matchStatusCache, nameof(matchStatusCache)).NotNull();
 
             _cacheItem = cacheItem;
             _matchStatusCache = matchStatusCache;
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_cacheItem != null);
-            Contract.Invariant(_matchStatusCache != null);
         }
 
         /// <summary>
@@ -49,8 +39,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public EventStatus Status => _cacheItem.Status;
 
         /// <summary>
-        /// Gets a value indicating whether a data journalist is present od the associated sport event, or a
-        /// null reference if the information is not available
+        /// Gets a value indicating whether a data journalist is present od the associated sport event, or a null reference if the information is not available
         /// </summary>
         public int? IsReported => _cacheItem.IsReported;
 

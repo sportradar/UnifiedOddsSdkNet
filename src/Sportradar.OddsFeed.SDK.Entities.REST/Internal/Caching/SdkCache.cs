@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Threading.Tasks;
 using Common.Logging;
@@ -42,7 +42,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// </summary>
         protected SdkCache(ICacheManager cacheManager)
         {
-            Contract.Requires(cacheManager != null);
+            Guard.Argument(cacheManager, nameof(cacheManager)).NotNull();
 
             _cacheManager = cacheManager;
 
@@ -54,23 +54,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         }
 
         /// <summary>
-        /// Defines object invariants as required by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(ExecutionLog != null);
-            Contract.Invariant(_cacheManager != null);
-        }
-
-        /// <summary>
         /// Gets the name of the cache instance
         /// </summary>
         /// <value>The name</value>
         public string CacheName { get; }
 
         /// <summary>
-        /// Registers the cache in <see cref="Caching.CacheManager" />
+        /// Registers the cache in <see cref="CacheManager" />
         /// </summary>
         public virtual void RegisterCache()
         {
@@ -98,6 +88,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <returns><c>true</c> if is added/updated, <c>false</c> otherwise</returns>
         public Task<bool> CacheAddDtoAsync(URN id, object item, CultureInfo culture, DtoType dtoType, ISportEventCI requester)
         {
+            Guard.Argument(id, nameof(id)).NotNull();
+            Guard.Argument(item, nameof(item)).NotNull();
+
             var timer = Metric.Context($"AddDtoTo_{CacheName}").Timer($"{dtoType}", Unit.Calls);
             using (timer.NewContext($"{id} [{culture.TwoLetterISOLanguageName}]"))
             {
@@ -135,9 +128,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// </summary>
         /// <param name="id">A string representing the id of the item in the cache to be deleted</param>
         /// <param name="cacheItemType">A cache item type</param>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         public virtual void CacheDeleteItem(string id, CacheItemType cacheItemType)
         {
+            Guard.Argument(id, nameof(id)).NotNull().NotEmpty();
+
             try
             {
                 var urn = URN.Parse(id);
@@ -155,9 +150,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="id">A string representing the id of the item to be checked</param>
         /// <param name="cacheItemType">A cache item type</param>
         /// <returns><c>true</c> if exists, <c>false</c> otherwise</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <exception cref="NotImplementedException"></exception>
         public virtual bool CacheHasItem(string id, CacheItemType cacheItemType)
         {
+            Guard.Argument(id, nameof(id)).NotNull().NotEmpty();
+
             try
             {
                 var urn = URN.Parse(id);

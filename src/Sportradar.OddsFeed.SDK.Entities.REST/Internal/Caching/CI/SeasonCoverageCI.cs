@@ -1,7 +1,11 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Diagnostics.Contracts;
+
+using System;
+using Dawn;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -49,7 +53,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="coverageDTO">A <see cref="SeasonCoverageDTO"/> instance containing information about the coverage</param>
         public SeasonCoverageCI(SeasonCoverageDTO coverageDTO)
         {
-            Contract.Requires(coverageDTO != null);
+            Guard.Argument(coverageDTO, nameof(coverageDTO)).NotNull();
 
             MaxCoverageLevel = coverageDTO.MaxCoverageLevel;
             MinCoverageLevel = coverageDTO.MinCoverageLevel;
@@ -57,6 +61,42 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Played = coverageDTO.Played;
             Scheduled = coverageDTO.Scheduled;
             SeasonId = coverageDTO.SeasonId;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SeasonCoverageCI"/> class.
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableSeasonCoverageCI"/> instance containing information about the coverage</param>
+        public SeasonCoverageCI(ExportableSeasonCoverageCI exportable)
+        {
+            if (exportable == null)
+            {
+                throw new ArgumentNullException(nameof(exportable));
+            }
+
+            MaxCoverageLevel = exportable.MaxCoverageLevel;
+            MinCoverageLevel = exportable.MinCoverageLevel;
+            MaxCovered = exportable.MaxCovered;
+            Played = exportable.Played;
+            Scheduled = exportable.Scheduled;
+            SeasonId = URN.Parse(exportable.SeasonId);
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableSeasonCoverageCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportableSeasonCoverageCI
+            {
+                Scheduled = Scheduled,
+                MaxCoverageLevel = MaxCoverageLevel,
+                MaxCovered = MaxCovered,
+                MinCoverageLevel = MinCoverageLevel,
+                Played = Played,
+                SeasonId = SeasonId?.ToString()
+            });
         }
     }
 }

@@ -2,11 +2,11 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
@@ -17,26 +17,28 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
     {
         public IEnumerable<TeamStatisticsDTO> TotalStatisticsDTOs { get; }
 
-        public IEnumerable<PeriodStatisticsDTO> PeriodStatisticsDTOs { get; }
+        public IEnumerable<PeriodStatisticsDTO> PeriodStatisticsDTOs { get; internal set; }
 
-        public SportEventStatisticsDTO(statisticsType result)
+        public SportEventStatisticsDTO(statisticsType record)
         {
-            Contract.Requires(result != null);
+            Guard.Argument(record, nameof(record)).NotNull();
 
             var totalStatisticsDTOs = new List<TeamStatisticsDTO>();
             totalStatisticsDTOs.Add(new TeamStatisticsDTO(
                 HomeAway.Home,
-                result.yellow_cards.home,
-                result.red_cards.home,
-                result.yellow_red_cards.home,
-                result.corners.home
+                record.yellow_cards.home,
+                record.red_cards.home,
+                record.yellow_red_cards.home,
+                record.corners.home,
+                record.green_cards == null ? 0 : record.green_cards.home
             ));
             totalStatisticsDTOs.Add(new TeamStatisticsDTO(
                 HomeAway.Away,
-                result.yellow_cards.away,
-                result.red_cards.away,
-                result.yellow_red_cards.away,
-                result.corners.away
+                record.yellow_cards.away,
+                record.red_cards.away,
+                record.yellow_red_cards.away,
+                record.corners.away,
+                record.green_cards == null ? 0 : record.green_cards.away
             ));
             TotalStatisticsDTOs = totalStatisticsDTOs;
 
@@ -45,7 +47,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         public SportEventStatisticsDTO(matchStatistics statistics, IDictionary<HomeAway, URN> homeAwayCompetitors)
         {
-            Contract.Requires(statistics != null);
+            Guard.Argument(statistics, nameof(statistics)).NotNull();
 
             var teamStats = new List<TeamStatisticsDTO>();
             if (statistics.totals != null)

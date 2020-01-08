@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -33,21 +33,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="dataFetcher">A <see cref="IDataFetcher"/> instance used to execute http requests</param>
         public ConnectionValidator(IOddsFeedConfigurationInternal config, IDataFetcher dataFetcher)
         {
-            Contract.Requires(config != null);
-            Contract.Requires(dataFetcher != null);
+            Guard.Argument(config, nameof(config)).NotNull();
+            Guard.Argument(dataFetcher, nameof(dataFetcher)).NotNull();
 
             _config = config;
             _dataFetcher = dataFetcher;
-        }
-
-        /// <summary>
-        /// Lists the object invariants as required by code-contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_config != null);
-            Contract.Invariant(_dataFetcher != null);
         }
 
         /// <summary>

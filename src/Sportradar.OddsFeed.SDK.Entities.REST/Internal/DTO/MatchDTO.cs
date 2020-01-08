@@ -1,9 +1,9 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
@@ -36,12 +36,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal MatchDTO(sportEvent sportEvent)
             : base(sportEvent)
         {
-            Contract.Requires(sportEvent != null);
+            Guard.Argument(sportEvent, nameof(sportEvent)).NotNull();
 
             if (sportEvent.season != null)
             {
-                Contract.Assume(!string.IsNullOrEmpty(sportEvent.season.id));
-                Contract.Assume(!string.IsNullOrEmpty(sportEvent.season.name));
+                Guard.Argument(sportEvent.season.id, nameof(sportEvent.season.id)).NotNull().NotEmpty();
+                Guard.Argument(sportEvent.season.name, nameof(sportEvent.season.name)).NotNull().NotEmpty();
                 Season = new SportEntityDTO(sportEvent.season.id, sportEvent.season.name);
             }
             if (sportEvent.tournament_round != null)
@@ -50,8 +50,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             }
             if (sportEvent.tournament != null)
             {
-                Contract.Assume(!string.IsNullOrEmpty(sportEvent.tournament.id));
-                Contract.Assume(!string.IsNullOrEmpty(sportEvent.tournament.name));
+                Guard.Argument(sportEvent.tournament.id, nameof(sportEvent.tournament.id)).NotNull().NotEmpty();
+                Guard.Argument(sportEvent.tournament.name, nameof(sportEvent.tournament.name)).NotNull().NotEmpty();
                 Tournament = new TournamentDTO(sportEvent.tournament);
             }
         }
@@ -63,12 +63,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal MatchDTO(matchSummaryEndpoint matchSummary)
             : base(matchSummary)
         {
-            Contract.Requires(matchSummary != null);
+            Guard.Argument(matchSummary, nameof(matchSummary)).NotNull();
 
             if (matchSummary.sport_event.season != null)
             {
-                Contract.Assume(!string.IsNullOrEmpty(matchSummary.sport_event.season.id));
-                Contract.Assume(!string.IsNullOrEmpty(matchSummary.sport_event.season.name));
+                Guard.Argument(matchSummary.sport_event.season.id, nameof(matchSummary.sport_event.season.id)).NotNull().NotEmpty();
+                Guard.Argument(matchSummary.sport_event.season.name, nameof(matchSummary.sport_event.season.name)).NotNull().NotEmpty();
                 Season = new SportEntityDTO(matchSummary.sport_event.season.id, matchSummary.sport_event.season.name);
             }
             if (matchSummary.sport_event.tournament_round != null)
@@ -77,8 +77,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             }
             if (matchSummary.sport_event.tournament != null)
             {
-                Contract.Assume(!string.IsNullOrEmpty(matchSummary.sport_event.tournament.id));
-                Contract.Assume(!string.IsNullOrEmpty(matchSummary.sport_event.tournament.name));
+                Guard.Argument(matchSummary.sport_event.tournament.id, nameof(matchSummary.sport_event.tournament.id)).NotNull().NotEmpty();
+                Guard.Argument(matchSummary.sport_event.tournament.name, nameof(matchSummary.sport_event.tournament.name)).NotNull().NotEmpty();
                 Tournament = new TournamentDTO(matchSummary.sport_event.tournament);
             }
         }
@@ -114,10 +114,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                                                                                     @virtual = t.@virtual,
                                                                                     virtualSpecified = t.virtualSpecified,
                                                                                     country_code = t.country_code,
-                                                                                    reference_ids = t.reference_ids
+                                                                                    reference_ids = t.reference_ids,
+                                                                                    division = t.division,
+                                                                                    divisionSpecified = t.divisionSpecified
                                                                                 }).ToArray(),
                                     parent = fixture.parent,
-                                    races = fixture.races
+                                    races = fixture.races,
+                                    status = fixture.status
                                 }
                             })
         {

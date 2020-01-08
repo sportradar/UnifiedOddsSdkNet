@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -14,6 +14,7 @@ using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities;
+using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
@@ -88,10 +89,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             IReadOnlyDictionary<string, string> specifiers,
             ExceptionHandlingStrategy exceptionStrategy)
         {
-            Contract.Requires(marketCacheProvider != null);
-            Contract.Requires(profileCache != null);
-            Contract.Requires(expressionFactory != null);
-            Contract.Requires(sportEvent != null);
+            Guard.Argument(marketCacheProvider, nameof(marketCacheProvider)).NotNull();
+            Guard.Argument(profileCache, nameof(profileCache)).NotNull();
+            Guard.Argument(expressionFactory, nameof(expressionFactory)).NotNull();
+            Guard.Argument(sportEvent, nameof(sportEvent)).NotNull();
 
             _marketCacheProvider = marketCacheProvider;
             _profileCache = profileCache;
@@ -101,17 +102,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             _specifiers = specifiers;
             _exceptionStrategy = exceptionStrategy;
             _competitorsAlreadyFetched = false;
-        }
-
-        /// <summary>
-        /// Defines object invariants as needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_marketCacheProvider != null);
-            Contract.Invariant(_expressionFactory != null);
-            Contract.Invariant(_sportEvent != null);
         }
 
         /// <summary>
@@ -199,8 +189,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <exception cref="CacheItemNotFoundException">The requested key was not found in the cache and could not be loaded</exception>
         private async Task<IMarketDescription> GetMarketDescriptorAsync(CultureInfo culture)
         {
-            Contract.Requires(culture != null);
-            Contract.Ensures(Contract.Result<Task<IMarketDescription>>() != null);
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             return await _marketCacheProvider.GetMarketDescriptionAsync(_marketId, _specifiers, new[] { culture }, true).ConfigureAwait(false);
         }
@@ -216,8 +205,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <exception cref="NameGenerationException">If so specified by the <see cref="_exceptionStrategy"/> field</exception>
         private void HandleErrorCondition(string message, string outcomeId, string nameDescriptor, CultureInfo culture, Exception innerException)
         {
-            Contract.Requires(!string.IsNullOrEmpty(message));
-            Contract.Requires(culture != null);
+            Guard.Argument(message, nameof(message)).NotNull().NotEmpty();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             var sb = new StringBuilder("An error occurred while generating the name for item=[");
             var specifiersString = _specifiers == null ? "null" : string.Join(SdkInfo.SpecifiersDelimiter, _specifiers.Select(k => $"{k.Key}={k.Value}"));
@@ -254,8 +243,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <exception cref="ArgumentException">One of the operators specified in the <code>nameDescriptor</code> is not supported</exception>
         protected IList<INameExpression> GetNameExpressions(string nameDescriptor, out string nameDescriptorFormat)
         {
-            Contract.Requires(!string.IsNullOrEmpty(nameDescriptor));
-            Contract.Ensures(!string.IsNullOrEmpty(Contract.ValueAtReturn(out nameDescriptorFormat)));
+            Guard.Argument(nameDescriptor, nameof(nameDescriptor)).NotNull().NotEmpty();
 
             var expressionStrings = NameExpressionHelper.ParseDescriptor(nameDescriptor, out nameDescriptorFormat);
             if (expressionStrings == null)
@@ -358,33 +346,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 }
             }
 
-            IMarketDescription marketDescriptor;
-            try
-            {
-                marketDescriptor = await GetMarketDescriptorAsync(culture).ConfigureAwait(false);
-            }
-            catch (CacheItemNotFoundException ex)
-            {
-                HandleErrorCondition("Failed to retrieve market name descriptor", outcomeId, null, culture, ex);
-                return null;
-            }
+            var marketDescriptor = await GetMarketDescriptionForOutcomeAsync(outcomeId, culture, true).ConfigureAwait(false);
 
-            if (marketDescriptor == null)
-            {
-                HandleErrorCondition("Failed to retrieve market descriptor", outcomeId, null, culture, null);
-                return null;
-            }
 
-            if (marketDescriptor.Outcomes == null)
-            {
-                HandleErrorCondition("Retrieved market descriptor does not contain outcomes", outcomeId, null, culture, null);
-                return null;
-            }
-
-            var outcome = marketDescriptor.Outcomes.FirstOrDefault(o => o.Id == outcomeId);
+            var outcome = marketDescriptor?.Outcomes.FirstOrDefault(o => o.Id == outcomeId);
             if (outcome == null)
             {
-                HandleErrorCondition("Retrieved market descriptor does not contain outcome", outcomeId, null, culture, null);
                 return null;
             }
 
@@ -440,6 +407,63 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 return null;
             }
             return string.Format(nameDescriptionFormat, tasks.Select(t => (object)t.Result).ToArray());
+        }
+
+        private async Task<IMarketDescription> GetMarketDescriptionForOutcomeAsync(string outcomeId, CultureInfo culture, bool firstTime)
+        {
+            IMarketDescription marketDescriptor;
+            try
+            {
+                marketDescriptor = await GetMarketDescriptorAsync(culture).ConfigureAwait(false);
+            }
+            catch (CacheItemNotFoundException ex)
+            {
+                HandleErrorCondition("Failed to retrieve market name descriptor", outcomeId, null, culture, ex);
+                return null;
+            }
+
+            if (marketDescriptor == null)
+            {
+                HandleErrorCondition("Failed to retrieve market descriptor", outcomeId, null, culture, null);
+                return null;
+            }
+
+            if (marketDescriptor.Outcomes == null)
+            {
+                if (firstTime)
+                {
+                    HandleErrorCondition("Retrieved market descriptor is lacking outcomes", outcomeId, null, culture, null);
+                    if (((MarketDescription) marketDescriptor).MarketDescriptionCI.CanBeFetched())
+                    {
+                        HandleErrorCondition("Reloading market description", outcomeId, null, culture, null);
+                        await _marketCacheProvider.ReloadMarketDescriptionAsync((int) marketDescriptor.Id,
+                                                                                _specifiers).ConfigureAwait(false);
+                        return await GetMarketDescriptionForOutcomeAsync(outcomeId, culture, false).ConfigureAwait(false);
+                    }
+                }
+                HandleErrorCondition("Retrieved market descriptor does not contain outcomes", outcomeId, null, culture, null);
+                return null;
+            }
+
+            var outcome = marketDescriptor.Outcomes.FirstOrDefault(o => o.Id == outcomeId);
+            if (outcome == null)
+            {
+                if (firstTime)
+                {
+                    HandleErrorCondition("Retrieved market descriptor is missing outcome", outcomeId, null, culture, null);
+                    if (((MarketDescription)marketDescriptor).MarketDescriptionCI.CanBeFetched())
+                    {
+                        HandleErrorCondition("Reloading market description", outcomeId, null, culture, null);
+                        await _marketCacheProvider.ReloadMarketDescriptionAsync((int)marketDescriptor.Id,
+                                                                                _specifiers).ConfigureAwait(false);
+                        return await GetMarketDescriptionForOutcomeAsync(outcomeId, culture, false).ConfigureAwait(false);
+                    }
+                }
+                HandleErrorCondition("Retrieved market descriptor does not contain outcome", outcomeId, null, culture, null);
+                return null;
+            }
+
+            return marketDescriptor;
         }
     }
 }

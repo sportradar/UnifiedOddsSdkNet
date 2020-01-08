@@ -2,9 +2,10 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Globalization;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
+using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
 {
@@ -53,7 +54,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
         /// <param name="cacheItem">The cache item</param>
         internal OutcomeMapping(OutcomeMappingCacheItem cacheItem)
         {
-            Contract.Requires(cacheItem != null);
+            Guard.Argument(cacheItem, nameof(cacheItem)).NotNull();
 
             OutcomeId = cacheItem.OutcomeId;
             ProducerOutcomeId = cacheItem.ProducerOutcomeId;

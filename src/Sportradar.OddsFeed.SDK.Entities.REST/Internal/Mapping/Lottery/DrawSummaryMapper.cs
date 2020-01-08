@@ -1,9 +1,9 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Diagnostics.Contracts;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping.Lottery
 {
@@ -24,7 +24,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping.Lottery
         /// <param name="drawSummary">A <see cref="draw_summary"/> containing lottery draw data</param>
         internal DrawSummaryMapper(draw_summary drawSummary)
         {
-            Contract.Requires(drawSummary != null);
+            Guard.Argument(drawSummary, nameof(drawSummary)).NotNull();
 
             _drawSummary = drawSummary;
         }

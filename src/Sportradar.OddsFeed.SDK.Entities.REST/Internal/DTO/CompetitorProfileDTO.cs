@@ -1,11 +1,13 @@
 /*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
@@ -43,18 +45,24 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public VenueDTO Venue { get; }
 
         /// <summary>
+        /// Gets the race driver profile
+        /// </summary>
+        /// <value>The race driver profile</value>
+        public RaceDriverProfileDTO RaceDriverProfile { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CompetitorProfileDTO"/> class
         /// </summary>
         /// <param name="record">A <see cref="competitorProfileEndpoint"/> containing information about the profile</param>
         public CompetitorProfileDTO(competitorProfileEndpoint record)
         {
-            Contract.Requires(record != null);
-            Contract.Requires(record.competitor != null);
+            Guard.Argument(record, nameof(record)).NotNull();
+            Guard.Argument(record.competitor, nameof(record.competitor)).NotNull();
 
             Competitor = new CompetitorDTO(record.competitor);
             if (record.players != null && record.players.Any())
             {
-                Players = new ReadOnlyCollection<PlayerProfileDTO>(record.players.Select(p => new PlayerProfileDTO(p)).ToList());
+                Players = new ReadOnlyCollection<PlayerProfileDTO>(record.players.Select(p => new PlayerProfileDTO(p, record.generated_atSpecified ? record.generated_at : (DateTime?) null)).ToList());
             }
             if (record.jerseys != null)
             {
@@ -67,6 +75,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             if (record.venue != null)
             {
                 Venue = new VenueDTO(record.venue);
+            }
+            if (record.race_driver_profile != null)
+            {
+                RaceDriverProfile = new RaceDriverProfileDTO(record.race_driver_profile);
             }
         }
     }

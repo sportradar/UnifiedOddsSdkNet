@@ -3,7 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,7 +14,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
     /// </summary>
     public class SemaphorePool : ISemaphorePool
     {
-        //private readonly ILog _executionLog = SdkLoggerFactory.GetLogger(typeof(SemaphorePool));
+        //private read-only ILog _executionLog = SdkLoggerFactory.GetLogger(typeof(SemaphorePool));
 
         /// <summary>
         /// A <see cref="List{T}"/> containing pool's semaphores
@@ -132,6 +132,8 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <returns>A <see cref="Task{SemaphoreSlim}"/> representing an async operation</returns>
         public Task<SemaphoreSlim> Acquire(string id)
         {
+            Guard.Argument(id, nameof(id)).NotNull().NotEmpty();
+
             var idFound = false;
             //_executionLog.Debug($"Entering lock for request with id={id}");
             lock (_syncObject)
@@ -176,9 +178,11 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// Releases the <see cref="SemaphoreSlim"/> previously acquired with the same id
         /// </summary>
         /// <param name="id">The Id which was used to acquire the semaphore being released </param>
-        /// <exception cref="System.ArgumentException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         public void Release(string id)
         {
+            Guard.Argument(id, nameof(id)).NotNull().NotEmpty();
+
             lock (_syncObject)
             {
                 foreach (var holder in _semaphores)
@@ -198,7 +202,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
                     return;
                 }
             }
-            throw new ArgumentException($"No semaphores are aquired with Id:{id}", nameof(id));
+            throw new ArgumentException($"No semaphores are acquired with Id:{id}", nameof(id));
         }
 
         /// <summary>
@@ -227,7 +231,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
             /// <param name="semaphore">The semaphore</param>
             public SemaphoreHolder(SemaphoreSlim semaphore)
             {
-                Contract.Requires(semaphore != null);
+                Guard.Argument(semaphore, nameof(semaphore)).NotNull();
 
                 Semaphore = semaphore;
             }

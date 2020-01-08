@@ -1,8 +1,12 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Diagnostics.Contracts;
+
+using System.Collections.Generic;
+using Dawn;
 using System.Globalization;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -37,7 +41,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public TournamentInfoBasicCI(TournamentInfoDTO dto, CultureInfo culture, IDataRouterManager dataRouterManager)
             : base(dto.Id, dto.Name, culture)
         {
-            Contract.Requires(dto != null);
+            Guard.Argument(dto, nameof(dto)).NotNull();
 
             _dataRouterManager = dataRouterManager;
             if (dto.Category != null)
@@ -49,6 +53,23 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 CurrentSeason = new CurrentSeasonInfoCI(dto.CurrentSeason, culture, _dataRouterManager);
             }
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TournamentInfoBasicCI"/> class
+        /// </summary>
+        /// <param name="exportable">The exportable</param>
+        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to fetch missing data</param>
+        public TournamentInfoBasicCI(ExportableTournamentInfoBasicCI exportable, IDataRouterManager dataRouterManager)
+            : base(exportable)
+        {
+            _dataRouterManager = dataRouterManager;
+
+            Category = exportable.Category != null ? URN.Parse(exportable.Category) : null;
+            CurrentSeason = exportable.CurrentSeason != null
+                ? new CurrentSeasonInfoCI(exportable.CurrentSeason, dataRouterManager)
+                : null;
+        }
+
         /// <summary>
         /// Merges the specified dto
         /// </summary>
@@ -76,6 +97,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                     CurrentSeason.Merge(dto.CurrentSeason, culture);
                 }
             }
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public async Task<ExportableTournamentInfoBasicCI> ExportAsync()
+        {
+            return new ExportableTournamentInfoBasicCI
+            {
+                Id = Id.ToString(),
+                Name = new Dictionary<CultureInfo, string>(Name ?? new Dictionary<CultureInfo, string>()),
+                CurrentSeason = CurrentSeason != null ? await CurrentSeason.ExportAsync().ConfigureAwait(false) : null,
+                Category = Category?.ToString()
+            };
         }
     }
 }

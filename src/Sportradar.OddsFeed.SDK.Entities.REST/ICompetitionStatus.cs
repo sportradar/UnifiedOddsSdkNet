@@ -2,7 +2,6 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 
-using System;
 using System.Collections.Generic;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -23,7 +22,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST
         /// <summary>
         /// Gets a <see cref="EventStatus"/> describing the high-level status of the associated sport event
         /// </summary>
-        [Obsolete("Use the GetEventStatusAsync on ICompetitionV1")]
         EventStatus Status { get; }
 
         /// <summary>

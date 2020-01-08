@@ -1,6 +1,11 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
+
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
 {
     /// <summary>
@@ -27,6 +32,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         {
             _reference = reference;
             _name = name;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProductInfoLink"/> class.
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableProductInfoLinkCI"/> representing the current item</param>
+        public ProductInfoLink(ExportableProductInfoLinkCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+
+            _reference = exportable.Reference;
+            _name = exportable.Name;
         }
 
         /// <summary>
@@ -57,6 +75,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         protected override string PrintJ()
         {
             return PrintJ(GetType(), this);
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableProductInfoLinkCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportableProductInfoLinkCI
+            {
+                Name = _name,
+                Reference = _reference
+            });
         }
     }
 }

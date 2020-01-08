@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 using SR = Sportradar.OddsFeed.SDK.Test.Shared.StaticRandom;
 // ReSharper disable UnusedMember.Local
 
@@ -475,7 +475,9 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                 virtualSpecified = true,
                 qualifier = SR.S1000,
                 country_code = SR.S1000,
-                reference_ids = references.ToArray()
+                reference_ids = references.ToArray(),
+                divisionSpecified = true,
+                division = SR.I100
             };
         }
 

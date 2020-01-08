@@ -1,8 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Diagnostics.Contracts;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Dawn;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
@@ -27,9 +27,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         public bool? Stripes { get; }
 
+        public string StripesColor { get; }
+
+        public string SplitColor { get; }
+
+        public string ShirtType { get; }
+
+        public string SleeveDetail { get; }
+        
         public JerseyDTO(jersey item)
         {
-            Contract.Requires(item != null);
+            Guard.Argument(item, nameof(item)).NotNull();
 
             BaseColor = item.@base;
             Number = item.number;
@@ -47,6 +55,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             Stripes = item.stripesSpecified
                 ? (bool?) item.stripes
                 : null;
+            StripesColor = item.stripes_color;
+            SplitColor = item.split_color;
+            ShirtType = item.shirt_type;
+            SleeveDetail = item.sleeve_detail;
         }
     }
 }

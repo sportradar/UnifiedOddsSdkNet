@@ -3,6 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Caching;
 using Moq;
@@ -14,6 +15,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles;
 using Sportradar.OddsFeed.SDK.Messages;
+// ReSharper disable UnusedVariable
 
 namespace Sportradar.OddsFeed.SDK.Test.Shared
 {
@@ -64,15 +66,27 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         public void InitializeSportEntities()
         {
+            var watch = Stopwatch.StartNew();
             if (SportEntityFactory == null)
             {
                 Init();
             }
+            var time = watch.Elapsed.TotalMilliseconds;
+            Debug.WriteLine($"Init time: {time}");
             Competition = SportEntityFactory.BuildSportEvent<ICompetition>(TestData.EventId, URN.Parse("sr:sport:3"), TestData.Cultures3, TestData.ThrowingStrategy);
+            Debug.WriteLine($"Competition time: {watch.Elapsed.TotalMilliseconds - time}");
+            time = watch.Elapsed.TotalMilliseconds;
             Sport = SportEntityFactory.BuildSportAsync(TestData.SportId, TestData.Cultures3, TestData.ThrowingStrategy).Result;
+            Debug.WriteLine($"Sport time: {watch.Elapsed.TotalMilliseconds - time}");
+            time = watch.Elapsed.TotalMilliseconds;
             Sports = SportEntityFactory.BuildSportsAsync(TestData.Cultures3, TestData.ThrowingStrategy).Result?.ToList();
+            Debug.WriteLine($"Sports time: {watch.Elapsed.TotalMilliseconds - time}");
+            time = watch.Elapsed.TotalMilliseconds;
             Tournament = SportEntityFactory.BuildSportEvent<ITournament>(TestData.TournamentId, TestData.SportId, TestData.Cultures3, TestData.ThrowingStrategy);
+            Debug.WriteLine($"Tournament time: {watch.Elapsed.TotalMilliseconds - time}");
+            time = watch.Elapsed.TotalMilliseconds;
             Season = SportEntityFactory.BuildSportEvent<ISeason>(TestData.SeasonId, TestData.SportId, TestData.Cultures3, TestData.ThrowingStrategy);
+            Debug.WriteLine($"Season time: {watch.Elapsed.TotalMilliseconds - time}");
         }
 
         public void LoadTournamentMissingValues()

@@ -3,9 +3,10 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
+using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
 using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
@@ -71,18 +72,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
         /// <param name="cacheItem">A <see cref="MarketMappingCacheItem"/> containing mapping info</param>
         internal MarketMapping(MarketMappingCacheItem cacheItem)
         {
-            Contract.Requires(cacheItem != null);
+            Guard.Argument(cacheItem, nameof(cacheItem)).NotNull();
 
             ProducerId = cacheItem.ProducerId;
             ProducerIds = cacheItem.ProducerIds;
             SportId = cacheItem.SportId;
+            MarketTypeId = cacheItem.MarketTypeId;
+            MarketSubTypeId = cacheItem.MarketSubTypeId;
             MarketId = string.IsNullOrEmpty(cacheItem.OrgMarketId)
                            ? MarketSubTypeId == null
                                  ? MarketTypeId.ToString()
                                  : $"{MarketTypeId}:{MarketSubTypeId}"
                            : cacheItem.OrgMarketId;
-            MarketTypeId = cacheItem.MarketTypeId;
-            MarketSubTypeId = cacheItem.MarketSubTypeId;
             SovTemplate = cacheItem.SovTemplate;
             ValidFor = cacheItem.ValidFor;
             OutcomeMappings = cacheItem.OutcomeMappings?.Select(o => new OutcomeMapping(o));
@@ -100,7 +101,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
         /// <exception cref="InvalidOperationException">The provided specifiers are not valid</exception>
         public bool CanMap(IProducer producer, URN sportId, IReadOnlyDictionary<string, string> specifiers)
         {
-            if (!ProducerIds.Contains(producer.Id) || !SportId.Equals(sportId))
+            if (!ProducerIds.Contains(producer.Id) || SportId != null && !SportId.Equals(sportId))
             {
                 return false;
             }

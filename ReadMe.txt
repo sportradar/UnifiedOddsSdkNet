@@ -25,6 +25,107 @@ The package contains:
 For more information please contact support@sportradar.com or visit https://iodocs.betradar.com/unifiedsdk/index.html
 
 CHANGE LOG:
+2019-12-09  1.27.0.0
+Added GetReplayEventsInQueue to the ReplayManager (extended with IReplayManagerV2)
+Added example for parsing messages in separate thread
+Improved fetching and loading PeriodStatistics
+Improved logic for getting player profiles
+Improved logic for parsing round groupId
+Fix: handling null markets in MarketMessage
+
+2019-11-08  1.26.0.0
+Fix: better market description cache handling
+Fix: Season.GetCompetitorsAsync returns competitors from groups if needed
+
+2019-10-24  1.25.0.0
+Added cache state export/import
+Added property AgeGroup to the Competitor (extended with ICompetitorV3)
+Added property GreenCards to the TeamStatistics (extended with ITeamStatisticsV2)
+Added IAdditionalProbabilities to the OutcomesOdds (extended with IOutcomesOddsV2)
+Fix: replay ignores messages from inactive producers
+Fix: green card can be null in sport event statistics
+
+2019-09-05  1.24.0.0
+Exposed option to delete old matches from cache - introduced ISportDataProviderV4
+Loading home and away penalty score from penalty PeriodScore if present
+Fix: return types in ISportDataProviderV3 (breaking change)
+Fix: updated CustomConfigurationBuilder not to override pre-configured values
+Fix: OutcomeDefinition null for variant markets
+Fix: ProfileCache - CommunicationException is not wrapped in CacheItemNotFoundException
+Fix: schedule date between normal and virtual feed synchronized
+Fix: SportDataProvider methods invokes API requests for correct language
+
+2019-07-19  1.23.1.0
+Fix: ReplayFeed init exception
+
+2019-07-18  1.23.0.0
+Added Gender property to the IPlayerProfileV1
+Added DecidedByFed property to the IMatchStatusV2
+Added RaceDriverProfile property to the ICompetitorV2
+Added GetExhibitionGamesAsync() to the IBasicTournamentV1 and ITournamentV1
+Added Id property to the IGroupV1
+Added TeamId and Name properties to the ITeamStatisticsV1
+Added support for List sport events - ISportDataProvider extended with ISportDataProviderV2
+Added support for TLS 1.2
+Added GetAvailableTournamentsAsync(sportId) and GetActiveTournamentsAsync() to the ISportDataProviderV3
+Fix: when sdk connects and API is down, UF SDK waits for next alive to make recovery
+Fix: not loading variant market data in multi-language scenario
+Fix: removed making whoami request in Feed ctor
+Fix: on Feed.Open exception, the Open state is reset
+Fix: NPE for validating market mappings when there are none
+
+2019-06-21  1.22.0.0
+Added GetStartTimeTbdAsync and GetReplacedByAsync to the ISportEventV1
+Added properties StripesColor, SplitColor, ShirtType and SleeveDetail to the IJerseyV1
+Improved on updating when new outcomes are available (outrights)
+Exposed option for user to receive raw feed and api data
+PeriodScore.MatchStatusCode no more obsolete
+Fix: unnecessary api calls for competitor profiles
+
+2019-06-07  1.21.0.0
+Added property Gender to the ICompetitorV1
+Added property Division to the ITeamCompetitorV1
+Added property StreamUrl to the ITvChannelV1
+Added property Phase to the IRoundV2
+ICompetitionStatus.Status no more obsolete (fixed underlining issue)
+Improved caching of variant market descriptions
+Fix: caching the category without tournament failed
+Fix: event status and score update issue
+Fix: IMarketDescription interface exposed to user
+Fix: error fetching data for sport event throws exception when enabled exception handling strategy
+Fix: ReplayManager - the parameter start_time fixed
+
+2019-05-23  1.20.1.0
+Fix: unable to initialize feed
+
+2019-05-22  1.20.0.0
+Added support for custom bets
+Added CustomBetManager, MarketDescriptionManager and EventRecoveryCompleted event to the IOddsFeedV2 (extends IOddsFeed)
+Added GetCompetition method without sportId parameter to the ISportDataProviderV1 (extends ISportDataProvider)
+Added GetFixtureChanges to the ISportsInfoManagerV1 interface (extends ISportsInfoManager)
+Exposed OutcomeDefinition on IOutcomeV1 (extends IOutcome)
+Exposed option to reload market descriptions
+Fix: creating session with MessageInterest.SpecificEventOnly
+Fix: exception when getting data for tournament with no schedule
+Fix: calling TournamentInfoCI.GetScheduleAsync() from multiple threads
+Fix: IMarketMappingData, IOutcomeMappingData moved from internal to public namespace
+
+2019-04-18  1.19.0.0
+Added property GroupId to the Round interface - IRound extended with IRoundV1
+Improved handling of SportEventStatus updates
+Improved name fetching for competitors
+Fix: fixed legacy market mappings
+Fix: incorrect message validation
+
+2019-04-08  1.18.0.0
+Added GetDisplayIdAsync to the IDrawV1
+Added support for non-cached fixture endpoint
+Improved fetching logic for the summary endpoint
+Made IAlive interface internal
+Fix: handling pre:outcometext and simpleteam ids in cache
+Fix: IMarket.GetNameAsync - removed concurrency issue
+Fix: added missing ConfigureAwait(false) to async functions
+
 2019-03-12  1.17.0.0
 Added property Grid to the EventResult interface - IEventResult extended with IEventResultV1
 Added property AamsId to the Reference - IReference extended with IReferenceV1

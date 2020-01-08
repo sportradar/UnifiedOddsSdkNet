@@ -4,18 +4,17 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
+using Dawn;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
-using Microsoft.Xml.Serialization.GeneratedAssembly;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 using Sportradar.OddsFeed.SDK.Messages.Internal;
-using Sportradar.OddsFeed.SDK.Messages.Internal.Feed;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -50,7 +49,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         static Deserializer()
         {
             var serializers = new Dictionary<string, SerializerWithInfo>();
-            var serializerContract = new XmlSerializerContract();
 
             foreach (var baseType in BaseTypes)
             {
@@ -67,7 +65,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                     if (string.IsNullOrWhiteSpace(rootElementName))
                     {
-                        throw new InvalidOperationException($"Type {feedMessagesType.FullName} cannot be deserilized with {typeof(Deserializer<>).FullName} because the name of RootXmlElement is not specified");
+                        throw new InvalidOperationException($"Type {feedMessagesType.FullName} cannot be deserialized with {typeof(Deserializer<>).FullName} because the name of RootXmlElement is not specified");
                     }
                     if (serializers.ContainsKey(rootElementName))
                     {
@@ -76,9 +74,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
                     var ignoreNamespace = ignoreNamespaceAttribute?.IgnoreNamespace ?? false;
 
-                    serializers.Add(
-                        rootElementName,
-                        new SerializerWithInfo(serializerContract.GetSerializer(feedMessagesType), ignoreNamespace));
+                    serializers.Add(rootElementName, new SerializerWithInfo(new XmlSerializer(feedMessagesType), ignoreNamespace));
                 }
             }
 
@@ -93,6 +89,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <exception cref="DeserializationException">The deserialization failed</exception>
         public T Deserialize(Stream stream)
         {
+            Guard.Argument(stream, nameof(stream)).NotNull();
+
             return Deserialize<T>(stream);
         }
 
@@ -105,6 +103,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <exception cref="DeserializationException">The deserialization failed</exception>
         public T1 Deserialize<T1>(Stream stream) where T1 : T
         {
+            Guard.Argument(stream, nameof(stream)).NotNull();
+
             using (var reader = new NamespaceIgnorantXmlTextReader(stream))
             {
                 bool startElementFound;
@@ -171,7 +171,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
             public SerializerWithInfo(XmlSerializer serializer, bool ignoreNamespace)
             {
-                Contract.Requires(serializer != null);
+                Guard.Argument(serializer, nameof(serializer)).NotNull();
 
                 Serializer = serializer;
                 IgnoreNamespace = ignoreNamespace;

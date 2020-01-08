@@ -85,6 +85,9 @@
       <HintPath>..\packages\Common.Logging.Core.3.4.1\lib\net40\Common.Logging.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Dawn.Guard, Version=1.10.0.0, Culture=neutral, PublicKeyToken=234740ae15f786ce, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dawn.Guard.1.10.0\lib\netstandard1.0\Dawn.Guard.dll</HintPath>
+    </Reference>
     <Reference Include="Metrics, Version=0.5.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Metrics.NET.0.5.5\lib\net45\Metrics.dll</HintPath>
       <Private>True</Private>
@@ -96,32 +99,49 @@
     </Reference>
     <Reference Include="Microsoft.Practices.Unity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
       <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Practices.Unity.Configuration, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
       <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Practices.Unity.RegistrationByConvention, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
       <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="RabbitMQ.Client, Version=3.6.9.0, Culture=neutral, PublicKeyToken=89e7d7c5feba84ce, processorArchitecture=MSIL">
       <HintPath>..\packages\RabbitMQ.Client.3.6.9\lib\net45\RabbitMQ.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.7.0\lib\netstandard1.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Contracts\ConfigurationBuilderContract.cs" />
-    <Compile Include="Contracts\OddsFeedV1Contract.cs" />
+    <Compile Include="CacheType.cs" />
+    <Compile Include="EventArguments\EventRecoveryCompletedEventArgs.cs" />
+    <Compile Include="IMarketDescriptionManagerV1.cs" />
+    <Compile Include="IMarketDescriptionManager.cs" />
+    <Compile Include="Internal\CustomBetSelectionBuilder.cs" />
+    <Compile Include="ICustomBetSelectionBuilder.cs" />
+    <Compile Include="ICustomBetManager.cs" />
     <Compile Include="IConfigurationBuilder.cs" />
     <Compile Include="IBookingManager.cs" />
+    <Compile Include="Internal\MarketDescriptionManager.cs" />
+    <Compile Include="Internal\CustomBetManager.cs" />
     <Compile Include="Internal\BookingManager.cs" />
     <Compile Include="Internal\ConfigurationSectionProvider.cs" />
     <Compile Include="Internal\Config\ConfigurationBuilder.cs" />
@@ -142,26 +162,16 @@
     <Compile Include="Internal\RecoveryOperation.cs" />
     <Compile Include="Internal\RecoveryResult.cs" />
     <Compile Include="Internal\RecoveryStatusChangeReason.cs" />
+    <Compile Include="Internal\Replay\ReplayEvent.cs" />
     <Compile Include="Internal\TimestampTracker.cs" />
+    <Compile Include="Extended\IOddsFeedExt.cs" />
+    <Compile Include="IOddsFeedV2.cs" />
     <Compile Include="IOddsFeedV1.cs" />
+    <Compile Include="IReplayEvent.cs" />
+    <Compile Include="IReplayManagerV2.cs" />
     <Compile Include="IReplayManagerV1.cs" />
     <Compile Include="IReplayScenario.cs" />
     <Compile Include="Internal\Replay\ReplayScenario.cs" />
-    <Compile Include="Contracts\ProducersProviderContract.cs" />
-    <Compile Include="Contracts\CashOutProbabilitiesProviderContract.cs" />
-    <Compile Include="Contracts\EntityDispatcherInternalContract.cs" />
-    <Compile Include="Contracts\EntityTypeMapperContract.cs" />
-    <Compile Include="Contracts\GlobalEventDispatcherContract.cs" />
-    <Compile Include="Contracts\OddsFeedConfigurationBuilderContract.cs" />
-    <Compile Include="Contracts\OddsFeedConfigurationContract.cs" />
-    <Compile Include="Contracts\OddsFeedContract.cs" />
-    <Compile Include="Contracts\OddsFeedSessionBuilderContract.cs" />
-    <Compile Include="Contracts\OddsFeedSessionContract.cs" />
-    <Compile Include="Contracts\FeedRecoveryManagerContract.cs" />
-    <Compile Include="Contracts\EventRecoveryRequestIssuerContract.cs" />
-    <Compile Include="Contracts\ProducerRecoveryManagerContract.cs" />
-    <Compile Include="Contracts\ProducerRecoveryManagerFactoryContract.cs" />
-    <Compile Include="Contracts\SessionMessageManagerContract.cs" />
     <Compile Include="EventArguments\AliveEventArgs.cs" />
     <Compile Include="EventArguments\FeedCloseEventArgs.cs" />
     <Compile Include="EventArguments\SnapshotCompleteEventArgs.cs" />
@@ -231,6 +241,11 @@
     <Compile Include="IReplayResponse.cs" />
     <Compile Include="IReplayStatus.cs" />
     <Compile Include="ISpecificEntityDispatcher.cs" />
+    <Compile Include="ISportDataProviderV5.cs" />
+    <Compile Include="ISportDataProviderV4.cs" />
+    <Compile Include="ISportDataProviderV3.cs" />
+    <Compile Include="ISportDataProviderV2.cs" />
+    <Compile Include="ISportDataProviderV1.cs" />
     <Compile Include="ISportDataProvider.cs" />
     <Compile Include="Feed.cs" />
     <Compile Include="Internal\IGlobalEventDispatcher.cs" />
@@ -240,11 +255,13 @@
     <Compile Include="Internal\OddsFeedSessionBuilder.cs" />
     <Compile Include="MessageType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Extended\FeedExt.cs" />
     <Compile Include="ReplayFeed.cs" />
     <Compile Include="ReplayPlayerStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="APIDiagram.cd" />
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

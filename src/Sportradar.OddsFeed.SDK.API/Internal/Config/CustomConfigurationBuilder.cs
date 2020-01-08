@@ -2,7 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 
@@ -23,7 +23,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <summary>
         /// Specifies the port of the message broker
         /// </summary>
-        private int _messagingPort;
+        private int? _messagingPort;
 
         /// <summary>
         /// Specifies the user name used for authentication with messaging broker
@@ -36,11 +36,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         private string _messagingPassword;
 
         /// <summary>
-        /// Value specifying whether SSL should be used when connecting to messaging broker
-        /// </summary>
-        private bool _useMessagingSsl;
-
-        /// <summary>
         /// Specifies the virtual host of the messaging broker
         /// </summary>
         private string _virtualHost;
@@ -49,6 +44,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// The host name of the Sports API
         /// </summary>
         private string _apiHost;
+
+        /// <summary>
+        /// Value specifying whether SSL should be used when connecting to messaging broker
+        /// </summary>
+        private bool _useMessagingSsl;
 
         /// <summary>
         /// Value specifying whether SSL should be used when connecting to Sports API
@@ -63,10 +63,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         internal CustomConfigurationBuilder(string accessToken, IConfigurationSectionProvider sectionProvider)
             : base(accessToken, sectionProvider)
         {
-            _messagingHost = SdkInfo.IntegrationHost;
-            _messagingPort = SdkInfo.DefaultHostPort;
+            //_messagingHost = SdkInfo.IntegrationHost;
+            //_messagingPort = SdkInfo.DefaultHostPort;
+            //_apiHost = SdkInfo.IntegrationApiHost;
             _useMessagingSsl = true;
-            _apiHost = SdkInfo.IntegrationApiHost;
             _useApiSsl = true;
         }
 
@@ -78,16 +78,23 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         protected override void PreBuildCheck()
         {
             base.PreBuildCheck();
-            if (_messagingHost != null && (_messagingHost.ToLower().StartsWith("http://") || _messagingHost.ToLower().StartsWith("https://")))
+            if (string.IsNullOrEmpty(_messagingHost))
+            {
+                throw new InvalidOperationException("MessagingHost is missing");
+            }
+            if (_messagingHost.ToLower().StartsWith("http://") || _messagingHost.ToLower().StartsWith("https://"))
             {
                 throw new InvalidOperationException($"messagingHost must not contain protocol specification. Value={_messagingHost}");
             }
-            if (_apiHost != null && (_apiHost.ToLower().StartsWith("http://") || _apiHost.ToLower().StartsWith("https://")))
+            if (string.IsNullOrEmpty(_apiHost))
+            {
+                throw new InvalidOperationException("ApiHost is missing");
+            }
+            if (_apiHost.ToLower().StartsWith("http://") || _apiHost.ToLower().StartsWith("https://"))
             {
                 throw new InvalidOperationException($"apiHost must not contain protocol specification. Value={_apiHost}");
             }
         }
-
 
         /// <summary>
         /// Sets the host name of the AMQP server
@@ -96,12 +103,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <returns>The <see cref="ICustomConfigurationBuilder" /> instance used to set custom config values</returns>
         public ICustomConfigurationBuilder SetMessagingHost(string host)
         {
-            _messagingHost = string.IsNullOrEmpty(host)
-                ? SdkInfo.IntegrationHost
-                : host;
+            Guard.Argument(host, nameof(host)).NotNull().NotEmpty();
+
+            _messagingHost = host;
             return this;
         }
-
 
         /// <summary>
         /// Sets the port used to connect to the AMQP server
@@ -110,7 +116,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <returns>The <see cref="ICustomConfigurationBuilder" /> instance used to set custom config values</returns>
         public ICustomConfigurationBuilder SetMessagingPort(int port)
         {
-            Contract.Requires(port >= 0);
             _messagingPort = port;
             return this;
         }
@@ -122,6 +127,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <returns>The <see cref="ICustomConfigurationBuilder" /> instance used to set custom config values</returns>
         public ICustomConfigurationBuilder SetMessagingUsername(string username)
         {
+            Guard.Argument(username, nameof(username)).NotNull().NotEmpty();
+
             _messagingUsername = username;
             return this;
         }
@@ -133,6 +140,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <returns>The <see cref="ICustomConfigurationBuilder" /> instance used to set custom config values</returns>
         public ICustomConfigurationBuilder SetMessagingPassword(string password)
         {
+            Guard.Argument(password, nameof(password)).NotNull().NotEmpty();
+
             _messagingPassword = password;
             return this;
         }
@@ -144,6 +153,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <returns>The <see cref="ICustomConfigurationBuilder" /> instance used to set custom config values</returns>
         public ICustomConfigurationBuilder SetVirtualHost(string virtualHost)
         {
+            Guard.Argument(virtualHost, nameof(virtualHost)).NotNull().NotEmpty();
+
             _virtualHost = virtualHost;
             return this;
         }
@@ -166,9 +177,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <returns>The <see cref="ICustomConfigurationBuilder" /> instance used to set custom config values</returns>
         public ICustomConfigurationBuilder SetApiHost(string apiHost)
         {
-            _apiHost = string.IsNullOrEmpty(apiHost)
-                ? SdkInfo.IntegrationApiHost
-                : apiHost;
+            Guard.Argument(apiHost, nameof(apiHost)).NotNull().NotEmpty();
+
+            _apiHost = apiHost;
             return this;
         }
 
@@ -194,47 +205,61 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         {
             base.LoadFromConfigFile(section);
 
-            _messagingHost = string.IsNullOrEmpty(section.Host) ? SdkInfo.IntegrationHost : section.Host;
-            _messagingPort = section.Port;
-            _messagingUsername = section.Username;
-            _messagingPassword = section.Password;
-            _virtualHost = section.VirtualHost;
+            if (!string.IsNullOrEmpty(section.Host))
+            {
+                _messagingHost = section.Host;
+            }
+            if (section.Port > 0)
+            {
+                _messagingPort = section.Port;
+            }
+            if (!string.IsNullOrEmpty(section.Username))
+            {
+                _messagingUsername = section.Username;
+            }
+            if (!string.IsNullOrEmpty(section.Username))
+            {
+                _messagingPassword = section.Password;
+            }
+            if (!string.IsNullOrEmpty(section.Username))
+            {
+                _virtualHost = section.VirtualHost;
+            }
+            if (!string.IsNullOrEmpty(section.Username))
+            {
+                _apiHost = section.ApiHost;
+            }
             _useMessagingSsl = section.UseSSL;
-            _apiHost = string.IsNullOrEmpty(section.ApiHost) ? SdkInfo.IntegrationApiHost : section.ApiHost; ;
             _useApiSsl = section.UseApiSSL;
-
         }
 
         /// <summary>
-        /// Builds and returns a <see cref="T:Sportradar.OddsFeed.SDK.API.IOddsFeedConfiguration" /> instance
+        /// Builds and returns a <see cref="IOddsFeedConfiguration" /> instance
         /// </summary>
-        /// <returns>The constructed <see cref="T:Sportradar.OddsFeed.SDK.API.IOddsFeedConfiguration" /> instance</returns>
+        /// <returns>The constructed <see cref="IOddsFeedConfiguration" /> instance</returns>
         public override IOddsFeedConfiguration Build()
         {
             PreBuildCheck();
 
-            var config = new OddsFeedConfiguration(
-                AccessToken,
-                SdkEnvironment.Custom,
-                DefaultLocale,
-                SupportedLocales,
-                _messagingHost,
-                _virtualHost,
-                _messagingPort == 0
-                    ? _useMessagingSsl ? SdkInfo.DefaultHostPort : SdkInfo.DefaultHostPort + 1
-                    : _messagingPort,
-                string.IsNullOrEmpty(_messagingUsername) ? AccessToken : _messagingUsername,
-                _messagingPassword,
-                _apiHost,
-                _useMessagingSsl,
-                _useApiSsl,
-                InactivitySeconds,
-                MaxRecoveryTimeInSeconds,
-                NodeId,
-                DisabledProducers,
-                ExceptionHandlingStrategy,
-                AdjustAfterAge,
-                Section);
+            var config = new OddsFeedConfiguration(AccessToken,
+                                                   SdkEnvironment.Custom,
+                                                   DefaultLocale,
+                                                   SupportedLocales,
+                                                   _messagingHost,
+                                                   _virtualHost,
+                                                   _messagingPort ?? (_useMessagingSsl ? SdkInfo.DefaultHostPort : SdkInfo.DefaultHostPort + 1),
+                                                   string.IsNullOrEmpty(_messagingUsername) ? AccessToken : _messagingUsername,
+                                                   _messagingPassword,
+                                                   _apiHost,
+                                                   _useMessagingSsl,
+                                                   _useApiSsl,
+                                                   InactivitySeconds ?? SdkInfo.MinInactivitySeconds,
+                                                   MaxRecoveryTimeInSeconds ?? SdkInfo.MaxRecoveryExecutionInSeconds,
+                                                   NodeId,
+                                                   DisabledProducers,
+                                                   ExceptionHandlingStrategy,
+                                                   AdjustAfterAge ?? false,
+                                                   Section);
 
             return config;
         }

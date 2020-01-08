@@ -2,9 +2,12 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using System.Collections.ObjectModel;
+using Dawn;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
@@ -54,13 +57,28 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         internal VenueCI(VenueDTO venue, CultureInfo culture)
             :base(venue)
         {
-            Contract.Requires(venue != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(venue, nameof(venue)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             _names = new Dictionary<CultureInfo, string>();
             _countryNames = new Dictionary<CultureInfo, string>();
             _cityNames = new Dictionary<CultureInfo, string>();
             Merge(venue, culture);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VenueCI"/> class
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableVenueCI"/> containing information about a venue</param>
+        public VenueCI(ExportableVenueCI exportable) 
+            : base(exportable)
+        {
+            _names = new Dictionary<CultureInfo, string>(exportable.Name);
+            _cityNames = new Dictionary<CultureInfo, string>(exportable.CityNames);
+            _countryNames = new Dictionary<CultureInfo, string>(exportable.CountryNames);
+            Capacity = exportable.Capacity;
+            Coordinates = exportable.Coordinates;
+            CountryCode = exportable.CountryCode;
         }
 
         /// <summary>
@@ -70,8 +88,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the input <see cref="VenueDTO"/></param>
         internal void Merge(VenueDTO venue, CultureInfo culture)
         {
-            Contract.Requires(venue != null);
-            Contract.Requires(culture != null);
+            Guard.Argument(venue, nameof(venue)).NotNull();
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             Capacity = venue.Capacity;
             Coordinates = venue.Coordinates;
@@ -88,7 +106,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <returns>The name of the venue in the specified language if it exists. Null otherwise.</returns>
         public string GetName(CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             return _names.ContainsKey(culture)
                 ? _names[culture]
@@ -103,7 +121,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <returns>The city name of the venue in the specified language if it exists. Null otherwise.</returns>
         public string GetCity(CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             return _cityNames.ContainsKey(culture)
                 ? _cityNames[culture]
@@ -117,7 +135,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <returns>The country name of the venue in the specified language if it exists. Null otherwise.</returns>
         public string GetCountry(CultureInfo culture)
         {
-            Contract.Requires(culture != null);
+            Guard.Argument(culture, nameof(culture)).NotNull();
 
             return _countryNames.ContainsKey(culture)
                 ? _countryNames[culture]
@@ -132,6 +150,24 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public bool HasTranslationsFor(IEnumerable<CultureInfo> cultures)
         {
             return cultures.All(c => _names.ContainsKey(c));
+        }
+
+        /// <summary>
+        /// Asynchronous export item's properties
+        /// </summary>
+        /// <returns>An <see cref="ExportableVenueCI"/> instance containing all relevant properties</returns>
+        public Task<ExportableVenueCI> ExportAsync()
+        {
+            return Task.FromResult(new ExportableVenueCI
+            {
+                Id = Id.ToString(),
+                Name = new ReadOnlyDictionary<CultureInfo, string>(_names),
+                CityNames = new ReadOnlyDictionary<CultureInfo, string>(_cityNames),
+                CountryNames = new ReadOnlyDictionary<CultureInfo, string>(_countryNames),
+                Capacity = Capacity,
+                Coordinates =  Coordinates,
+                CountryCode = CountryCode
+            });
         }
     }
 }

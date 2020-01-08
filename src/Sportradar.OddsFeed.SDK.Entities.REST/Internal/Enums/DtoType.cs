@@ -111,6 +111,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums
         /// <summary>
         /// The simple team profile
         /// </summary>
-        SimpleTeamProfile
+        SimpleTeamProfile,
+        /// <summary>
+        /// The available selections for the event
+        /// </summary>
+        AvailableSelections,
+        /// <summary>
+        /// The tournament list
+        /// </summary>
+        TournamentInfoList
     }
 }

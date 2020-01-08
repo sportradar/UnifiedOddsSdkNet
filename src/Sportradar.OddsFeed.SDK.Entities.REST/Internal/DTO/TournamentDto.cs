@@ -2,8 +2,8 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Diagnostics.Contracts;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Dawn;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
@@ -44,13 +44,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public SeasonCoverageDTO SeasonCoverage { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TournamentDTO"/> class.
+        /// Initializes a new instance of the <see cref="TournamentDTO"/> class
         /// </summary>
         /// <param name="tournament">The <see cref="tournament"/> used for creating instance</param>
         internal TournamentDTO(tournament tournament)
             :base(tournament.id, tournament.name)
         {
-            Contract.Requires(tournament != null);
+            Guard.Argument(tournament, nameof(tournament)).NotNull();
 
             Scheduled = tournament.scheduledSpecified
                 ? (DateTime?) tournament.scheduled
@@ -78,7 +78,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal TournamentDTO(tournamentExtended tournament)
             : base(tournament.id, tournament.name)
         {
-            Contract.Requires(tournament != null);
+            Guard.Argument(tournament, nameof(tournament)).NotNull();
 
             Scheduled = tournament.scheduledSpecified
                 ? (DateTime?)tournament.scheduled

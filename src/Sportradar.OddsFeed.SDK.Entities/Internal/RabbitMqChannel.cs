@@ -3,7 +3,8 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using System.Diagnostics.CodeAnalysis;
+using Dawn;
 using System.Threading;
 using Common.Logging;
 using RabbitMQ.Client;
@@ -59,19 +60,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="channelFactory">A <see cref="IChannelFactory"/> used to construct the <see cref="IModel"/> representing Rabbit MQ channel.</param>
         public RabbitMqChannel(IChannelFactory channelFactory)
         {
-            Contract.Requires(channelFactory != null);
+            Guard.Argument(channelFactory, nameof(channelFactory)).NotNull();
 
             _channelFactory = channelFactory;
-        }
-
-        /// <summary>
-        /// Defines invariant members of the class
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(ExecutionLog != null);
-            Contract.Invariant(_channelFactory != null);
         }
 
         /// <summary>
@@ -88,6 +79,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// Opens the current channel and binds the created queue to provided routing keys
         /// </summary>
         /// <param name="routingKeys">A <see cref="IEnumerable{String}"/> specifying the routing keys of the constructed queue.</param>
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public void Open(IEnumerable<string> routingKeys)
         {
             if (Interlocked.CompareExchange(ref _isOpened, 1, 0) != 0)
@@ -95,6 +87,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 ExecutionLog.Error("Opening an already opened channel is not allowed");
                 throw new InvalidOperationException("The instance is already opened");
             }
+
+            Guard.Argument(routingKeys, nameof(routingKeys)).NotNull().NotEmpty();
 
             _channel = _channelFactory.CreateChannel();
             ExecutionLog.Info($"Opening the channel with channelNumber: {_channel.ChannelNumber}.");
@@ -117,10 +111,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <summary>
         /// Closes the current channel
         /// </summary>
-        /// <exception cref="System.InvalidOperationException">The instance is already closed</exception>
+        /// <exception cref="InvalidOperationException">The instance is already closed</exception>
         public void Close()
         {
-            //Contract.Assume(_channel != null);
             if (Interlocked.CompareExchange(ref _isOpened, 0, 1) != 1)
             {
                 ExecutionLog.Error($"Cannot close the channel on channelNumber: {_channel?.ChannelNumber}, because this channel is already closed");

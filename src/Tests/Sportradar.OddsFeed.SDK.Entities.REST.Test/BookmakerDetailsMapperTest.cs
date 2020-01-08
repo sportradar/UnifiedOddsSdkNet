@@ -2,9 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.IO;
 using System.Net;
-using System.Net.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sportradar.OddsFeed.SDK.API.Internal;
 using Sportradar.OddsFeed.SDK.Common.Internal.Log;
@@ -12,7 +10,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
-using Sportradar.OddsFeed.SDK.Messages.Internal.REST;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 using Sportradar.OddsFeed.SDK.Test.Shared;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
@@ -58,17 +56,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         {
             var details = new BookmakerDetails(_entity);
             ValidateBookmakerDetailsFromXml(details);
-        }
-
-        [TestMethod]
-        public void SomeTest()
-        {
-            var client = new HttpClient();
-            var fetcher = new HttpDataFetcher(client, TestData.AccessToken, new Deserializer<response>());
-            var stream = fetcher.GetDataAsync(new Uri("https://www.betradar.com")).Result;
-            var streamReader = new StreamReader(stream);
-            var result = streamReader.ReadToEnd();
-            Assert.IsTrue(!string.IsNullOrEmpty(result));
         }
 
         [TestMethod]

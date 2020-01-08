@@ -1,10 +1,13 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Diagnostics.Contracts;
+
+using System;
+using Dawn;
 using System.Globalization;
 using System.Runtime.Caching;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
@@ -47,26 +50,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="fixtureTimestampCache">The in-memory cache of sport events fixture timestamps</param>
         public SportEventCacheItemFactory(IDataRouterManager dataRouterManager, ISemaphorePool semaphorePool, CultureInfo defaultCulture, ObjectCache fixtureTimestampCache)
         {
-            Contract.Requires(dataRouterManager != null);
-            Contract.Requires(semaphorePool != null);
-            Contract.Requires(defaultCulture != null);
-            Contract.Requires(fixtureTimestampCache != null);
+            Guard.Argument(dataRouterManager, nameof(dataRouterManager)).NotNull();
+            Guard.Argument(semaphorePool, nameof(semaphorePool)).NotNull();
+            Guard.Argument(defaultCulture, nameof(defaultCulture)).NotNull();
+            Guard.Argument(fixtureTimestampCache, nameof(fixtureTimestampCache)).NotNull();
 
             _dataRouterManager = dataRouterManager;
             _semaphorePool = semaphorePool;
             _defaultCulture = defaultCulture;
             _fixtureTimestampCache = fixtureTimestampCache;
-        }
-
-        /// <summary>
-        /// Defined field invariants needed by code contracts
-        /// </summary>
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_dataRouterManager != null);
-            Contract.Invariant(_defaultCulture != null);
-            Contract.Invariant(_fixtureTimestampCache != null);
         }
 
         /// <summary>
@@ -181,13 +173,50 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             {
                 return new TournamentInfoCI(fixture, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture, _fixtureTimestampCache);
             }
-            if (fixture.Id.TypeGroup == ResourceTypeGroup.DRAW
-                || fixture.Id.TypeGroup == ResourceTypeGroup.LOTTERY)
+            if (fixture.Id.TypeGroup == ResourceTypeGroup.DRAW || fixture.Id.TypeGroup == ResourceTypeGroup.LOTTERY)
             {
                 // should not be any fixture
-                var a = 1;
             }
             return new SportEventCI(fixture, _dataRouterManager, _semaphorePool, currentCulture, _defaultCulture, _fixtureTimestampCache);
+        }
+
+        /// <summary>
+        /// Builds a <see cref="SportEventCI"/> instance from the provided exportable cache item
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableCI"/> representing the sport event</param>
+        /// <returns>a new instance of <see cref="SportEventCI"/> instance</returns>
+        public SportEventCI Build(ExportableCI exportable)
+        {
+            if (exportable == null)
+                throw new ArgumentNullException(nameof(exportable));
+            var exportableSportEvent = exportable as ExportableSportEventCI;
+            if (exportableSportEvent == null)
+                throw new ArgumentOutOfRangeException(nameof(exportableSportEvent), "The exportable must be a subclass of ExportableSportEventCI");
+
+            var eventId = URN.Parse(exportable.Id);
+            if (eventId.TypeGroup == ResourceTypeGroup.STAGE)
+            {
+                return new StageCI(exportableSportEvent as ExportableStageCI, _dataRouterManager, _semaphorePool, _defaultCulture, _fixtureTimestampCache);
+            }
+            if (eventId.TypeGroup == ResourceTypeGroup.MATCH)
+            {
+                return new MatchCI(exportableSportEvent as ExportableMatchCI, _dataRouterManager, _semaphorePool, _defaultCulture, _fixtureTimestampCache);
+            }
+            if (eventId.TypeGroup == ResourceTypeGroup.SEASON
+                || eventId.TypeGroup == ResourceTypeGroup.BASIC_TOURNAMENT
+                || eventId.TypeGroup == ResourceTypeGroup.TOURNAMENT)
+            {
+                return new TournamentInfoCI(exportableSportEvent as ExportableTournamentInfoCI, _dataRouterManager, _semaphorePool, _defaultCulture, _fixtureTimestampCache);
+            }
+            if (eventId.TypeGroup == ResourceTypeGroup.DRAW)
+            {
+                return new DrawCI(exportableSportEvent as ExportableDrawCI, _dataRouterManager, _semaphorePool, _defaultCulture, _fixtureTimestampCache);
+            }
+            if (eventId.TypeGroup == ResourceTypeGroup.LOTTERY)
+            {
+                return new LotteryCI(exportableSportEvent as ExportableLotteryCI, _dataRouterManager, _semaphorePool, _defaultCulture, _fixtureTimestampCache);
+            }
+            return new SportEventCI(exportableSportEvent, _dataRouterManager, _semaphorePool, _defaultCulture, _fixtureTimestampCache);
         }
 
         /// <summary>
