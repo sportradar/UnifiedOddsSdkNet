@@ -1,1 +1,1 @@
-^(?:(?!(\.Internal\.|Microsoft\.|Humanizer\.|log4net\.|RabbitMQ\.)).)*$
+^(?:(?!(\.Internal\.|Microsoft\.|Humanizer\.|log4net\.|Dawn\.|RabbitMQ\.)).)*$

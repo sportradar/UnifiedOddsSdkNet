@@ -25,6 +25,13 @@ The package contains:
 For more information please contact support@sportradar.com or visit https://iodocs.betradar.com/unifiedsdk/index.html
 
 CHANGE LOG:
+2019-12-09  1.28.0.0
+Added new Replay API endpoints (FEEDSDK-1316)
+Internally replaced Code.Contracts with Dawn.Guard library
+Fix: fetching outcome mappings for special markets that exists only on dynamic variant endpoint (FEEDSDK-1314)
+Fix: outcome mapping uses product market id if available (FEEDSDK-1312)
+Fix: returning market decimal value in culture invariant format
+
 2019-12-09  1.27.0.0
 Added GetReplayEventsInQueue to the ReplayManager (extended with IReplayManagerV2)
 Added example for parsing messages in separate thread

@@ -134,7 +134,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="lib\net45\" />
+    <Folder Include="lib\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
