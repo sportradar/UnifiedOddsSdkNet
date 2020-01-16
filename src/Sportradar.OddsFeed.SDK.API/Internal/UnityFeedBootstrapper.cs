@@ -649,21 +649,14 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             //IRabbitMqChannel channel, IDeserializer<FeedMessage> deserializer, IRoutingKeyParser keyParser, IProducerManager producerManager, bool usedReplay
 
-            RegisterSessionMessageProcessor(container);
-
-            container.RegisterType<IFeedMessageProcessor>(
-                new HierarchicalLifetimeManager(),
-                new InjectionFactory(c => new CompositeMessageProcessor(c.ResolveAll<IFeedMessageProcessor>())));
-        }
-
-        private static void RegisterSessionMessageProcessor(IUnityContainer container)
-        {
-            Guard.Argument(container, nameof(container)).NotNull();
-
             container.RegisterType<IFeedMessageProcessor>(
                 "SessionMessageManager",
                 new HierarchicalLifetimeManager(),
                 new InjectionFactory(c => c.Resolve<IFeedRecoveryManager>().CreateSessionMessageManager()));
+
+            container.RegisterType<IFeedMessageProcessor>(
+                new HierarchicalLifetimeManager(),
+                new InjectionFactory(c => new CompositeMessageProcessor(c.ResolveAll<IFeedMessageProcessor>())));
         }
 
         private static void RegisterCacheMessageProcessor(IUnityContainer container)
@@ -711,8 +704,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<ISportEventCache>(),
                     new ResolvedParameter<ICacheManager>(),
                     new ResolvedParameter<IFeedMessageHandler>()));
-
-            container.RegisterType<ISportEventStatusCache>(new HierarchicalLifetimeManager());
 
             container.RegisterType<CacheMessageProcessor>(
                 new HierarchicalLifetimeManager(),
