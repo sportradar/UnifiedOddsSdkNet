@@ -507,6 +507,7 @@
     <Compile Include="ITeamStatisticsV1.cs" />
     <Compile Include="ITournamentV1.cs" />
     <Compile Include="ITvChannelV1.cs" />
+    <Compile Include="IVenueV1.cs" />
     <Compile Include="MarketMapping\IMarketMappingData.cs" />
     <Compile Include="Internal\InternalEntities\MarketDescription.cs" />
     <Compile Include="Internal\InternalEntities\OutcomeMapping.cs" />
