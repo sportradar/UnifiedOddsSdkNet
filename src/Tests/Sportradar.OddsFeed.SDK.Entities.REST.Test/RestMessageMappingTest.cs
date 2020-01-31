@@ -395,6 +395,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(msg.name, dto.Name);
             Assert.AreEqual(msg.abbreviation, dto.Abbreviation);
             Assert.AreEqual(msg.country, dto.CountryName);
+            Assert.AreEqual(msg.state, dto.State);
             Assert.AreEqual(msg.@virtual, dto.IsVirtual);
         }
 
@@ -404,6 +405,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(msg.name, dto.Name);
             Assert.AreEqual(msg.abbreviation, dto.Abbreviation);
             Assert.AreEqual(msg.country, dto.CountryName);
+            Assert.AreEqual(msg.state, dto.State); 
             Assert.AreEqual(msg.@virtual, dto.IsVirtual);
         }
 
@@ -413,6 +415,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(msg.name, dto.Name);
             Assert.AreEqual(msg.abbreviation, dto.Abbreviation);
             Assert.AreEqual(msg.country, dto.CountryName);
+            Assert.AreEqual(msg.state, dto.State); 
             Assert.AreEqual(msg.@virtual, dto.IsVirtual);
             //Assert.AreEqual(msg.@qualifier, dto.); //TODO: qualifier missing in dto
         }
@@ -427,6 +430,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(msg.qualifier, ci.Qualifier);
             Assert.AreEqual(msg.divisionSpecified, ci.Division.HasValue);
             Assert.AreEqual(msg.division, ci.Division);
+            Assert.AreEqual(msg.state, ci.State);
         }
 
         private static void ValidatePlayerExtended(playerExtended msg, PlayerProfileDTO dto)

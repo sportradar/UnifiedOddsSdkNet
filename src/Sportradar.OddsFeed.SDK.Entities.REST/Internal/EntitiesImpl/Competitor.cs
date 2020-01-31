@@ -22,7 +22,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// <seealso cref="Player" />
     /// <seealso cref="ICompetitor" />
     [DataContract]
-    internal class Competitor : Player, ICompetitorV3
+    internal class Competitor : Player, ICompetitorV4
     {
         private readonly CompetitorCI _competitorCI;
         private readonly IProfileCache _profileCache;
@@ -374,5 +374,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// </summary>
         /// <value>The age group</value>
         public string AgeGroup => GetCompetitor()?.AgeGroup;
+
+        /// <summary>
+        /// Gets the state
+        /// </summary>
+        /// <value>The state</value>
+        public string State => GetCompetitor()?.State;
     }
 }
