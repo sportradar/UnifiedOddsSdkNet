@@ -9,6 +9,15 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2020-02-18  1.29.0.0
+Added State to the Competitor (extended with ICompetitorV4)
+Added State to the Venue (extended with IVenueV1)
+Extended ISportInfoProvider.DeleteSportEventFromCache with option to delete sport event status
+Improved logging for connection errors
+Improved fetching fixtures for Replay environment
+Fix: calling variant endpoint only if user requests market data
+Fix: NullPointerException in ReplayManager
+
 2019-12-09  1.28.0.0
 Added new Replay API endpoints (FEEDSDK-1316)
 Internally replaced Code.Contracts with Dawn.Guard library
