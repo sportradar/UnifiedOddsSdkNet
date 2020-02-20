@@ -1,6 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
@@ -11,7 +13,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
     /// <summary>
     ///     Represents the result of a market outcome (selection)
     /// </summary>
-    internal class OutcomeSettlement : Outcome, IOutcomeSettlement
+    internal class OutcomeSettlement : Outcome, IOutcomeSettlementV1
     {
         /// <summary>Initializes a new instance of the <see cref="OutcomeSettlement" /> class</summary>
         /// <param name="deadHeatFactor">a dead-head factor for the current <see cref="IOutcomeSettlement" /> instance.</param>
@@ -24,7 +26,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <param name="outcomeDefinition">The associated <see cref="IOutcomeDefinition"/></param>
         internal OutcomeSettlement(double? deadHeatFactor,
                                    string id,
-                                   bool result,
+                                   int result,
                                    VoidFactor? voidFactor,
                                    INameProvider nameProvider,
                                    IMarketMappingProvider mappingProvider,
@@ -33,33 +35,46 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
             : base(id, nameProvider, mappingProvider, cultures, outcomeDefinition)
         {
             DeadHeatFactor = deadHeatFactor;
-            Result = result;
+            Result = result == 1;
             VoidFactor = voidFactor;
+            switch (result)
+            {
+                case 0:
+                    OutcomeResult = OutcomeResult.Lost;
+                    break;
+                case 1:
+                    OutcomeResult = OutcomeResult.Won;
+                    break;
+                default:
+                    OutcomeResult = OutcomeResult.UndecidedYet;
+                    break;
+            }
         }
 
         /// <summary>
-        ///     Gets a dead-head factor for the current <see cref="IOutcomeSettlement" /> instance.
+        /// Gets a dead-head factor for the current <see cref="IOutcomeSettlement" /> instance.
         /// </summary>
         /// <remarks>
-        ///     A dead heat is defined as an event in which there are two or more joint winning contracts.
-        ///     Dead heat rules state that the stake should be divided by the number of competitors involved in the dead heat and
-        ///     then settled at the normal odds
+        /// A dead heat is defined as an event in which there are two or more joint winning contracts.
+        /// Dead heat rules state that the stake should be divided by the number of competitors involved in the dead heat and then settled at the normal odds
         /// </remarks>
         public double? DeadHeatFactor { get; }
 
-        //TODO: An int is used in schema. Is it safe to represent it as a bool here?
         /// <summary>
-        ///     Gets a value indicating whether the outcome associated with current <see cref="IOutcomeSettlement" /> is winning -
-        ///     i.e. have the bets placed on this outcome winning or losing.
+        /// Gets a value indicating whether the outcome associated with current <see cref="IOutcomeSettlement" /> is winning - i.e. have the bets placed on this outcome winning or losing.
         /// </summary>
+        [Obsolete("Results may also include other values. Use IOutcomeSettlementV1.OutcomeResult instead.")]
         public bool Result { get; }
 
         /// <summary>
-        ///     Gets the <see cref="VoidFactor" /> associated with a current <see cref="IOutcomeSettlement" /> or a null reference.
-        ///     The
-        ///     value indicates
-        ///     the percentage of the stake that should be voided(returned to the punter).
+        /// Gets the <see cref="VoidFactor" /> associated with a current <see cref="IOutcomeSettlement" /> or a null reference.
+        /// The value indicates the percentage of the stake that should be voided(returned to the punter).
         /// </summary>
         public VoidFactor? VoidFactor { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the outcome associated with current <see cref="IOutcomeSettlement"/> is winning - i.e. have the bets placed on this outcome winning or losing
+        /// </summary>
+        public OutcomeResult OutcomeResult { get; }
     }
 }

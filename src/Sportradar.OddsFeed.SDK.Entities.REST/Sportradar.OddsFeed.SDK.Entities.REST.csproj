@@ -161,6 +161,7 @@
     <Compile Include="CustomBet\IAvailableSelections.cs" />
     <Compile Include="Enums\CoveredFrom.cs" />
     <Compile Include="Enums\DrawStatus.cs" />
+    <Compile Include="Enums\OutcomeResult.cs" />
     <Compile Include="Enums\PlayerHand.cs" />
     <Compile Include="Enums\TimeType.cs" />
     <Compile Include="Enums\DrawType.cs" />
