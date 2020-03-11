@@ -206,7 +206,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                                                                                 ? (double?)outcome.dead_heat_factor
                                                                                 : null,
                                                                             outcome.id,
-                                                                            outcome.result != 0,
+                                                                            outcome.result,
                                                                             MessageMapperHelper.GetVoidFactor(outcome.void_factorSpecified, outcome.void_factor),
                                                                             nameProvider,
                                                                             mappingProvider,
