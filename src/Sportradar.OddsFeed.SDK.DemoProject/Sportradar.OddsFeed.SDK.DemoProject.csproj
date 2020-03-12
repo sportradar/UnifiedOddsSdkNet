@@ -112,6 +112,28 @@
   <ItemGroup>
     <Content Include="resources\Sportradar.OddsFeed.SDK.dll" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Sportradar.OddsFeed.SDK.API\Sportradar.OddsFeed.SDK.API.csproj">
+      <Project>{0138441B-7929-4B88-85B1-378AB8556C74}</Project>
+      <Name>Sportradar.OddsFeed.SDK.API</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sportradar.OddsFeed.SDK.Common\Sportradar.OddsFeed.SDK.Common.csproj">
+      <Project>{400D70D5-C152-4F49-BD8F-CA995BFFC188}</Project>
+      <Name>Sportradar.OddsFeed.SDK.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sportradar.OddsFeed.SDK.Entities.REST\Sportradar.OddsFeed.SDK.Entities.REST.csproj">
+      <Project>{562AFE79-9F12-4030-9215-ADEA27FC9461}</Project>
+      <Name>Sportradar.OddsFeed.SDK.Entities.REST</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sportradar.OddsFeed.SDK.Entities\Sportradar.OddsFeed.SDK.Entities.csproj">
+      <Project>{70A849EA-72AC-43C3-A68A-5089D9A591D4}</Project>
+      <Name>Sportradar.OddsFeed.SDK.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sportradar.OddsFeed.SDK.Messages\Sportradar.OddsFeed.SDK.Messages.csproj">
+      <Project>{44421776-15E6-4A08-8F4E-25D08AC05618}</Project>
+      <Name>Sportradar.OddsFeed.SDK.Messages</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

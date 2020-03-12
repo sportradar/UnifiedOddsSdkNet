@@ -11,7 +11,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
 {
     /// <summary>
-    ///     Represents the result of a market outcome (selection)
+    /// Represents the result of a market outcome (selection)
     /// </summary>
     internal class OutcomeSettlement : Outcome, IOutcomeSettlementV1
     {

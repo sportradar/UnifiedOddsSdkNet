@@ -9,10 +9,10 @@ using System.Threading;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.API;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
+using Sportradar.OddsFeed.SDK.DemoProject.Utils;
 using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.DemoProject.Utils;
 
 namespace Sportradar.OddsFeed.SDK.DemoProject.Example
 {

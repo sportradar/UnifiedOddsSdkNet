@@ -3,12 +3,12 @@
 */
 
 using Common.Logging;
-using Sportradar.OddsFeed.SDK.API;
-using Sportradar.OddsFeed.SDK.Entities;
 using Newtonsoft.Json;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using Sportradar.OddsFeed.SDK.API;
+using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 
 namespace Sportradar.OddsFeed.SDK.DemoProject.Example

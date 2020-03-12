@@ -23,7 +23,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         private static readonly ILog Log = LogManager.GetLogger("EntityProcessor");
 
         /// <summary>
-        /// A <see cref="IEntityDispatcher{ISportEvent}"/> used to obtain SDK messages
+        /// A <see cref="IEntityDispatcher{T}"/> used to obtain SDK messages
         /// </summary>
         private readonly IEntityDispatcher<T> _dispatcher;
 
