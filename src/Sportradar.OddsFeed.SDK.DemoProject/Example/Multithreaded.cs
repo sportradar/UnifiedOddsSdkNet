@@ -4,12 +4,12 @@
 using System;
 using Dawn;
 using Common.Logging;
+using System.Collections.Concurrent;
+using System.Threading;
 using Sportradar.OddsFeed.SDK.API;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Entities.REST;
-using System.Collections.Concurrent;
-using System.Threading;
 
 namespace Sportradar.OddsFeed.SDK.DemoProject.Example
 {

@@ -7,10 +7,10 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Common.Logging;
-using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
+using Sportradar.OddsFeed.SDK.Common.Exceptions;
 
 namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
 {

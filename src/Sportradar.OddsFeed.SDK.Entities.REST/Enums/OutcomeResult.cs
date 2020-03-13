@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Sportradar.OddsFeed.SDK.Entities.REST.Enums
+﻿namespace Sportradar.OddsFeed.SDK.Entities.REST.Enums
 {
     /// <summary>
     /// An indication of the outcome result

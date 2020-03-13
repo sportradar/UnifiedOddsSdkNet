@@ -4,9 +4,9 @@
 using System;
 using Dawn;
 using Common.Logging;
+using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.API;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
-using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 
 namespace Sportradar.OddsFeed.SDK.DemoProject.Example
