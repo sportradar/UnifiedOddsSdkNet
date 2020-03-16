@@ -25,6 +25,11 @@ The package contains:
 For more information please contact support@sportradar.com or visit https://iodocs.betradar.com/unifiedsdk/index.html
 
 CHANGE LOG:
+2020-03-16  1.30.0.0
+Fix: added IOutcomeSettlementV1.OutcomeResult instead of IOutcomeSettlement.Result (obsolete)
+Fix: competitor references for seasons
+Fix: failing API requests on some configurations
+
 2020-02-18  1.29.0.0
 Added State to the Competitor (extended with ICompetitorV4)
 Added State to the Venue (extended with IVenueV1)
