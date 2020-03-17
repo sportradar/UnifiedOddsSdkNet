@@ -1,6 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Dawn;
@@ -47,7 +49,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                                     IEnumerable<CultureInfo> cultures)
             : base(id, specifiers, additionalInfo, nameProvider, mappingProvider, marketDefinition, voidReason, voidReasonsCache, cultures)
         {
-            Guard.Argument(outcomes, nameof(outcomes)).NotNull().NotEmpty();
+            Guard.Argument(outcomes, nameof(outcomes)).NotNull();//.NotEmpty();
+            if (!outcomes.Any())
+                throw new ArgumentOutOfRangeException(nameof(outcomes));
 
             var readonlyOutcomes = outcomes as IReadOnlyCollection<IOutcomeSettlement>;
             OutcomeSettlements = readonlyOutcomes ?? new ReadOnlyCollection<IOutcomeSettlement>(outcomes.ToList());

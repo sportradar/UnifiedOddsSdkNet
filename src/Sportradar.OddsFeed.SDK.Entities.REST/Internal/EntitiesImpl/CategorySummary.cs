@@ -1,9 +1,12 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using Dawn;
 using System.Globalization;
+using System.Linq;
 using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
@@ -26,7 +29,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             : base(id, names)
         {
             Guard.Argument(id, nameof(id)).NotNull();
-            Guard.Argument(names, nameof(names)).NotNull().NotEmpty();
+            Guard.Argument(names, nameof(names)).NotNull();//.NotEmpty();
+            if (!names.Any())
+                throw new ArgumentOutOfRangeException(nameof(names));
             //Guard.Argument(countryCode));
 
             CountryCode = countryCode;

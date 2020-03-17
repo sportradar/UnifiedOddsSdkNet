@@ -103,7 +103,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             Guard.Argument(dataRouterManager, nameof(dataRouterManager)).NotNull();
             Guard.Argument(sportEventCacheItemFactory, nameof(sportEventCacheItemFactory)).NotNull();
             Guard.Argument(timer, nameof(timer)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            if (!cultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(cultures));
 
             Cache = cache;
             _dataRouterManager = dataRouterManager;

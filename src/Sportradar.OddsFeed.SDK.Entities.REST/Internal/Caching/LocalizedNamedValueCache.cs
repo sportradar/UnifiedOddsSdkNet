@@ -85,7 +85,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         public LocalizedNamedValueCache(IDataProvider<EntityList<NamedValueDTO>> dataProvider, IEnumerable<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy)
         {
             Guard.Argument(dataProvider, nameof(dataProvider)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            if (!cultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(cultures));
 
             _dataProvider = dataProvider;
             _defaultCultures = cultures;

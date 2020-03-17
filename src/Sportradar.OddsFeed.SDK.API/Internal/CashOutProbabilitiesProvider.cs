@@ -59,7 +59,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         {
             Guard.Argument(dataProvider, nameof(dataProvider)).NotNull();
             Guard.Argument(messageMapper, nameof(messageMapper)).NotNull();
-            Guard.Argument(defaultCultures, nameof(defaultCultures)).NotNull().NotEmpty();
+            Guard.Argument(defaultCultures, nameof(defaultCultures)).NotNull();//.NotEmpty();
+            if (!defaultCultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(defaultCultures));
+
 
             _dataProvider = dataProvider;
             _messageMapper = messageMapper;

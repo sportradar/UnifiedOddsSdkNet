@@ -70,7 +70,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         {
             Guard.Argument(id, nameof(id)).NotNull();
             Guard.Argument(sportEventCache, nameof(sportEventCache)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            if (!cultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(cultures));
 
             Id = id;
             SportId = sportId;

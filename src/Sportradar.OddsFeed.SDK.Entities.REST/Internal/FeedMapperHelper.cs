@@ -25,7 +25,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         {
             Guard.Argument(values, nameof(values)).NotNull();//.NotEmpty();
             Guard.Argument(separators, nameof(separators)).NotNull();//.NotEmpty();
-            //TODO: Check why .NotEmpty throws in some cases
             if (values.Length == 0)
                 throw new ArgumentOutOfRangeException(nameof(values));
             if (separators.Length == 0)

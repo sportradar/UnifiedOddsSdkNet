@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Dawn;
 using System.Threading;
 using Common.Logging;
@@ -88,7 +89,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 throw new InvalidOperationException("The instance is already opened");
             }
 
-            Guard.Argument(routingKeys, nameof(routingKeys)).NotNull().NotEmpty();
+            Guard.Argument(routingKeys, nameof(routingKeys)).NotNull();//.NotEmpty();
+            if (!routingKeys.Any())
+                throw new ArgumentOutOfRangeException(nameof(routingKeys));
 
             _channel = _channelFactory.CreateChannel();
             ExecutionLog.Info($"Opening the channel with channelNumber: {_channel.ChannelNumber}.");

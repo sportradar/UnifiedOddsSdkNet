@@ -27,7 +27,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="validators">The <see cref="IReadOnlyCollection{T}"/> containing actual validators.</param>
         public CompositeMappingValidator(IEnumerable<IMappingValidator> validators)
         {
-            Guard.Argument(validators, nameof(validators)).NotNull().NotEmpty();
+            Guard.Argument(validators, nameof(validators)).NotNull();//.NotEmpty();
+            if (!validators.Any())
+                throw new ArgumentOutOfRangeException(nameof(validators));
 
             _validators = validators as IReadOnlyCollection<IMappingValidator> ?? new ReadOnlyCollection<IMappingValidator>(validators.ToList());
         }

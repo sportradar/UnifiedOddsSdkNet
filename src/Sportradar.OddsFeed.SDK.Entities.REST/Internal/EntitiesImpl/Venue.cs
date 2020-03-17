@@ -1,6 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Dawn;
@@ -68,7 +70,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public Venue(VenueCI ci, IEnumerable<CultureInfo> cultures)
         {
             Guard.Argument(ci, nameof(ci)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            if (!cultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(cultures));
 
             var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
 

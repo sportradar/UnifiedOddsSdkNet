@@ -116,7 +116,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         internal static void ParseSpecifier(string specifierName, IReadOnlyDictionary<string, string> specifiers, out int specifierValue)
         {
             Guard.Argument(specifierName, nameof(specifierName)).NotNull().NotEmpty();
-            Guard.Argument(specifiers, nameof(specifiers)).NotNull().NotEmpty();
+            Guard.Argument(specifiers, nameof(specifiers)).NotNull();//.NotEmpty();
+            if (!specifiers.Any())
+                throw new ArgumentOutOfRangeException(nameof(specifiers));
 
             if (!specifiers.TryGetValue(specifierName, out var specifierValueString))
             {
@@ -139,7 +141,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         internal static void ParseSpecifier(string specifierName, IReadOnlyDictionary<string, string> specifiers, out decimal specifierValue)
         {
             Guard.Argument(specifierName, nameof(specifierName)).NotNull().NotEmpty();
-            Guard.Argument(specifiers, nameof(specifiers)).NotNull().NotEmpty();
+            Guard.Argument(specifiers, nameof(specifiers)).NotNull();//.NotEmpty();
+            if (!specifiers.Any())
+                throw new ArgumentOutOfRangeException(nameof(specifiers));
 
             if (!specifiers.TryGetValue(specifierName, out var specifierValueString))
             {

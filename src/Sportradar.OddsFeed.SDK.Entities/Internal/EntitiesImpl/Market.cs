@@ -79,7 +79,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                         IEnumerable<CultureInfo> cultures)
         {
             Guard.Argument(nameProvider, nameof(nameProvider)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            if (!cultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(cultures));
 
             Id = id;
             Specifiers = specifiers;

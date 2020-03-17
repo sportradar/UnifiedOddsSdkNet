@@ -32,7 +32,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="processors">The list of processors.</param>
         public CompositeMessageProcessor(IEnumerable<IFeedMessageProcessor> processors)
         {
-            Guard.Argument(processors, nameof(processors)).NotNull().NotEmpty().Require(processors.All(p => p != null));
+            Guard.Argument(processors, nameof(processors)).NotNull()//.NotEmpty()
+                .Require(processors.All(p => p != null));
+            if (!processors.Any())
+                throw new ArgumentOutOfRangeException(nameof(processors));
 
             ProcessorId = Guid.NewGuid().ToString().Substring(0,4);
 

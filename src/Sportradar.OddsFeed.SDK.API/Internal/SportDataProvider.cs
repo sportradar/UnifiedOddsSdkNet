@@ -109,7 +109,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             Guard.Argument(sportEventCache, nameof(sportEventCache)).NotNull();
             Guard.Argument(profileCache, nameof(profileCache)).NotNull();
             Guard.Argument(sportDataCache, nameof(sportDataCache)).NotNull();
-            Guard.Argument(defaultCultures, nameof(defaultCultures)).NotNull().NotEmpty();
+            Guard.Argument(defaultCultures, nameof(defaultCultures)).NotNull();//.NotEmpty();
+            if (!defaultCultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(defaultCultures));
+
             Guard.Argument(cacheManager, nameof(cacheManager)).NotNull();
             Guard.Argument(matchStatusCache, nameof(matchStatusCache)).NotNull();
             Guard.Argument(dataRouterManager, nameof(dataRouterManager)).NotNull();

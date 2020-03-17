@@ -24,7 +24,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <returns></returns>
         public static IEnumerable<IEnumerable<string>> GenerateKeys(IEnumerable<MessageInterest> interests, int nodeId = 0)
         {
-            Guard.Argument(interests, nameof(interests)).NotNull().NotEmpty();
+            Guard.Argument(interests, nameof(interests)).NotNull();//.NotEmpty();
+            if (!interests.Any())
+                throw new ArgumentOutOfRangeException(nameof(interests));
 
             var messageInterests = interests as IList<MessageInterest> ?? interests.ToList();
             var sessionKeys = new List<List<string>>(messageInterests.Count);
@@ -267,7 +269,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <returns>A <see cref="MessageInterest"/> indicating an interest in messages associated with specific events</returns>
         private static IEnumerable<string> SpecificEventsOnly(IEnumerable<URN> eventIds)
         {
-            Guard.Argument(eventIds, nameof(eventIds)).NotNull().NotEmpty();
+            Guard.Argument(eventIds, nameof(eventIds)).NotNull();//.NotEmpty();
+            if (!eventIds.Any())
+                throw new ArgumentOutOfRangeException(nameof(eventIds));
 
             //channels using this routing key will also receive 'system' messages so they have to be manually removed in the receiver
             return eventIds.Select(u => $"#.{u.Prefix}:{u.Type}.{u.Id}");

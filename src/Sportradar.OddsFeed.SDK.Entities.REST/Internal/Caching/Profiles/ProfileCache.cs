@@ -127,7 +127,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         public async Task<PlayerProfileCI> GetPlayerProfileAsync(URN playerId, IEnumerable<CultureInfo> cultures)
         {
             Guard.Argument(playerId, nameof(playerId)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            if (!cultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(cultures));
 
             Metric.Context("CACHE").Meter("ProfileCache->GetPlayerProfileAsync", Unit.Calls);
 
@@ -213,7 +215,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         public async Task<CompetitorCI> GetCompetitorProfileAsync(URN competitorId, IEnumerable<CultureInfo> cultures)
         {
             Guard.Argument(competitorId, nameof(competitorId)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            if (!cultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(cultures));
 
             Metric.Context("CACHE").Meter("ProfileCache->GetCompetitorProfileAsync", Unit.Calls);
 

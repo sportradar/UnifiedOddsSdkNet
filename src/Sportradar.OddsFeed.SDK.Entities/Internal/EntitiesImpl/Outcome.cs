@@ -60,7 +60,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         protected Outcome(string id, INameProvider nameProvider, IMarketMappingProvider mappingProvider, IEnumerable<CultureInfo> cultures, IOutcomeDefinition outcomeDefinition)
         {
             Guard.Argument(nameProvider, nameof(nameProvider)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            if (!cultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(cultures));
 
             Id = id;
             _nameProvider = nameProvider;

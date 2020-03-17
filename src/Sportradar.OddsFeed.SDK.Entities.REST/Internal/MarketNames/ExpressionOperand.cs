@@ -3,6 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Dawn;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
@@ -46,7 +47,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <param name="staticValue">The value to be added to the value of the specifier</param>
         public ExpressionOperand(IReadOnlyDictionary<string, string> specifiers, string operand, SimpleMathOperation operation, int staticValue)
         {
-            Guard.Argument(specifiers, nameof(specifiers)).NotNull().NotEmpty();
+            Guard.Argument(specifiers, nameof(specifiers)).NotNull();//.NotEmpty();
+            if (!specifiers.Any())
+                throw new ArgumentOutOfRangeException(nameof(specifiers));
+
             Guard.Argument(operand, nameof(operand)).NotNull().NotEmpty();
             Guard.Argument(operation, nameof(operation)).Require(Enum.IsDefined(typeof(SimpleMathOperation), operation));
 

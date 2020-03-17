@@ -228,7 +228,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="interests">The interests for which to open trackers</param>
         public void Open(IEnumerable<MessageInterest> interests)
         {
-            Guard.Argument(interests, nameof(interests)).NotNull().NotEmpty();
+            Guard.Argument(interests, nameof(interests)).NotNull();//.NotEmpty();
+            if (!interests.Any())
+                throw new ArgumentOutOfRangeException(nameof(interests));
 
             var interestList = interests as List<MessageInterest> ?? interests.ToList();
 

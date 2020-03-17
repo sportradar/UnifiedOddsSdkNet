@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using Dawn;
 using System.Globalization;
+using System.Linq;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 {
@@ -23,7 +24,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         protected static void ParseSpecifier(string specifierName, IReadOnlyDictionary<string, string> specifiers, out int specifierValue)
         {
             Guard.Argument(specifierName, nameof(specifierName)).NotNull().NotEmpty();
-            Guard.Argument(specifiers, nameof(specifiers)).NotNull().NotEmpty();
+            Guard.Argument(specifiers, nameof(specifiers)).NotNull();//.NotEmpty();
+            if (!specifiers.Any())
+                throw new ArgumentOutOfRangeException(nameof(specifiers));
 
             string specifierValueString;
             if (!specifiers.TryGetValue(specifierName, out specifierValueString))
@@ -47,7 +50,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         protected static void ParseSpecifier(string specifierName, IReadOnlyDictionary<string, string> specifiers, out decimal specifierValue)
         {
             Guard.Argument(specifierName, nameof(specifierName)).NotNull().NotEmpty();
-            Guard.Argument(specifiers, nameof(specifiers)).NotNull().NotEmpty();
+            Guard.Argument(specifiers, nameof(specifiers)).NotNull();//.NotEmpty();
+            if (!specifiers.Any())
+                throw new ArgumentOutOfRangeException(nameof(specifiers));
 
             string specifierValueString;
             if (!specifiers.TryGetValue(specifierName, out specifierValueString))

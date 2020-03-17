@@ -130,7 +130,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <returns>A <see cref="IEnumerable{CultureInfo}"/> containing missing translations or a null reference if none of the translations are missing</returns>
         private static IEnumerable<CultureInfo> GetMissingTranslations(MarketDescriptionCacheItem item, IEnumerable<CultureInfo> requiredTranslations)
         {
-            Guard.Argument(requiredTranslations, nameof(requiredTranslations)).NotNull().NotEmpty();
+            Guard.Argument(requiredTranslations, nameof(requiredTranslations)).NotNull();//.NotEmpty();
+            if (!requiredTranslations.Any())
+                throw new ArgumentOutOfRangeException(nameof(requiredTranslations));
 
             if (item == null)
             {
@@ -157,7 +159,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         private async Task<MarketDescriptionCacheItem> GetMarketInternal(int id, string variant, IEnumerable<CultureInfo> cultures)
         {
             Guard.Argument(variant, nameof(variant)).NotNull().NotEmpty();
-            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            if (!cultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(cultures));
 
             var cultureList = cultures as List<CultureInfo> ?? cultures.ToList();
 

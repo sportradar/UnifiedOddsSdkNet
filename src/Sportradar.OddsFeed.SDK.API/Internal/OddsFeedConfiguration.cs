@@ -1,6 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using Dawn;
 using System.Globalization;
@@ -143,7 +145,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             IOddsFeedConfigurationSection section){
 
             Guard.Argument(accessToken, nameof(accessToken)).NotNull().NotEmpty();
-            Guard.Argument(requiredLanguages, nameof(requiredLanguages)).NotNull().NotEmpty();
+            Guard.Argument(requiredLanguages, nameof(requiredLanguages)).NotNull();//.NotEmpty();
+            if (!requiredLanguages.Any())
+                throw new ArgumentOutOfRangeException(nameof(requiredLanguages));
+
             Guard.Argument(inactivitySeconds, nameof(inactivitySeconds)).InRange(SdkInfo.MinInactivitySeconds, SdkInfo.MaxInactivitySeconds);
             Guard.Argument(maxRecoveryTimeInSeconds, nameof(maxRecoveryTimeInSeconds)).Min(SdkInfo.MinRecoveryExecutionInSeconds);
             Guard.Argument(apiHost, nameof(apiHost)).NotNull().NotEmpty();

@@ -109,7 +109,9 @@ namespace Sportradar.OddsFeed.SDK.Entities
         /// <returns>A <see cref="MessageInterest"/> indicating an interest in messages associated with specific events</returns>
         public static MessageInterest SpecificEventsOnly(IEnumerable<URN> eventIds)
         {
-            Guard.Argument(eventIds, nameof(eventIds)).NotNull().NotEmpty();
+            Guard.Argument(eventIds, nameof(eventIds)).NotNull();//.NotEmpty();
+            if (!eventIds.Any())
+                throw new ArgumentOutOfRangeException(nameof(eventIds));
 
             //channels using this routing key will also receive 'system' messages so they have to be manually removed in the receiver
             return new MessageInterest("custom", -1, eventIds.Distinct());

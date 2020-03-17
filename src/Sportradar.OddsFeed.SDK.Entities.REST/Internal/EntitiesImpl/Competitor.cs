@@ -133,7 +133,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             : base(ci.Id, new Dictionary<CultureInfo, string>())
         {
             //Guard.Argument(ci, nameof(ci)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            if (!cultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(cultures));
+
             Guard.Argument(sportEntityFactory, nameof(sportEntityFactory)).NotNull();
 
             if (ci == null)
@@ -166,7 +169,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             : base(ci.Id, new Dictionary<CultureInfo, string>())
         {
             //Guard.Argument(ci, nameof(ci)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            if (!cultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(cultures));
+
             Guard.Argument(sportEntityFactory, nameof(sportEntityFactory)).NotNull();
 
             if (ci == null)

@@ -3,6 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Dawn;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
@@ -32,7 +33,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <param name="operandString">The <see cref="string"/> representation of the operand - i.e. name of the specifier.</param>
         public SimpleOperand(IReadOnlyDictionary<string, string> specifiers, string operandString)
         {
-            Guard.Argument(specifiers, nameof(specifiers)).NotNull().NotEmpty();
+            Guard.Argument(specifiers, nameof(specifiers)).NotNull();//.NotEmpty();
+            if (!specifiers.Any())
+                throw new ArgumentOutOfRangeException(nameof(specifiers));
+
             Guard.Argument(operandString, nameof(operandString)).NotNull().NotEmpty();
 
             _specifiers = specifiers;

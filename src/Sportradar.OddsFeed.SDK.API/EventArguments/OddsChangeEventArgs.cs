@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using Dawn;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
@@ -50,7 +51,10 @@ namespace Sportradar.OddsFeed.SDK.API.EventArguments
         {
             Guard.Argument(messageMapper, nameof(messageMapper)).NotNull();
             Guard.Argument(feedMessage, nameof(feedMessage)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            if (!cultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(cultures));
+
 
             _messageMapper = messageMapper;
             _feedMessage = feedMessage;

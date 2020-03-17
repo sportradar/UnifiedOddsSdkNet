@@ -104,8 +104,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             Guard.Argument(dataRouterManager, nameof(dataRouterManager)).NotNull();
             Guard.Argument(mappingValidatorFactory, nameof(mappingValidatorFactory)).NotNull();
             Guard.Argument(timer, nameof(timer)).NotNull();
-            Guard.Argument(prefetchLanguages, nameof(prefetchLanguages)).NotNull().NotEmpty();
-
+            Guard.Argument(prefetchLanguages, nameof(prefetchLanguages)).NotNull();//.NotEmpty();
+            if (!prefetchLanguages.Any())
+                throw new ArgumentOutOfRangeException(nameof(prefetchLanguages));
 
             _cache = cache;
             _dataRouterManager = dataRouterManager;
@@ -199,7 +200,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <exception cref="FormatException">An error occurred while mapping deserialized entities</exception>
         private async Task<MarketDescriptionCacheItem> GetMarketInternalAsync(int id, IEnumerable<CultureInfo> cultures)
         {
-            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            if (!cultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(cultures));
 
             var cultureList = cultures as List<CultureInfo> ?? cultures.ToList();
 
@@ -304,7 +307,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <exception cref="CacheItemNotFoundException">The requested key was not found in the cache and could not be loaded</exception>
         public async Task<IMarketDescription> GetMarketDescriptionAsync(int marketId, string variant, IEnumerable<CultureInfo> cultures)
         {
-            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            if (!cultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(cultures));
 
             var cultureList = cultures as List<CultureInfo> ?? cultures.ToList();
 
@@ -349,7 +354,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
         public async Task<IEnumerable<IMarketDescription>> GetAllInvariantMarketDescriptionsAsync(IEnumerable<CultureInfo> cultures)
         {
-            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            if (!cultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(cultures));
 
             var cultureList = cultures as List<CultureInfo> ?? cultures.ToList();
             await GetMarketInternalAsync(1, cultureList).ConfigureAwait(false);
@@ -548,7 +555,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         private void Merge(CultureInfo culture, IEnumerable<MarketDescriptionDTO> descriptions)
         {
             Guard.Argument(culture, nameof(culture)).NotNull();
-            Guard.Argument(descriptions, nameof(descriptions)).NotNull().NotEmpty();
+            Guard.Argument(descriptions, nameof(descriptions)).NotNull();//.NotEmpty();
+            if (!descriptions.Any())
+                throw new ArgumentOutOfRangeException(nameof(descriptions));
 
             var descriptionList = descriptions as List<MarketDescriptionDTO> ?? descriptions.ToList();
 

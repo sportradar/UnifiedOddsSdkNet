@@ -113,7 +113,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         {
             Guard.Argument(eventId, nameof(eventId)).NotNull();
             Guard.Argument(sportId, nameof(sportId)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            if (!cultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(cultures));
 
             var cultureInfos = cultures as CultureInfo[] ?? cultures.ToArray();
 
@@ -152,7 +154,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         {
             Guard.Argument(eventId, nameof(eventId)).NotNull();
             Guard.Argument(sportId, nameof(sportId)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            if (!cultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(cultures));
 
             return BuildEvent<T>(eventId, sportId, cultures, _externalExceptionStrategy);
         }
@@ -168,7 +172,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         {
             Guard.Argument(eventId, nameof(eventId)).NotNull();
             Guard.Argument(sportId, nameof(sportId)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull().NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            if (!cultures.Any())
+                throw new ArgumentOutOfRangeException(nameof(cultures));
 
             return BuildEvent<T>(eventId, sportId, cultures, ExceptionHandlingStrategy.THROW);
         }

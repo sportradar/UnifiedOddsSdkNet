@@ -1,6 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Dawn;
@@ -33,7 +35,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public Sport(URN id, IReadOnlyDictionary<CultureInfo, string> names, IEnumerable<ICategory> categories)
            : base(id, names)
         {
-            Guard.Argument(names, nameof(names)).NotNull().NotEmpty();
+            Guard.Argument(names, nameof(names)).NotNull();//.NotEmpty();
+            if (!names.Any())
+                throw new ArgumentOutOfRangeException(nameof(names));
 
             if (categories != null)
             {

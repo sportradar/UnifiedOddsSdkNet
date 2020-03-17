@@ -100,7 +100,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             Guard.Argument(producer, nameof(producer)).NotNull();
             Guard.Argument(maxInactivitySeconds, nameof(maxInactivitySeconds)).Positive();
             Guard.Argument(maxMessageAgeInSeconds, nameof(maxMessageAgeInSeconds)).Positive();
-            Guard.Argument(allInterests, nameof(allInterests)).NotNull().NotEmpty();
+            Guard.Argument(allInterests, nameof(allInterests)).NotNull();//.NotEmpty();
+            if (!allInterests.Any())
+                throw new ArgumentOutOfRangeException(nameof(allInterests));
 
             _producer = producer;
             _maxInactivitySeconds = maxInactivitySeconds;

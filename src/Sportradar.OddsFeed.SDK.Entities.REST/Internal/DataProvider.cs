@@ -111,7 +111,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         protected virtual Uri GetRequestUri(params object[] identifiers)
         {
             Guard.Argument(identifiers, nameof(identifiers)).NotNull();//.NotEmpty();
-            //TODO: Check why .NotEmpty throws in some cases
             if (identifiers.Length == 0)
                 throw new ArgumentOutOfRangeException(nameof(identifiers));
 
