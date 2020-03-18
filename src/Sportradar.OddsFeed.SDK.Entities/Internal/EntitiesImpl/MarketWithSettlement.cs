@@ -49,9 +49,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                                     IEnumerable<CultureInfo> cultures)
             : base(id, specifiers, additionalInfo, nameProvider, mappingProvider, marketDefinition, voidReason, voidReasonsCache, cultures)
         {
-            Guard.Argument(outcomes, nameof(outcomes)).NotNull();//.NotEmpty();
-            if (!outcomes.Any())
-                throw new ArgumentOutOfRangeException(nameof(outcomes));
+            Guard.Argument(outcomes, nameof(outcomes)).NotNull();
 
             var readonlyOutcomes = outcomes as IReadOnlyCollection<IOutcomeSettlement>;
             OutcomeSettlements = readonlyOutcomes ?? new ReadOnlyCollection<IOutcomeSettlement>(outcomes.ToList());
