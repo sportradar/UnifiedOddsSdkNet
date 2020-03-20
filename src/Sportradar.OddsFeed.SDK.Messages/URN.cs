@@ -92,7 +92,7 @@ namespace Sportradar.OddsFeed.SDK.Messages
         public URN(string prefix, string type, long id)
         {
             Guard.Argument(prefix, nameof(prefix)).NotNull().NotEmpty();
-            Guard.Argument(type, nameof(prefix)).NotNull().NotEmpty();
+            Guard.Argument(type, nameof(type)).NotNull().NotEmpty();
             Guard.Argument(id, nameof(id)).Positive();
 
             var tuple = Types.FirstOrDefault(t => t.Item1 == type);

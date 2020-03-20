@@ -88,7 +88,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         {
             Guard.Argument(culture, nameof(culture)).NotNull();
             Guard.Argument(item, nameof(item)).NotNull();
-            Guard.Argument(item.Name, nameof(item.Name)).NotNull().NotEmpty();
+            Guard.Argument(item.Name, nameof(item.Name)).NotNull();//.NotEmpty();
+            if (!item.Name.Any())
+                throw new ArgumentOutOfRangeException(nameof(item.Name));
 
             if (item.Name.Count == 1) // must be only 1 name (received from mapper)
             {
