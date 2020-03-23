@@ -9,6 +9,12 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2020-03-23  1.31.0.0
+Fix: invalid timestamp for cashout probabilities
+Fix: handle settlement markets without outcomes
+Fix: EventRecoveryCompleted is properly raised when snapshot completes
+Fix: removed Guard.NotEmpty() on collections
+
 2020-03-16  1.30.0.0
 Fix: added IOutcomeSettlementV1.OutcomeResult instead of IOutcomeSettlement.Result (obsolete)
 Fix: competitor references for seasons
