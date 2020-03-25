@@ -9,6 +9,9 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2020-03-25  1.31.1.0
+Changed Replay API URL
+
 2020-03-23  1.31.0.0
 Fix: invalid timestamp for cashout probabilities
 Fix: handle settlement markets without outcomes
