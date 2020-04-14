@@ -187,16 +187,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             var cultureInfos = cultures as IReadOnlyList<CultureInfo> ?? cultures.ToList();
             Metric.Context("CACHE").Meter("SportDataCache->FetchAndMergeAll", Unit.Calls).Mark($"Getting for cultures='{string.Join(",", cultureInfos.Select(c => c.TwoLetterISOLanguageName))}'.");
 
-            var fetchTasks = cultureInfos.Select(c => _dataRouterManager.GetAllSportsAsync(c)).ToList();
-            fetchTasks.AddRange(cultureInfos.Select(c => _dataRouterManager.GetAllTournamentsForAllSportAsync(c)).ToList());
-            fetchTasks.AddRange(cultureInfos.Select(c => _dataRouterManager.GetAllLotteriesAsync(c)).ToList());
-
             if (clearExistingData)
             {
                 FetchedCultures.Clear();
                 Categories.Clear();
                 Sports.Clear();
+                _sportEventCache.DeleteSportEventsFromCache(DateTime.MaxValue);
             }
+
+            var fetchTasks = cultureInfos.Select(c => _dataRouterManager.GetAllSportsAsync(c)).ToList();
+            fetchTasks.AddRange(cultureInfos.Select(c => _dataRouterManager.GetAllTournamentsForAllSportAsync(c)).ToList());
+            fetchTasks.AddRange(cultureInfos.Select(c => _dataRouterManager.GetAllLotteriesAsync(c)).ToList());
 
             await Task.WhenAll(fetchTasks).ConfigureAwait(false);
 
