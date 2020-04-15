@@ -170,6 +170,7 @@
     <Compile Include="Enums\EventStatus.cs" />
     <Compile Include="Enums\HomeAway.cs" />
     <Compile Include="IAssist.cs" />
+    <Compile Include="IBasicTournamentV2.cs" />
     <Compile Include="IBasicTournamentV1.cs" />
     <Compile Include="IBasicTournament.cs" />
     <Compile Include="IBonusInfo.cs" />
