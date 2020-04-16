@@ -9,6 +9,12 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2020-04-16  1.32.0.0
+Added GetScheduleAsync to the BasicTournament (extended with IBasicTournamentV2)
+Added bookmakerId to the ClientProperties
+Fix: fixture endpoint on Replay
+Fix: refreshing categories after complete sport data cache reload
+
 2020-03-25  1.31.1.0
 Changed Replay API URL
 
