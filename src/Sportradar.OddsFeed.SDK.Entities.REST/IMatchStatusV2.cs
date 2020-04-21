@@ -6,7 +6,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST
     /// <summary>
     /// Defines a contract implemented by classes representing a match status
     /// </summary>
-    /// <remarks>Interface will be merged into base <see cref="ITimelineEvent"/> in next major version scheduled for January 2019</remarks>
+    /// <remarks>Interface will be merged into base <see cref="IMatchStatus"/> in next major version scheduled for January 2019</remarks>
     /// <seealso cref="ICompetitionStatus" />
     public interface IMatchStatusV2 : IMatchStatusV1
     {

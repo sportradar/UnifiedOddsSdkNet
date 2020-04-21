@@ -8,16 +8,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST
     /// </summary>
     /// <remarks>Interface will be merged into base <see cref="IMatchStatus"/> in next major version scheduled for January 2019</remarks>
     /// <seealso cref="ICompetitionStatus" />
-    public interface IMatchStatusV1 : IMatchStatus
+    public interface IMatchStatusV3 : IMatchStatusV2
     {
         /// <summary>
-        /// Gets the penalty score of the home competitor competing on the associated sport event (for Ice Hockey)
+        /// Gets the score of the home competitor competing on the associated sport event
         /// </summary>
-        int? HomePenaltyScore { get; }
+        /// <value>The score of the home competitor competing on the associated sport event</value>
+        new decimal? HomeScore { get; }
 
         /// <summary>
-        /// Gets the penalty score of the away competitor competing on the associated sport event (for Ice Hockey)
+        /// Gets the score of the away competitor competing on the associated sport event
         /// </summary>
-        int? AwayPenaltyScore { get; }
+        /// <value>The score of the away competitor competing on the associated sport event</value>
+        new decimal? AwayScore { get; }
     }
 }

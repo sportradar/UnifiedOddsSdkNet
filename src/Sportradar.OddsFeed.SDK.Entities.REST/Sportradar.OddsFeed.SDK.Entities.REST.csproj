@@ -182,6 +182,7 @@
     <Compile Include="Caching\Exportable\ExportableCategoryCI.cs" />
     <Compile Include="Caching\Exportable\ExportableSportCI.cs" />
     <Compile Include="Caching\Exportable\ExportableCI.cs" />
+    <Compile Include="IMatchStatusV3.cs" />
     <Compile Include="Internal\Caching\Exportable\IExportableCI.cs" />
     <Compile Include="Internal\Caching\Exportable\IExportableSdkCache.cs" />
     <Compile Include="Internal\EntitiesImpl\Car.cs" />
