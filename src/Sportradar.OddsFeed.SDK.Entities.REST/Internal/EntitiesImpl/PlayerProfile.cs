@@ -16,7 +16,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// </summary>
     /// <seealso cref="Player" />
     /// <seealso cref="IPlayerProfile" />
-    internal class PlayerProfile : Player, IPlayerProfileV1
+    internal class PlayerProfile : Player, IPlayerProfileV2
     {
         private readonly PlayerProfileCI _playerProfileCI;
         private readonly List<CultureInfo> _cultures;
@@ -50,6 +50,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// Gets the gender
         /// </summary>
         public string Gender => _playerProfileCI.Gender;
+
+        /// <summary>
+        /// Gets the country code
+        /// </summary>
+        public string CountryCode => _playerProfileCI.CountryCode;
+
+        /// <summary>
+        /// Gets the full name of the player
+        /// </summary>
+        public string FullName => _playerProfileCI.FullName;
+
+        /// <summary>
+        /// Gets the nickname of the player
+        /// </summary>
+        public string Nickname => _playerProfileCI.Nickname;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PlayerProfile"/> class
@@ -109,7 +124,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         protected override string PrintF()
         {
             var nationalities = string.Join(" ", Nationalities.Select(x => x.Key.TwoLetterISOLanguageName + ":" + x.Value));
-            return $"{base.PrintF()}, Type={Type}, DateOfBirth={DateOfBirth}, Weight={Weight}, Height={Height}, Nationality=[{nationalities}]";
+            return $"{base.PrintF()}, Type={Type}, DateOfBirth={DateOfBirth}, FullName={FullName}, Nickname={Nickname}, Weight={Weight}, Height={Height}, Nationality=[{nationalities}], CountryCode={CountryCode}";
         }
 
         /// <summary>

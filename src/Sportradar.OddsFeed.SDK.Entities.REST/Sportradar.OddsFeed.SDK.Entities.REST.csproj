@@ -191,6 +191,7 @@
     <Compile Include="Internal\ListSportAvailableTournamentProvider.cs" />
     <Compile Include="Internal\Mapping\ListSportAvailableTournamentMapper.cs" />
     <Compile Include="Internal\Mapping\ListSportAvailableTournamentMapperFactory.cs" />
+    <Compile Include="IPlayerProfileV2.cs" />
     <Compile Include="IRaceDriverProfile.cs" />
     <Compile Include="ICompetitorV2.cs" />
     <Compile Include="ICompetitorV1.cs" />
