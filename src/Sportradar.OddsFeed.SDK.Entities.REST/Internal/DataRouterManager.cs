@@ -132,6 +132,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// The fixture changes provider
         /// </summary>
         private readonly IDataProvider<IEnumerable<FixtureChangeDTO>> _fixtureChangesProvider;
+        /// <summary>
+        /// The result changes provider
+        /// </summary>
+        private readonly IDataProvider<IEnumerable<ResultChangeDTO>> _resultChangesProvider;
 
         /// <summary>
         /// The list sport events provider
@@ -193,6 +197,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="availableSelectionsProvider">Available selections provider</param>
         /// <param name="calculateProbabilityProvider">The probability calculation provider</param>
         /// <param name="fixtureChangesProvider">Fixture changes provider</param>
+        /// <param name="resultChangesProvider">Result changes provider</param>
         /// <param name="listSportEventProvider">List sport events provider</param>
         /// <param name="availableSportTournamentsProvider">The sports available tournaments provider</param>
         public DataRouterManager(ICacheManager cacheManager,
@@ -222,6 +227,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                                  IDataProvider<AvailableSelectionsDTO> availableSelectionsProvider,
                                  ICalculateProbabilityProvider calculateProbabilityProvider,
                                  IDataProvider<IEnumerable<FixtureChangeDTO>> fixtureChangesProvider,
+                                 IDataProvider<IEnumerable<ResultChangeDTO>> resultChangesProvider,
                                  IDataProvider<EntityList<SportEventSummaryDTO>> listSportEventProvider,
                                  IDataProvider<EntityList<TournamentInfoDTO>> availableSportTournamentsProvider)
         {
@@ -249,6 +255,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Guard.Argument(availableSelectionsProvider, nameof(availableSelectionsProvider)).NotNull();
             Guard.Argument(calculateProbabilityProvider, nameof(calculateProbabilityProvider)).NotNull();
             Guard.Argument(fixtureChangesProvider, nameof(fixtureChangesProvider)).NotNull();
+            Guard.Argument(resultChangesProvider, nameof(resultChangesProvider)).NotNull();
             Guard.Argument(listSportEventProvider, nameof(listSportEventProvider)).NotNull();
             Guard.Argument(availableSportTournamentsProvider, nameof(availableSportTournamentsProvider)).NotNull();
 
@@ -280,6 +287,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             _availableSelectionsProvider = availableSelectionsProvider;
             _calculateProbabilityProvider = calculateProbabilityProvider;
             _fixtureChangesProvider = fixtureChangesProvider;
+            _resultChangesProvider = resultChangesProvider;
             _listSportEventProvider = listSportEventProvider;
             _availableSportTournamentsProvider = availableSportTournamentsProvider;
 
@@ -306,6 +314,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             //_availableSelectionsProvider.RawApiDataReceived += OnRawApiDataReceived;
             //_calculateProbabilityProvider.RawApiDataReceived += OnRawApiDataReceived;
             _fixtureChangesProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _resultChangesProvider.RawApiDataReceived += OnRawApiDataReceived;
             _listSportEventProvider.RawApiDataReceived += OnRawApiDataReceived;
             _availableSportTournamentsProvider.RawApiDataReceived += OnRawApiDataReceived;
         }
@@ -1411,6 +1420,42 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Gets the list of all results that have changed in the last 24 hours
+        /// </summary>
+        /// <param name="culture">The culture to be fetched</param>
+        /// <returns>The list of all results that have changed in the last 24 hours</returns>
+        public async Task<IEnumerable<IResultChange>> GetResultChangesAsync(CultureInfo culture)
+        {
+            Metric.Context("DataRouterManager").Meter("GetResultChangesAsync", Unit.Calls);
+            var timer = Metric.Context("DataRouterManager").Timer("GetResultChangesAsync", Unit.Requests);
+            using (var t = timer.NewContext())
+            {
+                WriteLog("Executing GetResultChangesAsync.", true);
+
+                IEnumerable<ResultChangeDTO> result = null;
+                int restCallTime;
+                try
+                {
+                    result = await _resultChangesProvider.GetDataAsync(culture.TwoLetterISOLanguageName).ConfigureAwait(false);
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                }
+                catch (Exception e)
+                {
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    var message = e.InnerException?.Message ?? e.Message;
+                    _executionLog.Error($"Error getting result changes. Message={message}", e.InnerException ?? e);
+                    if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                    {
+                        throw;
+                    }
+                }
+
+                WriteLog($"Executing GetResultChangesAsync took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
+                return result?.Select(f => new ResultChange(f)).ToList();
+            }
         }
 
         private void WriteLog(string text, bool useDebug = false)

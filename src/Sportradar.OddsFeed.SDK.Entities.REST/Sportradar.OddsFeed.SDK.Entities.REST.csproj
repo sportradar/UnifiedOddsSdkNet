@@ -177,6 +177,11 @@
     <Compile Include="IBookmakerDetails.cs" />
     <Compile Include="ICompetitorV4.cs" />
     <Compile Include="ICompetitorV3.cs" />
+    <Compile Include="Internal\DTO\ResultChangeDTO.cs" />
+    <Compile Include="Internal\EntitiesImpl\ResultChange.cs" />
+    <Compile Include="Internal\Mapping\ResultChangesMapper.cs" />
+    <Compile Include="Internal\Mapping\ResultChangesMapperFactory.cs" />
+    <Compile Include="IResultChange.cs" />
     <Compile Include="IGroupV1.cs" />
     <Compile Include="IMatchStatusV2.cs" />
     <Compile Include="Caching\Exportable\ExportableCategoryCI.cs" />

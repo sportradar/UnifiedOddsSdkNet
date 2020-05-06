@@ -27,7 +27,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
     /// Provides access to sport related data (sports, tournaments, sport events, ...)
     /// </summary>
     [Log(LoggerType.ClientInteraction)]
-    internal class SportDataProvider : ISportDataProviderV5
+    internal class SportDataProvider : ISportDataProviderV6
     {
         private static readonly ILog Log = SdkLoggerFactory.GetLoggerForClientInteraction(typeof(SportDataProvider));
 
@@ -501,6 +501,23 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             };
             tasks.ForEach(t => t.ConfigureAwait(false));
             return Task.WhenAll(tasks);
+        }
+
+        /// <summary>
+        /// Gets the list of all results that have changed in the last 24 hours
+        /// </summary>
+        /// <param name="culture">A <see cref="CultureInfo"/> specifying the language or a null reference to use the languages specified in the configuration</param>
+        /// <returns>A list of all results that have changed in the last 24 hours</returns>
+        public async Task<IEnumerable<IResultChange>> GetResultChangesAsync(CultureInfo culture = null)
+        {
+            culture = culture ?? _defaultCultures.First();
+
+            Log.Info($"Invoked GetResultChangesAsync: [Cultures={culture.TwoLetterISOLanguageName}].");
+
+            var result = (await _dataRouterManager.GetResultChangesAsync(culture).ConfigureAwait(false))?.ToList();
+
+            Log.Info($"GetResultChangesAsync returned {result?.Count} results.");
+            return result;
         }
     }
 }
