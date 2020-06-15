@@ -339,7 +339,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             }
             if (competitorCI != null)
             {
-                ExecutionLog.Warn($"Transforming CompetitorCI to TeamCompetitorCI for {teamCompetitorId}");
+                ExecutionLog.Debug($"Transforming CompetitorCI to TeamCompetitorCI for {teamCompetitorId}");
                 var teamCI = new TeamCompetitorCI(competitorCI);
                 return BuildTeamCompetitor(teamCI, cultureInfos, rootCompetitionCI);
             }
