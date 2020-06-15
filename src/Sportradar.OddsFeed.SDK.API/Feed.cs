@@ -33,7 +33,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <summary>
         /// A <see cref="ILog"/> instance used for execution logging
         /// </summary>
-        private static readonly ILog Log = SdkLoggerFactory.GetLoggerForExecution(typeof(Feed));
+        private static ILog _log = SdkLoggerFactory.GetLoggerForExecution(typeof(Feed));
 
         /// <summary>
         /// A <see cref="IUnityContainer"/> used to resolve
@@ -136,7 +136,7 @@ namespace Sportradar.OddsFeed.SDK.API
                 }
                 catch (Exception e)
                 {
-                    Log.Error("Error getting available producers.", e);
+                    _log.Error("Error getting available producers.", e);
                     throw;
                 }
             }
@@ -228,9 +228,7 @@ namespace Sportradar.OddsFeed.SDK.API
         protected Feed(IOddsFeedConfiguration config, bool isReplay)
         {
             Guard.Argument(config, nameof(config)).NotNull();
-
-            LogInit();
-
+            
             FeedInitialized = false;
 
             UnityContainer = new UnityContainer();
@@ -240,6 +238,10 @@ namespace Sportradar.OddsFeed.SDK.API
             {
                 InternalConfig.EnableReplayServer();
             }
+
+            _log = SdkLoggerFactory.GetLoggerForExecution(typeof(Feed));
+
+            LogInit();
         }
 
         /// <summary>
@@ -286,7 +288,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <param name="shutdownEventArgs">A <see cref="ShutdownEventArgs"/> containing additional event information</param>
         private void OnConnectionShutdown(object sender, ShutdownEventArgs shutdownEventArgs)
         {
-            Log.Warn($"The connection is shutdown. Cause: {shutdownEventArgs.Cause}");
+            _log.Warn($"The connection is shutdown. Cause: {shutdownEventArgs.Cause}");
             _feedRecoveryManager.ConnectionShutdown();
             ((IGlobalEventDispatcher) this).DispatchDisconnected();
         }
@@ -314,7 +316,7 @@ namespace Sportradar.OddsFeed.SDK.API
 
         private void OnCloseFeed(object sender, FeedCloseEventArgs e)
         {
-            Log.Error("Feed must be closed. Reason: " + e.GetReason());
+            _log.Error("Feed must be closed. Reason: " + e.GetReason());
 
             try
             {
@@ -323,7 +325,7 @@ namespace Sportradar.OddsFeed.SDK.API
             }
             catch (ObjectDisposedException ex)
             {
-                Log.Warn($"Error happened during closing feed, because the instance {ex.ObjectName} is being disposed.");
+                _log.Warn($"Error happened during closing feed, because the instance {ex.ObjectName} is being disposed.");
 
                 if (InternalConfig.ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
                 {
@@ -332,14 +334,14 @@ namespace Sportradar.OddsFeed.SDK.API
             }
             catch (Exception ex)
             {
-                Log.Warn($"Error happened during closing feed. Exception: {ex}");
+                _log.Warn($"Error happened during closing feed. Exception: {ex}");
 
                 if (InternalConfig.ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
                 {
                     throw;
                 }
             }
-            Log.Info("Feed was successfully disposed.");
+            _log.Info("Feed was successfully disposed.");
         }
 
         /// <summary>
@@ -512,13 +514,20 @@ namespace Sportradar.OddsFeed.SDK.API
                 return;
             }
 
-            _connection.ConnectionShutdown -= OnConnectionShutdown;
-            _feedRecoveryManager.ProducerDown -= MarkProducerAsDown;
-            _feedRecoveryManager.ProducerUp -= MarkProducerAsUp;
-            _feedRecoveryManager.CloseFeed -= OnCloseFeed;
-            _feedRecoveryManager.EventRecoveryCompleted -= OnEventRecoveryCompleted;
-            _feedRecoveryManager.Close();
+            if (_connection != null)
+            {
+                _connection.ConnectionShutdown -= OnConnectionShutdown;
+            }
 
+            if (_feedRecoveryManager != null)
+            {
+                _feedRecoveryManager.ProducerDown -= MarkProducerAsDown;
+                _feedRecoveryManager.ProducerUp -= MarkProducerAsUp;
+                _feedRecoveryManager.CloseFeed -= OnCloseFeed;
+                _feedRecoveryManager.EventRecoveryCompleted -= OnEventRecoveryCompleted;
+                _feedRecoveryManager.Close();
+            }
+            
             foreach (var session in Sessions)
             {
                 session.Close();
@@ -532,7 +541,7 @@ namespace Sportradar.OddsFeed.SDK.API
                 }
                 catch (Exception ex)
                 {
-                    Log.Warn("An exception has occurred while disposing the feed instance. Exception: ", ex);
+                    _log.Warn("An exception has occurred while disposing the feed instance. Exception: ", ex);
                 }
             }
 
@@ -569,7 +578,7 @@ namespace Sportradar.OddsFeed.SDK.API
             }
 
             //SdkInfo.LogSdkVersion(Log);
-            Log.Info($"Feed configuration: [{InternalConfig}]");
+            _log.Info($"Feed configuration: [{InternalConfig}]");
 
             try
             {
