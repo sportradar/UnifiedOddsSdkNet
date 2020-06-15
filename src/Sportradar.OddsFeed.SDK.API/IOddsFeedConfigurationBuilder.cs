@@ -116,6 +116,13 @@ namespace Sportradar.OddsFeed.SDK.API
         IOddsFeedConfigurationBuilder SetNodeId(int nodeId);
 
         /// <summary>
+        /// Sets the timeout for HTTP responses for this instance of the sdk
+        /// </summary>
+        /// <param name="httpClientTimeout">The timeout for HTTP responses</param>
+        /// <returns>The <see cref="IOddsFeedConfigurationBuilder"/> instance used to set additional values.</returns>
+        IOddsFeedConfigurationBuilder SetHttpClientTimeout(int httpClientTimeout);
+
+        /// <summary>
         /// Builds and returns a <see cref="IOddsFeedConfiguration"/> instance
         /// </summary>
         /// <returns>The constructed <see cref="IOddsFeedConfiguration"/> instance.</returns>

@@ -7,6 +7,7 @@ using Dawn;
 using System.Globalization;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Common;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal.Config
 {
@@ -50,6 +51,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// The node identifier
         /// </summary>
         protected int NodeId;
+
+        /// <summary>
+        /// Value specifying timeout set for HTTP responses
+        /// </summary>
+        protected int? HttpClientTimeout;
 
         internal IOddsFeedConfigurationSection Section { get; private set; }
 
@@ -100,6 +106,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
                 var producerIds = section.DisabledProducers.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
                 SetDisabledProducers(producerIds.Select(producerId => int.Parse(producerId.Trim())));
             }
+
+            HttpClientTimeout = section.HttpClientTimeout;
         }
 
         /// <summary>
@@ -185,6 +193,17 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
             {
                 DisabledProducers.AddRange(producerIds.Distinct().ToList());
             }
+            return this as T;
+        }
+
+        /// <summary>
+        /// Sets the timeout for HTTP responses for this instance of the sdk
+        /// </summary>
+        /// <param name="httpClientTimeout">The timeout for HTTP responses</param>
+        /// <returns>A <see cref="IConfigurationBuilderBase{T}"/> derived instance used to set general configuration properties</returns>
+        public T SetHttpClientTimeout(int httpClientTimeout)
+        {
+            HttpClientTimeout = httpClientTimeout;
             return this as T;
         }
 
