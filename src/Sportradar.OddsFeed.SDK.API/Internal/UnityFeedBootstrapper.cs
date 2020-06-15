@@ -54,7 +54,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
 
             //register common types
-            container.RegisterType<HttpClient, HttpClient>(new ContainerControlledLifetimeManager(), new InjectionConstructor());
+            container.RegisterType<HttpClient, HttpClient>(new ContainerControlledLifetimeManager(), new InjectionFactory(
+                unityContainer =>
+                {
+                    var httpClient = new HttpClient {Timeout = TimeSpan.FromSeconds(userConfig.HttpClientTimeout)};
+                    return httpClient;
+                }));
 
             var seed = (int)DateTime.Now.Ticks;
             var rand = new Random(seed);
@@ -1004,7 +1009,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     RestConnectionFailureTimeoutInSec));
             object[] argsRest =
             {
-                new HttpClient(),
+                new HttpClient {Timeout = TimeSpan.FromSeconds(config.HttpClientTimeout)},
                 config.AccessToken,
                 new Deserializer<response>(),
                 RestConnectionFailureLimit,

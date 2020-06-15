@@ -69,6 +69,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         private int _nodeId;
 
         /// <summary>
+        /// Value specifying timeout set for HTTP responses
+        /// </summary>
+        private int _httpClientTimeout;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="OddsFeedConfigurationBuilder"/> class
         /// </summary>
         /// <param name="sectionProvider">A <see cref="IConfigurationSectionProvider"/> used to retrieve settings from config file</param>
@@ -90,6 +95,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 _maxRecoveryTime = SdkInfo.MaxRecoveryExecutionInSeconds;
                 _useIntegrationEnvironment = false;
                 _nodeId = 0;
+                _httpClientTimeout = SdkInfo.DefaultHttpClientTimeout;
                 return;
             }
 
@@ -111,6 +117,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             }
             _useIntegrationEnvironment = _section.UseStagingEnvironment || _section.UseIntegrationEnvironment;
             _nodeId = _section.NodeId;
+            _httpClientTimeout = _section.HttpClientTimeout;
         }
 
 
@@ -276,6 +283,17 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         }
 
         /// <summary>
+        /// Sets the timeout for HTTP responses for this instance of the sdk
+        /// </summary>
+        /// <param name="httpClientTimeout">The timeout for HTTP responses</param>
+        /// <returns>The <see cref="IOddsFeedConfigurationBuilder"/> instance used to set additional values.</returns>
+        public IOddsFeedConfigurationBuilder SetHttpClientTimeout(int httpClientTimeout)
+        {
+            _httpClientTimeout = httpClientTimeout;
+            return this;
+        }
+
+        /// <summary>
         /// Builds and returns a <see cref="IOddsFeedConfiguration"/> instance
         /// </summary>
         /// <returns>The constructed <see cref="IOddsFeedConfiguration"/> instance</returns>
@@ -311,6 +329,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 _nodeId,
                 _section?.ExceptionHandlingStrategy ?? ExceptionHandlingStrategy.CATCH,
                 false,
+                _httpClientTimeout,
                 _section);
 
             Init();

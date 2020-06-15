@@ -111,7 +111,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             var exportString = SerializeExportables(export);
             var secondExportString = SerializeExportables(await _sportDataCache.ExportAsync());
-            Assert.AreEqual(exportString, secondExportString);
+            Assert.AreEqual(exportString, secondExportString, "The first and the second export json are not equal");
         }
 
         [TestMethod]
@@ -188,7 +188,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             var exportString = SerializeExportables(export);
             var secondExportString = SerializeExportables(await _profileCache.ExportAsync());
-            Assert.AreEqual(exportString, secondExportString);
+            Assert.AreEqual(exportString, secondExportString, "The first and the second export json are not equal");
         }
 
         [TestMethod]
@@ -242,7 +242,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             var exportString = SerializeExportables(export);
             var secondExportString = SerializeExportables(await _sportEventCache.ExportAsync());
-            Assert.AreEqual(exportString, secondExportString);
+            Assert.AreEqual(exportString, secondExportString, "The first and the second export json are not equal");
         }
 
         private string SerializeExportables(IEnumerable<ExportableCI> exportables)
