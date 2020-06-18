@@ -53,7 +53,6 @@ namespace Sportradar.OddsFeed.SDK.API.EventArguments
         /// Gets the raw xml message received from the feed
         /// </summary>
         /// <returns>Returns the raw xml message received from the feed</returns>
-        [Obsolete("The message was moved to event")]
         public string GetRawMessage()
         {
             return _rawMessage == null
