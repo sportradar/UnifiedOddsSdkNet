@@ -74,6 +74,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         private int _httpClientTimeout;
 
         /// <summary>
+        /// Value specifying timeout set for recovery HTTP responses
+        /// </summary>
+        private int _recoveryHttpClientTimeout;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="OddsFeedConfigurationBuilder"/> class
         /// </summary>
         /// <param name="sectionProvider">A <see cref="IConfigurationSectionProvider"/> used to retrieve settings from config file</param>
@@ -96,6 +101,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 _useIntegrationEnvironment = false;
                 _nodeId = 0;
                 _httpClientTimeout = SdkInfo.DefaultHttpClientTimeout;
+                _recoveryHttpClientTimeout = SdkInfo.DefaultHttpClientTimeout;
                 return;
             }
 
@@ -118,6 +124,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             _useIntegrationEnvironment = _section.UseStagingEnvironment || _section.UseIntegrationEnvironment;
             _nodeId = _section.NodeId;
             _httpClientTimeout = _section.HttpClientTimeout;
+            _recoveryHttpClientTimeout = _section.RecoveryHttpClientTimeout;
         }
 
 
@@ -294,6 +301,17 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         }
 
         /// <summary>
+        /// Sets the timeout for recovery HTTP responses for this instance of the sdk
+        /// </summary>
+        /// <param name="recoveryHttpClientTimeout">The timeout for recovery HTTP responses</param>
+        /// <returns>The <see cref="IOddsFeedConfigurationBuilder"/> instance used to set additional values.</returns>
+        public IOddsFeedConfigurationBuilder SetRecoveryHttpClientTimeout(int recoveryHttpClientTimeout)
+        {
+            _recoveryHttpClientTimeout = recoveryHttpClientTimeout;
+            return this;
+        }
+
+        /// <summary>
         /// Builds and returns a <see cref="IOddsFeedConfiguration"/> instance
         /// </summary>
         /// <returns>The constructed <see cref="IOddsFeedConfiguration"/> instance</returns>
@@ -330,6 +348,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 _section?.ExceptionHandlingStrategy ?? ExceptionHandlingStrategy.CATCH,
                 false,
                 _httpClientTimeout,
+                _recoveryHttpClientTimeout,
                 _section);
 
             Init();

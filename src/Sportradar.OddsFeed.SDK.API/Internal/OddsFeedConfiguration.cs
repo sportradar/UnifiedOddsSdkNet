@@ -129,6 +129,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         public int HttpClientTimeout { get; }
 
         /// <summary>
+        /// Gets a value specifying timeout set for recovery HTTP responses
+        /// </summary>
+        public int RecoveryHttpClientTimeout { get; }
+
+        /// <summary>
         /// Gets the <see cref="IOddsFeedConfigurationSection"/> used to obtain 'hidden' properties
         /// </summary>
         /// <value>The <see cref="IOddsFeedConfigurationSection"/> used to obtain 'hidden' properties</value>
@@ -149,6 +154,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             ExceptionHandlingStrategy exceptionHandlingStrategy,
             bool adjustAfterAge,
             int httpClientTimeout,
+            int recoveryHttpClientTimeout,
             IOddsFeedConfigurationSection section){
 
             Guard.Argument(accessToken, nameof(accessToken)).NotNull().NotEmpty();
@@ -161,6 +167,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             Guard.Argument(apiHost, nameof(apiHost)).NotNull().NotEmpty();
             Guard.Argument(host, nameof(host)).NotNull().NotEmpty();
             Guard.Argument(httpClientTimeout, nameof(httpClientTimeout)).InRange(SdkInfo.MinHttpClientTimeout, SdkInfo.MaxHttpClientTimeout);
+            Guard.Argument(recoveryHttpClientTimeout, nameof(recoveryHttpClientTimeout)).InRange(SdkInfo.MinHttpClientTimeout, SdkInfo.MaxHttpClientTimeout);
 
             AccessToken = accessToken;
             InactivitySeconds = inactivitySeconds;
@@ -203,6 +210,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             Password = null;
             AdjustAfterAge = adjustAfterAge;
             HttpClientTimeout = httpClientTimeout;
+            RecoveryHttpClientTimeout = recoveryHttpClientTimeout;
             Section = section;
         }
 
@@ -226,6 +234,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             ExceptionHandlingStrategy exceptionHandlingStrategy,
             bool adjustAfterAge,
             int httpClientTimeout,
+            int recoveryHttpClientTimeout,
             IOddsFeedConfigurationSection section)
         {
             Guard.Argument(accessToken, nameof(accessToken)).NotNull().NotEmpty();
@@ -233,6 +242,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             Guard.Argument(inactivitySeconds, nameof(inactivitySeconds)).InRange(SdkInfo.MinInactivitySeconds, SdkInfo.MaxInactivitySeconds);
             Guard.Argument(maxRecoveryExecutionInSeconds, nameof(maxRecoveryExecutionInSeconds)).Min(SdkInfo.MinRecoveryExecutionInSeconds);
             Guard.Argument(httpClientTimeout, nameof(httpClientTimeout)).InRange(SdkInfo.MinHttpClientTimeout, SdkInfo.MaxHttpClientTimeout);
+            Guard.Argument(recoveryHttpClientTimeout, nameof(recoveryHttpClientTimeout)).InRange(SdkInfo.MinHttpClientTimeout, SdkInfo.MaxHttpClientTimeout);
 
             AccessToken = accessToken;
             Environment = environment;
@@ -269,6 +279,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             ExceptionHandlingStrategy = exceptionHandlingStrategy;
             AdjustAfterAge = adjustAfterAge;
             HttpClientTimeout = httpClientTimeout;
+            RecoveryHttpClientTimeout = recoveryHttpClientTimeout;
             Section = section;
         }
     }

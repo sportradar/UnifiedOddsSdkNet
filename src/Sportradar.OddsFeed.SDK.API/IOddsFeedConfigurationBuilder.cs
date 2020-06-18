@@ -123,6 +123,13 @@ namespace Sportradar.OddsFeed.SDK.API
         IOddsFeedConfigurationBuilder SetHttpClientTimeout(int httpClientTimeout);
 
         /// <summary>
+        /// Sets the timeout for recovery HTTP responses for this instance of the sdk
+        /// </summary>
+        /// <param name="recoveryHttpClientTimeout">The timeout for recovery HTTP responses</param>
+        /// <returns>The <see cref="IOddsFeedConfigurationBuilder"/> instance used to set additional values.</returns>
+        IOddsFeedConfigurationBuilder SetRecoveryHttpClientTimeout(int recoveryHttpClientTimeout);
+
+        /// <summary>
         /// Builds and returns a <see cref="IOddsFeedConfiguration"/> instance
         /// </summary>
         /// <returns>The constructed <see cref="IOddsFeedConfiguration"/> instance.</returns>

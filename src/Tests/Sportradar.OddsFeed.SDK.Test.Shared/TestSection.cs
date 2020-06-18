@@ -35,6 +35,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                 1150,
                 11,
                 false,
+                30,
                 30);
         }
 
@@ -61,6 +62,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             SdkInfo.MaxRecoveryExecutionInSeconds,
             0,
             false,
+            30,
             30);
 
         internal static IOddsFeedConfigurationSection MinimalProductionSection = new TestSection(
@@ -86,6 +88,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             SdkInfo.MaxRecoveryExecutionInSeconds,
             0,
             false,
+            30,
             30);
 
         internal static IOddsFeedConfigurationSection IntegrationSection = new TestSection(
@@ -111,6 +114,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             1150,
             11,
             true,
+            30,
             30);
 
         internal static IOddsFeedConfigurationSection ProductionSection = new TestSection(
@@ -136,6 +140,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             1150,
             11,
             true,
+            30,
             30);
 
         internal static readonly IOddsFeedConfigurationSection DefaultSection = new TestSection(
@@ -161,6 +166,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             600,
             33,
             false,
+            30,
             30);
 
         public string AccessToken { get; set; }
@@ -192,7 +198,12 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         /// </summary>
         public int HttpClientTimeout { get; set; }
 
-        public TestSection(string accessToken, int inactivitySeconds, string host, string virtualHost, int port, string username, string password, string apiHost, bool useSSL, bool useApiSSL, string supportedLanguages, string defaultLanguage, bool statisticsEnabled, int statisticsTimeout, int statisticsRecordLimit, string sdkLogConfigPath, bool useIntegrationEnvironment, ExceptionHandlingStrategy exceptionHandlingStrategy, string disabledProducers, int maxRecoveryTime, int nodeId, bool adjustAfterAge, int httpClientTimeout)
+        /// <summary>
+        /// Gets a value specifying timeout set for recovery HTTP responses
+        /// </summary>
+        public int RecoveryHttpClientTimeout { get; set; }
+
+        public TestSection(string accessToken, int inactivitySeconds, string host, string virtualHost, int port, string username, string password, string apiHost, bool useSSL, bool useApiSSL, string supportedLanguages, string defaultLanguage, bool statisticsEnabled, int statisticsTimeout, int statisticsRecordLimit, string sdkLogConfigPath, bool useIntegrationEnvironment, ExceptionHandlingStrategy exceptionHandlingStrategy, string disabledProducers, int maxRecoveryTime, int nodeId, bool adjustAfterAge, int httpClientTimeout, int recoveryHttpClientTimeout)
         {
             AccessToken = accessToken;
             InactivitySeconds = inactivitySeconds;
@@ -217,6 +228,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             NodeId = nodeId;
             AdjustAfterAge = adjustAfterAge;
             HttpClientTimeout = httpClientTimeout;
+            RecoveryHttpClientTimeout = recoveryHttpClientTimeout;
         }
     }
 

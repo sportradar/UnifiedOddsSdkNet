@@ -133,5 +133,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// Gets a value specifying timeout set for HTTP responses
         /// </summary>
         int HttpClientTimeout { get; }
+
+        /// <summary>
+        /// Gets a value specifying timeout set for recovery HTTP responses
+        /// </summary>
+        int RecoveryHttpClientTimeout { get; }
     }
 }

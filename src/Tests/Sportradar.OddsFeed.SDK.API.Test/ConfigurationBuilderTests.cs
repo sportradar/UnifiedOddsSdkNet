@@ -652,6 +652,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             Assert.AreEqual(80, StageBuilder(_testSection).SetHttpClientTimeout(80).Build().HttpClientTimeout);
             Assert.AreEqual(80, IntegrationBuilder(_testSection).SetHttpClientTimeout(80).Build().HttpClientTimeout);
             Assert.AreEqual(80, ProductionBuilder(_testSection).SetHttpClientTimeout(80).Build().HttpClientTimeout);
+            Assert.AreEqual(80, ReplayBuilder(_testSection).SetHttpClientTimeout(80).Build().HttpClientTimeout);
             Assert.AreEqual(80, CustomBuilder(_testSection).SetHttpClientTimeout(80).Build().HttpClientTimeout);
 
             Assert.AreEqual(SdkInfo.DefaultHttpClientTimeout, StageBuilder("token").SetDefaultLanguage(TestData.Culture).Build().HttpClientTimeout);
@@ -661,5 +662,26 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             Assert.AreEqual(SdkInfo.DefaultHttpClientTimeout, CustomBuilder("token").SetDefaultLanguage(TestData.Culture).SetMessagingHost(_testSection.Host).SetApiHost(_testSection.ApiHost).Build().HttpClientTimeout);
         }
 
+        [TestMethod]
+        public void recoveryHttpClientTimeout_has_correct_value()
+        {
+            _testSection.RecoveryHttpClientTimeout = 50;
+            Assert.AreEqual(_testSection.RecoveryHttpClientTimeout, StageBuilder(_testSection).Build().RecoveryHttpClientTimeout);
+            Assert.AreEqual(_testSection.RecoveryHttpClientTimeout, IntegrationBuilder(_testSection).Build().RecoveryHttpClientTimeout);
+            Assert.AreEqual(_testSection.RecoveryHttpClientTimeout, ProductionBuilder(_testSection).Build().RecoveryHttpClientTimeout);
+            Assert.AreEqual(SdkInfo.DefaultHttpClientTimeout, ReplayBuilder(_testSection).Build().RecoveryHttpClientTimeout);
+            Assert.AreEqual(_testSection.RecoveryHttpClientTimeout, CustomBuilder(_testSection).Build().RecoveryHttpClientTimeout);
+
+            Assert.AreEqual(80, StageBuilder(_testSection).SetRecoveryHttpClientTimeout(80).Build().RecoveryHttpClientTimeout);
+            Assert.AreEqual(80, IntegrationBuilder(_testSection).SetRecoveryHttpClientTimeout(80).Build().RecoveryHttpClientTimeout);
+            Assert.AreEqual(80, ProductionBuilder(_testSection).SetRecoveryHttpClientTimeout(80).Build().RecoveryHttpClientTimeout);
+            Assert.AreEqual(80, CustomBuilder(_testSection).SetRecoveryHttpClientTimeout(80).Build().RecoveryHttpClientTimeout);
+
+            Assert.AreEqual(SdkInfo.DefaultHttpClientTimeout, StageBuilder("token").SetDefaultLanguage(TestData.Culture).Build().RecoveryHttpClientTimeout);
+            Assert.AreEqual(SdkInfo.DefaultHttpClientTimeout, IntegrationBuilder("token").SetDefaultLanguage(TestData.Culture).Build().RecoveryHttpClientTimeout);
+            Assert.AreEqual(SdkInfo.DefaultHttpClientTimeout, ProductionBuilder("token").SetDefaultLanguage(TestData.Culture).Build().RecoveryHttpClientTimeout);
+            Assert.AreEqual(SdkInfo.DefaultHttpClientTimeout, ReplayBuilder("token").SetDefaultLanguage(TestData.Culture).Build().RecoveryHttpClientTimeout);
+            Assert.AreEqual(SdkInfo.DefaultHttpClientTimeout, CustomBuilder("token").SetDefaultLanguage(TestData.Culture).SetMessagingHost(_testSection.Host).SetApiHost(_testSection.ApiHost).Build().RecoveryHttpClientTimeout);
+        }
     }
 }
