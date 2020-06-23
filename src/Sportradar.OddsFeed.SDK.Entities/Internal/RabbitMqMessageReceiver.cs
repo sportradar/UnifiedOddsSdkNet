@@ -126,11 +126,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             var sessionName = _interest == null ? "system" : _interest.Name;
             string messageBody = null;
             FeedMessage feedMessage;
+            IProducer producer;
+            string messageName;
             try
             {
-                if (FeedLog.IsDebugEnabled)
+                messageBody = Encoding.UTF8.GetString(eventArgs.Body);
+                feedMessage = _deserializer.Deserialize(new MemoryStream(eventArgs.Body));
+                producer = _producerManager.Get(feedMessage.ProducerId);
+                messageName = feedMessage.GetType().Name;
+
+                if (FeedLog.IsDebugEnabled && producer.IsAvailable && !producer.IsDisabled)
                 {
-                    messageBody = Encoding.UTF8.GetString(eventArgs.Body);
                     FeedLog.Debug($"<~> {sessionName} <~> {eventArgs.RoutingKey} <~> {messageBody}");
                 }
                 else
@@ -157,9 +163,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             // send RawFeedMessage if needed
             try
             {
-                //ExecutionLog.Debug($"Raw msg [{_interest}]: {feedMessage.GetType().Name} for event {feedMessage.EventId}.");
-                var args = new RawFeedMessageEventArgs(eventArgs.RoutingKey, feedMessage, sessionName);
-                RawFeedMessageReceived?.Invoke(this, args);
+                if (producer.IsAvailable && !producer.IsDisabled)
+                {
+                    //ExecutionLog.LogDebug($"Raw msg [{_interest}]: {feedMessage.GetType().Name} for event {feedMessage.EventId}.");
+                    var args = new RawFeedMessageEventArgs(eventArgs.RoutingKey, feedMessage, sessionName);
+                    RawFeedMessageReceived?.Invoke(this, args);
+                }
             }
             catch (Exception e)
             {
@@ -172,10 +181,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 ExecutionLog.Warn($"A message for producer which is not defined was received. Producer={feedMessage.ProducerId}");
                 return;
             }
-
-            var producer = _producerManager.Get(feedMessage.ProducerId);
-            var messageName = feedMessage.GetType().Name;
-
+            
             if (!_useReplay && (!producer.IsAvailable || producer.IsDisabled))
             {
                 ExecutionLog.Debug($"A message for producer which is disabled was received. Producer={producer}, MessageType={messageName}");
