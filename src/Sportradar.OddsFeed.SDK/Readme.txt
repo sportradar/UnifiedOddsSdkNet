@@ -9,6 +9,18 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2020-06-24  1.34.0.0
+Added support for configuring HTTP timeout
+Added overloaded methods for fixture and result changes with filters
+Updated supported languages
+Removed logging of feed message for disabled producers
+RawMessage on UnparsableMessageEventArgs is no longer obsolete
+Changed retention policy for variant market cache 
+Improved reporting of invalid message interest combinations
+Fix: Synchronized Producer Up/Down event dispatching
+Fix: Disposing of Feed instance
+Fix: Permanent failure to open connection to feed
+
 2020-05-11  1.33.0.0
 Added FullName, Nickname and CountryCode to IPlayerProfile (extended with IPlayerProfileV2)
 Added support for result changes endpoint
