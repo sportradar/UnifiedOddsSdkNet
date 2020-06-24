@@ -122,5 +122,32 @@ namespace Sportradar.OddsFeed.SDK.Common
         {
             return true;
         }
+
+        /// <summary>
+        /// Get the logger level
+        /// </summary>
+        /// <param name="logger">The logger to check</param>
+        /// <returns>The log level supported by the logger</returns>
+        public static LogLevel GetLoggerLogLevel(ILog logger)
+        {
+            if (logger == null)
+            {
+                return LogLevel.Off;
+            }
+
+            if (logger.IsTraceEnabled)
+                return LogLevel.Trace;
+            if (logger.IsDebugEnabled)
+                return LogLevel.Debug;
+            if (logger.IsInfoEnabled)
+                return LogLevel.Info;
+            if (logger.IsWarnEnabled)
+                return LogLevel.Warn;
+            if (logger.IsErrorEnabled)
+                return LogLevel.Error;
+            if (logger.IsFatalEnabled)
+                return LogLevel.Fatal;
+            return LogLevel.Off;
+        }
     }
 }
