@@ -513,7 +513,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             container.RegisterType<IDataProvider<IEnumerable<FixtureChangeDTO>>, DataProvider<fixtureChangesEndpoint, IEnumerable<FixtureChangeDTO>>>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
-                    config.ApiBaseUri + "/v1/sports/{0}/fixtures/changes.xml",
+                    config.ApiBaseUri + "/v1/sports/{0}/fixtures/changes.xml{1}",
                     new ResolvedParameter<IDataFetcher>(),
                     new ResolvedParameter<IDeserializer<fixtureChangesEndpoint>>(),
                     new ResolvedParameter<ISingleTypeMapperFactory<fixtureChangesEndpoint, IEnumerable<FixtureChangeDTO>>>()));
@@ -524,7 +524,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             container.RegisterType<IDataProvider<IEnumerable<ResultChangeDTO>>, DataProvider<resultChangesEndpoint, IEnumerable<ResultChangeDTO>>>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
-                    config.ApiBaseUri + "/v1/sports/{0}/results/changes.xml",
+                    config.ApiBaseUri + "/v1/sports/{0}/results/changes.xml{1}",
                     new ResolvedParameter<IDataFetcher>(),
                     new ResolvedParameter<IDeserializer<resultChangesEndpoint>>(),
                     new ResolvedParameter<ISingleTypeMapperFactory<resultChangesEndpoint, IEnumerable<ResultChangeDTO>>>()));
