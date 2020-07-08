@@ -56,6 +56,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         public int MaxRecoveryTime { get; }
 
         /// <summary>
+        /// Gets the minimal interval between recovery requests initiated by alive messages (seconds)
+        /// </summary>
+        public int MinIntervalBetweenRecoveryRequests { get; }
+
+        /// <summary>
         /// Gets the node identifier
         /// </summary>
         /// <remarks>MTS customer must set this value! Use only positive numbers; negative are reserved for internal use.</remarks>
@@ -149,6 +154,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             string virtualHost,
             bool useSsl,
             int maxRecoveryTimeInSeconds,
+            int minIntervalBetweenRecoveryRequests,
             bool useIntegrationEnvironment,
             int nodeId,
             ExceptionHandlingStrategy exceptionHandlingStrategy,
@@ -164,6 +170,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             Guard.Argument(inactivitySeconds, nameof(inactivitySeconds)).InRange(SdkInfo.MinInactivitySeconds, SdkInfo.MaxInactivitySeconds);
             Guard.Argument(maxRecoveryTimeInSeconds, nameof(maxRecoveryTimeInSeconds)).Min(SdkInfo.MinRecoveryExecutionInSeconds);
+            Guard.Argument(minIntervalBetweenRecoveryRequests, nameof(minIntervalBetweenRecoveryRequests)).InRange(SdkInfo.MinIntervalBetweenRecoveryRequests, SdkInfo.MaxIntervalBetweenRecoveryRequests);
             Guard.Argument(apiHost, nameof(apiHost)).NotNull().NotEmpty();
             Guard.Argument(host, nameof(host)).NotNull().NotEmpty();
             Guard.Argument(httpClientTimeout, nameof(httpClientTimeout)).InRange(SdkInfo.MinHttpClientTimeout, SdkInfo.MaxHttpClientTimeout);
@@ -181,6 +188,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             VirtualHost = virtualHost;
             UseSsl = useSsl;
             MaxRecoveryTime = maxRecoveryTimeInSeconds;
+            MinIntervalBetweenRecoveryRequests = minIntervalBetweenRecoveryRequests;
             NodeId = nodeId;
             if (nodeId < 0)
             {
@@ -229,6 +237,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             bool useApiSsl,
             int inactivitySeconds,
             int maxRecoveryExecutionInSeconds,
+            int minIntervalBetweenRecoveryRequests,
             int nodeId,
             List<int> disabledProducers,
             ExceptionHandlingStrategy exceptionHandlingStrategy,
@@ -241,6 +250,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             Guard.Argument(defaultCulture, nameof(defaultCulture)).NotNull();
             Guard.Argument(inactivitySeconds, nameof(inactivitySeconds)).InRange(SdkInfo.MinInactivitySeconds, SdkInfo.MaxInactivitySeconds);
             Guard.Argument(maxRecoveryExecutionInSeconds, nameof(maxRecoveryExecutionInSeconds)).Min(SdkInfo.MinRecoveryExecutionInSeconds);
+            Guard.Argument(minIntervalBetweenRecoveryRequests, nameof(minIntervalBetweenRecoveryRequests)).InRange(SdkInfo.MinIntervalBetweenRecoveryRequests, SdkInfo.MaxIntervalBetweenRecoveryRequests);
             Guard.Argument(httpClientTimeout, nameof(httpClientTimeout)).InRange(SdkInfo.MinHttpClientTimeout, SdkInfo.MaxHttpClientTimeout);
             Guard.Argument(recoveryHttpClientTimeout, nameof(recoveryHttpClientTimeout)).InRange(SdkInfo.MinHttpClientTimeout, SdkInfo.MaxHttpClientTimeout);
 
@@ -268,6 +278,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             UseApiSsl = useApiSsl;
             InactivitySeconds = inactivitySeconds;
             MaxRecoveryTime = maxRecoveryExecutionInSeconds;
+            MinIntervalBetweenRecoveryRequests = minIntervalBetweenRecoveryRequests;
             NodeId = nodeId;
             if (nodeId < 0)
             {

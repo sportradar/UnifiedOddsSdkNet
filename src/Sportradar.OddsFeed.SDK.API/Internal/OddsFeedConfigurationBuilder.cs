@@ -59,6 +59,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         private int _maxRecoveryTime;
 
         /// <summary>
+        /// The minimal interval between recovery requests initiated by alive messages (seconds)
+        /// </summary>
+        private int _minIntervalBetweenRecoveryRequests;
+
+        /// <summary>
         /// Value indicating whether the SDK should connect to integration environment
         /// </summary>
         private bool _useIntegrationEnvironment;
@@ -98,6 +103,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 _inactivitySeconds = SdkInfo.MinInactivitySeconds;
                 _useSsl = true;
                 _maxRecoveryTime = SdkInfo.MaxRecoveryExecutionInSeconds;
+                _minIntervalBetweenRecoveryRequests = SdkInfo.DefaultIntervalBetweenRecoveryRequests;
                 _useIntegrationEnvironment = false;
                 _nodeId = 0;
                 _httpClientTimeout = SdkInfo.DefaultHttpClientTimeout;
@@ -112,6 +118,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             _virtualHost = _section.VirtualHost;
             _useSsl = _section.UseSSL;
             _maxRecoveryTime = _section.MaxRecoveryTime;
+            _maxRecoveryTime = _section.MinIntervalBetweenRecoveryRequests;
 
             _locales.Clear();
             if (!string.IsNullOrEmpty(_section?.SupportedLanguages))
@@ -256,6 +263,26 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         }
 
         /// <summary>
+        /// Sets the minimal interval between recovery requests initiated by alive messages (between 20 and 180 seconds)
+        /// </summary>
+        /// <param name="minIntervalBetweenRecoveryRequests">The minimal interval between recovery requests initiated by alive messages (seconds)</param>
+        /// <returns>The <see cref="IOddsFeedConfigurationBuilder" /> instance used to set additional values</returns>
+        public IOddsFeedConfigurationBuilder SetMinIntervalBetweenRecoveryRequests(int minIntervalBetweenRecoveryRequests)
+        {
+            if (minIntervalBetweenRecoveryRequests < SdkInfo.MinIntervalBetweenRecoveryRequests)
+            {
+                throw new ArgumentException($"Value must be at least {SdkInfo.MinIntervalBetweenRecoveryRequests}.");
+            }
+            if (minIntervalBetweenRecoveryRequests > SdkInfo.MaxIntervalBetweenRecoveryRequests)
+            {
+                throw new ArgumentException($"Value must be less then {SdkInfo.MaxIntervalBetweenRecoveryRequests}.");
+            }
+
+            _minIntervalBetweenRecoveryRequests = minIntervalBetweenRecoveryRequests;
+            return this;
+        }
+
+        /// <summary>
         /// Sets a value indicating whether the SDK should connect to the integration environment
         /// </summary>
         /// <param name="useStagingEnvironment"></param>
@@ -343,6 +370,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 _virtualHost,
                 _useSsl,
                 _maxRecoveryTime,
+                _minIntervalBetweenRecoveryRequests,
                 _useIntegrationEnvironment,
                 _nodeId,
                 _section?.ExceptionHandlingStrategy ?? ExceptionHandlingStrategy.CATCH,
