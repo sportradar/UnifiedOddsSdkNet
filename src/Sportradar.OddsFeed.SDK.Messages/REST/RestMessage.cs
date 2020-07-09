@@ -238,7 +238,6 @@ namespace Sportradar.OddsFeed.SDK.Messages.REST
     {
     }
 
-    [Obsolete("Not used")]
     public partial class teamExtended
     {
     }

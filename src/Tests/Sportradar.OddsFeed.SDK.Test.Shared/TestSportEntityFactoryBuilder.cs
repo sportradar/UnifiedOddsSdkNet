@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Caching;
 using Moq;
+using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST;
@@ -61,7 +62,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
             EventStatusCache = new SportEventStatusCache(_statusMemoryCache, new SportEventStatusMapperFactory(), SportEventCache, _cacheManager, TimeSpan.Zero);
 
-            SportEntityFactory = new SportEntityFactory(SportDataCache, SportEventCache, EventStatusCache, sportEventStatusCache, profileCache);
+            SportEntityFactory = new SportEntityFactory(SportDataCache, SportEventCache, EventStatusCache, sportEventStatusCache, profileCache, ExceptionHandlingStrategy.THROW);
         }
 
         public void InitializeSportEntities()

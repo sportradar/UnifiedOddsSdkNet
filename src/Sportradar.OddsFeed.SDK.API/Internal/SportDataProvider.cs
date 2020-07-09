@@ -320,7 +320,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             var cacheItem = await _profileCache.GetCompetitorProfileAsync(id, cs).ConfigureAwait(false);
             return cacheItem == null
                        ? null
-                       : _sportEntityFactory.BuildCompetitor(cacheItem, cs, (ICompetitionCI) null);
+                       : _sportEntityFactory.BuildCompetitor(cacheItem, cs, (ICompetitionCI) null, _exceptionStrategy);
         }
 
         /// <summary>
