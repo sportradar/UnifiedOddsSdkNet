@@ -9,6 +9,12 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2020-07-09  1.35.0.0
+Added GetSportAsync() and GetCategoryAsync() to ICompetitor interface (extended with ICompetitorV5)
+Throttling recovery requests
+Fix: support Replay routing keys without node id
+Fix: calling Replay fixture endpoint with node id
+
 2020-06-24  1.34.0.0
 Added support for configuring HTTP timeout
 Added overloaded methods for fixture and result changes with filters
