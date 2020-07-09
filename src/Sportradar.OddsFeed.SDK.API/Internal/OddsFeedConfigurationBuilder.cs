@@ -118,7 +118,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             _virtualHost = _section.VirtualHost;
             _useSsl = _section.UseSSL;
             _maxRecoveryTime = _section.MaxRecoveryTime;
-            _maxRecoveryTime = _section.MinIntervalBetweenRecoveryRequests;
+            _minIntervalBetweenRecoveryRequests = _section.MinIntervalBetweenRecoveryRequests;
 
             _locales.Clear();
             if (!string.IsNullOrEmpty(_section?.SupportedLanguages))
