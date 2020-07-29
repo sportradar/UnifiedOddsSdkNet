@@ -58,7 +58,6 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// </summary>
         /// <param name="semaphore">The <see cref="SemaphoreSlim"/> on which to wait</param>
         /// <returns>True if entering the semaphore succeeded (e.g. instance was not yet disposed); otherwise false</returns>
-
         public static async Task<bool> WaitAsyncSafe(this SemaphoreSlim semaphore)
         {
             Guard.Argument(semaphore, nameof(semaphore)).NotNull();
@@ -79,7 +78,6 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// </summary>
         /// <param name="semaphore">The <see cref="SemaphoreSlim"/> to be released</param>
         /// <returns>True if releasing the semaphore succeeded (e.g. instance was not yet disposed); otherwise false</returns>
-
         public static bool ReleaseSafe(this SemaphoreSlim semaphore)
         {
             Guard.Argument(semaphore, nameof(semaphore)).NotNull();
