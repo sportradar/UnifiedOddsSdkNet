@@ -142,7 +142,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         }
 
         /// <summary>
-        /// Asynchronously gets a bool value indicating if the results are in chronological order
+        /// Asynchronously gets a boolean value indicating if the results are in chronological order
         /// </summary>
         /// <returns>The value indicating if the results are in chronological order</returns>
         public async Task<bool> AreResultsChronologicalAsync()
@@ -276,15 +276,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         protected override async Task<T> CreateExportableCIAsync<T>()
         {
             var exportable = await base.CreateExportableCIAsync<T>();
-            var draw = exportable as ExportableDrawCI;
-
-            draw.LotteryId = _lotteryId?.ToString();
-            draw.DrawStatus = _drawStatus;
-            draw.ResultsChronological = _resultsChronological;
-            var resultTasks = _results?.Select(async r => await r.ExportAsync().ConfigureAwait(false));
-            draw.Results = resultTasks != null ? await Task.WhenAll(resultTasks) : null;
-            draw.DisplayId = _displayId;
-
+            if (exportable is ExportableDrawCI draw)
+            {
+                draw.LotteryId = _lotteryId?.ToString();
+                draw.DrawStatus = _drawStatus;
+                draw.ResultsChronological = _resultsChronological;
+                var resultTasks = _results?.Select(async r => await r.ExportAsync().ConfigureAwait(false));
+                draw.Results = resultTasks != null ? await Task.WhenAll(resultTasks) : null;
+                draw.DisplayId = _displayId;
+            }
             return exportable;
         }
 

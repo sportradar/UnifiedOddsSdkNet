@@ -619,7 +619,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     }
                     else
                     {
-                        LogSavingDtoConflict(id, typeof(TournamentInfoDTO), item.GetType());
+                        LogSavingDtoConflict(id, typeof(TournamentSeasonsDTO), item.GetType());
                     }
                     break;
                 case DtoType.MarketDescriptionList:
@@ -637,7 +637,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     }
                     else
                     {
-                        LogSavingDtoConflict(id, typeof(TournamentInfoDTO), item.GetType());
+                        LogSavingDtoConflict(id, typeof(LotteryDTO), item.GetType());
                     }
                     break;
                 case DtoType.LotteryDraw:
@@ -649,7 +649,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     }
                     else
                     {
-                        LogSavingDtoConflict(id, typeof(TournamentInfoDTO), item.GetType());
+                        LogSavingDtoConflict(id, typeof(DrawDTO), item.GetType());
                     }
                     break;
                 case DtoType.LotteryList:
@@ -664,7 +664,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     }
                     else
                     {
-                        LogSavingDtoConflict(id, typeof(TournamentInfoDTO), item.GetType());
+                        LogSavingDtoConflict(id, typeof(EntityList<LotteryDTO>), item.GetType());
                     }
                     break;
                 case DtoType.BookingStatus:
@@ -691,7 +691,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     }
                     else
                     {
-                        LogSavingDtoConflict(id, typeof(EntityList<TournamentDTO>), item.GetType());
+                        LogSavingDtoConflict(id, typeof(EntityList<TournamentInfoDTO>), item.GetType());
                     }
                     break;
                 default:

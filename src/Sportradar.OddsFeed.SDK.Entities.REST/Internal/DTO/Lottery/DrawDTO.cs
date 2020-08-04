@@ -72,7 +72,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery
 
             if (item.draw_fixture != null)
             {
-                if (item.draw_fixture.id != null)
+                if (item.draw_fixture.id != null && item.draw_fixture.lottery != null)
                 {
                     Lottery = new LotteryDTO(item.draw_fixture.lottery);
                 }
@@ -102,7 +102,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery
         internal DrawDTO(draw_fixtures item)
             : base(new sportEvent
             {
-                id = item == null ? "wns:draw:1" : item?.draw_fixture?.id,
+                id = item == null ? "wns:draw:1" : item.draw_fixture?.id,
                 name = string.Empty,
                 scheduledSpecified = item?.draw_fixture?.draw_dateSpecified ?? false,
                 scheduled = item?.draw_fixture?.draw_date ?? DateTime.MinValue,
@@ -115,8 +115,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery
             })
         {
             Guard.Argument(item?.draw_fixture, "item.draw_fixture").NotNull();
-            var fixture = item.draw_fixture;
 
+            var fixture = item.draw_fixture;
             Debug.Assert(fixture != null, nameof(fixture) + " != null");
 
             if (fixture.lottery != null)
