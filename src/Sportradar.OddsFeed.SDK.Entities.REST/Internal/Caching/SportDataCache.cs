@@ -92,17 +92,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="sportEventCache">A <see cref="ISportEventCache"/> containing also tournament data</param>
         /// <param name="cacheManager">A <see cref="ICacheManager"/> used to interact among caches</param>
         public SportDataCache(IDataRouterManager dataRouterManager,
-                              ITimer timer,
-                              IEnumerable<CultureInfo> cultures,
-                              ISportEventCache sportEventCache,
-                              ICacheManager cacheManager)
+            ITimer timer,
+            IEnumerable<CultureInfo> cultures,
+            ISportEventCache sportEventCache,
+            ICacheManager cacheManager)
             : base(cacheManager)
         {
             Guard.Argument(dataRouterManager, nameof(dataRouterManager)).NotNull();
             Guard.Argument(timer, nameof(timer)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull(); //.NotEmpty();
             if (!cultures.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
+            }
 
             Guard.Argument(sportEventCache, nameof(sportEventCache)).NotNull();
 
@@ -129,7 +131,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="e">The <see cref="EventArgs"/> providing additional information about the event which invoked the method</param>
         private async void OnTimerElapsed(object sender, EventArgs e)
         {
-
             if (!await _semaphore.WaitAsyncSafe().ConfigureAwait(false))
             {
                 return;
@@ -182,7 +183,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
             if (!cultures.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
+            }
 
             var cultureInfos = cultures as IReadOnlyList<CultureInfo> ?? cultures.ToList();
             Metric.Context("CACHE").Meter("SportDataCache->FetchAndMergeAll", Unit.Calls).Mark($"Getting for cultures='{string.Join(",", cultureInfos.Select(c => c.TwoLetterISOLanguageName))}'.");
@@ -331,7 +334,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 }
                 catch (Exception e)
                 {
-                    ExecutionLog.Warn($"An error occured while retrieving sport from cache. id={id} and lang=[{string.Join(",", cultureList)}].", e);
+                    ExecutionLog.Warn($"An error occurred while retrieving sport from cache. id={id} and lang=[{string.Join(",", cultureList)}].", e);
                 }
 
                 return new SportData(
@@ -1202,7 +1205,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="useDebug">if set to <c>true</c> [use debug].</param>
         protected override void WriteLog(string text, bool useDebug = false)
         {
-            //base.WriteLog(text, useDebug);
+            base.WriteLog(text, useDebug);
         }
 
         /// <summary>
@@ -1235,15 +1238,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             foreach (var exportable in items)
             {
-                var exportableSport = exportable as ExportableSportCI;
-                var exportableCategory = exportable as ExportableCategoryCI;
-
-                if (exportableSport != null)
+                if (exportable is ExportableSportCI exportableSport)
                 {
                     AddSport(exportableSport);
+                    continue;
                 }
 
-                if (exportableCategory != null)
+                if (exportable is ExportableCategoryCI exportableCategory)
                 {
                     AddCategory(exportableCategory);
                 }

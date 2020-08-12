@@ -77,6 +77,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Division = exportable.Division;
         }
 
+        internal void Import(ExportableTeamCompetitorCI exportable)
+        {
+            base.Import(exportable);
+
+            Qualifier = exportable.Qualifier;
+            Division = exportable.Division;
+        }
+
         /// <summary>
         /// Merges the specified <see cref="TeamCompetitorDTO"/> into instance
         /// </summary>
@@ -113,7 +121,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 
             return team as T;
         }
-
 
         /// <summary>
         /// Asynchronous export item's properties

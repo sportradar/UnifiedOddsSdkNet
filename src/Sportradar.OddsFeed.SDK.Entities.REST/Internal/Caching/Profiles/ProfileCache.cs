@@ -129,7 +129,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             Guard.Argument(playerId, nameof(playerId)).NotNull();
             Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
             if (!cultures.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
+            }
 
             Metric.Context("CACHE").Meter("ProfileCache->GetPlayerProfileAsync", Unit.Calls);
 
@@ -217,7 +219,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             Guard.Argument(competitorId, nameof(competitorId)).NotNull();
             Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
             if (!cultures.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
+            }
 
             Metric.Context("CACHE").Meter("ProfileCache->GetCompetitorProfileAsync", Unit.Calls);
 
@@ -614,18 +618,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             {
                 try
                 {
-                    var ci = (CompetitorCI) _cache.Get(item.Id);
-                    var teamCI = ci as TeamCompetitorCI;
+                    var competitorCI = (CompetitorCI) _cache.Get(item.Id);
+                    var teamCI = competitorCI as TeamCompetitorCI;
                     if (teamCI != null)
                     {
                         _semaphoreCacheMerge.Wait();
-                        teamCI.Merge(new TeamCompetitorCI(item, _dataRouterManager));
+                        teamCI.Import(item);
                     }
                     else
                     {
                         _semaphoreCacheMerge.Wait();
-                        teamCI = new TeamCompetitorCI(ci);
-                        teamCI.Merge(new TeamCompetitorCI(item, _dataRouterManager));
+                        teamCI = new TeamCompetitorCI(competitorCI);
+                        teamCI.Import(item);
                         _cache.Set(item.Id, teamCI, GetCorrectCacheItemPolicy(URN.Parse(item.Id)));
                     }
                 }
@@ -697,7 +701,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                 {
                     var ci = (CompetitorCI) _cache.Get(item.Id);
                     _semaphoreCacheMerge.Wait();
-                    ci.Merge(new CompetitorCI(item, _dataRouterManager));
+                    ci.Import(item);
                 }
                 catch (Exception ex)
                 {
@@ -847,7 +851,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                 {
                     var ci = (PlayerProfileCI) _cache.Get(item.Id);
                     _semaphoreCacheMerge.Wait();
-                    ci.Merge(new PlayerProfileCI(item, _dataRouterManager));
+                    ci.Import(item);
                 }
                 catch (Exception ex)
                 {
@@ -968,21 +972,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         {
             foreach (var exportable in items)
             {
-                var exportableCompetitor = exportable as ExportableCompetitorCI;
-                var exportableTeamCompetitor = exportable as ExportableTeamCompetitorCI;
-                var exportablePlayerProfile = exportable as ExportablePlayerProfileCI;
-
-                if (exportableCompetitor != null)
-                {
-                    AddCompetitor(exportableCompetitor);
-                }
-
-                if (exportableTeamCompetitor != null)
+                if (exportable is ExportableTeamCompetitorCI exportableTeamCompetitor)
                 {
                     AddTeamCompetitor(exportableTeamCompetitor);
+                    continue;
                 }
-
-                if (exportablePlayerProfile != null)
+                if (exportable is ExportableCompetitorCI exportableCompetitor)
+                {
+                    AddCompetitor(exportableCompetitor);
+                    continue;
+                }
+                if (exportable is ExportablePlayerProfileCI exportablePlayerProfile)
                 {
                     AddPlayerProfile(exportablePlayerProfile);
                 }
