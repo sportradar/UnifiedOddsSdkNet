@@ -135,15 +135,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 producer = _producerManager.Get(feedMessage.ProducerId);
                 messageName = feedMessage.GetType().Name;
 
-                if (FeedLog.IsDebugEnabled && producer.IsAvailable && !producer.IsDisabled)
+                if (producer.IsAvailable && !producer.IsDisabled)
                 {
-                    FeedLog.Debug($"<~> {sessionName} <~> {eventArgs.RoutingKey} <~> {messageBody}");
+                    FeedLog.Info($"<~> {sessionName} <~> {eventArgs.RoutingKey} <~> {messageBody}");
                 }
                 else
                 {
-                    FeedLog.Info(eventArgs.RoutingKey);
+                    if (FeedLog.IsDebugEnabled)
+                    {
+                        FeedLog.Debug($"<~> {sessionName} <~> {eventArgs.RoutingKey} <~> {producer.Id}");
+                    }
                 }
-                feedMessage = _deserializer.Deserialize(new MemoryStream(eventArgs.Body));
+
                 if (eventArgs.BasicProperties?.Headers != null)
                 {
                     feedMessage.SentAt = eventArgs.BasicProperties.Headers.ContainsKey("timestamp_in_ms")
@@ -151,6 +154,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                                              : feedMessage.GeneratedAt;
                 }
                 feedMessage.ReceivedAt = receivedAt;
+                Metric.Context("RABBIT").Meter("RabbitMqMessageReceiver", Unit.Items).Mark(messageName);
             }
             catch (DeserializationException ex)
             {
@@ -202,7 +206,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 }
             }
 
-            Metric.Context("RABBIT").Meter("RabbitMqMessageReceiver", Unit.Items).Mark(messageName);
             RaiseMessageReceived(feedMessage, eventArgs.Body);
         }
 
