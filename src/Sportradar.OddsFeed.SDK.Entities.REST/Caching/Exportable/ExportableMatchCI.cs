@@ -1,7 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-
 using System;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
@@ -15,7 +14,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         /// <summary>
         /// A <see cref="ExportableCI"/> representation of the season
         /// </summary>
-        public ExportableCI Season { get; set; }
+        public ExportableSeasonCI Season { get; set; }
 
         /// <summary>
         /// A <see cref="ExportableRoundCI"/> representation of the tournament round

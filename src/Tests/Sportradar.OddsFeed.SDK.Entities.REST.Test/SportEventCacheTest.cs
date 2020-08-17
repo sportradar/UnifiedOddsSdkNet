@@ -130,7 +130,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(TestData.Cultures.Count * 3, _dataRouterManager.GetCallCount(DateSchedule), $"{DateSchedule} should be called exactly {TestData.Cultures.Count * 3} times.");
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly 0 times.");
 
-            CacheItem info = null;
+            SeasonCI info = null;
             Task.Run(async () =>
             {
                 await item.GetTournamentIdAsync();
@@ -289,7 +289,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             List<URN> competitors = null;
             TeamCompetitorCI comp = null;
             RoundCI round = null;
-            CacheItem season = null;
+            SeasonCI season = null;
 
             Task.Run(async () =>
             {
@@ -318,8 +318,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             }
             Assert.IsTrue(string.IsNullOrEmpty(round.GetName(TestData.Culture)));
 
-            Assert.AreEqual(3, season.Name.Count);
-            Assert.AreEqual("Mexican League 2016", season.Name[TestData.Culture]);
+            Assert.AreEqual(3, season.Names.Count);
+            Assert.AreEqual("Mexican League 2016", season.Names[TestData.Culture]);
         }
     }
 }

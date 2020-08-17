@@ -4,6 +4,7 @@
 using System;
 using Dawn;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
@@ -30,6 +31,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal string Year { get; }
 
         /// <summary>
+        /// Gets the associated tournament identifier.
+        /// </summary>
+        /// <value>The associated tournament identifier.</value>
+        internal URN TournamentId { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SeasonDTO"/> class
         /// </summary>
         /// <param name="season">A <see cref="season"/> containing information about a season.</param>
@@ -50,6 +57,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 EndDate = SdkInfo.CombineDateAndTime(season.end_date, season.end_time);
             }
+            URN.TryParse(season.tournament_id, out var tId);
+            TournamentId = tId;
         }
 
         /// <summary>
@@ -72,6 +81,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 EndDate = SdkInfo.CombineDateAndTime(season.end_date, season.end_time);
             }
+            URN.TryParse(season.tournament_id, out var tId);
+            TournamentId = tId;
         }
     }
 }

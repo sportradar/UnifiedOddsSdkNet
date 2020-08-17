@@ -123,6 +123,7 @@
     <Compile Include="Caching\Exportable\ExportableEventTimelineCI.cs" />
     <Compile Include="Caching\Exportable\ExportableEventPlayerAssistCI.cs" />
     <Compile Include="Caching\Exportable\ExportableDelayedInfoCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableSeasonCI.cs" />
     <Compile Include="Caching\Exportable\ExportableTimelineEventCI.cs" />
     <Compile Include="Caching\Exportable\ExportableScheduledStartTimeChangeCI.cs" />
     <Compile Include="Caching\Exportable\ExportableProductInfoLinkCI.cs" />
@@ -512,6 +513,7 @@
     <Compile Include="Internal\EntitiesImpl\Venue.cs" />
     <Compile Include="Internal\EntitiesImpl\WeatherInfo.cs" />
     <Compile Include="Internal\EventArguments\TournamentReceivedEventArgs.cs" />
+    <Compile Include="ISeasonInfoV1.cs" />
     <Compile Include="ISportEventV1.cs" />
     <Compile Include="ITeamCompetitorV1.cs" />
     <Compile Include="ITeamStatisticsV2.cs" />
