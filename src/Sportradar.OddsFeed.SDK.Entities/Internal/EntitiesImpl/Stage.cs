@@ -20,7 +20,7 @@ using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
 {
-    internal class Stage : Competition, IStage
+    internal class Stage : Competition, IStageV1
     {
         /// <summary>
         /// A <see cref="ILog"/> instance used for execution logging
