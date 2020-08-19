@@ -9,6 +9,20 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2020-08-19  1.36.0.0
+Extended ISeasonInfo with ISeasonInfoV1 (added StartDate, EndDate, Year and TournamentId)
+Fix: Problem with casting event to IStageV1
+FIx: special case when recovery status does not reflect actual state - results in wrong triggering ProducerUp-Down event
+Fix: URN.TryParse could throw unhandled exception
+Fix: several issues with CustomBet(Manager) fixed
+Fix: Export-Import breaks on missing data
+Fix: Lottery throws exception when no schedule is obtained from api
+Fix: missing nodeId in snapshot_complete routing key
+Fix: SportDataProvider.GetActiveTournaments returned null
+Fix: SportEventCache: improved locking mechanism on period fetching of schedule for a date
+Fix: reloading market description in case variant descriptions are not available
+Improved logging of initial message processing
+
 2020-07-09  1.35.0.0
 Added GetSportAsync() and GetCategoryAsync() to ICompetitor interface (extended with ICompetitorV5)
 Throttling recovery requests
