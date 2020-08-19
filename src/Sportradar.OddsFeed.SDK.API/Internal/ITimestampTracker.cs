@@ -7,7 +7,7 @@ using Sportradar.OddsFeed.SDK.Messages.Feed;
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
     /// <summary>
-    /// Defines a contract implemented by classes to keep a track of timming of received messages
+    /// Defines a contract implemented by classes to keep a track of timeing of received messages
     /// </summary>
     public interface ITimestampTracker
     {
