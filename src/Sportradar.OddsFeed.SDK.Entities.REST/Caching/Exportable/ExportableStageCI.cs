@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
+using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
 {
@@ -20,9 +21,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public string CategoryId { get; set; }
 
         /// <summary>
-        /// A <see cref="ExportableStageCI"/> representing the parent stage
+        /// A id representing the parent stage
         /// </summary>
-        public ExportableStageCI ParentStage { get; set; }
+        public URN ParentStageId { get; set; }
 
         /// <summary>
         /// A <see cref="IEnumerable{T}"/> representing the child stages

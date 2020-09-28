@@ -226,8 +226,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             Log.Info($"Invoked GetTournament: [Id={id}, Cultures={s}].");
 
+            var sportEventCI = _sportEventCache.GetEventCacheItem(id);
+
             var result = _sportEntityFactory.BuildSportEvent<ILongTermEvent>(id,
-                                                                             null,
+                                                                             sportEventCI?.GetSportIdAsync().Result,
                                                                              culture == null
                                                                                  ? _defaultCultures
                                                                                  : new[] {culture},

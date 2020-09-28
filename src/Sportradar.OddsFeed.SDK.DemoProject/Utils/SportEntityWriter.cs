@@ -2,6 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
+using System.Collections.Generic;
 using Dawn;
 using System.Globalization;
 using System.Linq;
@@ -35,6 +36,11 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
         private readonly CultureInfo _culture;
 
         /// <summary>
+        /// A <see cref="CultureInfo" /> specifying which language of the translatable properties to take
+        /// </summary>
+        private readonly IEnumerable<CultureInfo> _cultures;
+
+        /// <summary>
         /// A <see cref="CultureInfo"/> specifying which language of the translatable properties to take
         /// </summary>
         private readonly bool _writeNotCacheableData;
@@ -54,6 +60,16 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
             _taskProcessor = taskProcessor;
             _culture = culture;
             _writeNotCacheableData = writeNotCacheableData;
+            _cultures = new List<CultureInfo> {_culture};
+        }
+
+        private static string JoinValuesPerLanguage(IDictionary<CultureInfo, string> values)
+        {
+            if (values == null || !values.Any()) return null;
+
+            var result = values.Aggregate(string.Empty, (current, value) => current + "; " + value.Key.TwoLetterISOLanguageName + "-" + value.Value);
+
+            return result.Substring(2);
         }
 
         /// <summary>
@@ -169,9 +185,30 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
             var season = _taskProcessor.GetTaskResult(match.GetSeasonAsync());
             var round = _taskProcessor.GetTaskResult(match.GetTournamentRoundAsync());
             var matchStatus = _taskProcessor.GetTaskResult(match.GetStatusAsync());
+            var sport = _taskProcessor.GetTaskResult(match.GetSportIdAsync());
             var periodScores = string.Empty;
             var eventResults = string.Empty;
             var eventStatus = string.Empty;
+
+            if (sport == null)
+            {
+
+            }
+            var soc = match as ISoccerEvent;
+            if (soc == null && sport.Id == 1)
+            {
+                var damn = soc.Id;
+            }
+            else
+            {
+                var damn = sport.Id;
+            }
+
+            if (season != null)
+            {
+                WriteSeasonInfo(season);
+            }
+
             if (matchStatus != null)
             {
                 var matchStatusStatuses = _taskProcessor.GetTaskResult(matchStatus.GetMatchStatusAsync(_culture));
@@ -503,6 +540,34 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
                 props = props.Substring(1);
             }
             return $"[BetradarId={reference.BetradarId}, BetfairId={reference.BetfairId}, Refs={props}]";
+        }
+
+        private string WriteCompetitors(IEnumerable<ICompetitor> competitors)
+        {
+            if (competitors == null) return string.Empty;
+            var competitorList = competitors.ToList();
+            if (competitorList.Any(c => c.AssociatedPlayers != null && c.AssociatedPlayers.Any()))
+            {
+                var x = string.Empty;
+            }
+            return string.Join(";", competitorList.Select(s => s.ToString("c")));
+        }
+
+        private string WriteSeasonInfo(ISeasonInfo seasonInfo)
+        {
+            if (seasonInfo == null) return string.Empty;
+
+            var seasonNames = _cultures.Count() == 1
+                ? seasonInfo.GetName(_cultures.First())
+                : $"[{JoinValuesPerLanguage(_cultures.ToDictionary(ci => ci, seasonInfo.GetName(ci)))}]";
+
+            var seasonInfo1 = seasonInfo as ISeasonInfoV1;
+            if(seasonInfo1 != null)
+            {
+                return $"[{seasonInfo1.Id} ({seasonInfo1.TournamentId})-{seasonNames}; {seasonInfo1.Year}: {seasonInfo1.StartDate} - {seasonInfo1.EndDate}]";
+            }
+
+            return $"[{seasonInfo.Id} - {seasonNames}]";
         }
 
         /// <summary>
