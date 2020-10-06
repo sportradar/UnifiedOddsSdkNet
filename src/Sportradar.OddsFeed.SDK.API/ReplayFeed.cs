@@ -14,7 +14,14 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <summary>
         /// The replay manager for interaction with xReplay Server
         /// </summary>
-        public IReplayManagerV1 ReplayManager;
+        public IReplayManagerV1 ReplayManager
+        {
+            get
+            {
+                InitFeed();
+                return UnityContainer.Resolve<IReplayManagerV1>();
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReplayFeed"/> class
@@ -33,7 +40,6 @@ namespace Sportradar.OddsFeed.SDK.API
                 return;
             }
             base.InitFeed();
-            ReplayManager = UnityContainer.Resolve<IReplayManagerV1>();
             ((ProducerManager) ProducerManager).SetIgnoreRecovery(0);
         }
     }
