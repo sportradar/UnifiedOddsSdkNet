@@ -9,7 +9,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST
     /// <summary>
     /// Defines a contract implemented by classes representing sport events regardless to which sport they belong
     /// </summary>
-    public interface ICompetitionV2 : ICompetitionV1
+    public interface ICompetitionV2 : ICompetitionV1, ISportEventV1
     {
         /// <summary>
         /// Asynchronously gets a liveOdds

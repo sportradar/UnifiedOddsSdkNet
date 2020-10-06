@@ -20,7 +20,7 @@ using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
 {
-    internal class Stage : Competition, IStageV1
+    internal class Stage : Competition, IStageV2
     {
         /// <summary>
         /// A <see cref="ILog"/> instance used for execution logging
@@ -126,15 +126,61 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
             return cacheItems?.Select(c => new Stage(c.Id, GetSportAsync().Result.Id, _sportEntityFactory, SportEventCache, _sportDataCache, SportEventStatusCache, _matchStatusesCache, Cultures, ExceptionStrategy));
         }
 
-        public async Task<StageType> GetStageTypeAsync()
+        /// <summary>
+        /// Asynchronously get the type of the stage
+        /// </summary>
+        /// <returns>The type of the stage</returns>
+        async Task<StageType> IStage.GetStageTypeAsync()
         {
-            var stageCI = (StageCI) SportEventCache.GetEventCacheItem(Id);
+            var stageCI = (StageCI)SportEventCache.GetEventCacheItem(Id);
             if (stageCI == null)
             {
                 ExecutionLog.Debug($"Missing data. No stage cache item for id={Id}.");
                 return StageType.Child;
             }
-            return await stageCI.GetTypeAsync().ConfigureAwait(false);
+            return await stageCI.GetStageTypeAsync().ConfigureAwait(false) ?? StageType.Child;
+        }
+
+        public async Task<StageType?> GetStageTypeAsync()
+        {
+            var stageCI = (StageCI) SportEventCache.GetEventCacheItem(Id);
+            if (stageCI == null)
+            {
+                ExecutionLog.Debug($"Missing data. No stage cache item for id={Id}.");
+                return null;
+            }
+            return await stageCI.GetStageTypeAsync().ConfigureAwait(false);
+        }
+
+        public async Task<SportEventType?> GetEventTypeAsync()
+        {
+            var stageCI = (StageCI)SportEventCache.GetEventCacheItem(Id);
+            if (stageCI == null)
+            {
+                ExecutionLog.Debug($"Missing data. No stage cache item for id={Id}.");
+                return null;
+            }
+            return await stageCI.GetSportEventTypeAsync().ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Asynchronously gets a list of additional ids of the parent stages of the current instance or a null reference if the represented stage does not have the parent stages
+        /// </summary>
+        /// <returns>A <see cref="Task{StageCI}"/> representing the asynchronous operation</returns>
+        public async Task<IEnumerable<IStage>> GetAdditionalParentStagesAsync()
+        {
+            var stageCI = (StageCI)SportEventCache.GetEventCacheItem(Id);
+            if (stageCI == null)
+            {
+                ExecutionLog.Debug($"Missing data. No stage cache item for id={Id}.");
+                return null;
+            }
+            var cacheItems = ExceptionStrategy == ExceptionHandlingStrategy.THROW
+                ? await stageCI.GetAdditionalParentStagesAsync(Cultures).ConfigureAwait(false)
+                : await new Func<IEnumerable<CultureInfo>, Task<IEnumerable<URN>>>(stageCI.GetAdditionalParentStagesAsync)
+                    .SafeInvokeAsync(Cultures, ExecutionLog, GetFetchErrorMessage("AdditionalParentStages")).ConfigureAwait(false);
+
+            return cacheItems?.Select(c => new Stage(c, GetSportAsync().Result.Id, _sportEntityFactory, SportEventCache, _sportDataCache, SportEventStatusCache, _matchStatusesCache, Cultures, ExceptionStrategy));
         }
     }
 }

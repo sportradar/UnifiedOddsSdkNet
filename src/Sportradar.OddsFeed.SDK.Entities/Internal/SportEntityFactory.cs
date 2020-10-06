@@ -262,10 +262,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                         break;
                     }
                 case ResourceTypeGroup.UNKNOWN:
-                    {
-                        sportEvent = new SportEvent(id, sportId, null, _sportEventCache, cultures, exceptionStrategy);
-                        break;
-                    }
+                {
+                    ExecutionLog.Warn($"Received entity with unknown resource type group: id={id}, sportId={sportId}");
+                    sportEvent = new SportEvent(id, sportId, null, _sportEventCache, cultures, exceptionStrategy);
+                    break;
+                }
                 default:
                     throw new ArgumentException($"ResourceTypeGroup:{id.TypeGroup} is not supported", nameof(id));
             }

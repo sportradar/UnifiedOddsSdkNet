@@ -21,6 +21,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public URN ParentStageId => _parentStageId;
 
         /// <summary>
+        /// Gets a <see cref="IEnumerable{T}"/> specifying the additional parent stages associated with the current instance
+        /// </summary>
+        public IEnumerable<URN> AdditionalParentIds { get; }
+
+        /// <summary>
         /// Gets a <see cref="IEnumerable{T}"/> specifying the child stages associated with the current instance
         /// </summary>
         public IEnumerable<StageDTO> Stages { get; }
@@ -49,6 +54,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 Tournament = new TournamentDTO(sportEvent.tournament);
             }
+            if (sportEvent.additional_parents != null && sportEvent.additional_parents.Any())
+            {
+                AdditionalParentIds = sportEvent.additional_parents.Select(s => URN.Parse(s.id));
+            }
         }
 
         /// <summary>
@@ -69,6 +78,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             if (stageEvent.sport_event?.tournament != null)
             {
                 Tournament = new TournamentDTO(stageEvent.sport_event.tournament);
+            }
+            if (stageEvent.sport_event.additional_parents != null && stageEvent.sport_event.additional_parents.Any())
+            {
+                AdditionalParentIds = stageEvent.sport_event.additional_parents.Select(s => URN.Parse(s.id));
             }
         }
 

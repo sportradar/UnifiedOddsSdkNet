@@ -527,6 +527,7 @@
     <Compile Include="Internal\EventArguments\TournamentReceivedEventArgs.cs" />
     <Compile Include="ISeasonInfoV1.cs" />
     <Compile Include="ISportEventV1.cs" />
+    <Compile Include="IStageV2.cs" />
     <Compile Include="ITeamCompetitorV1.cs" />
     <Compile Include="ITeamStatisticsV2.cs" />
     <Compile Include="ITeamStatisticsV1.cs" />

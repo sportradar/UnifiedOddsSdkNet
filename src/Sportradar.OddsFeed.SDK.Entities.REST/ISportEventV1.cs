@@ -1,6 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -12,9 +14,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST
     public interface ISportEventV1 : ISportEvent
     {
         /// <summary>
-        /// Asynchronously gets a <see cref="Nullable{bool}"/> specifying if the start time to be determined is set for the associated sport event.
+        /// Asynchronously gets a <see cref="Nullable{T}"/> specifying if the start time to be determined is set for the associated sport event.
         /// </summary>
-        /// <returns>A <see cref="Nullable{bool}"/> specifying if the start time to be determined is set for the associated sport event.</returns>
+        /// <returns>A <see cref="Nullable{T}"/> specifying if the start time to be determined is set for the associated sport event.</returns>
         Task<bool?> GetStartTimeTbdAsync();
 
         /// <summary>
