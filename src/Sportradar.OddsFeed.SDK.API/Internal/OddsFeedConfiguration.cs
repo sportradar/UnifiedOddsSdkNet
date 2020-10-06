@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using Dawn;
 using System.Globalization;
 using System.Linq;
-using System.Net;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;

@@ -16,7 +16,6 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Test.Shared;
-using CacheItem = Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI.CacheItem;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 {

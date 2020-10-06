@@ -7,7 +7,6 @@ using Dawn;
 using System.Globalization;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Common;
-using Sportradar.OddsFeed.SDK.Common.Internal;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal.Config
 {

@@ -29,6 +29,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Enums
         Round,
 
         /// <summary>
+        /// The season
+        /// </summary>
+        Season,
+
+        /// <summary>
         /// The competition group
         /// </summary>
         CompetitionGroup

@@ -87,10 +87,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
             Id = URN.Parse(sportEvent.id);
             Scheduled = sportEvent.scheduledSpecified
-                ? (DateTime?)sportEvent.scheduled.ToLocalTime()
+                ? (DateTime?) sportEvent.scheduled.ToLocalTime()
                 : null;
             ScheduledEnd = sportEvent.scheduled_endSpecified
-                ? (DateTime?)sportEvent.scheduled_end.ToLocalTime()
+                ? (DateTime?) sportEvent.scheduled_end.ToLocalTime()
                 : null;
             if (sportEvent.tournament?.sport != null)
             {
@@ -99,11 +99,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                     SportId = sportId;
                 }
             }
+
             Name = sportEvent.name;
             if (RestMapperHelper.TryGetSportEventType(sportEvent.type, out var type))
             {
                 Type = type;
             }
+
             if (!string.IsNullOrEmpty(sportEvent.replaced_by))
             {
                 if (URN.TryParse(sportEvent.replaced_by, out var replacedBy))
@@ -111,7 +113,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                     ReplacedBy = replacedBy;
                 }
             }
-            StartTimeTbd = sportEvent.start_time_tbdSpecified ? (bool?)sportEvent.start_time_tbd : null;
+
+            StartTimeTbd = sportEvent.start_time_tbdSpecified ? (bool?) sportEvent.start_time_tbd : null;
 
             StatusOnEvent = sportEvent.status;
 

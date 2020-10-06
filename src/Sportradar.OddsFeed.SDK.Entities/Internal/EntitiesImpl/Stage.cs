@@ -138,7 +138,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                 ExecutionLog.Debug($"Missing data. No stage cache item for id={Id}.");
                 return StageType.Child;
             }
-            return await stageCI.GetStageTypeAsync().ConfigureAwait(false) ?? StageType.Child;
+
+            var result = await stageCI.GetStageTypeAsync().ConfigureAwait(false);
+            return result ?? StageType.Child;
         }
 
         public async Task<StageType?> GetStageTypeAsync()

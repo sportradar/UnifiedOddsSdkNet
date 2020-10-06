@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Dawn;
+﻿using Dawn;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl

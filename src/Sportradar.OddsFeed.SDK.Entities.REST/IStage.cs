@@ -1,6 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
@@ -40,6 +42,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST
         /// Asynchronously get the type of the stage
         /// </summary>
         /// <returns>The type of the stage</returns>
+        [Obsolete("Use Task<StageType?> GetStageTypeAsync() available on IStageV2")]
         Task<StageType> GetStageTypeAsync();
     }
 }

@@ -12,7 +12,6 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
 using Sportradar.OddsFeed.SDK.Messages;
-using CacheItem = Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI.CacheItem;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
 {

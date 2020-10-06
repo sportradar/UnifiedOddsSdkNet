@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Caching;
 using Moq;
-using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST;
