@@ -24,7 +24,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
     /// <summary>
     /// Represents a sport event regardless to which sport it belongs
     /// </summary>
-    internal abstract class Competition : SportEvent, ICompetitionV1
+    internal abstract class Competition : SportEvent, ICompetitionV2
     {
         internal readonly ISportEventStatusCache SportEventStatusCache;
 
@@ -225,6 +225,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
             await Task.WhenAll(tasks).ConfigureAwait(false);
 
             return tasks.Select(s=>s.Result);
+        }
+
+        /// <summary>
+        /// Asynchronously gets a liveOdds
+        /// </summary>
+        /// <returns>A liveOdds</returns>
+        public async Task<string> GetLiveOddsAsync()
+        {
+            var sportEventCI = SportEventCache.GetEventCacheItem(Id);
+            if (sportEventCI == null)
+            {
+                ExecutionLog.Debug($"Missing data. No match cache item for id={Id}.");
+                return null;
+            }
+            var liveOdds = ExceptionStrategy == ExceptionHandlingStrategy.THROW
+                ? await sportEventCI.GetLiveOddsAsync().ConfigureAwait(false)
+                : await new Func<Task<string>>(sportEventCI.GetLiveOddsAsync).SafeInvokeAsync(ExecutionLog, GetFetchErrorMessage("LiveOdds")).ConfigureAwait(false);
+
+            return liveOdds;
         }
     }
 }

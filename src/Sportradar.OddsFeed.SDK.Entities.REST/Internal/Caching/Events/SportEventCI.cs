@@ -15,6 +15,7 @@ using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
+using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -81,6 +82,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// The replaced by
         /// </summary>
         private URN _replacedBy;
+
+        private string _liveOdds;
+
+        private SportEventType? _sportEventType;
+
+        private StageType? _stageType;
 
         /// <summary>
         /// The loaded fixtures
@@ -168,6 +175,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             ScheduledEnd = exportable.ScheduledEnd;
             _startTimeTbd = exportable.StartTimeTbd;
             _replacedBy = exportable.ReplacedBy != null ? URN.Parse(exportable.ReplacedBy) : null;
+            _liveOdds = string.IsNullOrEmpty(exportable.LiveOdds) ? null : exportable.LiveOdds;
+            _sportEventType = exportable.SportEventType;
+            _stageType = exportable.StageType;
             LoadedFixtures = new List<CultureInfo>(exportable.LoadedFixtures ?? new List<CultureInfo>());
             LoadedSummaries = new List<CultureInfo>(exportable.LoadedSummaries ?? new List<CultureInfo>());
         }
@@ -487,6 +497,60 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         }
 
         /// <summary>
+        /// Asynchronously gets a liveOdds
+        /// </summary>
+        /// <returns>A liveOdds</returns>
+        public async Task<string> GetLiveOddsAsync()
+        {
+            if (!string.IsNullOrEmpty(_liveOdds))
+            {
+                return _liveOdds;
+            }
+            if (LoadedSummaries.Any())
+            {
+                return _liveOdds;
+            }
+            await FetchMissingSummary(new List<CultureInfo> { DefaultCulture }, false).ConfigureAwait(false);
+            return _liveOdds;
+        }
+
+        /// <summary>
+        /// Asynchronously gets a <see cref="SportEventType"/> for the associated sport event.
+        /// </summary>
+        /// <returns>A <see cref="SportEventType"/> for the associated sport event.</returns>
+        public async Task<SportEventType?> GetSportEventTypeAsync()
+        {
+            if (_sportEventType != null)
+            {
+                return _sportEventType;
+            }
+            if (LoadedSummaries.Any())
+            {
+                return _sportEventType;
+            }
+            await FetchMissingSummary(new List<CultureInfo> { DefaultCulture }, false).ConfigureAwait(false);
+            return _sportEventType;
+        }
+
+        /// <summary>
+        /// Asynchronously gets a <see cref="StageType"/> for the associated sport event.
+        /// </summary>
+        /// <returns>A <see cref="StageType"/> for the associated sport event.</returns>
+        public async Task<StageType?> GetStageTypeAsync()
+        {
+            if (_stageType != null)
+            {
+                return _stageType;
+            }
+            if (LoadedSummaries.Any())
+            {
+                return _stageType;
+            }
+            await FetchMissingSummary(new List<CultureInfo> { DefaultCulture }, false).ConfigureAwait(false);
+            return _stageType;
+        }
+
+        /// <summary>
         /// Merge current instance with the data obtained via provider
         /// </summary>
         /// <param name="eventSummary">A <see cref="SportEventSummaryDTO" /> used to merge properties with current instance</param>
@@ -523,6 +587,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 ScheduledEnd = eventSummary.ScheduledEnd;
                 _startTimeTbd = eventSummary.StartTimeTbd;
                 _replacedBy = eventSummary.ReplacedBy;
+                _liveOdds = eventSummary.LiveOdds;
+                _sportEventType = eventSummary.Type;
+                _stageType = eventSummary.StageType;
             }
         }
 
@@ -542,6 +609,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 ScheduledEnd = ScheduledEnd,
                 StartTimeTbd = _startTimeTbd,
                 ReplacedBy = _replacedBy?.ToString(),
+                LiveOdds = _liveOdds,
+                SportEventType = _sportEventType,
+                StageType = _stageType,
                 LoadedFixtures = new List<CultureInfo>(LoadedFixtures ?? new List<CultureInfo>()),
                 LoadedSummaries = new List<CultureInfo>(LoadedSummaries ?? new List<CultureInfo>())
             };

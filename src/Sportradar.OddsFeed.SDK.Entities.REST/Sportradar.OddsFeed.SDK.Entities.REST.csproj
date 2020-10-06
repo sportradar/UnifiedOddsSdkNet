@@ -177,6 +177,7 @@
     <Compile Include="IBasicTournament.cs" />
     <Compile Include="IBonusInfo.cs" />
     <Compile Include="IBookmakerDetails.cs" />
+    <Compile Include="ICompetitionV2.cs" />
     <Compile Include="ICompetitorResult.cs" />
     <Compile Include="ICompetitorV5.cs" />
     <Compile Include="ICompetitorV4.cs" />
