@@ -2,6 +2,8 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Dawn;
 using Sportradar.OddsFeed.SDK.Messages.Feed;
 using Sportradar.OddsFeed.SDK.Messages.REST;
@@ -131,6 +133,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public int? Grid { get; }
 
         /// <summary>
+        /// Gets the distance
+        /// </summary>
+        /// <value>The distance</value>
+        public double? Distance { get; }
+
+        /// <summary>
+        /// Gets the competitor results
+        /// </summary>
+        /// <value>The results</value>
+        /// <remarks>Sportradar</remarks>
+        public IEnumerable<CompetitorResultDTO> CompetitorResults { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EventResultDTO"/> class
         /// </summary>
         /// <param name="result">The result</param>
@@ -165,6 +180,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             Climber = ClimberDecimal.HasValue && ClimberDecimal.Value % 1 == 0 ? (int?) ClimberDecimal.Value : null;
             ClimberRanking = stageResultCompetitor.climber_rankingSpecified ? stageResultCompetitor.climber_ranking : (int?) null;
             Grid = stageResultCompetitor.gridSpecified ? stageResultCompetitor.grid : (int?) null;
+            Distance = stageResultCompetitor.distanceSpecified ? stageResultCompetitor.distance : (double?)null;
+            if (stageResultCompetitor.result != null && stageResultCompetitor.result.Any())
+            {
+                CompetitorResults = stageResultCompetitor.result.Select(s => new CompetitorResultDTO(s));
+            }
         }
     }
 }

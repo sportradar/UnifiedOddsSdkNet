@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -14,7 +15,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// Class EventResult
     /// </summary>
     /// <seealso cref="IEventResult" />
-    public class EventResult : IEventResultV1
+    public class EventResult : IEventResultV2
     {
         private readonly ILocalizedNamedValueCache _matchStatusesCache;
         private readonly int _matchStatusCode;
@@ -129,6 +130,24 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public decimal? AwayScore { get; }
 
         /// <summary>
+        /// Gets the grid
+        /// </summary>
+        /// <value>The grid</value>
+        public int? Grid { get; }
+
+        /// <summary>
+        /// Gets the distance
+        /// </summary>
+        /// <value>The distance</value>
+        public double? Distance { get; }
+
+        /// <summary>
+        /// Gets the results.
+        /// </summary>
+        /// <value>The results.</value>
+        public IEnumerable<ICompetitorResult> CompetitorResults { get; }
+
+        /// <summary>
         /// Asynchronously gets the match status
         /// </summary>
         /// <param name="culture">The culture used to get match status id and description</param>
@@ -164,12 +183,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             HomeScore = dto.HomeScore;
             AwayScore = dto.AwayScore;
             Grid = dto.Grid;
+            Distance = dto.Distance;
+            CompetitorResults = dto.CompetitorResults?.Select(s => new CompetitorResult(s));
         }
-
-        /// <summary>
-        /// Gets the grid
-        /// </summary>
-        /// <value>The grid</value>
-        public int? Grid { get; }
     }
 }

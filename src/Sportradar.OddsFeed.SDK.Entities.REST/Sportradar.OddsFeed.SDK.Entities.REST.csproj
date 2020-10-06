@@ -177,13 +177,17 @@
     <Compile Include="IBasicTournament.cs" />
     <Compile Include="IBonusInfo.cs" />
     <Compile Include="IBookmakerDetails.cs" />
+    <Compile Include="ICompetitorResult.cs" />
     <Compile Include="ICompetitorV5.cs" />
     <Compile Include="ICompetitorV4.cs" />
     <Compile Include="ICompetitorV3.cs" />
+    <Compile Include="IEventResultV2.cs" />
     <Compile Include="IHole.cs" />
     <Compile Include="Internal\Caching\CI\HoleCI.cs" />
+    <Compile Include="Internal\DTO\CompetitorResultDTO.cs" />
     <Compile Include="Internal\DTO\HoleDTO.cs" />
     <Compile Include="Internal\DTO\ResultChangeDTO.cs" />
+    <Compile Include="Internal\EntitiesImpl\CompetitorResult.cs" />
     <Compile Include="Internal\EntitiesImpl\Hole.cs" />
     <Compile Include="Internal\EntitiesImpl\ResultChange.cs" />
     <Compile Include="Internal\Mapping\ResultChangesMapper.cs" />
