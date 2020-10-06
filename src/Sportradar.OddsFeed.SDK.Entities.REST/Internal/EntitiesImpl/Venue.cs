@@ -16,7 +16,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// <summary>
     /// Represents a sport event venue
     /// </summary>
-    internal class Venue : EntityPrinter, IVenueV1
+    internal class Venue : EntityPrinter, IVenueV2
     {
         /// <summary>
         /// Gets a <see cref="URN"/> uniquely identifying the current <see cref="IVenue" /> instance
@@ -63,6 +63,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public string State { get; }
 
         /// <summary>
+        /// Gets the course
+        /// </summary>
+        /// <value>The course</value>
+        public IEnumerable<IHole> Course { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Venue"/> class.
         /// </summary>
         /// <param name="ci">A <see cref="VenueCI"/> used to create new instance</param>
@@ -80,14 +86,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             Coordinates = ci.Coordinates;
             Capacity = ci.Capacity;
 
-            Names = new ReadOnlyDictionary<CultureInfo, string>(
-                cultureList.Where(c => ci.GetName(c) != null).ToDictionary(c => c, ci.GetName));
-            Cities = new ReadOnlyDictionary<CultureInfo, string>(
-                cultureList.Where(c => ci.GetCity(c) != null).ToDictionary(c => c, ci.GetCity));
-            Countries = new ReadOnlyDictionary<CultureInfo, string>(
-                cultureList.Where(c => ci.GetCountry(c) != null).ToDictionary(c => c, ci.GetCountry));
+            Names = new ReadOnlyDictionary<CultureInfo, string>(cultureList.Where(c => ci.GetName(c) != null).ToDictionary(c => c, ci.GetName));
+            Cities = new ReadOnlyDictionary<CultureInfo, string>(cultureList.Where(c => ci.GetCity(c) != null).ToDictionary(c => c, ci.GetCity));
+            Countries = new ReadOnlyDictionary<CultureInfo, string>(cultureList.Where(c => ci.GetCountry(c) != null).ToDictionary(c => c, ci.GetCountry));
             CountryCode = ci.CountryCode;
             State = ci.State;
+            Course = ci.Course?.Select(s => new Hole(s));
         }
 
         /// <summary>
@@ -123,7 +127,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             var cityNames = string.Join(", ", Cities.Select(x => x.Key.TwoLetterISOLanguageName + ":" + x.Value));
             var countryNames = string.Join(", ", Countries.Select(x => x.Key.TwoLetterISOLanguageName + ":" + x.Value));
 
-            return $"Id={Id}, Capacity={Capacity}, Coordinates={Coordinates}, Names=[{names}], Cities=[{cityNames}], Countries=[{countryNames}], CountryCode={CountryCode}, State={State}";
+            var course = string.Empty;
+            if (Course != null && Course.Any())
+            {
+                course = ", Course=[" + string.Join(", ", Course.Select(x => x.Number + "-" + x.Par)) + "]";
+            }
+
+            return $"Id={Id}, Capacity={Capacity}, Coordinates={Coordinates}, Names=[{names}], Cities=[{cityNames}], Countries=[{countryNames}], CountryCode={CountryCode}, State={State}{course}";
         }
 
         /// <summary>

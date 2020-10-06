@@ -123,6 +123,7 @@
     <Compile Include="Caching\Exportable\ExportableEventTimelineCI.cs" />
     <Compile Include="Caching\Exportable\ExportableEventPlayerAssistCI.cs" />
     <Compile Include="Caching\Exportable\ExportableDelayedInfoCI.cs" />
+    <Compile Include="Caching\Exportable\ExportableHoleCI.cs" />
     <Compile Include="Caching\Exportable\ExportableSeasonCI.cs" />
     <Compile Include="Caching\Exportable\ExportableTimelineEventCI.cs" />
     <Compile Include="Caching\Exportable\ExportableScheduledStartTimeChangeCI.cs" />
@@ -179,7 +180,11 @@
     <Compile Include="ICompetitorV5.cs" />
     <Compile Include="ICompetitorV4.cs" />
     <Compile Include="ICompetitorV3.cs" />
+    <Compile Include="IHole.cs" />
+    <Compile Include="Internal\Caching\CI\HoleCI.cs" />
+    <Compile Include="Internal\DTO\HoleDTO.cs" />
     <Compile Include="Internal\DTO\ResultChangeDTO.cs" />
+    <Compile Include="Internal\EntitiesImpl\Hole.cs" />
     <Compile Include="Internal\EntitiesImpl\ResultChange.cs" />
     <Compile Include="Internal\Mapping\ResultChangesMapper.cs" />
     <Compile Include="Internal\Mapping\ResultChangesMapperFactory.cs" />
@@ -520,6 +525,7 @@
     <Compile Include="ITeamStatisticsV1.cs" />
     <Compile Include="ITournamentV1.cs" />
     <Compile Include="ITvChannelV1.cs" />
+    <Compile Include="IVenueV2.cs" />
     <Compile Include="IVenueV1.cs" />
     <Compile Include="MarketMapping\IMarketMappingData.cs" />
     <Compile Include="Internal\InternalEntities\MarketDescription.cs" />
