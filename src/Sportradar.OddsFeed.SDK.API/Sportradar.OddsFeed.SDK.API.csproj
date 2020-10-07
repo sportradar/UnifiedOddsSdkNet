@@ -132,6 +132,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CacheType.cs" />
+    <Compile Include="EventArguments\ConnectionExceptionEventArgs.cs" />
     <Compile Include="EventArguments\EventRecoveryCompletedEventArgs.cs" />
     <Compile Include="IMarketDescriptionManagerV1.cs" />
     <Compile Include="IMarketDescriptionManager.cs" />
@@ -165,6 +166,7 @@
     <Compile Include="Internal\Replay\ReplayEvent.cs" />
     <Compile Include="Internal\TimestampTracker.cs" />
     <Compile Include="Extended\IOddsFeedExt.cs" />
+    <Compile Include="IOddsFeedV3.cs" />
     <Compile Include="IOddsFeedV2.cs" />
     <Compile Include="IOddsFeedV1.cs" />
     <Compile Include="IReplayEvent.cs" />

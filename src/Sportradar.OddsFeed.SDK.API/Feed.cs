@@ -11,6 +11,7 @@ using System.Threading;
 using Common.Logging;
 using Microsoft.Practices.Unity;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.API.Internal;
@@ -28,7 +29,7 @@ namespace Sportradar.OddsFeed.SDK.API
     /// <summary>
     /// A <see cref="IOddsFeed"/> implementation acting as an entry point to the odds feed SDK
     /// </summary>
-    public class Feed : EntityDispatcherBase, IOddsFeedV2, IGlobalEventDispatcher
+    public class Feed : EntityDispatcherBase, IOddsFeedV3, IGlobalEventDispatcher
     {
         /// <summary>
         /// A <see cref="ILog"/> instance used for execution logging
@@ -92,6 +93,11 @@ namespace Sportradar.OddsFeed.SDK.API
         /// the odds feed went up (back online)
         /// </summary>
         public event EventHandler<ProducerStatusChangeEventArgs> ProducerUp;
+
+        /// <summary>
+        /// Occurs when an exception occurs in the connection loop
+        /// </summary>
+        public event EventHandler<ConnectionExceptionEventArgs> ConnectionException;
 
         /// <summary>
         /// Gets a <see cref="IEventRecoveryRequestIssuer"/> instance used to issue recovery requests to the feed
@@ -413,6 +419,15 @@ namespace Sportradar.OddsFeed.SDK.API
         }
 
         /// <summary>
+        /// Dispatches the information that the exception was thrown in connection loop
+        /// <param name="callbackExceptionEventArgs">The information about the exception</param>
+        /// </summary>
+        public void DispatchConnectionException(CallbackExceptionEventArgs callbackExceptionEventArgs)
+        {
+            Dispatch(ConnectionException, new ConnectionExceptionEventArgs(callbackExceptionEventArgs.Exception, callbackExceptionEventArgs.Detail), "ConnectionException");
+        }
+
+        /// <summary>
         /// Dispatches the <see cref="IProducerStatusChange"/> message
         /// </summary>
         /// <param name="producerStatusChange">The <see cref="IProducerStatusChange"/> instance to be dispatched</param>
@@ -517,6 +532,7 @@ namespace Sportradar.OddsFeed.SDK.API
             if (_connection != null)
             {
                 _connection.ConnectionShutdown -= OnConnectionShutdown;
+                _connection.CallbackException -= OnCallbackException;
             }
 
             if (_feedRecoveryManager != null)
@@ -583,6 +599,7 @@ namespace Sportradar.OddsFeed.SDK.API
 
                 _connection = UnityContainer.Resolve<IConnectionFactory>().CreateConnection();
                 _connection.ConnectionShutdown += OnConnectionShutdown;
+                _connection.CallbackException += OnCallbackException; 
                 _feedRecoveryManager.ProducerUp += MarkProducerAsUp;
                 _feedRecoveryManager.ProducerDown += MarkProducerAsDown;
                 _feedRecoveryManager.CloseFeed += OnCloseFeed;
@@ -639,6 +656,11 @@ namespace Sportradar.OddsFeed.SDK.API
                 Interlocked.CompareExchange(ref _opened, 0, 1);
                 throw;
             }
+        }
+
+        private void OnCallbackException(object sender, CallbackExceptionEventArgs e)
+        {
+            ((IGlobalEventDispatcher)this).DispatchConnectionException(e);
         }
 
         private void OnEventRecoveryCompleted(object sender, EventRecoveryCompletedEventArgs e)
