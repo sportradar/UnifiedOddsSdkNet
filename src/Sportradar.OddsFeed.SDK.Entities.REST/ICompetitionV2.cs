@@ -2,6 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST
 {
@@ -15,5 +16,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST
         /// </summary>
         /// <returns>A liveOdds</returns>
         Task<string> GetLiveOddsAsync();
+
+        /// <summary>
+        /// Asynchronously get the type of the stage
+        /// </summary>
+        /// <returns>The type of the stage</returns>
+        Task<SportEventType?> GetSportEventTypeAsync();
     }
 }

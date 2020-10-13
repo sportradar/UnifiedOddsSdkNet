@@ -154,17 +154,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
             return await stageCI.GetStageTypeAsync().ConfigureAwait(false);
         }
 
-        public async Task<SportEventType?> GetEventTypeAsync()
-        {
-            var stageCI = (StageCI)SportEventCache.GetEventCacheItem(Id);
-            if (stageCI == null)
-            {
-                ExecutionLog.Debug($"Missing data. No stage cache item for id={Id}.");
-                return null;
-            }
-            return await stageCI.GetSportEventTypeAsync().ConfigureAwait(false);
-        }
-
         /// <summary>
         /// Asynchronously gets a list of additional ids of the parent stages of the current instance or a null reference if the represented stage does not have the parent stages
         /// </summary>

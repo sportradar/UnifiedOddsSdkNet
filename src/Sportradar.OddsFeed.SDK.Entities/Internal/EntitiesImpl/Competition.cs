@@ -228,20 +228,39 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         }
 
         /// <summary>
-        /// Asynchronously gets a liveOdds
+        /// Asynchronously gets a <see cref="SportEventType"/> for the associated sport event.
         /// </summary>
-        /// <returns>A liveOdds</returns>
-        public async Task<string> GetLiveOddsAsync()
+        /// <returns>A <see cref="SportEventType"/> for the associated sport event.</returns>
+        public async Task<SportEventType?> GetSportEventTypeAsync()
         {
-            var sportEventCI = SportEventCache.GetEventCacheItem(Id);
-            if (sportEventCI == null)
+            var competitionCI = (CompetitionCI) SportEventCache.GetEventCacheItem(Id);
+            if (competitionCI == null)
             {
                 ExecutionLog.Debug($"Missing data. No match cache item for id={Id}.");
                 return null;
             }
             var liveOdds = ExceptionStrategy == ExceptionHandlingStrategy.THROW
-                ? await sportEventCI.GetLiveOddsAsync().ConfigureAwait(false)
-                : await new Func<Task<string>>(sportEventCI.GetLiveOddsAsync).SafeInvokeAsync(ExecutionLog, GetFetchErrorMessage("LiveOdds")).ConfigureAwait(false);
+                ? await competitionCI.GetSportEventTypeAsync().ConfigureAwait(false)
+                : await new Func<Task<SportEventType?>>(competitionCI.GetSportEventTypeAsync).SafeInvokeAsync(ExecutionLog, GetFetchErrorMessage("SportEventType")).ConfigureAwait(false);
+
+            return liveOdds;
+        }
+
+        /// <summary>
+        /// Asynchronously gets a liveOdds
+        /// </summary>
+        /// <returns>A liveOdds</returns>
+        public async Task<string> GetLiveOddsAsync()
+        {
+            var competitionCI = (CompetitionCI) SportEventCache.GetEventCacheItem(Id);
+            if (competitionCI == null)
+            {
+                ExecutionLog.Debug($"Missing data. No match cache item for id={Id}.");
+                return null;
+            }
+            var liveOdds = ExceptionStrategy == ExceptionHandlingStrategy.THROW
+                ? await competitionCI.GetLiveOddsAsync().ConfigureAwait(false)
+                : await new Func<Task<string>>(competitionCI.GetLiveOddsAsync).SafeInvokeAsync(ExecutionLog, GetFetchErrorMessage("LiveOdds")).ConfigureAwait(false);
 
             return liveOdds;
         }

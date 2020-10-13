@@ -41,24 +41,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public string ReplacedBy { get; set; }
 
         /// <summary>
-        /// Gets a liveOdds
-        /// </summary>
-        /// <returns>A liveOdds</returns>
-        public string LiveOdds { get; set; }
-
-        /// <summary>
-        /// Gets a <see cref="SportEventType"/> for the associated sport event.
-        /// </summary>
-        /// <returns>A <see cref="SportEventType"/> for the associated sport event.</returns>
-        public SportEventType? SportEventType { get; set; }
-
-        /// <summary>
-        /// Gets a <see cref="StageType"/> for the associated sport event.
-        /// </summary>
-        /// <returns>A <see cref="StageType"/> for the associated sport event.</returns>
-        public StageType? StageType { get; set; }
-
-        /// <summary>
         /// Gets the <see cref="List{T}"/> specifying the loaded fixtures
         /// </summary>
         public List<CultureInfo> LoadedFixtures { get; set; }

@@ -40,20 +40,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public string Name { get; }
 
         /// <summary>
-        /// Gets a <see cref="SportEventType"/> specifying the type of the associated sport event or a null reference if property is not applicable
-        /// for the associated sport event
-        /// </summary>
-        /// <seealso cref="SportEventType"/>
-        public SportEventType? Type { get; }
-
-        /// <summary>
-        /// Gets a <see cref="StageType"/> specifying the stage type of the associated sport event or a null reference if property is not applicable
-        /// for the associated sport event
-        /// </summary>
-        /// <seealso cref="StageType"/>
-        public StageType? StageType { get; }
-
-        /// <summary>
         /// Gets a <see cref="bool"/> specifying if the start time to be determined is set for the associated sport event
         /// </summary>
         public bool? StartTimeTbd { get; }
@@ -69,12 +55,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// </summary>
         /// <value>The status (directly from sportEvent)</value>
         public string StatusOnEvent { get; }
-
-        /// <summary>
-        /// Gets the live odds property
-        /// </summary>
-        /// <value>The live odds property</value>
-        public string LiveOdds { get;  }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SportEventSummaryDTO"/> class
@@ -101,10 +81,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             }
 
             Name = sportEvent.name;
-            if (RestMapperHelper.TryGetSportEventType(sportEvent.type, out var type))
-            {
-                Type = type;
-            }
 
             if (!string.IsNullOrEmpty(sportEvent.replaced_by))
             {
@@ -117,13 +93,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             StartTimeTbd = sportEvent.start_time_tbdSpecified ? (bool?) sportEvent.start_time_tbd : null;
 
             StatusOnEvent = sportEvent.status;
-
-            LiveOdds = sportEvent.liveodds;
-
-            if (RestMapperHelper.TryGetStageType(sportEvent.stage_type, out var stageType))
-            {
-                StageType = stageType;
-            }
         }
 
         /// <summary>
@@ -148,10 +117,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             //    SportId = sportId;
             //}
             Name = parentStage.name;
-            if (RestMapperHelper.TryGetSportEventType(parentStage.type, out var type))
-            {
-                Type = type;
-            }
             if (!string.IsNullOrEmpty(parentStage.replaced_by))
             {
                 if (URN.TryParse(parentStage.replaced_by, out var replacedBy))
@@ -162,13 +127,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             StartTimeTbd = parentStage.start_time_tbdSpecified ? (bool?)parentStage.start_time_tbd : null;
 
             StatusOnEvent = null;
-
-            LiveOdds = null;
-
-            if (RestMapperHelper.TryGetStageType(parentStage.stage_type, out var stageType))
-            {
-                StageType = stageType;
-            }
         }
 
         /// <summary>
@@ -193,10 +151,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             //    SportId = sportId;
             //}
             Name = childStage.name;
-            if (RestMapperHelper.TryGetSportEventType(childStage.type, out var type))
-            {
-                Type = type;
-            }
             if (!string.IsNullOrEmpty(childStage.replaced_by))
             {
                 if (URN.TryParse(childStage.replaced_by, out var replacedBy))
@@ -207,13 +161,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             StartTimeTbd = childStage.start_time_tbdSpecified ? (bool?)childStage.start_time_tbd : null;
 
             StatusOnEvent = null;
-
-            LiveOdds = null;
-
-            if (RestMapperHelper.TryGetStageType(childStage.stage_type, out var stageType))
-            {
-                StageType = stageType;
-            }
         }
     }
 }

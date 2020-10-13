@@ -308,11 +308,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <returns>A <see cref="SportEventType"/> member obtained by mapping. A null reference is mapped to null reference</returns>
         public static bool TryGetSportEventType(string value, out SportEventType? result)
         {
+            if (string.IsNullOrEmpty(value))
+            {
+                result = null;
+                return true;
+            }
             switch (value)
             {
-                case null:
-                    result = null;
-                    return true;
                 case "parent":
                     result = SportEventType.Parent;
                     return true;
@@ -333,11 +335,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <returns>A <see cref="SportEventType"/> member obtained by mapping. A null reference is mapped to null reference</returns>
         public static bool TryGetStageType(string value, out StageType? result)
         {
+            if (string.IsNullOrEmpty(value))
+            {
+                result = null;
+                return true;
+            }
             switch (value)
             {
-                case null:
-                    result = null;
-                    return true;
                 case "parent":
                     result = StageType.Parent;
                     return true;
@@ -347,14 +351,24 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                 case "event":
                     result = StageType.Event;
                     return true;
-                case "round":
-                    result = StageType.Round;
-                    return true;
                 case "season":
                     result = StageType.Season;
                     return true;
+                case "round":
+                    result = StageType.Round;
+                    return true;
                 case "competition_group":
                     result = StageType.CompetitionGroup;
+                    return true;
+                case "discipline":
+                case "dicipline":
+                    result = StageType.Discipline;
+                    return true;
+                case "race":
+                    result = StageType.Race;
+                    return true;
+                case "stage":
+                    result = StageType.Stage;
                     return true;
                 default:
                     result = null;
@@ -372,11 +386,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <returns>True if the provided <see cref="string"/> was successfully mapped to <see cref="CoveredFrom"/>; False otherwise</returns>
         public static bool TryGetCoveredFrom(string value, out CoveredFrom? result)
         {
+            if (string.IsNullOrEmpty(value))
+            {
+                result = null;
+                return true;
+            }
             switch (value)
             {
-                case null:
-                    result = null;
-                    return true;
                 case "tv":
                     result = CoveredFrom.Tv;
                     return true;

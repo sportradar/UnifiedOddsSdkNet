@@ -202,7 +202,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             var wantedCultures = cultures as IList<CultureInfo> ?? cultures.ToList();
             if (_eventTimeline == null || !_eventTimeline.IsFinalized)
             {
-                // if we dont have timeline or is not yet finalized, all cultures should be fetched; otherwise only missing ones
+                // if we don't have timeline or is not yet finalized, all cultures should be fetched; otherwise only missing ones
             }
             else
             {
@@ -394,28 +394,35 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         protected override async Task<T> CreateExportableCIAsync<T>()
         {
             var exportable = await base.CreateExportableCIAsync<T>();
-            var match = exportable as ExportableMatchCI;
 
-            match.Season = _season != null
-                ? await _season.ExportAsync().ConfigureAwait(false)
-                : null;
-            match.TournamentRound = _tournamentRound != null
-                ? await _tournamentRound.ExportAsync().ConfigureAwait(false)
-                : null;
-            match.TournamentId = _tournamentId?.ToString();
-            match.Fixture = _fixture != null ? await ((Fixture) _fixture).ExportAsync().ConfigureAwait(false) : null;
-            match.EventTimeline = _eventTimeline != null ? await _eventTimeline.ExportAsync().ConfigureAwait(false) : null;
-            match.DelayedInfo = _delayedInfo != null ? await _delayedInfo.ExportAsync().ConfigureAwait(false) : null;
-            match.CoverageInfo = _coverageInfo != null
-                ? new ExportableCoverageInfoCI
-                {
-                    CoveredFrom = _coverageInfo.CoveredFrom,
-                    Includes = _coverageInfo.Includes,
-                    IsLive = _coverageInfo.IsLive,
-                    Level = _coverageInfo.Level
-                }
-                : null;
-            
+            if (exportable is ExportableMatchCI match)
+            {
+                match.Season = _season != null
+                    ? await _season.ExportAsync().ConfigureAwait(false)
+                    : null;
+                match.TournamentRound = _tournamentRound != null
+                    ? await _tournamentRound.ExportAsync().ConfigureAwait(false)
+                    : null;
+                match.TournamentId = _tournamentId?.ToString();
+                match.Fixture = _fixture != null
+                    ? await ((Fixture) _fixture).ExportAsync().ConfigureAwait(false)
+                    : null;
+                match.EventTimeline = _eventTimeline != null
+                    ? await _eventTimeline.ExportAsync().ConfigureAwait(false)
+                    : null;
+                match.DelayedInfo =
+                    _delayedInfo != null ? await _delayedInfo.ExportAsync().ConfigureAwait(false) : null;
+                match.CoverageInfo = _coverageInfo != null
+                    ? new ExportableCoverageInfoCI
+                    {
+                        CoveredFrom = _coverageInfo.CoveredFrom,
+                        Includes = _coverageInfo.Includes,
+                        IsLive = _coverageInfo.IsLive,
+                        Level = _coverageInfo.Level
+                    }
+                    : null;
+            }
+
             return exportable;
         }
 
