@@ -9,6 +9,22 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2020-10-13  1.37.0.0
+IRound - GroupName renamed to Group, added GroupName property (breaking change)
+IStage extended with IStageV2 - added GetAdditionalParentStages, GetStageType (breaking change - result changed from SportEventType to StageType)
+IEventResult extended with Distance and CompetitorResults (extended with IEventResultV2)
+ICompetition extended with ICompetitionV2 - GetLiveOdds and GetSportEventType property
+Added Course to the IVenue (extended with IVenueV2
+Added Coverage to IMatch (extended with IMatchV2)
+Improvements in recovery manager
+Added support for markets with outcome_type=competitors
+Make replay manager available before the feed is open
+Improved connection error handling and reporting
+Fix: exception thrown when there are no fixture changes
+Fix: soccer events not instance of ISoccerEvent
+Fix: entities null even though data is present on the API
+Fix: event status enumeration
+
 2020-08-19  1.36.0.0
 Extended ISeasonInfo with ISeasonInfoV1 (added StartDate, EndDate, Year and TournamentId)
 Fix: Problem with casting event to IStageV1
