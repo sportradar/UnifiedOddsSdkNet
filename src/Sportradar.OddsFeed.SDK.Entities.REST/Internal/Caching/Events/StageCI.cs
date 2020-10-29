@@ -228,18 +228,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         {
             base.Merge(eventSummary, culture, false);
 
-            if (eventSummary.ParentStageId != null)
-            {
-                // no translatable data - just replace with new value
-                _parentStageId = eventSummary.ParentStageId;
-            }
-            //else
-            //{
-            //    if (eventSummary.Tournament != null)
-            //    {
-            //        _parentStage = new StageCI(eventSummary.Tournament.Id, DataRouterManager, SemaphorePool, culture, FixtureTimestampCache);
-            //    }
-            //}
             if (eventSummary.Stages != null)
             {
                 // no translatable data - just replace with new value
@@ -253,9 +241,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 _categoryId = eventSummary.Tournament.Category.Id;
             }
 
-            if (eventSummary.AdditionalParentIds != null && eventSummary.AdditionalParentIds.Any())
+
+            if (eventSummary.ParentStage != null)
             {
-                _additionalParentIds = eventSummary.AdditionalParentIds;
+                _parentStageId = eventSummary.ParentStage.Id;
+            }
+            if (eventSummary.AdditionalParents != null && eventSummary.AdditionalParents.Any())
+            {
+                _additionalParentIds = eventSummary.AdditionalParents.Select(s => s.Id);
             }
         }
 
@@ -328,6 +321,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             }
         }
 
+        /// <inheritdoc />
         protected override async Task<T> CreateExportableCIAsync<T>()
         {
             var exportable = await base.CreateExportableCIAsync<T>();

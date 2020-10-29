@@ -1,9 +1,9 @@
 /*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
@@ -13,17 +13,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
     /// </summary>
     public class StageDTO : CompetitionDTO
     {
-        private readonly URN _parentStageId;
-
         /// <summary>
         /// Gets a id of the parent stage associated with the current instance
         /// </summary>
-        public URN ParentStageId => _parentStageId;
+        public StageDTO ParentStage { get; }
 
         /// <summary>
         /// Gets a <see cref="IEnumerable{T}"/> specifying the additional parent stages associated with the current instance
         /// </summary>
-        public IEnumerable<URN> AdditionalParentIds { get; }
+        public IEnumerable<StageDTO> AdditionalParents { get; }
 
         /// <summary>
         /// Gets a <see cref="IEnumerable{T}"/> specifying the child stages associated with the current instance
@@ -42,10 +40,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal StageDTO(sportEvent sportEvent)
             : base(sportEvent)
         {
-            if (sportEvent.parent != null)
-            {
-                URN.TryParse(sportEvent.parent.id, out _parentStageId);
-            }
             if (sportEvent.races != null && sportEvent.races.Any())
             {
                 Stages = sportEvent.races.Select(s => new StageDTO(s));
@@ -54,9 +48,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 Tournament = new TournamentDTO(sportEvent.tournament);
             }
+            if (sportEvent.parent != null)
+            {
+                ParentStage = new StageDTO(sportEvent.parent);
+            }
             if (sportEvent.additional_parents != null && sportEvent.additional_parents.Any())
             {
-                AdditionalParentIds = sportEvent.additional_parents.Select(s => URN.Parse(s.id));
+                AdditionalParents = sportEvent.additional_parents.Select(s => new StageDTO(s));
             }
         }
 
@@ -67,10 +65,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal StageDTO(stageSummaryEndpoint stageEvent)
             : base(stageEvent)
         {
-            if (stageEvent.sport_event.parent != null)
-            {
-                URN.TryParse(stageEvent.sport_event.parent.id, out _parentStageId);
-            }
             if (stageEvent.sport_event.races != null && stageEvent.sport_event.races.Any())
             {
                 Stages = stageEvent.sport_event.races.Select(s => new StageDTO(s));
@@ -79,9 +73,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 Tournament = new TournamentDTO(stageEvent.sport_event.tournament);
             }
+            if (stageEvent.sport_event.parent != null)
+            {
+                ParentStage = new StageDTO(stageEvent.sport_event.parent);
+            }
             if (stageEvent.sport_event.additional_parents != null && stageEvent.sport_event.additional_parents.Any())
             {
-                AdditionalParentIds = stageEvent.sport_event.additional_parents.Select(s => URN.Parse(s.id));
+                AdditionalParents = stageEvent.sport_event.additional_parents.Select(s => new StageDTO(s));
             }
         }
 
@@ -89,18 +87,51 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// Initializes a new instance of the <see cref="StageDTO"/> class
         /// </summary>
         /// <param name="childStage">A <see cref="sportEventChildrenSport_event"/> containing basic information about the event</param>
-        protected StageDTO(sportEventChildrenSport_event childStage)
-            : base(new sportEvent
-                        {
-                            id = childStage.id,
-                            name = childStage.name,
-                            type = childStage.type,
-                            scheduledSpecified = childStage.scheduledSpecified,
-                            scheduled = childStage.scheduled,
-                            scheduled_endSpecified = childStage.scheduled_endSpecified,
-                            scheduled_end = childStage.scheduled_end
-                        })
+        internal StageDTO(sportEventChildrenSport_event childStage)
+            : base(childStage)
         {
+        }
+
+        internal StageDTO(parentStage parentStage)
+            : base(parentStage)
+        {
+        }
+
+        internal StageDTO(TournamentDTO tournament)
+            : this(new sportEvent
+            {
+                id = tournament.Id.ToString(),
+                name = tournament.Name,
+                //type = tournament.type,
+                scheduledSpecified = tournament.Scheduled != null,
+                scheduled = tournament.Scheduled.GetValueOrDefault(DateTime.MinValue),
+                scheduled_endSpecified = tournament.ScheduledEnd != null,
+                scheduled_end = tournament.ScheduledEnd.GetValueOrDefault(DateTime.MinValue),
+                //liveodds = tournament.liveodds,
+                //season = tournament.season,
+                tournament = new tournament
+                {
+                    id = tournament.Id.ToString(),
+                    name = tournament.Name,
+                    scheduledSpecified = tournament.Scheduled != null,
+                    scheduled = tournament.Scheduled.GetValueOrDefault(DateTime.MinValue),
+                    scheduled_endSpecified = tournament.ScheduledEnd != null,
+                    scheduled_end = tournament.ScheduledEnd.GetValueOrDefault(DateTime.MinValue),
+                    category = new category
+                    {
+                        id = tournament.Category.Id.ToString(),
+                        name = tournament.Category.Name,
+                        country_code = tournament.Category.CountryCode
+                    },
+                    sport = new sport
+                    {
+                        id = tournament.Sport.Id.ToString(),
+                        name = tournament.Sport.Name
+                    }
+                }
+            })
+        {
+            Tournament = tournament;
         }
     }
 }

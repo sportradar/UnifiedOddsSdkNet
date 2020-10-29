@@ -88,6 +88,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <value>The scheduled start time changes</value>
         public IEnumerable<IScheduledStartTimeChange> ScheduledStartTimeChanges { get; }
 
+        /// <summary>
+        /// Gets a id of the parent stage associated with the current instance
+        /// </summary>
+        public URN ParentStageId { get; }
+
+        /// <summary>
+        /// Gets the list specifying the additional parent ids associated with the current instance
+        /// </summary>
+        public IEnumerable<URN> AdditionalParentsIds { get; }
+
         internal Fixture(FixtureDTO fixtureDto)
         {
             Guard.Argument(fixtureDto, nameof(fixtureDto)).NotNull();
@@ -95,7 +105,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             StartTime = fixtureDto.StartTime;
             NextLiveTime = fixtureDto.NextLiveTime;
             StartTimeConfirmed = fixtureDto.StartTimeConfirmed;
-            StartTimeTBD = fixtureDto.StartTimeTBD;
+            StartTimeTBD = fixtureDto.StartTimeTbd;
             ReplacedBy = fixtureDto.ReplacedBy;
             ExtraInfo = fixtureDto.ExtraInfo;
             if (fixtureDto.TvChannels != null)
@@ -120,9 +130,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                     TvChannels = tvChannels;
                 }
             }
-            if (fixtureDto.CoverageInfo != null)
+            if (fixtureDto.Coverage != null)
             {
-                CoverageInfo = new CoverageInfo(fixtureDto.CoverageInfo.Level, fixtureDto.CoverageInfo.IsLive, fixtureDto.CoverageInfo.Includes, fixtureDto.CoverageInfo.CoveredFrom);
+                CoverageInfo = new CoverageInfo(fixtureDto.Coverage.Level, fixtureDto.Coverage.IsLive, fixtureDto.Coverage.Includes, fixtureDto.Coverage.CoveredFrom);
             }
             if (fixtureDto.ProductInfo != null)
             {
@@ -138,17 +148,26 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             {
                 References = new Reference(new ReferenceIdCI(fixtureDto.ReferenceIds));
             }
-
             if (fixtureDto.ScheduledStartTimeChanges != null)
             {
                 ScheduledStartTimeChanges = fixtureDto.ScheduledStartTimeChanges.Select(s => new ScheduledStartTimeChange(s));
+            }
+            if (fixtureDto.ParentStage != null)
+            {
+                ParentStageId = fixtureDto.ParentStage.Id;
+            }
+            if (fixtureDto.AdditionalParents != null && fixtureDto.AdditionalParents.Any())
+            {
+                AdditionalParentsIds = fixtureDto.AdditionalParents.Select(s => s.Id);
             }
         }
 
         internal Fixture(ExportableFixtureCI exportable)
         {
             if (exportable == null)
+            {
                 throw new ArgumentNullException(nameof(exportable));
+            }
 
             StartTime = exportable.StartTime;
             NextLiveTime = exportable.NextLiveTime;
@@ -162,6 +181,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             References = exportable.References != null ? new Reference(new ReferenceIdCI(exportable.References)) : null;
             ScheduledStartTimeChanges = exportable.ScheduledStartTimeChanges
                 ?.Select(s => new ScheduledStartTimeChange(s)).ToList();
+            ParentStageId = exportable.ParentStageId;
+            AdditionalParentsIds = exportable.AdditionalParentsIds;
         }
 
         /// <summary>
@@ -224,7 +245,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 ScheduledStartTimeChanges = scheduledTasks != null ? await Task.WhenAll(scheduledTasks) : null,
                 StartTime = StartTime,
                 TvChannels = channelTasks != null ? await Task.WhenAll(channelTasks) : null,
-                StartTimeTBD = StartTimeTBD
+                StartTimeTBD = StartTimeTBD,
+                ParentStageId = ParentStageId,
+                AdditionalParentsIds = AdditionalParentsIds
             };
         }
     }

@@ -8,7 +8,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
     public class TournamentCoverageDTO
     {
-        public  bool LiveCoverage { get; }
+        /// <summary>
+        /// Live coverage
+        /// </summary>
+        public bool LiveCoverage { get; }
 
         internal TournamentCoverageDTO(tournamentLiveCoverageInfo tournamentCoverage)
         {

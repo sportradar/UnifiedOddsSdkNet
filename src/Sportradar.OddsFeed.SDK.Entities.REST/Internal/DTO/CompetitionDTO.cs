@@ -179,9 +179,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                 Type = type;
             }
 
-            LiveOdds = null;
+            //LiveOdds = null;
 
             if (RestMapperHelper.TryGetStageType(stageSummary.stage_type, out var stageType))
+            {
+                StageType = stageType;
+            }
+        }
+
+        protected CompetitionDTO(parentStage parentStage)
+            : base(parentStage)
+        {
+            if (RestMapperHelper.TryGetSportEventType(parentStage.type, out var type))
+            {
+                Type = type;
+            }
+
+            //LiveOdds = null;
+
+            if (RestMapperHelper.TryGetStageType(parentStage.stage_type, out var stageType))
             {
                 StageType = stageType;
             }

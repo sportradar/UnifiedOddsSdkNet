@@ -345,7 +345,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             }
             if (fixture.Coverage != null)
             {
-                _coverageInfo = new CoverageInfoCI(fixture.CoverageInfo);
+                _coverageInfo = new CoverageInfoCI(fixture.Coverage);
             }
         }
 
@@ -391,6 +391,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             }
         }
 
+        /// <inheritdoc />
         protected override async Task<T> CreateExportableCIAsync<T>()
         {
             var exportable = await base.CreateExportableCIAsync<T>();
