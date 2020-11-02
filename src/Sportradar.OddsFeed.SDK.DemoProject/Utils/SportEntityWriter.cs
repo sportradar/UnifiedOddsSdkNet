@@ -559,7 +559,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
 
             var seasonNames = _cultures.Count() == 1
                 ? seasonInfo.GetName(_cultures.First())
-                : $"[{JoinValuesPerLanguage(_cultures.ToDictionary(ci => ci, seasonInfo.GetName(ci)))}]";
+                : $"[{JoinValuesPerLanguage(_cultures.ToDictionary(ci => ci, seasonInfo.GetName))}]";
 
             var seasonInfo1 = seasonInfo as ISeasonInfoV1;
             if(seasonInfo1 != null)

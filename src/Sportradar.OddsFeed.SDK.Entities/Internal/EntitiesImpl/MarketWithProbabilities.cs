@@ -9,7 +9,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
 {
-    internal class MarketWithProbabilities : Market, IMarketWithProbabilities
+    internal class MarketWithProbabilities : Market, IMarketWithProbabilitiesV1
     {
         /// <summary>
         /// Gets a <see cref="MarketStatus" /> enum member specifying the status of the market associated with the current market
@@ -21,6 +21,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// probabilities information for one outcome(selection)
         /// </summary>
         public IEnumerable<IOutcomeProbabilities> OutcomeProbabilities { get; }
+
+        /// <summary>
+        /// Gets a <see cref="CashoutStatus"/> enum member specifying the availability of cashout, or a null reference
+        /// </summary>
+        public CashoutStatus? CashoutStatus { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MarketWithProbabilities"/> class
@@ -35,6 +40,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// for one outcome associated with the current <see cref="IMarketWithProbabilities"/> instance</param>
         /// <param name="marketDefinition">The associated market definition</param>
         /// <param name="cultures">A <see cref="IEnumerable{CultureInfo}"/> specifying languages the current instance supports</param>
+        /// <param name="cashoutStatus">A <see cref="CashoutStatus"/> enum member specifying the availability of cashout, or a null reference</param>
         internal MarketWithProbabilities(int id,
                                          IReadOnlyDictionary<string, string> specifiers,
                                          IReadOnlyDictionary<string, string> additionalInfo,
@@ -43,7 +49,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                                          MarketStatus status,
                                          IEnumerable<IOutcomeProbabilities> outcomeProbabilities,
                                          IMarketDefinition marketDefinition,
-                                         IEnumerable<CultureInfo> cultures)
+                                         IEnumerable<CultureInfo> cultures,
+                                         CashoutStatus? cashoutStatus)
             : base(id, specifiers, additionalInfo, nameProvider, mappingProvider, marketDefinition, cultures)
         {
             Status = status;
@@ -52,6 +59,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
             {
                 OutcomeProbabilities = outcomeProbabilities as ReadOnlyCollection<IOutcomeProbabilities> ?? new ReadOnlyCollection<IOutcomeProbabilities>(outcomeProbabilities.ToList());
             }
+
+            CashoutStatus = cashoutStatus;
         }
     }
 }
