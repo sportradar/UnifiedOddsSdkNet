@@ -2,7 +2,9 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using Common.Logging;
 
@@ -292,6 +294,21 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         public static DateTime CombineDateAndTime(DateTime date, DateTime time)
         {
             return date.AddHours(time.ToUniversalTime().Hour).AddMinutes(time.ToUniversalTime().Minute).AddSeconds(time.Second);
+        }
+
+        /// <summary>
+        /// Dictionaries to string of key-value pairs
+        /// </summary>
+        /// <param name="specifiers">The specifiers.</param>
+        /// <returns>System.String.</returns>
+        public static string DictionaryToString(IDictionary<string, string> specifiers)
+        {
+            if (specifiers == null || !specifiers.Any())
+            {
+                return string.Empty;
+            }
+            var tmp = specifiers.Aggregate(string.Empty, (current, pair) => current + $"{pair.Key}={pair.Value}|");
+            return tmp.Remove(tmp.Length - 1);
         }
     }
 }

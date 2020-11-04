@@ -31,6 +31,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         private static readonly ILog ExecutionLog = SdkLoggerFactory.GetLogger(typeof(MarketMappingProvider));
 
         /// <summary>
+        /// A <see cref="ILog"/> instance used for execution logging
+        /// </summary>
+        private static readonly ILog CacheLog = SdkLoggerFactory.GetLoggerForCache(typeof(MarketMappingProvider));
+
+        /// <summary>
         /// A <see cref="IMarketCacheProvider"/> instance used to retrieve market descriptors
         /// </summary>
         private readonly IMarketCacheProvider _marketCacheProvider;
@@ -158,6 +163,26 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             {
                 ExecutionLog.Debug($"Market with id:{_marketId}, producer:{_producer}, sportId:{_sportId} has no mappings.");
                 return null;
+            }
+
+            if (mappings.Count > 1)
+            {
+                foreach (var mapping in mappings)
+                {
+                    if (mapping.MarketId.Equals(marketDescription.Id.ToString()))
+                    {
+                        return new[] { mapping };
+                    }
+                }
+
+                ExecutionLog.Warn($"Market with id:{_marketId}, producer:{_producer.Id}, sportId:{_sportId.Id} has too many mappings [{mappings.Count}].");
+                CacheLog.Warn($"MarketId:{_marketId}, producer:{_producer.Id}, sportId:{_sportId.Id}, specifiers={MarketHelper.SpecifiersKeysToString(marketDescription.Specifiers)} has too many mappings [{mappings.Count}].");
+                var i = 0;
+                foreach (var mapping in mappings)
+                {
+                    CacheLog.Debug($"MarketId:{_marketId}, producer:{_producer.Id}, sportId:{_sportId.Id} mapping[{i}]: {mapping}.");
+                    i++;
+                }
             }
 
             return mappings;
