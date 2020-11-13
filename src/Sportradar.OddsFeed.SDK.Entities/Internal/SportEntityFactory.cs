@@ -94,7 +94,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             Guard.Argument(sportData, nameof(sportData)).NotNull();
             Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
             if (!cultures.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
+            }
 
             var categories = sportData.Categories?.Select(categoryData => new Category(
                 categoryData.Id,

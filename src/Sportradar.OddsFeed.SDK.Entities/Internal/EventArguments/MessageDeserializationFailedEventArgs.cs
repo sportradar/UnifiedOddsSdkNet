@@ -26,7 +26,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments
         {
             Guard.Argument(rawData, nameof(rawData)).NotNull();//.NotEmpty();
             if (!rawData.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(rawData));
+            }
 
             RawData = rawData;
         }

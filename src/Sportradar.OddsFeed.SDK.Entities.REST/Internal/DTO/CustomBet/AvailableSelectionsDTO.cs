@@ -1,7 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -34,7 +33,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet
         internal AvailableSelectionsDTO(AvailableSelectionsType availableSelections)
         {
             if (availableSelections == null)
+            {
                 throw new ArgumentNullException(nameof(availableSelections));
+            }
 
             Event = URN.Parse(availableSelections.@event.id);
             var markets = availableSelections.@event.markets;
