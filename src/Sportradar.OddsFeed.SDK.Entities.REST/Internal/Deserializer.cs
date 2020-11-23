@@ -58,9 +58,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                     var ignoreNamespaceAttribute = feedMessagesType.GetCustomAttribute<OverrideXmlNamespaceAttribute>(false);
 
                     var rootElementName = xmlRootAttribute == null || string.IsNullOrWhiteSpace(xmlRootAttribute.ElementName)
-                        ? ignoreNamespaceAttribute == null
-                            ? null
-                            : ignoreNamespaceAttribute.RootElementName
+                        ? ignoreNamespaceAttribute?.RootElementName
                         : xmlRootAttribute.ElementName;
 
                     if (string.IsNullOrWhiteSpace(rootElementName))

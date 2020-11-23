@@ -203,7 +203,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                     }
                 }
             }
-            }
         }
     }
 }
