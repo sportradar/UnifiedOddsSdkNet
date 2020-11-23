@@ -112,7 +112,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         {
             Guard.Argument(identifiers, nameof(identifiers)).NotNull();//.NotEmpty();
             if (identifiers.Length == 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(identifiers));
+            }
 
             return new Uri(string.Format(_uriFormat, identifiers));
         }
