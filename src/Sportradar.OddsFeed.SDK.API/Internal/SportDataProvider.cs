@@ -255,12 +255,18 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             Log.Info($"Invoked GetCompetition: [Id={id}, SportId={sportId}, Cultures={s}].");
 
+            if (sportId == null)
+            {
+                sportId = _sportEventCache.GetEventSportIdAsync(id).Result;
+            }
+
             var result = _sportEntityFactory.BuildSportEvent<ICompetition>(id,
                                                                            sportId,
                                                                            culture == null
                                                                                ? _defaultCultures
                                                                                : new[] {culture},
                                                                            _exceptionStrategy);
+
             Log.Info($"GetCompetition returned: {result?.Id}.");
             return result;
         }
