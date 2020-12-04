@@ -118,234 +118,351 @@ namespace Sportradar.OddsFeed.SDK.Messages.Feed
     [OverrideXmlNamespace(RootElementName = "alive", IgnoreNamespace = false)]
     public partial class alive : FeedMessage
     {
+        /// <summary>
+        /// The message name
+        /// </summary>
         public static readonly string MessageName = typeof(alive).Name;
 
+        /// <inheritdoc />
         public override bool IsEventRelated => false;
 
+        /// <inheritdoc />
         public override int ProducerId => product;
 
+        /// <inheritdoc />
         public override long? RequestId => null;
 
+        /// <inheritdoc />
         public override PropertyUsage RequestIdUsage => PropertyUsage.FORBBIDEN;
 
+        /// <inheritdoc />
         public override bool IsStateful => false;
 
+        /// <inheritdoc />
         public override string EventId => null;
 
+        /// <inheritdoc />
         public override string Name => MessageName;
 
+        /// <inheritdoc />
         public override long GeneratedAt => timestamp;
 
+        /// <inheritdoc />
         public override long SentAt { get;  set; }
 
+        /// <inheritdoc />
         public override long ReceivedAt { get;  set; }
     }
 
     [OverrideXmlNamespace(RootElementName = "snapshot_complete", IgnoreNamespace = false)]
     public partial class snapshot_complete : FeedMessage
     {
+        /// <summary>
+        /// The message name
+        /// </summary>
         public static readonly string MessageName = typeof(snapshot_complete).Name;
 
+        /// <inheritdoc />
         public override bool IsEventRelated => false;
 
+        /// <inheritdoc />
         public override int ProducerId => product;
 
+        /// <inheritdoc />
         public override long? RequestId => request_id;
 
+        /// <inheritdoc />
         public override PropertyUsage RequestIdUsage => PropertyUsage.REQUIRED;
 
+        /// <inheritdoc />
         public override bool IsStateful => false;
 
+        /// <inheritdoc />
         public override string EventId => null;
 
+        /// <inheritdoc />
         public override string Name => MessageName;
 
+        /// <inheritdoc />
         public override long GeneratedAt => timestamp;
 
+        /// <inheritdoc />
         public override long SentAt { get;  set; }
 
+        /// <inheritdoc />
         public override long ReceivedAt { get;  set; }
     }
 
     [OverrideXmlNamespace(RootElementName = "odds_change", IgnoreNamespace = false)]
     public partial class odds_change : FeedMessage
     {
+        /// <summary>
+        /// The message name
+        /// </summary>
         public static readonly string MessageName = typeof(odds_change).Name;
 
+        /// <inheritdoc />
         public override bool IsEventRelated => true;
 
+        /// <inheritdoc />
         public override int ProducerId => product;
 
+        /// <inheritdoc />
         public override long? RequestId => request_idSpecified ? (long?)request_id : null;
 
+        /// <inheritdoc />
         public override PropertyUsage RequestIdUsage => PropertyUsage.OPTIONAL;
 
+        /// <inheritdoc />
         public override bool IsStateful => false;
 
+        /// <inheritdoc />
         public override string EventId => event_id;
 
+        /// <inheritdoc />
         public override string Name => MessageName;
 
+        /// <inheritdoc />
         public override long GeneratedAt => timestamp;
 
+        /// <inheritdoc />
         public override long SentAt { get;  set; }
 
+        /// <inheritdoc />
         public override long ReceivedAt { get;  set; }
     }
 
     [OverrideXmlNamespace(RootElementName = "bet_stop", IgnoreNamespace = false)]
     public partial class bet_stop : FeedMessage
     {
+        /// <summary>
+        /// The message name
+        /// </summary>
         public static readonly string MessageName = typeof(bet_stop).Name;
 
+        /// <inheritdoc />
         public override bool IsEventRelated => true;
 
+        /// <inheritdoc />
         public override int ProducerId => product;
 
+        /// <inheritdoc />
         public override long? RequestId => request_idSpecified ? (long?)request_id : null;
 
+        /// <inheritdoc />
         public override PropertyUsage RequestIdUsage => PropertyUsage.OPTIONAL;
 
+        /// <inheritdoc />
         public override bool IsStateful => false;
 
+        /// <inheritdoc />
         public override string EventId => event_id;
 
+        /// <inheritdoc />
         public override string Name => MessageName;
 
+        /// <inheritdoc />
         public override long GeneratedAt => timestamp;
 
+        /// <inheritdoc />
         public override long SentAt { get;  set; }
 
+        /// <inheritdoc />
         public override long ReceivedAt { get;  set; }
     }
 
     [OverrideXmlNamespace(RootElementName = "bet_settlement", IgnoreNamespace = false)]
     public partial class bet_settlement : FeedMessage
     {
+        /// <summary>
+        /// The message name
+        /// </summary>
         public static readonly string MessageName = typeof(bet_settlement).Name;
 
+        /// <inheritdoc />
         public override bool IsEventRelated => true;
 
+        /// <inheritdoc />
         public override int ProducerId => product;
 
+        /// <inheritdoc />
         public override long? RequestId => request_idSpecified ? (long?)request_id : null;
 
+        /// <inheritdoc />
         public override PropertyUsage RequestIdUsage => PropertyUsage.OPTIONAL;
 
+        /// <inheritdoc />
         public override bool IsStateful => true;
 
+        /// <inheritdoc />
         public override string EventId => event_id;
 
+        /// <inheritdoc />
         public override string Name => MessageName;
 
+        /// <inheritdoc />
         public override long GeneratedAt => timestamp;
 
+        /// <inheritdoc />
         public override long SentAt { get;  set; }
 
+        /// <inheritdoc />
         public override long ReceivedAt { get;  set; }
     }
 
     [OverrideXmlNamespace(RootElementName = "rollback_bet_settlement", IgnoreNamespace = false)]
     public partial class rollback_bet_settlement : FeedMessage
     {
+        /// <summary>
+        /// The message name
+        /// </summary>
         public static readonly string MessageName = typeof(rollback_bet_settlement).Name;
 
+        /// <inheritdoc />
         public override bool IsEventRelated => true;
 
+        /// <inheritdoc />
         public override int ProducerId => product;
 
+        /// <inheritdoc />
         public override long? RequestId => request_idSpecified ? (long?)request_id : null;
 
+        /// <inheritdoc />
         public override PropertyUsage RequestIdUsage => PropertyUsage.OPTIONAL;
 
+        /// <inheritdoc />
         public override bool IsStateful => true;
 
+        /// <inheritdoc />
         public override string EventId => event_id;
 
+        /// <inheritdoc />
         public override string Name => MessageName;
 
+        /// <inheritdoc />
         public override long GeneratedAt => timestamp;
 
+        /// <inheritdoc />
         public override long SentAt { get;  set; }
 
+        /// <inheritdoc />
         public override long ReceivedAt { get;  set; }
     }
 
     [OverrideXmlNamespace(RootElementName = "bet_cancel", IgnoreNamespace = false)]
     public partial class bet_cancel : FeedMessage
     {
+        /// <summary>
+        /// The message name
+        /// </summary>
         public static readonly string MessageName = typeof(bet_cancel).Name;
 
+        /// <inheritdoc />
         public override bool IsEventRelated => true;
 
+        /// <inheritdoc />
         public override int ProducerId => product;
 
+        /// <inheritdoc />
         public override long? RequestId => request_idSpecified ? (long?)request_id : null;
 
+        /// <inheritdoc />
         public override PropertyUsage RequestIdUsage => PropertyUsage.OPTIONAL;
 
+        /// <inheritdoc />
         public override bool IsStateful => true;
 
+        /// <inheritdoc />
         public override string EventId => event_id;
 
+        /// <inheritdoc />
         public override string Name => MessageName;
 
+        /// <inheritdoc />
         public override long GeneratedAt => timestamp;
 
+        /// <inheritdoc />
         public override long SentAt { get;  set; }
 
+        /// <inheritdoc />
         public override long ReceivedAt { get;  set; }
     }
 
     [OverrideXmlNamespace(RootElementName = "rollback_bet_cancel", IgnoreNamespace = false)]
     public partial class rollback_bet_cancel : FeedMessage
     {
+        /// <summary>
+        /// The message name
+        /// </summary>
         public static readonly string MessageName = typeof(rollback_bet_cancel).Name;
 
+        /// <inheritdoc />
         public override bool IsEventRelated => true;
 
+        /// <inheritdoc />
         public override int ProducerId => product;
 
+        /// <inheritdoc />
         public override long? RequestId => request_idSpecified ? (long?)request_id : null;
 
+        /// <inheritdoc />
         public override PropertyUsage RequestIdUsage => PropertyUsage.OPTIONAL;
 
+        /// <inheritdoc />
         public override bool IsStateful => true;
 
+        /// <inheritdoc />
         public override string EventId => event_id;
 
+        /// <inheritdoc />
         public override string Name => MessageName;
 
+        /// <inheritdoc />
         public override long GeneratedAt => timestamp;
 
+        /// <inheritdoc />
         public override long SentAt { get;  set; }
 
+        /// <inheritdoc />
         public override long ReceivedAt { get;  set; }
     }
 
     [OverrideXmlNamespace(RootElementName = "fixture_change", IgnoreNamespace = false)]
     public partial class fixture_change : FeedMessage
     {
+        /// <summary>
+        /// The message name
+        /// </summary>
         public static readonly string MessageName = typeof(fixture_change).Name;
 
+        /// <inheritdoc />
         public override bool IsEventRelated => true;
 
+        /// <inheritdoc />
         public override int ProducerId => product;
 
+        /// <inheritdoc />
         public override long? RequestId => request_idSpecified ? (long?)request_id : null;
 
+        /// <inheritdoc />
         public override PropertyUsage RequestIdUsage => PropertyUsage.OPTIONAL;
 
+        /// <inheritdoc />
         public override bool IsStateful => false;
 
+        /// <inheritdoc />
         public override string EventId => event_id;
 
+        /// <inheritdoc />
         public override string Name => MessageName;
 
+        /// <inheritdoc />
         public override long GeneratedAt => timestamp;
 
+        /// <inheritdoc />
         public override long SentAt { get;  set; }
 
+        /// <inheritdoc />
         public override long ReceivedAt { get;  set; }
     }
 }

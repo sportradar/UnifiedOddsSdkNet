@@ -141,43 +141,43 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Example
         private void SessionOnRollbackBetSettlement(object sender, RollbackBetSettlementEventArgs<ISportEvent> rollbackBetSettlementEventArgs)
         {
             var baseEntity = rollbackBetSettlementEventArgs.GetBetSettlementRollback();
-            WriteSportEntity(baseEntity.GetType().Name, baseEntity.Event, baseEntity.Timestamp);
+            WriteSportEntity(baseEntity.GetType().Name, baseEntity.Event, baseEntity.Timestamps);
         }
 
         private void SessionOnRollbackBetCancel(object sender, RollbackBetCancelEventArgs<ISportEvent> rollbackBetCancelEventArgs)
         {
             var baseEntity = rollbackBetCancelEventArgs.GetBetCancelRollback();
-            WriteSportEntity(baseEntity.GetType().Name, baseEntity.Event, baseEntity.Timestamp);
+            WriteSportEntity(baseEntity.GetType().Name, baseEntity.Event, baseEntity.Timestamps);
         }
 
         private void SessionOnOddsChange(object sender, OddsChangeEventArgs<ISportEvent> oddsChangeEventArgs)
         {
             var baseEntity = oddsChangeEventArgs.GetOddsChange();
-            WriteSportEntity(baseEntity.GetType().Name, baseEntity.Event, baseEntity.Timestamp);
+            WriteSportEntity(baseEntity.GetType().Name, baseEntity.Event, baseEntity.Timestamps);
         }
 
         private void SessionOnFixtureChange(object sender, FixtureChangeEventArgs<ISportEvent> fixtureChangeEventArgs)
         {
             var baseEntity = fixtureChangeEventArgs.GetFixtureChange();
-            WriteSportEntity(baseEntity.GetType().Name, baseEntity.Event, baseEntity.Timestamp);
+            WriteSportEntity(baseEntity.GetType().Name, baseEntity.Event, baseEntity.Timestamps);
         }
 
         private void SessionOnBetStop(object sender, BetStopEventArgs<ISportEvent> betStopEventArgs)
         {
             var baseEntity = betStopEventArgs.GetBetStop();
-            WriteSportEntity(baseEntity.GetType().Name, baseEntity.Event, baseEntity.Timestamp);
+            WriteSportEntity(baseEntity.GetType().Name, baseEntity.Event, baseEntity.Timestamps);
         }
 
         private void SessionOnBetSettlement(object sender, BetSettlementEventArgs<ISportEvent> betSettlementEventArgs)
         {
             var baseEntity = betSettlementEventArgs.GetBetSettlement();
-            WriteSportEntity(baseEntity.GetType().Name, baseEntity.Event, baseEntity.Timestamp);
+            WriteSportEntity(baseEntity.GetType().Name, baseEntity.Event, baseEntity.Timestamps);
         }
 
         private void SessionOnBetCancel(object sender, BetCancelEventArgs<ISportEvent> betCancelEventArgs)
         {
             var baseEntity = betCancelEventArgs.GetBetCancel();
-            WriteSportEntity(baseEntity.GetType().Name, baseEntity.Event, baseEntity.Timestamp);
+            WriteSportEntity(baseEntity.GetType().Name, baseEntity.Event, baseEntity.Timestamps);
         }
 
         private void SessionOnUnparsableMessageReceived(object sender, UnparsableMessageEventArgs unparsableMessageEventArgs)
@@ -225,9 +225,9 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Example
             _log.Info($"Producer {e.GetProducerStatusChange().Producer} is up");
         }
 
-        private void WriteSportEntity(string msgType, ISportEvent message, long timestamp)
+        private void WriteSportEntity(string msgType, ISportEvent message, IMessageTimestamp timestamp)
         {
-            _log.Debug($"{msgType.Replace("`1", string.Empty)} message for eventId {message.Id}. Timestamp={timestamp}.");
+            _log.Debug($"{msgType.Replace("`1", string.Empty)} message for eventId {message.Id}. Timestamp={timestamp?.Created}.");
         }
 
         private void ReplayServerInteraction(ReplayFeed replayFeed)

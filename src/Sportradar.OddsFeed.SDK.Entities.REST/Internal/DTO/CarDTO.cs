@@ -3,6 +3,7 @@
 */
 using Dawn;
 using Sportradar.OddsFeed.SDK.Messages.REST;
+#pragma warning disable 1591
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {

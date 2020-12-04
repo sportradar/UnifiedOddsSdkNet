@@ -1,6 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+#pragma warning disable 1591
+
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
     public class EventClockDTO

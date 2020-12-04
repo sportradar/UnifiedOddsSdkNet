@@ -709,6 +709,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             }
         }
 
+        /// <summary>
+        /// Create exportable cache items
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>Exportable cache items</returns>
         protected override async Task<T> CreateExportableCIAsync<T>()
         {
             var exportable = await base.CreateExportableCIAsync<T>();

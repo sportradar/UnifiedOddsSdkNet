@@ -8,6 +8,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.Feed;
 using Sportradar.OddsFeed.SDK.Messages.REST;
+#pragma warning disable 1591
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {

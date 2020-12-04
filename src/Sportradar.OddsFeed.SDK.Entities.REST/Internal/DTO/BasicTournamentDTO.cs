@@ -9,6 +9,9 @@ using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
+    /// <summary>
+    /// The basic tournament dto
+    /// </summary>
     public class BasicTournamentDTO : SportEventSummaryDTO
     {
         /// <summary>

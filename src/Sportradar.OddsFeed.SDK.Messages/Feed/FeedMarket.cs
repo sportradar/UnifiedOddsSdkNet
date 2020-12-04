@@ -4,9 +4,13 @@
 
 using System.Collections.Generic;
 using System.Xml.Serialization;
+// ReSharper disable InconsistentNaming
 
 namespace Sportradar.OddsFeed.SDK.Messages.Feed
 {
+    /// <summary>
+    /// Base FeedMarket class
+    /// </summary>
     public abstract class FeedMarket
     {
         /// <summary>
@@ -29,16 +33,19 @@ namespace Sportradar.OddsFeed.SDK.Messages.Feed
 
     public partial class market : FeedMarket
     {
+        /// <inheritdoc />
         public override string SpecifierString => specifiers;
     }
 
     public partial class betSettlementMarket : FeedMarket
     {
+        /// <inheritdoc />
         public override string SpecifierString => specifiers;
     }
 
     public partial class oddsChangeMarket : FeedMarket
     {
+        /// <inheritdoc />
         public override string SpecifierString => specifiers;
     }
 }
