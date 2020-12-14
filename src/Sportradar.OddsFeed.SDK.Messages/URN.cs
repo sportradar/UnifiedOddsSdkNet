@@ -2,9 +2,9 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using Dawn;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Dawn;
 
 namespace Sportradar.OddsFeed.SDK.Messages
 {

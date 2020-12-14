@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
@@ -52,6 +53,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             {
                 ParentStage = new StageDTO(sportEvent.parent);
             }
+            if (ParentStage == null && Type != null && Type == SportEventType.Parent && sportEvent.tournament != null)
+            {
+                ParentStage = new StageDTO(new TournamentDTO(sportEvent.tournament));
+            }
             if (sportEvent.additional_parents != null && sportEvent.additional_parents.Any())
             {
                 AdditionalParents = sportEvent.additional_parents.Select(s => new StageDTO(s));
@@ -65,6 +70,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal StageDTO(stageSummaryEndpoint stageEvent)
             : base(stageEvent)
         {
+            if (stageEvent.sport_event == null)
+            {
+                return;
+            }
             if (stageEvent.sport_event.races != null && stageEvent.sport_event.races.Any())
             {
                 Stages = stageEvent.sport_event.races.Select(s => new StageDTO(s));
@@ -76,6 +85,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             if (stageEvent.sport_event.parent != null)
             {
                 ParentStage = new StageDTO(stageEvent.sport_event.parent);
+            }
+            if (ParentStage == null && Type != null && Type == SportEventType.Parent && stageEvent.sport_event.tournament != null)
+            {
+                ParentStage = new StageDTO(new TournamentDTO(stageEvent.sport_event.tournament));
             }
             if (stageEvent.sport_event.additional_parents != null && stageEvent.sport_event.additional_parents.Any())
             {

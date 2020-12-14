@@ -72,7 +72,7 @@ namespace Sportradar.OddsFeed.SDK.API.Extended
             }
             catch (Exception ex)
             {
-                Log.Error($"Error dispatching raw feed message for {e.RoutingKey} and {e.FeedMessage.EventId}", ex);
+                Log.Error($"Error dispatching raw feed message for {e.RoutingKey} and {e.FeedMessage?.EventId}", ex);
             }
         }
 
