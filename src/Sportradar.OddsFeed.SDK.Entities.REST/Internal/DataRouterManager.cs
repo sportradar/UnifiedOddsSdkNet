@@ -137,16 +137,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// The result changes provider
         /// </summary>
         private readonly IDataProvider<IEnumerable<ResultChangeDTO>> _resultChangesProvider;
-
         /// <summary>
         /// The list sport events provider
         /// </summary>
         private readonly IDataProvider<EntityList<SportEventSummaryDTO>> _listSportEventProvider;
-
         /// <summary>
         /// The list sport available tournaments provider
         /// </summary>
         private readonly IDataProvider<EntityList<TournamentInfoDTO>> _availableSportTournamentsProvider;
+        /// <summary>
+        /// The sport event fixture provider for when tournamentInfo is returned
+        /// </summary>
+        private readonly IDataProvider<TournamentInfoDTO> _sportEventFixtureForTournamentProvider;
+        /// <summary>
+        /// The sport event fixture provider without cacher for when tournamentInfo is returned
+        /// </summary>
+        private readonly IDataProvider<TournamentInfoDTO> _sportEventFixtureChangeFixtureForTournamentProvider;
 
         /// <summary>
         /// The cache manager
@@ -201,6 +207,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="resultChangesProvider">Result changes provider</param>
         /// <param name="listSportEventProvider">List sport events provider</param>
         /// <param name="availableSportTournamentsProvider">The sports available tournaments provider</param>
+        /// <param name="sportEventFixtureForTournamentProvider">The sport event fixture provider for when tournamentInfo is returned</param>
+        /// <param name="sportEventFixtureChangeFixtureForTournamentProvider">The sport event fixture provider without cache for when tournamentInfo is returned</param>
         public DataRouterManager(ICacheManager cacheManager,
                                  IProducerManager producerManager,
                                  ExceptionHandlingStrategy exceptionHandlingStrategy,
@@ -230,7 +238,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                                  IDataProvider<IEnumerable<FixtureChangeDTO>> fixtureChangesProvider,
                                  IDataProvider<IEnumerable<ResultChangeDTO>> resultChangesProvider,
                                  IDataProvider<EntityList<SportEventSummaryDTO>> listSportEventProvider,
-                                 IDataProvider<EntityList<TournamentInfoDTO>> availableSportTournamentsProvider)
+                                 IDataProvider<EntityList<TournamentInfoDTO>> availableSportTournamentsProvider,
+                                 IDataProvider<TournamentInfoDTO> sportEventFixtureForTournamentProvider,
+                                 IDataProvider<TournamentInfoDTO> sportEventFixtureChangeFixtureForTournamentProvider)
         {
             Guard.Argument(cacheManager, nameof(cacheManager)).NotNull();
             Guard.Argument(sportEventSummaryProvider, nameof(sportEventSummaryProvider)).NotNull();
@@ -259,6 +269,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Guard.Argument(resultChangesProvider, nameof(resultChangesProvider)).NotNull();
             Guard.Argument(listSportEventProvider, nameof(listSportEventProvider)).NotNull();
             Guard.Argument(availableSportTournamentsProvider, nameof(availableSportTournamentsProvider)).NotNull();
+            Guard.Argument(sportEventFixtureForTournamentProvider, nameof(sportEventFixtureForTournamentProvider)).NotNull();
+            Guard.Argument(sportEventFixtureChangeFixtureForTournamentProvider, nameof(sportEventFixtureChangeFixtureForTournamentProvider)).NotNull();
 
             _cacheManager = cacheManager;
             var wnsProducer = producerManager.Get(7);
@@ -291,6 +303,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             _resultChangesProvider = resultChangesProvider;
             _listSportEventProvider = listSportEventProvider;
             _availableSportTournamentsProvider = availableSportTournamentsProvider;
+            _sportEventFixtureForTournamentProvider = sportEventFixtureForTournamentProvider;
+            _sportEventFixtureChangeFixtureForTournamentProvider = sportEventFixtureChangeFixtureForTournamentProvider;
 
             _sportEventSummaryProvider.RawApiDataReceived += OnRawApiDataReceived;
             _sportEventFixtureProvider.RawApiDataReceived += OnRawApiDataReceived;
@@ -318,6 +332,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             _resultChangesProvider.RawApiDataReceived += OnRawApiDataReceived;
             _listSportEventProvider.RawApiDataReceived += OnRawApiDataReceived;
             _availableSportTournamentsProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _sportEventFixtureForTournamentProvider.RawApiDataReceived += OnRawApiDataReceived;
+            _sportEventFixtureChangeFixtureForTournamentProvider.RawApiDataReceived += OnRawApiDataReceived;
         }
 
         private void OnRawApiDataReceived(object sender, RawApiDataEventArgs e)
@@ -394,6 +410,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 }
                 catch (Exception e)
                 {
+                    if (e.Message != null && e.Message.Contains("Unable to cast object"))
+                    {
+                        try
+                        {
+                            // instead of fixture there is probably tournamentInfo returned
+                            var isTournamentFixtureFetched = await GetSportEventFixtureForTournamentAsync(id, culture, useCachedProvider, requester).ConfigureAwait(false);
+                            if (isTournamentFixtureFetched)
+                            {
+                                restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                                WriteLog($"Executing GetSportEventFixtureAsync (via tournament) for id={id} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
+                                return;
+                            }
+                        }
+                        catch (Exception exception)
+                        {
+                            var innerMessage = exception.InnerException?.Message ?? exception.Message;
+                            _executionLog.Error($"Error getting sport event fixture for id={id} and lang:[{culture.TwoLetterISOLanguageName}]. Message={innerMessage}", exception.InnerException ?? exception);
+                        }
+                    }
                     restCallTime = (int) t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
                     _executionLog.Error($"Error getting sport event fixture for id={id} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
@@ -409,6 +444,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 }
                 WriteLog($"Executing GetSportEventFixtureAsync for id={id} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }
+        }
+
+        private async Task<bool> GetSportEventFixtureForTournamentAsync(URN id, CultureInfo culture, bool useCachedProvider, ISportEventCI requester)
+        {
+            var provider = useCachedProvider
+                ? _sportEventFixtureForTournamentProvider // cached endpoint
+                : _sportEventFixtureChangeFixtureForTournamentProvider; // not cached endpoint
+            var result = await provider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
+
+            if (result != null)
+            {
+                await _cacheManager.SaveDtoAsync(id, result, culture, DtoType.TournamentInfo, requester).ConfigureAwait(false);
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
