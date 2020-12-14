@@ -184,6 +184,7 @@
     <Compile Include="ICompetitorV3.cs" />
     <Compile Include="IEventResultV2.cs" />
     <Compile Include="IHole.cs" />
+    <Compile Include="ILotteryV1.cs" />
     <Compile Include="IMatchV2.cs" />
     <Compile Include="Internal\Caching\CI\CoverageInfoCI.cs" />
     <Compile Include="Internal\Caching\CI\HoleCI.cs" />
