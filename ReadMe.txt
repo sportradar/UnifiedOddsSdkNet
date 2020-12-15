@@ -25,6 +25,13 @@ The package contains:
 For more information please contact support@sportradar.com or visit https://iodocs.betradar.com/unifiedsdk/index.html
 
 CHANGE LOG:
+2020-12-15  1.39.0.0
+Extended ILottery with GetDraws (ILotteryV1) to return list of IDraw (not just ids)
+Extended ISportDataProvider with GetSportEvent (ISportDataProviderV8) so also IDraw can be obtained
+Fix: getting fixture from API when result is tournamentInfo
+Fix: added removal of obsolete EventTimeline events
+Fix: not getting tournament data for stages
+
 2020-12-04  1.38.1.0
 Fix: getting ScheduleForDay endpoint when no events throw exception
 Fix: missing totalStatistics in SoccerStatus.Statistics
