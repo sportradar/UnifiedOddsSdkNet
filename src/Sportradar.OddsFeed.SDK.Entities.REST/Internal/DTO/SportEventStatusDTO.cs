@@ -439,7 +439,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         {
             Guard.Argument(stageSES, nameof(stageSES)).NotNull();
 
-            var tempProperties = new Dictionary<string, object>(0);
+            var tempProperties = new Dictionary<string, object>();
 
             //TODO: review this
             var eventResults = new List<EventResultDTO>();

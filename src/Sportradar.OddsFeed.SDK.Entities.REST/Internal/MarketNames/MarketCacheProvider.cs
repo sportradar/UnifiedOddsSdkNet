@@ -75,9 +75,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             var cultureInfos = cultures as IList<CultureInfo> ?? cultures.ToList();
             try
             {
-                //_executionLog.Debug($"Fetching invariant market description for id={marketId} and langs: [{string.Join(",", cultureInfos.Select(s => s.TwoLetterISOLanguageName))}].");
                 marketDescriptor = await _invariantMarketsCache.GetMarketDescriptionAsync(marketId, null, cultureInfos).ConfigureAwait(false);
-                //_executionLog.Debug($"Fetching invariant market description for id={marketId} and langs: [{string.Join(",", cultureInfos.Select(s => s.TwoLetterISOLanguageName))}] COMPLETED.");
             }
             catch (Exception e)
             {
@@ -91,6 +89,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             // case 1: if its not a variant market, return the static market descriptor as is
             if (string.IsNullOrEmpty(variantValue))
             {
+                return marketDescriptor;
+            }
+
+            if (variantValue.Equals("null", StringComparison.InvariantCultureIgnoreCase))
+            {
+                _executionLog.Error($"Missing/wrong variant value -> marketId:{marketId}, variantValue: {variantValue}");
                 return marketDescriptor;
             }
 

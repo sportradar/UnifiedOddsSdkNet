@@ -136,6 +136,7 @@
     <Compile Include="EventArguments\EventRecoveryCompletedEventArgs.cs" />
     <Compile Include="IMarketDescriptionManagerV1.cs" />
     <Compile Include="IMarketDescriptionManager.cs" />
+    <Compile Include="Internal\ChannelFactory.cs" />
     <Compile Include="Internal\CustomBetSelectionBuilder.cs" />
     <Compile Include="ICustomBetSelectionBuilder.cs" />
     <Compile Include="ICustomBetManager.cs" />

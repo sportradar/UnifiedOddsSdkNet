@@ -135,7 +135,6 @@
     <Compile Include="ICashOutProbabilities.cs" />
     <Compile Include="IMarketWithProbabilities.cs" />
     <Compile Include="Internal\CacheMessageProcessor.cs" />
-    <Compile Include="Internal\ChannelFactory.cs" />
     <Compile Include="Internal\EntitiesImpl\Alive.cs" />
     <Compile Include="Internal\EntitiesImpl\BetCancel.cs" />
     <Compile Include="Internal\EntitiesImpl\BetSettlement.cs" />
