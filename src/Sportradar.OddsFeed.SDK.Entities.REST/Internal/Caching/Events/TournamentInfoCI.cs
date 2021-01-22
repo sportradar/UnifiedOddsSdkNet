@@ -1,6 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Dawn;
@@ -667,7 +669,40 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 ? new List<GroupCI>()
                 : new List<GroupCI>(_groups);
 
-            foreach (var group in groups)
+            // remove obsolete groups
+            var groupDtos = groups.ToList();
+            if (_groups != null && !_groups.Any())
+            {
+                try
+                {
+                    foreach (var tmpGroup in _groups)
+                    {
+                        if (!string.IsNullOrEmpty(tmpGroup.Id))
+                        {
+                            if (groupDtos.First(f =>
+                                f.Id.Equals(tmpGroup.Id, StringComparison.InvariantCultureIgnoreCase)) == null)
+                            {
+                                tmpGroups.Remove(tmpGroup);
+                            }
+                        }
+
+                        if (string.IsNullOrEmpty(tmpGroup.Id) && !string.IsNullOrEmpty(tmpGroup.Name))
+                        {
+                            if (groupDtos.First(f =>
+                                f.Name.Equals(tmpGroup.Name, StringComparison.InvariantCultureIgnoreCase)) == null)
+                            {
+                                tmpGroups.Remove(tmpGroup);
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    // ignored
+                }
+            }
+
+            foreach (var group in groupDtos)
             {
                 var tempGroup = tmpGroups.FirstOrDefault(c => c.Name.Equals(group.Name));
                 if (tempGroup == null)
