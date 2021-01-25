@@ -43,9 +43,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
     {
         private static readonly ILog Log = SdkLoggerFactory.GetLogger(typeof(UnityFeedBootstrapper));
 
-        private const int RestConnectionFailureLimit = 5;
-        private const int RestConnectionFailureTimeoutInSec = 15;
-
         public static void RegisterBaseTypes(this IUnityContainer container, IOddsFeedConfiguration userConfig)
         {
             Guard.Argument(container, nameof(container)).NotNull();
@@ -85,8 +82,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<HttpClient>(),
                     userConfig.AccessToken,
                     new ResolvedParameter<IDeserializer<response>>(),
-                    RestConnectionFailureLimit,
-                    RestConnectionFailureTimeoutInSec,
+                    SdkInfo.RestConnectionFailureLimit,
+                    SdkInfo.RestConnectionFailureTimeoutInSec,
                     true));
 
             container.RegisterType<LogHttpDataFetcher, LogHttpDataFetcher>(
@@ -96,8 +93,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     userConfig.AccessToken,
                     new ResolvedParameter<ISequenceGenerator>(),
                     new ResolvedParameter<IDeserializer<response>>(),
-                    RestConnectionFailureLimit,
-                    RestConnectionFailureTimeoutInSec));
+                    SdkInfo.RestConnectionFailureLimit,
+                    SdkInfo.RestConnectionFailureTimeoutInSec));
 
             var logFetcher = container.Resolve<LogHttpDataFetcher>();
             container.RegisterInstance<IDataFetcher>(logFetcher, new ContainerControlledLifetimeManager());
@@ -111,8 +108,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     userConfig.AccessToken,
                     new ResolvedParameter<ISequenceGenerator>(),
                     new ResolvedParameter<IDeserializer<response>>(),
-                    RestConnectionFailureLimit,
-                    RestConnectionFailureTimeoutInSec));
+                    SdkInfo.RestConnectionFailureLimit,
+                    SdkInfo.RestConnectionFailureTimeoutInSec));
 
             var recoveryLogFetcher = container.Resolve<LogHttpDataFetcher>("RecoveryLogHttpDataFetcher");
             container.RegisterInstance<IDataFetcher>("RecoveryDataFetcher", recoveryLogFetcher, new ContainerControlledLifetimeManager());
@@ -154,7 +151,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<ISportEventCache>(),
                     new ResolvedParameter<ISportEventStatusCache>(),
                     new ResolvedParameter<ILocalizedNamedValueCache>("MatchStatusCache"),
-                    new ResolvedParameter<IProfileCache>()
+                    new ResolvedParameter<IProfileCache>(),
+                    SdkInfo.SoccerSportUrns
                     ));
 
             var config = container.Resolve<IOddsFeedConfigurationInternal>();
@@ -1061,15 +1059,15 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<HttpClient>(),
                     config.AccessToken,
                     new ResolvedParameter<IDeserializer<response>>(),
-                    RestConnectionFailureLimit,
-                    RestConnectionFailureTimeoutInSec));
+                    SdkInfo.RestConnectionFailureLimit,
+                    SdkInfo.RestConnectionFailureTimeoutInSec));
             object[] argsRest =
             {
                 new HttpClient {Timeout = TimeSpan.FromSeconds(config.HttpClientTimeout)},
                 config.AccessToken,
                 new Deserializer<response>(),
-                RestConnectionFailureLimit,
-                RestConnectionFailureTimeoutInSec
+                SdkInfo.RestConnectionFailureLimit,
+                SdkInfo.RestConnectionFailureTimeoutInSec
             };
 
             container.RegisterInstance<IDataRestful>(LogProxyFactory.Create<HttpDataRestful>(argsRest, m => m.Name.Contains("Async"), LoggerType.RestTraffic),
