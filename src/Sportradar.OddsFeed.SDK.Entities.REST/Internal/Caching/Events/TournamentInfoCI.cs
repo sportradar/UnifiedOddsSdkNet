@@ -669,8 +669,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 ? new List<GroupCI>()
                 : new List<GroupCI>(_groups);
 
+            var groupDTOs = groups.ToList();
             // remove obsolete groups
-            var groupDtos = groups.ToList();
             if (_groups != null && !_groups.Any())
             {
                 try
@@ -679,7 +679,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                     {
                         if (!string.IsNullOrEmpty(tmpGroup.Id))
                         {
-                            if (groupDtos.First(f =>
+                            if (groupDTOs.First(f =>
                                 f.Id.Equals(tmpGroup.Id, StringComparison.InvariantCultureIgnoreCase)) == null)
                             {
                                 tmpGroups.Remove(tmpGroup);
@@ -688,7 +688,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
 
                         if (string.IsNullOrEmpty(tmpGroup.Id) && !string.IsNullOrEmpty(tmpGroup.Name))
                         {
-                            if (groupDtos.First(f =>
+                            if (groupDTOs.First(f =>
                                 f.Name.Equals(tmpGroup.Name, StringComparison.InvariantCultureIgnoreCase)) == null)
                             {
                                 tmpGroups.Remove(tmpGroup);
@@ -702,7 +702,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 }
             }
 
-            foreach (var group in groupDtos)
+            foreach (var group in groupDTOs)
             {
                 var tempGroup = tmpGroups.FirstOrDefault(c => c.Name.Equals(group.Name));
                 if (tempGroup == null)

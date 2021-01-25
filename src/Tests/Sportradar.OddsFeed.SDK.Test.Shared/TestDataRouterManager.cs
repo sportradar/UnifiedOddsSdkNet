@@ -287,9 +287,9 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         public Task GetCompetitorAsync(URN id, CultureInfo culture, ISportEventCI requester)
         {
             RecordCall("GetCompetitorAsync");
-            return SdkInfo.SimpleTeamIdentifier.Equals(id?.Type, StringComparison.InvariantCultureIgnoreCase) ?
-                GetSimpleTeamProfileAsync(id, culture, requester) :
-                GetCompetitorProfileAsync(id, culture, requester);
+            return id.IsSimpleTeam()
+                ? GetSimpleTeamProfileAsync(id, culture, requester) 
+                : GetCompetitorProfileAsync(id, culture, requester);
         }
 
         private async Task GetCompetitorProfileAsync(URN id, CultureInfo culture, ISportEventCI requester)

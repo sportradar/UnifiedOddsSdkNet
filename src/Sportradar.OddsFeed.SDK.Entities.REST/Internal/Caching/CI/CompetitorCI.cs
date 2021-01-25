@@ -729,7 +729,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 
         private ReferenceIdCI UpdateReferenceIds(URN id, IDictionary<string, string> referenceIds)
         {
-            if (id.Type.Equals(SdkInfo.SimpleTeamIdentifier, StringComparison.InvariantCultureIgnoreCase))
+            if (id.IsSimpleTeam())
             {
                 if (referenceIds == null || !referenceIds.Any())
                 {

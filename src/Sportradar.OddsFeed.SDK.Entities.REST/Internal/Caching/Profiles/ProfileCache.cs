@@ -275,9 +275,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         public HealthCheckResult StartHealthCheck()
         {
             var keys = _cache.Select(w => w.Key).ToList();
-            var details = $" [Players: {keys.Count(c => c.Contains("player"))}, Competitors: {keys.Count(c => c.Contains("competitor"))}, Teams: {keys.Count(c => c.Equals("team"))}, SimpleTeams: {keys.Count(c => c.Contains(SdkInfo.SimpleTeamIdentifier))}]";
-            //var otherKeys = _cache.Where(w => !w.Key.Contains("competitor")).Select(s => s.Key);
-            //CacheLog.Debug($"Ids: {string.Join(",", otherKeys)}");
+            var details = $" [Players: {keys.Count(c => c.Contains("player"))}, Competitors: {keys.Count(c => c.Contains("competitor"))}, Teams: {keys.Count(c => c.Equals("team"))}, SimpleTeams: {keys.Count(URN.IsSimpleTeam)}]";
             return _cache.Any() ? HealthCheckResult.Healthy($"Cache has {_cache.Count()} items{details}.") : HealthCheckResult.Unhealthy("Cache is empty.");
         }
 
@@ -932,7 +930,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
 
         private CacheItemPolicy GetCorrectCacheItemPolicy(URN id)
         {
-            return id.Type.Equals(SdkInfo.SimpleTeamIdentifier, StringComparison.InvariantCultureIgnoreCase)
+            return id.IsSimpleTeam()
                 ? _simpleTeamCacheItemPolicy
                 : _normalCacheItemPolicy;
         }
