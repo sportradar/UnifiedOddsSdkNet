@@ -32,7 +32,6 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// The integration API host
         /// </summary>
         public const string IntegrationApiHost = "stgapi.betradar.com";
-
         /// <summary>
         /// The replay host
         /// </summary>
@@ -41,12 +40,10 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// The replay API host
         /// </summary>
         public const string ReplayApiHost = IntegrationApiHost;
-
         /// <summary>
         /// The default host port
         /// </summary>
         public const int DefaultHostPort = 5671;
-
         /// <summary>
         /// The unknown producer identifier
         /// </summary>

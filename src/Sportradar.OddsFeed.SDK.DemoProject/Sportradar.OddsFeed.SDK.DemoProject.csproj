@@ -46,8 +46,8 @@
       <HintPath>..\packages\Common.Logging.Log4Net208.3.4.1\lib\net40\Common.Logging.Log4Net208.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Dawn.Guard, Version=1.10.0.0, Culture=neutral, PublicKeyToken=234740ae15f786ce, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dawn.Guard.1.10.0\lib\netstandard1.0\Dawn.Guard.dll</HintPath>
+    <Reference Include="Dawn.Guard, Version=1.12.0.0, Culture=neutral, PublicKeyToken=234740ae15f786ce, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\LocalProjects\UfNet\UfNetLocal\packages\Dawn.Guard.1.12.0\lib\netstandard1.0\Dawn.Guard.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
