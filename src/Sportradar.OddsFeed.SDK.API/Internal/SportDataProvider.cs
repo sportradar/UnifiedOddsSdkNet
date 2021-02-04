@@ -27,7 +27,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
     /// Provides access to sport related data (sports, tournaments, sport events, ...)
     /// </summary>
     [Log(LoggerType.ClientInteraction)]
-    internal class SportDataProvider : ISportDataProviderV8
+    internal class SportDataProvider : ISportDataProviderV9
     {
         private static readonly ILog LogInt = SdkLoggerFactory.GetLoggerForClientInteraction(typeof(SportDataProvider));
 
@@ -581,6 +581,30 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             LogInt.Info($"GetSportEvent returned: {result?.Id}.");
             return result;
+        }
+
+        /// <summary>
+        /// Gets the list of available lotteries
+        /// </summary>
+        /// <param name="culture">A <see cref="CultureInfo"/> specifying the language or a null reference to use the languages specified in the configuration</param>
+        /// <returns>A list of available lotteries</returns>
+        public async Task<IEnumerable<ILottery>> GetLotteriesAsync(CultureInfo culture = null)
+        {
+            culture = culture ?? _defaultCultures.First();
+
+            LogInt.Info($"Invoked GetLotteriesAsync: Culture={culture.TwoLetterISOLanguageName}.");
+
+            var result = (await _dataRouterManager.GetAllLotteriesAsync(culture, false).ConfigureAwait(false))?.ToList();
+
+            if (result != null && result.Any())
+            {
+                var lotteries = result.Select(s => _sportEntityFactory.BuildSportEvent<ILottery>(s.Item1, s.Item2, new[] { culture }, _exceptionStrategy)).ToList();
+                LogInt.Info($"GetLotteriesAsync returned {lotteries.Count} results.");
+                return lotteries;
+            }
+
+            LogInt.Info($"GetLotteriesAsync returned 0 results.");
+            return new List<ILottery>();
         }
     }
 }
