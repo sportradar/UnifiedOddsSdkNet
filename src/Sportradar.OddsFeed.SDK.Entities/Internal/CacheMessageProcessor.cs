@@ -8,7 +8,6 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.Common;
-using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -45,7 +44,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <summary>
         /// The sport event cache
         /// </summary>
-        private readonly ISportEventCache _sportEventCache;
+        private readonly SportEventCache _sportEventCache;
 
         /// <summary>
         /// The cache manager
@@ -74,7 +73,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             ProcessorId = "CMP" + Guid.NewGuid().ToString().Substring(0, 4);
 
             _mapperFactory = mapperFactory;
-            _sportEventCache = sportEventCache;
+            _sportEventCache = (SportEventCache) sportEventCache;
             _cacheManager = cacheManager;
             _feedMessageHandler = feedMessageHandler;
         }
@@ -129,10 +128,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                     // fixtureChange was already dispatched (via another session)
                     return;
                 }
-                //ExecutionLog.Debug($"{ProcessorId}: processing fixtureChange for id={fixtureChange.EventId}, producer={fixtureChange.ProducerId} and timestamp={fixtureChange.GeneratedAt}.");
             }
 
-            RaiseOnMessageProcessedEvent(new FeedMessageReceivedEventArgs(message, interest, rawMessage));
+            //RaiseOnMessageProcessedEvent(new FeedMessageReceivedEventArgs(message, interest, rawMessage));
         }
 
         /// <summary>
@@ -143,11 +141,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         {
             try
             {
-                var cache = _sportEventCache as SportEventCache;
-                if (cache != null)
-                {
-                    Task.Run(async () => await cache.GetEventIdsAsync(urn, (IEnumerable<CultureInfo>) null)).ConfigureAwait(false);
-                }
+                Task.Run(async () => await _sportEventCache.GetEventIdsAsync(urn, (IEnumerable<CultureInfo>) null)).ConfigureAwait(false);
             }
             catch (Exception e)
             {

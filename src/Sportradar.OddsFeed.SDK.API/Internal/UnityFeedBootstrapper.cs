@@ -728,7 +728,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             container.RegisterType<IFeedMessageProcessor>(
                 new HierarchicalLifetimeManager(),
-                new InjectionFactory(c => new CompositeMessageProcessor(c.ResolveAll<IFeedMessageProcessor>())));
+                new InjectionFactory(c => new CompositeMessageProcessor(c.ResolveAll<IFeedMessageProcessor>().ToList())));
         }
 
         private static void RegisterCacheMessageProcessor(IUnityContainer container)
@@ -949,8 +949,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new InjectionConstructor(
                     new ResolvedParameter<IMarketCacheProvider>(),
                     new ResolvedParameter<ISportEventStatusCache>(),
-                    new ResolvedParameter<ExceptionHandlingStrategy>(),
-                    new ResolvedParameter<IProducerManager>()));
+                    new ResolvedParameter<ExceptionHandlingStrategy>()));
         }
 
         private static void RegisterCashOutProbabilitiesProvider(IUnityContainer container, IOddsFeedConfigurationInternal config)

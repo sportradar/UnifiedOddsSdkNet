@@ -40,6 +40,8 @@ namespace Sportradar.OddsFeed.SDK.API.EventArguments
         /// </summary>
         private readonly byte[] _rawMessage;
 
+        private readonly IRollbackBetSettlement<T> _rollbackBetSettlement;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="OddsChangeEventArgs{T}"/> class
         /// </summary>
@@ -51,15 +53,15 @@ namespace Sportradar.OddsFeed.SDK.API.EventArguments
         {
             Guard.Argument(messageMapper, nameof(messageMapper)).NotNull();
             Guard.Argument(feedMessage, nameof(feedMessage)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
             if (!cultures.Any())
                 throw new ArgumentOutOfRangeException(nameof(cultures));
-
 
             _messageMapper = messageMapper;
             _feedMessage = feedMessage;
             _defaultCultures = cultures as IReadOnlyCollection<CultureInfo>;
             _rawMessage = rawMessage;
+
+            _rollbackBetSettlement = GetBetSettlementRollback();
         }
 
         /// <summary>
@@ -70,6 +72,11 @@ namespace Sportradar.OddsFeed.SDK.API.EventArguments
         /// <returns>Returns the <see cref="IRollbackBetSettlement{T}"/> implementation representing the received bet settlement rollback message translated to the specified languages</returns>
         public IRollbackBetSettlement<T> GetBetSettlementRollback(CultureInfo culture = null)
         {
+            if (_rollbackBetSettlement != null && culture == null)
+            {
+                return _rollbackBetSettlement;
+            }
+
             return _messageMapper.MapRollbackBetSettlement<T>(
                 _feedMessage,
                 culture == null

@@ -10,6 +10,7 @@ using Common.Logging;
 using Metrics;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.Common;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
@@ -27,7 +28,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <summary>
         /// A <see cref="ILog"/> instance used for execution logging
         /// </summary>
-        private static readonly ILog Log = SdkLoggerFactory.GetLoggerForExecution(typeof(OddsFeedSession));
+        private static readonly ILog ExecutionLog = SdkLoggerFactory.GetLoggerForExecution(typeof(OddsFeedSession));
 
         /// <summary>
         /// A <see cref="IMessageReceiver"/> used to provide feed messages
@@ -130,23 +131,23 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             switch (validationResult)
             {
                 case ValidationResult.FAILURE:
-                    Log.Warn($"{WriteMessageInterest()}Validation of message=[{message}] failed. Raising OnUnparsableMessageReceived event");
+                    ExecutionLog.Warn($"{WriteMessageInterest()}Validation of message=[{message}] failed. Raising OnUnparsableMessageReceived event");
                     var messageType = _messageDataExtractor.GetMessageTypeFromMessage(message);
 
                     var eventArgs = new UnparsableMessageEventArgs(messageType, message.ProducerId.ToString(), message.EventId, e.RawMessage);
                     Dispatch(OnUnparsableMessageReceived, eventArgs, "OnUnparsableMessageReceived", message.ProducerId);
                     return;
                 case ValidationResult.PROBLEMS_DETECTED:
-                    Log.Warn($"{WriteMessageInterest()}Problems were detected while validating message=[{message}], but the message is still eligible for further processing.");
+                    ExecutionLog.Warn($"{WriteMessageInterest()}Problems were detected while validating message=[{message}], but the message is still eligible for further processing.");
                     _messageProcessor.ProcessMessage(message, MessageInterest, e.RawMessage);
                     return;
                 case ValidationResult.SUCCESS:
-                    Metric.Context("FEED").Meter($"FeedSession->MessageReceived ({MessageInterest.ProducerId})", Unit.Items).Mark();
-                    Log.Debug($"{WriteMessageInterest()}Message=[{message}] successfully validated. Continuing with message processing.");
+                    Metric.Context("FEED").Meter($"OddsFeedSession->MessageReceived ({MessageInterest.ProducerId})", Unit.Items).Mark();
+                    ExecutionLog.Debug($"{WriteMessageInterest()}Message=[{message}] successfully validated. Continuing with message processing.");
                     _messageProcessor.ProcessMessage(message, MessageInterest, e.RawMessage);
                     return;
                 default:
-                    Log.Error($"{WriteMessageInterest()}ValidationResult {Enum.GetName(typeof(ValidationResult), validationResult)} is not supported. Aborting processing of message=[{message}].");
+                    ExecutionLog.Error($"{WriteMessageInterest()}ValidationResult {Enum.GetName(typeof(ValidationResult), validationResult)} is not supported. Aborting processing of message=[{message}].");
                     return;
             }
         }
@@ -160,7 +161,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         {
             var rawData = eventArgs.RawData as byte[] ?? eventArgs.RawData.ToArray();
             var basicMessageData = _messageDataExtractor.GetBasicMessageData(rawData);
-            Log.Info($"{WriteMessageInterest()}Extracted the following data from unparsed message data: [{basicMessageData}], raising OnUnparsableMessageReceived event");
+            ExecutionLog.Info($"{WriteMessageInterest()}Extracted the following data from unparsed message data: [{basicMessageData}], raising OnUnparsableMessageReceived event");
             var dispatchmentEventArgs = new UnparsableMessageEventArgs(basicMessageData.MessageType, basicMessageData.ProducerId, basicMessageData.EventId, rawData);
             var producerId = 0;
             if (!string.IsNullOrEmpty(basicMessageData.ProducerId))
@@ -177,6 +178,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="e">A <see cref="FeedMessageReceivedEventArgs"/> instance containing event information</param>
         private void OnMessageProcessed(object sender, FeedMessageReceivedEventArgs e)
         {
+            var processingTook = string.Empty;
+            var sdkProcessingTime = DateTime.Now - SdkInfo.FromEpochTime(e.Message.ReceivedAt);
+            if (sdkProcessingTime.TotalMilliseconds > 500)
+            {
+                processingTook = $" Sdk processing took {(int)sdkProcessingTime.TotalMilliseconds}ms";
+            }
+            ExecutionLog.Debug($"Dispatching {e.Message.GetType().Name} for {e.Message.EventId} ({e.Message.GeneratedAt}).{processingTook}");
             var dispatcher = SelectDispatcher(e.Message);
             dispatcher.Dispatch(e.Message, e.RawMessage);
         }

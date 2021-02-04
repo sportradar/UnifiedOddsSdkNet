@@ -83,12 +83,69 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         internal EntityDispatcher(IFeedMessageMapper messageMapper, IEnumerable<CultureInfo> defaultCultures)
         {
             Guard.Argument(messageMapper, nameof(messageMapper)).NotNull();
-            Guard.Argument(defaultCultures, nameof(defaultCultures)).NotNull();//.NotEmpty();
             if (!defaultCultures.Any())
                 throw new ArgumentOutOfRangeException(nameof(defaultCultures));
 
             MessageMapper = messageMapper;
             DefaultCultures = defaultCultures as IReadOnlyCollection<CultureInfo>;
+        }
+
+        /// <summary>
+        /// Dispatches the provided <see cref="FeedMessage"/>
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="rawMessage"></param>
+        public virtual void Dispatch(FeedMessage message, byte[] rawMessage)
+        {
+            var oddsChange = message as odds_change;
+            if (oddsChange != null)
+            {
+                DispatchOddsChange(oddsChange, rawMessage);
+                return;
+            }
+
+            var betStop = message as bet_stop;
+            if (betStop != null)
+            {
+                DispatchBetStop(betStop, rawMessage);
+                return;
+            }
+
+            var betSettlement = message as bet_settlement;
+            if (betSettlement != null)
+            {
+                DispatchBetSettlement(betSettlement, rawMessage);
+                return;
+            }
+
+            var rollbackBetSettlement = message as rollback_bet_settlement;
+            if (rollbackBetSettlement != null)
+            {
+                DispatchRollbackBetSettlement(rollbackBetSettlement, rawMessage);
+                return;
+            }
+
+            var betCancel = message as bet_cancel;
+            if (betCancel != null)
+            {
+                DispatchBetCancel(betCancel, rawMessage);
+                return;
+            }
+
+            var rollbackBetCancel = message as rollback_bet_cancel;
+            if (rollbackBetCancel != null)
+            {
+                DispatchRollbackBetCancel(rollbackBetCancel, rawMessage);
+                return;
+            }
+
+            var fixtureChange = message as fixture_change;
+            if (fixtureChange != null)
+            {
+                DispatchFixtureChange(fixtureChange, rawMessage);
+                return;
+            }
+            throw new ArgumentException($"FeedMessage of type '{message.GetType().Name}' is not supported.");
         }
 
         /// <summary>
@@ -204,64 +261,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             }
 
             OnClosing();
-        }
-
-        /// <summary>
-        /// Dispatches the provided <see cref="FeedMessage"/>
-        /// </summary>
-        /// <param name="feedMessage"></param>
-        /// <param name="rawMessage"></param>
-        public virtual void Dispatch(FeedMessage feedMessage, byte[] rawMessage)
-        {
-            var oddsChange = feedMessage as odds_change;
-            if (oddsChange != null)
-            {
-                DispatchOddsChange(oddsChange, rawMessage);
-                return;
-            }
-
-            var betStop = feedMessage as bet_stop;
-            if (betStop != null)
-            {
-                DispatchBetStop(betStop, rawMessage);
-                return;
-            }
-
-            var betSettlement = feedMessage as bet_settlement;
-            if (betSettlement != null)
-            {
-                DispatchBetSettlement(betSettlement, rawMessage);
-                return;
-            }
-
-            var rollbackBetSettlement = feedMessage as rollback_bet_settlement;
-            if (rollbackBetSettlement != null)
-            {
-                DispatchRollbackBetSettlement(rollbackBetSettlement, rawMessage);
-                return;
-            }
-
-            var betCancel = feedMessage as bet_cancel;
-            if (betCancel != null)
-            {
-                DispatchBetCancel(betCancel, rawMessage);
-                return;
-            }
-
-            var rollbackBetCancel = feedMessage as rollback_bet_cancel;
-            if (rollbackBetCancel != null)
-            {
-                DispatchRollbackBetCancel(rollbackBetCancel, rawMessage);
-                return;
-            }
-
-            var fixtureChange = feedMessage as fixture_change;
-            if (fixtureChange != null)
-            {
-                DispatchFixtureChange(fixtureChange, rawMessage);
-                return;
-            }
-            throw new ArgumentException($"FeedMessage of type '{feedMessage.GetType().Name}' is not supported.");
         }
     }
 }

@@ -55,7 +55,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// </summary>
         private readonly int _marketId;
 
-        private readonly IProducer _producer;
+        private readonly int _producerId;
 
         private readonly URN _sportId;
 
@@ -77,8 +77,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// </summary>
         private readonly ExceptionHandlingStrategy _exceptionStrategy;
 
-        private readonly IProducerManager _producerManager;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="NameProvider"/> class
         /// </summary>
@@ -87,24 +85,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <param name="sportEvent">A <see cref="ISportEvent"/> instance representing associated sport @event</param>
         /// <param name="marketId">A market identifier of the market associated with the constructed instance</param>
         /// <param name="specifiers">A <see cref="IReadOnlyDictionary{String, String}"/> representing specifiers of the associated market</param>
-        /// <param name="producer">An <see cref="IProducer"/> used to get market/outcome mappings</param>
+        /// <param name="producerId">An id of the <see cref="IProducer"/> used to get market/outcome mappings</param>
         /// <param name="sportId">A sportId used to get market/outcome mappings</param>
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> describing the mode in which the SDK is running</param>
-        /// <param name="producerManager">The <see cref="IProducerManager"/> used get available <see cref="IProducer"/></param>
         internal MarketMappingProvider(IMarketCacheProvider marketCacheProvider,
                                        ISportEventStatusCache eventStatusCache,
                                        ISportEvent sportEvent,
                                        int marketId,
                                        IReadOnlyDictionary<string, string> specifiers,
-                                       IProducer producer,
+                                       int producerId,
                                        URN sportId,
-                                       ExceptionHandlingStrategy exceptionStrategy,
-                                       IProducerManager producerManager)
+                                       ExceptionHandlingStrategy exceptionStrategy)
         {
             Guard.Argument(marketCacheProvider, nameof(marketCacheProvider)).NotNull();
             Guard.Argument(sportEvent, nameof(sportEvent)).NotNull();
             Guard.Argument(eventStatusCache, nameof(eventStatusCache)).NotNull();
-            Guard.Argument(producerManager, nameof(producerManager)).NotNull();
+            Guard.Argument(producerId, nameof(producerId)).Positive();
 
             _marketCacheProvider = marketCacheProvider;
             _eventStatusCache = eventStatusCache;
@@ -112,8 +108,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             _marketId = marketId;
             _specifiers = specifiers;
             _exceptionStrategy = exceptionStrategy;
-            _producerManager = producerManager;
-            _producer = producer;
+            _producerId = producerId;
             _sportId = sportId;
         }
 
@@ -154,14 +149,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 return null;
             }
 
-            var mappings = marketDescription.Mappings.Where(m => m.CanMap(_producer, _sportId, _specifiers)).ToList();
-
-            //var mappings1 = marketDescription.Mappings.Where(m => m.CanMap(_producerManager.Get(1), URN.Parse("sr:sport:1"), new Dictionary<string, string> { { "total", "5.5" } })).ToList();
-            //var mappings2 = marketDescription.Mappings.Where(m => m.CanMap(_producerManager.Get(3), URN.Parse("sr:sport:1"), new Dictionary<string, string> { { "total", "5.5" } })).ToList();
+            var mappings = marketDescription.Mappings.Where(m => m.CanMap(_producerId, _sportId, _specifiers)).ToList();
 
             if (!mappings.Any())
             {
-                ExecutionLog.Debug($"Market with id:{_marketId}, producer:{_producer}, sportId:{_sportId} has no mappings.");
+                ExecutionLog.Debug($"Market with id:{_marketId}, producer:{_producerId}, sportId:{_sportId} has no mappings.");
                 return null;
             }
 
@@ -171,16 +163,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 {
                     if (mapping.MarketId.Equals(marketDescription.Id.ToString()))
                     {
-                        return new[] { mapping };
+                        return new[] {mapping};
                     }
                 }
 
-                ExecutionLog.Warn($"Market with id:{_marketId}, producer:{_producer.Id}, sportId:{_sportId.Id} has too many mappings [{mappings.Count}].");
-                CacheLog.Warn($"MarketId:{_marketId}, producer:{_producer.Id}, sportId:{_sportId.Id}, specifiers={MarketHelper.SpecifiersKeysToString(marketDescription.Specifiers)} has too many mappings [{mappings.Count}].");
+                ExecutionLog.Warn($"Market with id:{_marketId}, producer:{_producerId}, sportId:{_sportId.Id} has too many mappings [{mappings.Count}].");
+                CacheLog.Warn($"MarketId:{_marketId}, producer:{_producerId}, sportId:{_sportId.Id}, specifiers={MarketHelper.SpecifiersKeysToString(marketDescription.Specifiers)} has too many mappings [{mappings.Count}].");
                 var i = 0;
                 foreach (var mapping in mappings)
                 {
-                    CacheLog.Debug($"MarketId:{_marketId}, producer:{_producer.Id}, sportId:{_sportId.Id} mapping[{i}]: {mapping}.");
+                    CacheLog.Debug($"MarketId:{_marketId}, producer:{_producerId}, sportId:{_sportId.Id} mapping[{i}]: {mapping}.");
                     i++;
                 }
             }
@@ -218,7 +210,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
             if (string.IsNullOrEmpty(sovValue))
             {
-                HandleMappingErrorCondition($"Market with id:{_marketId}, producer:{_producer}, sportId:{_sportId} and SOV:{currentTemplate} has no appropriate specifier.", "SovTemplate", currentTemplate, "MarketMapping", null);
+                HandleMappingErrorCondition($"Market with id:{_marketId}, producer:{_producerId}, sportId:{_sportId} and SOV:{currentTemplate} has no appropriate specifier.", "SovTemplate", currentTemplate, "MarketMapping", null);
             }
             else
             {
@@ -277,7 +269,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <returns>A <see cref="Task{IMarketMappingId}"/> representing the asynchronous operation</returns>
         public async Task<IEnumerable<IMarketMapping>> GetMappedMarketIdAsync(IEnumerable<CultureInfo> cultures)
         {
-            if (_producer.Equals(_producerManager.Get(5)))
+            if (_producerId == 5)
             {
                 return null;
             }
@@ -285,16 +277,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             var marketDescription = await GetMarketDescriptorAsync(cultures).ConfigureAwait(false);
 
             var marketMappings = GetMarketMapping(marketDescription);
-            if (marketMappings == null || !marketMappings.Any())
+            var marketMappingDatas = marketMappings.ToList();
+            if (marketMappings == null || !marketMappingDatas.Any())
             {
                 return null;
             }
 
             var mappings = new List<IMarketMapping>();
-            foreach (var mappingData in marketMappings)
+            foreach (var mappingData in marketMappingDatas)
             {
                 var sov = GetSovValue(mappingData.SovTemplate);
-                if (mappingData.MarketSubTypeId != null || _producer.Equals(_producerManager.Get("LO")))
+                if (mappingData.MarketSubTypeId != null || _producerId == 1)
                 {
                     mappings.Add(new LoMarketMapping(mappingData.MarketTypeId, mappingData.MarketSubTypeId ?? -1, sov));
                 }
@@ -315,7 +308,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <returns>A <see cref="Task{IOutcomeMappingId}"/> representing the asynchronous operation</returns>
         public async Task<IEnumerable<IOutcomeMapping>> GetMappedOutcomeIdAsync(string outcomeId, IEnumerable<CultureInfo> cultures)
         {
-            if (_producer.Equals(_producerManager.Get(5)))
+            if (_producerId == 5)
             {
                 return null;
             }
@@ -323,13 +316,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             var cultureInfos = cultures.ToList();
             var marketDescription = await GetMarketDescriptorAsync(cultureInfos).ConfigureAwait(false);
             var marketMappings = GetMarketMapping(marketDescription);
-            if (marketMappings == null || !marketMappings.Any())
+            var marketMappingDatas = marketMappings.ToList();
+            if (marketMappings == null || !marketMappingDatas.Any())
             {
                 return null;
             }
 
             var allOutcomes = new List<IOutcomeMappingData>();
-            foreach (var marketMapping in marketMappings)
+            foreach (var marketMapping in marketMappingDatas)
             {
                 if (marketMapping?.OutcomeMappings != null)
                 {

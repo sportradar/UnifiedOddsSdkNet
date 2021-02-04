@@ -137,7 +137,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             FeedMessageReceived?.Invoke(this, new FeedMessageReceivedEventArgs(message, interest, rawMessage));
 
-            RaiseOnMessageProcessedEvent(new FeedMessageReceivedEventArgs(message, interest, rawMessage));
+            //RaiseOnMessageProcessedEvent(new FeedMessageReceivedEventArgs(message, interest, rawMessage));
         }
 
         /// <summary>
