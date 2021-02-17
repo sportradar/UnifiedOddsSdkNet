@@ -26,7 +26,7 @@ For more information please contact support@sportradar.com or visit https://iodo
 
 CHANGE LOG:
 2021-02-09  1.40.0.0
-Added ISportDataProvider.GetLotteriesAsync
+Added ISportDataProvider.GetLotteriesAsync (extended with ISportDataProviderV9)
 Improved translation of market names (upgraded referenced library Humanizer to 2.8.26 and Dawn.Guard to 1.12.0)
 Added support for eSoccer - returns SoccerEvent instead of Match
 Added support for simple_team urn
