@@ -39,7 +39,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="processors">The list of processors.</param>
         public CompositeMessageProcessor(List<IFeedMessageProcessor> processors)
         {
-            Guard.Argument(processors, nameof(processors)).NotNull().NotEmpty().Require(processors.All(p => p != null));
+            Guard.Argument(processors, nameof(processors)).NotNull().Require(processors.All(p => p != null));
             if (!processors.Any())
                 throw new ArgumentOutOfRangeException(nameof(processors));
 

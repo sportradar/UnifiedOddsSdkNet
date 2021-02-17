@@ -81,7 +81,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             Guard.Argument(eventStatusCache, nameof(eventStatusCache)).NotNull();
             Guard.Argument(matchStatusCache, nameof(matchStatusCache)).NotNull();
             Guard.Argument(profileCache, nameof(profileCache)).NotNull();
-            Guard.Argument(soccerSportUrns, nameof(soccerSportUrns)).NotNull().NotEmpty();
+            Guard.Argument(soccerSportUrns, nameof(soccerSportUrns)).NotNull();
 
             _sportDataCache = sportDataCache;
             _sportEventCache = sportEventCache;
