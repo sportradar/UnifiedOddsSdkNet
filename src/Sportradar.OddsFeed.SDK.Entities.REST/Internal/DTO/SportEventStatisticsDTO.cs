@@ -8,7 +8,6 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.Feed;
 using Sportradar.OddsFeed.SDK.Messages.REST;
-#pragma warning disable 1591
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 {
@@ -17,36 +16,55 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
     /// </summary>
     public class SportEventStatisticsDTO
     {
+        /// <summary>
+        /// Total statistics
+        /// </summary>
         public IEnumerable<TeamStatisticsDTO> TotalStatisticsDTOs { get; internal set; }
 
+        /// <summary>
+        /// Period statistics
+        /// </summary>
         public IEnumerable<PeriodStatisticsDTO> PeriodStatisticsDTOs { get; internal set; }
-
+        
+        /// <summary>
+        /// Constructor for statistics from feed 
+        /// </summary>
+        /// <param name="record"></param>
         public SportEventStatisticsDTO(statisticsType record)
         {
             Guard.Argument(record, nameof(record)).NotNull();
 
             var totalStatisticsDTOs = new List<TeamStatisticsDTO>();
             totalStatisticsDTOs.Add(new TeamStatisticsDTO(
+                null,
+                null,
                 HomeAway.Home,
                 record.yellow_cards.home,
                 record.red_cards.home,
                 record.yellow_red_cards.home,
                 record.corners.home,
-                record.green_cards == null ? 0 : record.green_cards.home
+                record.green_cards.home
             ));
             totalStatisticsDTOs.Add(new TeamStatisticsDTO(
+                null,
+                null,
                 HomeAway.Away,
                 record.yellow_cards.away,
                 record.red_cards.away,
                 record.yellow_red_cards.away,
                 record.corners.away,
-                record.green_cards == null ? 0 : record.green_cards.away
+                record.green_cards.away
             ));
             TotalStatisticsDTOs = totalStatisticsDTOs;
 
             PeriodStatisticsDTOs = null;
         }
-
+        
+        /// <summary>
+        /// Constructor for statistics from API 
+        /// </summary>
+        /// <param name="statistics">Event statistics</param>
+        /// <param name="homeAwayCompetitors"></param>
         public SportEventStatisticsDTO(matchStatistics statistics, IDictionary<HomeAway, URN> homeAwayCompetitors)
         {
             Guard.Argument(statistics, nameof(statistics)).NotNull();
