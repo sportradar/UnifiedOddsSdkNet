@@ -146,13 +146,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                         if (feedMessage is odds_change oddsChange)
                         {
                             marketCounts = oddsChange.odds?.market?.Length ?? 0;
-                            outcomeCounts = oddsChange.odds?.market?.SelectMany(list => list.outcome).Count() ?? 0;
+                            outcomeCounts = oddsChange.odds?.market?.Where(w=> w.outcome!=null).SelectMany(list => list.outcome).Count() ?? 0;
                         }
 
                         if (feedMessage is bet_settlement betSettlement)
                         {
                             marketCounts = betSettlement.outcomes?.Length ?? 0;
-                            outcomeCounts = betSettlement.outcomes?.SelectMany(list => list.Items).Count() ?? 0;
+                            outcomeCounts = betSettlement.outcomes?.Where(w=> w.Items!=null).SelectMany(list => list.Items).Count() ?? 0;
                         }
 
                         ExecutionLog.Debug(
