@@ -268,6 +268,11 @@ namespace Sportradar.OddsFeed.SDK.API
                 }
 
                 InternalConfig.Load(); // loads bookmaker_details
+                if (InternalConfig.BookmakerDetails == null)
+                {
+                    _log.Error("Token not accepted.");
+                    return;
+                }
                 UnityContainer.RegisterTypes(this);
                 UnityContainer.RegisterAdditionalTypes();
 

@@ -489,40 +489,52 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <summary>
         /// Merge current instance with the data obtained via provider
         /// </summary>
-        /// <param name="eventSummary">A <see cref="SportEventSummaryDTO" /> used to merge properties with current instance</param>
+        /// <param name="dto">A <see cref="SportEventSummaryDTO" /> used to merge properties with current instance</param>
         /// <param name="culture">A language code of the <see cref="SportEventSummaryDTO" /> data</param>
         /// <param name="useLock">Should the lock mechanism be used during merge</param>
-        public void Merge(SportEventSummaryDTO eventSummary, CultureInfo culture, bool useLock)
+        public void Merge(SportEventSummaryDTO dto, CultureInfo culture, bool useLock)
         {
             if (useLock)
             {
                 lock (MergeLock)
                 {
-                    Merge(eventSummary, culture);
+                    Merge(dto, culture);
                 }
             }
             else
             {
-                Merge(eventSummary, culture);
+                Merge(dto, culture);
             }
         }
 
-        private void Merge(SportEventSummaryDTO eventSummary, CultureInfo culture)
+        private void Merge(SportEventSummaryDTO dto, CultureInfo culture)
         {
-            Guard.Argument(eventSummary, nameof(eventSummary)).NotNull();
+            Guard.Argument(dto, nameof(dto)).NotNull();
             Guard.Argument(culture, nameof(culture)).NotNull();
 
             lock (MergeLock)
             {
-                Names[culture] = eventSummary.Name;
-                if(eventSummary.SportId != null)
+                Names[culture] = dto.Name;
+                if(dto.SportId != null)
                 {
-                    _sportId = eventSummary.SportId;
+                    _sportId = dto.SportId;
                 }
-                Scheduled = eventSummary.Scheduled;
-                ScheduledEnd = eventSummary.ScheduledEnd;
-                _startTimeTbd = eventSummary.StartTimeTbd;
-                _replacedBy = eventSummary.ReplacedBy;
+                if (dto.Scheduled != null)
+                {
+                    Scheduled = dto.Scheduled;
+                }
+                if (dto.ScheduledEnd != null)
+                {
+                    ScheduledEnd = dto.ScheduledEnd;
+                }
+                if (dto.StartTimeTbd != null)
+                {
+                    _startTimeTbd = dto.StartTimeTbd;
+                }
+                if (dto.ReplacedBy != null)
+                {
+                    _replacedBy = dto.ReplacedBy;
+                }
             }
         }
 
