@@ -12,7 +12,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject
     /// <summary>
     /// A simple example program used to demonstrate the usage of Odds Feed SDK
     /// </summary>
-    internal class OddsFeedExample
+    internal static class OddsFeedExample
     {
         /// <summary>
         /// A <see cref="ILog"/> instance used for execution logging
