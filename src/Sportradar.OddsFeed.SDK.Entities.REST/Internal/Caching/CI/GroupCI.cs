@@ -1,7 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,12 +22,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <summary>
         /// Gets the id of the group
         /// </summary>
-        public string Id { get; }
+        public string Id { get; private set; }
 
         /// <summary>
         /// Gets the name of the group
         /// </summary>
-        public string Name { get; }
+        public string Name { get; private set; }
 
         /// <summary>
         /// Gets a <see cref="IReadOnlyCollection{ICompetitorCI}"/> representing group competitors
@@ -54,14 +53,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Guard.Argument(culture, nameof(culture)).NotNull();
 
             _dataRouterManager = dataRouterManager;
-            Id = group.Id;
-            Name = group.Name;
-            Competitors = group.Competitors != null
-                ? new ReadOnlyCollection<CompetitorCI>(group.Competitors.Select(c => new CompetitorCI(c, culture, _dataRouterManager)).ToList())
-                : null;
-            CompetitorsReferences = group.Competitors != null
-                ? new ReadOnlyDictionary<URN, ReferenceIdCI>(group.Competitors.ToDictionary(c => c.Id, c => new ReferenceIdCI(c.ReferenceIds)))
-                : null;
+            
+            Merge(group, culture);
         }
 
         /// <summary>
@@ -72,7 +65,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         internal GroupCI(ExportableGroupCI exportable, IDataRouterManager dataRouterManager)
         {
             if (exportable == null)
+            {
                 throw new ArgumentNullException(nameof(exportable));
+            }
 
             _dataRouterManager = dataRouterManager;
             Id = exportable.Id;
@@ -91,23 +86,50 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Guard.Argument(group, nameof(group)).NotNull();
             Guard.Argument(culture, nameof(culture)).NotNull();
 
-            var tempCompetitors = new List<CompetitorCI>(Competitors);
-
-            foreach (var competitor in group.Competitors)
+            if(string.IsNullOrEmpty(Id) || !string.IsNullOrEmpty(Id) && !string.IsNullOrEmpty(group.Id))
             {
-                var tempCompetitor = tempCompetitors.FirstOrDefault(c => c.Id.Equals(competitor.Id));
-                if (tempCompetitor == null)
-                {
-                    tempCompetitors.Add(new CompetitorCI(competitor, culture, _dataRouterManager));
-                }
-                else
-                {
-                    tempCompetitor.Merge(competitor, culture);
-                }
+                Id = group.Id;
             }
-            Competitors = new ReadOnlyCollection<CompetitorCI>(tempCompetitors);
-            CompetitorsReferences =
-                new ReadOnlyDictionary<URN, ReferenceIdCI>(tempCompetitors.ToDictionary(c => c.Id, c => c.ReferenceId));
+            if(string.IsNullOrEmpty(Name) || !string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(group.Name))
+            {
+                Name = group.Name;
+            }
+
+            if (group.Competitors != null && group.Competitors.Any())
+            {
+                var tempCompetitors = Competitors == null ? new List<CompetitorCI>() : new List<CompetitorCI>(Competitors);
+                
+                if (tempCompetitors.Count > 0 && tempCompetitors.Count != group.Competitors.Count())
+                {
+                    tempCompetitors.Clear();
+                }
+
+                if (!group.Competitors.All(a => tempCompetitors.Select(s => s.Id).Contains(a.Id)))
+                {
+                    tempCompetitors.Clear();
+                }
+
+                foreach (var competitor in group.Competitors)
+                {
+                    var tempCompetitor = tempCompetitors.FirstOrDefault(c => c.Id.Equals(competitor.Id));
+                    if (tempCompetitor == null)
+                    {
+                        tempCompetitors.Add(new CompetitorCI(competitor, culture, _dataRouterManager));
+                    }
+                    else
+                    {
+                        tempCompetitor.Merge(competitor, culture);
+                    }
+                }
+
+                Competitors = new ReadOnlyCollection<CompetitorCI>(tempCompetitors);
+                CompetitorsReferences = new ReadOnlyDictionary<URN, ReferenceIdCI>(tempCompetitors.ToDictionary(c => c.Id, c => c.ReferenceId));
+            }
+            else
+            {
+                Competitors = null;
+                CompetitorsReferences = null;
+            }
         }
 
         /// <summary>
