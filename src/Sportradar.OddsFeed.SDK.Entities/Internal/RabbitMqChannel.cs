@@ -16,7 +16,7 @@ using Sportradar.OddsFeed.SDK.Common.Internal;
 namespace Sportradar.OddsFeed.SDK.Entities.Internal
 {
     /// <summary>
-    /// A class used to connect to the Rabbit mq broker
+    /// A class used to connect to the RabbitMQ broker
     /// </summary>
     /// <seealso cref="IRabbitMqChannel" />
     public class RabbitMqChannel : IRabbitMqChannel
@@ -144,18 +144,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
 
         private void ConsumerOnShutdown(object sender, ShutdownEventArgs shutdownEventArgs)
         {
-            ExecutionLog.Info($"The consumer: {_consumer.ConsumerTag} is shutdown.");
+            ExecutionLog.Info($"The consumer {_consumer.ConsumerTag} is shutdown.");
         }
 
         private void ChannelOnModelShutdown(object sender, ShutdownEventArgs shutdownEventArgs)
         {
-            ExecutionLog.Info($"The channel with channelNumber: {_channel.ChannelNumber} is shutdown.");
+            ExecutionLog.Info($"The channel with channelNumber {_channel.ChannelNumber} is shutdown.");
         }
 
         private void CreateAndAttachEvents()
         {
+            ExecutionLog.Info("Opening the channel ...");
             _channel = _channelFactory.CreateChannel();
-            ExecutionLog.Info($"Channel opened with channelNumber: {_channel.ChannelNumber}.");
+            ExecutionLog.Info($"Channel opened with channelNumber: {_channel.ChannelNumber}");
             var declareResult = _channel.QueueDeclare();
 
             foreach (var routingKey in _routingKeys)
@@ -169,11 +170,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             _consumer.Received += ConsumerOnDataReceived;
             _consumer.Shutdown += ConsumerOnShutdown;
             _channel.BasicConsume(declareResult.QueueName, true, _consumer);
+
+            _lastMessageReceived = DateTime.Now;
         }
 
         private void DetachEvents()
         {
-            ExecutionLog.Info($"Closing the channel with channelNumber: {_channel?.ChannelNumber}.");
+            ExecutionLog.Info($"Closing the channel with channelNumber: {_channel?.ChannelNumber}");
             if (_consumer != null)
             {
                 _consumer.Received -= ConsumerOnDataReceived;
@@ -201,25 +204,31 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         private async Task OnTimerElapsedAsync()
         {
             await _timerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
-            //ExecutionLog.Debug($"Timer connection check for the channel with channelNumber: {_channel?.ChannelNumber}. Last message arrived: {_lastMessageReceived}");
             if (IsOpened)
             {
                 try
                 {
                     if (_channel == null)
                     {
-                        ExecutionLog.Info("Opening the channel ...");
+                        CreateAndAttachEvents();
+                    }
+
+                    if(_channelFactory.ConnectionCreated > _lastMessageReceived)
+                    {
+                        // it means, the connection was reseted in between
+                        DetachEvents();
                         CreateAndAttachEvents();
                     }
 
                     var lastMessageDiff = DateTime.Now - _lastMessageReceived;
                     if (_lastMessageReceived > DateTime.MinValue && lastMessageDiff > _maxTimeBetweenMessages)
                     {
-                        var isOpen = _channelFactory.CreateChannel().IsOpen ? "s" : string.Empty;
+                        var isOpen = _channelFactory.IsConnectionOpen() ? "s" : string.Empty;
                         ExecutionLog.Warn($"There were no message{isOpen} in more then {_maxTimeBetweenMessages.TotalSeconds}s for the channel with channelNumber: {_channel?.ChannelNumber}. Last message arrived: {_lastMessageReceived}");
                         DetachEvents();
-                        ExecutionLog.Warn($"Resetting connection for the channel with channelNumber: {_channel?.ChannelNumber}.");
+                        ExecutionLog.Info($"Resetting connection for the channel with channelNumber: {_channel?.ChannelNumber}");
                         _channelFactory.ResetConnection();
+                        ExecutionLog.Info($"Resetting connection finished for the channel with channelNumber: {_channel?.ChannelNumber}");
                         CreateAndAttachEvents();
                     }
                 }
@@ -228,7 +237,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                     ExecutionLog.Warn("Error checking connection: " + e.Message);
                 }
             }
-
             _timerSemaphoreSlim.Release();
         }
     }

@@ -1,6 +1,7 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
 using RabbitMQ.Client;
 
 namespace Sportradar.OddsFeed.SDK.Entities.Internal
@@ -20,5 +21,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// Resets the connection.
         /// </summary>
         void ResetConnection();
+
+        /// <summary>
+        /// Checks if the connection is opened
+        /// </summary>
+        bool IsConnectionOpen();
+
+        /// <summary>
+        /// DateTime when connection was created
+        /// </summary>
+        DateTime ConnectionCreated { get; }
     }
 }
