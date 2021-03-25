@@ -1,7 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-
 using System;
 using System.Collections.Generic;
 
@@ -44,9 +43,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public ExportableRoundCI CurrentRound { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representation of the competitors
+        /// A <see cref="IEnumerable{T}"/> representation of the competitors ids
         /// </summary>
-        public IEnumerable<ExportableCompetitorCI> Competitors { get; set; }
+        public IEnumerable<string> Competitors { get; set; }
 
         /// <summary>
         /// A <see cref="IEnumerable{T}"/> representation of the schedule

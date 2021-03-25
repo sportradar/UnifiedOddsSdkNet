@@ -557,8 +557,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _abbreviations[culture] = string.IsNullOrEmpty(competitorProfile.Competitor.Abbreviation)
                 ? SdkInfo.GetAbbreviationFromName(competitorProfile.Competitor.Name)
                 : competitorProfile.Competitor.Abbreviation;
-            _referenceId =
-                UpdateReferenceIds(competitorProfile.Competitor.Id, competitorProfile.Competitor.ReferenceIds);
+            _referenceId = UpdateReferenceIds(competitorProfile.Competitor.Id, competitorProfile.Competitor.ReferenceIds);
             _countryCode = competitorProfile.Competitor.CountryCode;
             _state = competitorProfile.Competitor.State;
 
@@ -647,8 +646,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _abbreviations[culture] = string.IsNullOrEmpty(simpleTeamProfile.Competitor.Abbreviation)
                 ? SdkInfo.GetAbbreviationFromName(simpleTeamProfile.Competitor.Name)
                 : simpleTeamProfile.Competitor.Abbreviation;
-            _referenceId =
-                UpdateReferenceIds(simpleTeamProfile.Competitor.Id, simpleTeamProfile.Competitor.ReferenceIds);
+            _referenceId = UpdateReferenceIds(simpleTeamProfile.Competitor.Id, simpleTeamProfile.Competitor.ReferenceIds);
             _countryCode = simpleTeamProfile.Competitor.CountryCode;
             _state = simpleTeamProfile.Competitor.State;
             if (!string.IsNullOrEmpty(simpleTeamProfile.Competitor.Gender))
@@ -819,5 +817,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// </summary>
         /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
         public virtual async Task<ExportableCI> ExportAsync() => await CreateExportableCIAsync<ExportableCompetitorCI>().ConfigureAwait(false);
+
+        /// <summary>Determines whether the specified object is equal to the current object</summary>
+        /// <returns>true if the specified object  is equal to the current object; otherwise, false</returns>
+        /// <param name="obj">The object to compare with the current object</param>
+        public override bool Equals(object obj)
+        {
+            var other = obj as CompetitorCI;
+            if (other == null)
+            {
+                return false;
+            }
+            return Id == other.Id;
+        }
+
+        /// <summary>Serves as the default hash function</summary>
+        /// <returns>A hash code for the current object</returns>
+        public override int GetHashCode()
+        {
+            return Id?.GetHashCode() ?? 0;
+        }
     }
 }

@@ -26,7 +26,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
     /// <summary>
     /// A <see cref="IProfileCache"/> implementation using <see cref="ObjectCache"/> to cache fetched information
     /// </summary>
-    internal class ProfileCache : SdkCache, IProfileCache, IDisposable, IHealthStatusProvider, IExportableSdkCache
+    internal class ProfileCache : SdkCache, IProfileCache
     {
         /// <summary>
         /// A <see cref="ObjectCache"/> used to store fetched information
@@ -275,7 +275,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         public HealthCheckResult StartHealthCheck()
         {
             var keys = _cache.Select(w => w.Key).ToList();
-            var details = $" [Players: {keys.Count(c => c.Contains("player"))}, Competitors: {keys.Count(c => c.Contains("competitor"))}, Teams: {keys.Count(c => c.Equals("team"))}, SimpleTeams: {keys.Count(URN.IsSimpleTeam)}]";
+            var details = $" [Players: {keys.Count(c => c.Contains("player"))}, CompetitorsIds: {keys.Count(c => c.Contains("competitor"))}, Teams: {keys.Count(c => c.Equals("team"))}, SimpleTeams: {keys.Count(URN.IsSimpleTeam)}]";
             return _cache.Any() ? HealthCheckResult.Healthy($"Cache has {_cache.Count()} items{details}.") : HealthCheckResult.Unhealthy("Cache is empty.");
         }
 
@@ -295,7 +295,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                                      DtoType.SportEventSummary,
                                      DtoType.TournamentInfo,
                                      DtoType.RaceSummary,
-                                     DtoType.MatchSummary
+                                     DtoType.MatchSummary,
+                                     DtoType.TournamentInfoList,
+                                     DtoType.TournamentSeasons,
+                                     DtoType.SportEventSummaryList
                                  };
         }
 
@@ -461,6 +464,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                     }
                     break;
                 case DtoType.TournamentSeasons:
+                    var tournamentSeason = item as TournamentSeasonsDTO;
+                    if (tournamentSeason?.Tournament != null)
+                    {
+                        SaveCompetitorsFromSportEvent(tournamentSeason.Tournament, culture);
+                        saved = true;
+                    }
                     break;
                 case DtoType.Fixture:
                     if (SaveCompetitorsFromSportEvent(item, culture))
@@ -475,6 +484,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                 case DtoType.SportList:
                     break;
                 case DtoType.SportEventSummaryList:
+                    var sportEventSummaryList = item as EntityList<SportEventSummaryDTO>;
+                    if (sportEventSummaryList != null)
+                    {
+                        foreach (var sportEventSummary in sportEventSummaryList.Items)
+                        {
+                            SaveCompetitorsFromSportEvent(sportEventSummary, culture);
+                        }
+                        saved = true;
+                    }
+                    else
+                    {
+                        LogSavingDtoConflict(id, typeof(SportEventSummaryDTO), item.GetType());
+                    }
                     break;
                 case DtoType.MarketDescriptionList:
                     break;
@@ -491,6 +513,23 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                 case DtoType.BookingStatus:
                     break;
                 case DtoType.SportCategories:
+                    break;
+                case DtoType.AvailableSelections:
+                    break;
+                case DtoType.TournamentInfoList:
+                    var ts = item as EntityList<TournamentInfoDTO>;
+                    if (ts != null)
+                    {
+                        foreach (var t1 in ts.Items)
+                        {
+                            SaveCompetitorsFromSportEvent(t1, culture);
+                        }
+                        saved = true;
+                    }
+                    else
+                    {
+                        LogSavingDtoConflict(id, typeof(EntityList<TournamentInfoDTO>), item.GetType());
+                    }
                     break;
                 default:
                     ExecutionLog.Warn($"Trying to add unchecked dto type: {dtoType} for id: {id}.");
@@ -546,6 +585,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                     foreach (var competitorDTO in tour.Competitors)
                     {
                         AddCompetitor(competitorDTO.Id, competitorDTO, culture, true);
+                    }
+                }
+                if(tour.Groups != null && tour.Groups.Any())
+                {
+                    foreach (var tourGroup in tour.Groups)
+                    {
+                        if(tourGroup.Competitors != null && tourGroup.Competitors.Any())
+                        {
+                            foreach (var tourGroupCompetitorDTO in tourGroup.Competitors)
+                            {
+                                AddCompetitor(tourGroupCompetitorDTO.Id, tourGroupCompetitorDTO, culture, true);
+                            }
+                        }
                     }
                 }
                 return true;

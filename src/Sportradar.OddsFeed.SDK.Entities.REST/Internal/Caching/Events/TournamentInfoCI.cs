@@ -33,9 +33,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// </summary>
         private TournamentCoverageCI _tournamentCoverage;
         /// <summary>
-        /// The competitors
+        /// The competitors ids
         /// </summary>
-        private IEnumerable<CompetitorCI> _competitors;
+        private IEnumerable<URN> _competitors;
         /// <summary>
         /// The current season information
         /// </summary>
@@ -169,16 +169,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             _tournamentCoverage = exportable.TournamentCoverage != null
                 ? new TournamentCoverageCI(exportable.TournamentCoverage)
                 : null;
-            _competitors = exportable.Competitors?.Select(c => new CompetitorCI(c, dataRouterManager)).ToList();
+            _competitors = exportable.Competitors?.Select(URN.Parse).ToList();
             _currentSeasonInfo = exportable.CurrentSeasonInfo != null
-                ? new CurrentSeasonInfoCI(exportable.CurrentSeasonInfo, dataRouterManager)
+                ? new CurrentSeasonInfoCI(exportable.CurrentSeasonInfo)
                 : null;
-            _groups = exportable.Groups?.Select(g => new GroupCI(g, dataRouterManager)).ToList();
+            _groups = exportable.Groups?.Select(g => new GroupCI(g)).ToList();
             _scheduleUrns = exportable.ScheduleUrns?.Select(URN.Parse).ToList();
             _round = exportable.Round != null ? new RoundCI(exportable.Round) : null;
             _year = exportable.Year;
             _tournamentInfoBasic = exportable.TournamentInfoBasic != null
-                ? new TournamentInfoBasicCI(exportable.TournamentInfoBasic, dataRouterManager)
+                ? new TournamentInfoBasicCI(exportable.TournamentInfoBasic)
                 : null;
             _referenceId = exportable.ReferenceId != null ? new ReferenceIdCI(exportable.ReferenceId) : null;
             _seasonCoverage = exportable.SeasonCoverage != null
@@ -221,14 +221,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         }
 
         /// <summary>
-        /// Get competitors as an asynchronous operation
+        /// Get competitors ids as an asynchronous operation
         /// </summary>
         /// <param name="cultures">A <see cref="IEnumerable{CultureInfo}" /> specifying the languages to which the returned instance should be translated</param>
         /// <returns>A <see cref="Task{TResult}" /> representing an async operation</returns>
-        public async Task<IEnumerable<CompetitorCI>> GetCompetitorsAsync(IEnumerable<CultureInfo> cultures)
+        public async Task<IEnumerable<URN>> GetCompetitorsIdsAsync(IEnumerable<CultureInfo> cultures)
         {
             var wantedCultures = cultures as List<CultureInfo> ?? cultures.ToList();
-            wantedCultures = LanguageHelper.GetMissingCultures(wantedCultures, _competitors?.FirstOrDefault()?.Names.Keys).ToList();
+            wantedCultures = LanguageHelper.GetMissingCultures(wantedCultures, LoadedSummaries).ToList();
             if (_competitors != null && !wantedCultures.Any())
             {
                 return await PrepareCompetitorList(_competitors, wantedCultures);
@@ -237,7 +237,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             return await PrepareCompetitorList(_competitors, wantedCultures);
         }
 
-        private async Task<IEnumerable<CompetitorCI>> PrepareCompetitorList(IEnumerable<CompetitorCI> competitors, IEnumerable<CultureInfo> cultures)
+        private async Task<IEnumerable<URN>> PrepareCompetitorList(IEnumerable<URN> competitors, IEnumerable<CultureInfo> cultures)
         {
             if (competitors != null)
             {
@@ -245,7 +245,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             }
 
             var groups = await GetGroupsAsync(cultures);
-            return groups?.SelectMany(g => g.Competitors).Distinct();
+            return groups?.SelectMany(g => g.CompetitorsIds).Distinct();
         }
 
         /// <summary>
@@ -272,7 +272,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         public async Task<IEnumerable<GroupCI>> GetGroupsAsync(IEnumerable<CultureInfo> cultures)
         {
             var wantedCultures = cultures as CultureInfo[] ?? cultures.ToArray();
-            if (_groups != null && !LanguageHelper.GetMissingCultures(wantedCultures, _groups.FirstOrDefault()?.Competitors?.FirstOrDefault()?.Names.Keys).Any())
+            if (_groups != null && !LanguageHelper.GetMissingCultures(wantedCultures, LoadedSummaries).Any())
             {
                 return _groups;
             }
@@ -473,7 +473,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 if (_competitors == null)
                 {
-                    _competitors = new List<CompetitorCI>(dto.Competitors.Select(t => new CompetitorCI(t, culture, DataRouterManager)));
+                    _competitors = new List<URN>(dto.Competitors.Select(t => t.Id));
                 }
                 else
                 {
@@ -485,7 +485,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 if (_currentSeasonInfo == null)
                 {
-                    _currentSeasonInfo = new CurrentSeasonInfoCI(dto.CurrentSeason, culture, DataRouterManager);
+                    _currentSeasonInfo = new CurrentSeasonInfoCI(dto.CurrentSeason, culture);
                 }
                 else
                 {
@@ -496,7 +496,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 if (_groups == null)
                 {
-                    _groups = new List<GroupCI>(dto.Groups.Select(s => new GroupCI(s, culture, DataRouterManager)));
+                    _groups = new List<GroupCI>(dto.Groups.Select(s => new GroupCI(s, culture)));
                 }
                 else
                 {
@@ -505,7 +505,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 var comps = new List<CompetitorDTO>();
                 foreach (var groupDTO in dto.Groups)
                 {
-                    comps.AddRange(groupDTO.Competitors);
+                    foreach (var groupDTOCompetitor in groupDTO.Competitors)
+                    {
+                        if (!comps.Any(c => c.Id.Equals(groupDTOCompetitor.Id)))
+                        {
+                            comps.Add(groupDTOCompetitor);
+                        }
+                    }
                 }
                 FillCompetitorsReferences(comps);
             }
@@ -536,7 +542,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 if (_tournamentInfoBasic == null)
                 {
-                    _tournamentInfoBasic = new TournamentInfoBasicCI(dto.TournamentInfo, culture, DataRouterManager);
+                    _tournamentInfoBasic = new TournamentInfoBasicCI(dto.TournamentInfo, culture);
                 }
                 else
                 {
@@ -636,22 +642,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             }
 
             var tempCompetitors = _competitors == null
-                ? new List<CompetitorCI>()
-                : new List<CompetitorCI>(_competitors);
+                ? new List<URN>()
+                : new List<URN>(_competitors);
 
             foreach (var competitor in competitors)
             {
-                var tempCompetitor = tempCompetitors.FirstOrDefault(c => c.Id.Equals(competitor.Id));
+                var tempCompetitor = tempCompetitors.FirstOrDefault(c => c.Equals(competitor.Id));
                 if (tempCompetitor == null)
                 {
-                    tempCompetitors.Add(new CompetitorCI(competitor, culture, DataRouterManager));
-                }
-                else
-                {
-                    tempCompetitor.Merge(competitor, culture);
+                    tempCompetitors.Add(competitor.Id);
                 }
             }
-            _competitors = new ReadOnlyCollection<CompetitorCI>(tempCompetitors);
+            _competitors = new ReadOnlyCollection<URN>(tempCompetitors);
         }
 
         /// <summary>
@@ -719,6 +721,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                                 tmpGroups.Clear();
                                 break;
                             }
+
+                            // if no group with matching competitors
+                            var groupExists = MergerHelper.FindExistingGroup(groupDTOs, tmpGroup);
+                            if(groupExists == null)
+                            {
+                                tmpGroups.Remove(tmpGroup);
+                            }
                         }
                     }
                 }
@@ -737,14 +746,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
 
             foreach (var group in groupDTOs)
             {
-                var tempGroup = !string.IsNullOrEmpty(group.Id)
-                    ? tmpGroups.FirstOrDefault(c => c.Id.Equals(group.Id))
-                    : !string.IsNullOrEmpty(group.Name)
-                        ? tmpGroups.FirstOrDefault(c => c.Name.Equals(group.Name))
-                        : tmpGroups.FirstOrDefault(c => string.IsNullOrEmpty(c.Id) && string.IsNullOrEmpty(c.Name));
+                var tempGroup =  MergerHelper.FindExistingGroup(tmpGroups, group);
                 if (tempGroup == null)
                 {
-                    tmpGroups.Add(new GroupCI(group, culture, DataRouterManager));
+                    tmpGroups.Add(new GroupCI(group, culture));
                 }
                 else
                 {
@@ -793,8 +798,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
 
             info.CategoryId = _categoryId?.ToString();
             info.TournamentCoverage = _tournamentCoverage != null ? await _tournamentCoverage.ExportAsync().ConfigureAwait(false) : null;
-            var competitorsTasks = _competitors?.Select(async c => await c.ExportAsync().ConfigureAwait(false) as ExportableCompetitorCI);
-            info.Competitors = competitorsTasks != null ? await Task.WhenAll(competitorsTasks) : null;
+            info.Competitors = _competitors?.Select(s=>s.ToString());
             info.CurrentSeasonInfo = _currentSeasonInfo != null ? await _currentSeasonInfo.ExportAsync().ConfigureAwait(false) : null;
             var groupsTasks = _groups?.Select(async g => await g.ExportAsync().ConfigureAwait(false));
             info.Groups = groupsTasks != null ? await Task.WhenAll(groupsTasks) : null;

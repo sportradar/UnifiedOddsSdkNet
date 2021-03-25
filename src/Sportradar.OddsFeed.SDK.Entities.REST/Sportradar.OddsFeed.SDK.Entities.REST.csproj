@@ -187,6 +187,8 @@
     <Compile Include="IMatchV2.cs" />
     <Compile Include="Internal\Caching\CI\CoverageInfoCI.cs" />
     <Compile Include="Internal\Caching\CI\HoleCI.cs" />
+    <Compile Include="Internal\Caching\ComparerHelper.cs" />
+    <Compile Include="Internal\Caching\MergerHelper.cs" />
     <Compile Include="Internal\DTO\CompetitorResultDTO.cs" />
     <Compile Include="Internal\DTO\HoleDTO.cs" />
     <Compile Include="Internal\DTO\ResultChangeDTO.cs" />
@@ -669,6 +671,7 @@
     <Compile Include="Enums\VoidFactor.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Internal\Caching\Events\EventCiDiagram.cd" />
     <None Include="packages.config" />
     <None Include="RestEntities.cd" />
     <None Include="SportEventHierarchy.cd" />

@@ -180,7 +180,8 @@ namespace Sportradar.OddsFeed.SDK.Messages
         /// <returns><c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.</returns>
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            var other = obj as URN;
+            if (other == null)
             {
                 return false;
             }
@@ -188,12 +189,6 @@ namespace Sportradar.OddsFeed.SDK.Messages
             if (ReferenceEquals(this, obj))
             {
                 return true;
-            }
-
-            var other = obj as URN;
-            if (other == null)
-            {
-                return false;
             }
 
             return Prefix == other.Prefix && Type == other.Type && Id == other.Id;
@@ -214,9 +209,7 @@ namespace Sportradar.OddsFeed.SDK.Messages
         /// <returns><c>true</c> if represents simple team; otherwise, <c>false</c>.</returns>
         public bool IsSimpleTeam()
         {
-            if (Type != null
-                && (Type.Equals("simpleteam", StringComparison.InvariantCultureIgnoreCase)
-                    || Type.Equals("simple_team", StringComparison.InvariantCultureIgnoreCase)))
+            if (Type != null && (Type.Equals("simpleteam", StringComparison.InvariantCultureIgnoreCase) || Type.Equals("simple_team", StringComparison.InvariantCultureIgnoreCase)))
             {
                 return true;
             }

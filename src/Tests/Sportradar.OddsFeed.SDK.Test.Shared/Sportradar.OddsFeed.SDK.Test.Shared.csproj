@@ -93,7 +93,7 @@
     <Compile Include="TestProducersProvider.cs" />
     <Compile Include="TestSection.cs" />
     <Compile Include="TestSportEntityFactoryBuilder.cs" />
-    <Compile Include="TestSportEventFactory.cs" />
+    <Compile Include="TestSportEntityFactory.cs" />
     <Compile Include="TestStatsCollector.cs" />
     <Compile Include="TestTimer.cs" />
   </ItemGroup>
@@ -744,6 +744,31 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="REST XMLs\Summarys\summary_sr_season_80242.de.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="REST XMLs\Summarys\summary_sr_season_80242.hu.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="REST XMLs\Summarys\summary_sr_season_80242.nl.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="REST XMLs\Summarys\summary_sr_tournament_40.de.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="REST XMLs\Summarys\summary_sr_tournament_40.en.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="REST XMLs\Summarys\summary_sr_tournament_40.hu.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="REST XMLs\Summarys\summary_sr_tournament_40.nl.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="REST XMLs\Summarys\summary_sr_season_80242.en.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="REST XMLs\Profiles\en.simpleteam.1.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
