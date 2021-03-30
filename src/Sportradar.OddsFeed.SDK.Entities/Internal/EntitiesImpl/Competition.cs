@@ -211,7 +211,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                 : await new Func<IEnumerable<CultureInfo>, Task<IEnumerable<URN>>>(competitionCI.GetCompetitorsIdsAsync).SafeInvokeAsync(Cultures, ExecutionLog, GetFetchErrorMessage("CompetitorsIds")).ConfigureAwait(false);
 
             var competitorsIds = items == null ? new List<URN>() : items.ToList();
-            if (competitorsIds.Any())
+            if (!competitorsIds.Any())
             {
                 return new List<ICompetitor>();
             }

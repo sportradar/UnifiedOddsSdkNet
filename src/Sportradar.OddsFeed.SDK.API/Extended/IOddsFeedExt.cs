@@ -10,7 +10,7 @@ namespace Sportradar.OddsFeed.SDK.API.Extended
     /// <summary>
     /// Represent an extended unified odds feed
     /// </summary>
-    public interface IOddsFeedExt : IOddsFeedV3
+    public interface IOddsFeedExt : IOddsFeedV4
     {
         /// <summary>
         /// Occurs when any feed message arrives

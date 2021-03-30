@@ -29,7 +29,7 @@ namespace Sportradar.OddsFeed.SDK.API
     /// <summary>
     /// A <see cref="IOddsFeed"/> implementation acting as an entry point to the odds feed SDK
     /// </summary>
-    public class Feed : EntityDispatcherBase, IOddsFeedV3, IGlobalEventDispatcher
+    public class Feed : EntityDispatcherBase, IOddsFeedV4, IGlobalEventDispatcher
     {
         /// <summary>
         /// A <see cref="ILog"/> instance used for execution logging
@@ -207,6 +207,18 @@ namespace Sportradar.OddsFeed.SDK.API
             {
                 InitFeed();
                 return UnityContainer.Resolve<ICustomBetManager>();
+            }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="IEventChangeManager"/> instance used to automatically receive fixture and result changes
+        /// </summary>
+        public IEventChangeManager EventChangeManager
+        {
+            get
+            {
+                InitFeed();
+                return UnityContainer.Resolve<IEventChangeManager>();
             }
         }
 
@@ -552,6 +564,8 @@ namespace Sportradar.OddsFeed.SDK.API
             {
                 session.Close();
             }
+
+            EventChangeManager.Stop();
 
             if (disposing)
             {

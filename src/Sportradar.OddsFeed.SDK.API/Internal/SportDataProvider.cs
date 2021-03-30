@@ -1,7 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -580,6 +579,16 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 _exceptionStrategy);
 
             LogInt.Info($"GetSportEvent returned: {result?.Id}.");
+            return result;
+        }
+
+        internal ISportEvent GetSportEventForEventChange(URN id)
+        {
+            var result = _sportEntityFactory.BuildSportEvent<ISportEvent>(id,
+                id.TypeGroup == ResourceTypeGroup.MATCH ? _sportEventCache.GetEventSportIdAsync(id).Result : null, 
+                _defaultCultures,
+                _exceptionStrategy);
+            
             return result;
         }
 

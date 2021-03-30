@@ -255,6 +255,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             RegisterCashOutProbabilitiesProvider(container, config);
             RegisterReplayManager(container, config);
             RegisterCustomBetManager(container, config);
+            RegisterEventChangeManager(container, config);
         }
 
         public static void RegisterAdditionalTypes(this IUnityContainer container)
@@ -1130,6 +1131,18 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new InjectionConstructor(
                     new ResolvedParameter<IDataRouterManager>(),
                     new ResolvedParameter<ICustomBetSelectionBuilder>()));
+        }
+
+        private static void RegisterEventChangeManager(IUnityContainer container, IOddsFeedConfigurationInternal config)
+        {
+            container.RegisterType<IEventChangeManager, EventChangeManager>(
+                new ContainerControlledLifetimeManager(),
+                new InjectionConstructor(
+                    TimeSpan.FromMinutes(60),
+                    TimeSpan.FromMinutes(60),
+                    new ResolvedParameter<ISportDataProvider>(),
+                    new ResolvedParameter<ISportEventCache>(),
+                    config));
         }
     }
 }
