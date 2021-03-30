@@ -52,6 +52,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         private string _state;
         private URN _sportId;
         private URN _categoryId;
+        private string _shortName;
 
         /// <summary>
         /// Last time (if any) competitor profile was fetched
@@ -152,15 +153,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <summary>
         /// Gets the reference ids
         /// </summary>
-        public ReferenceIdCI ReferenceId
-        {
-            get
-            {
-                //DEBUG
-                //FetchProfileIfNeeded(_primaryCulture);
-                return _referenceId;
-            }
-        }
+        public ReferenceIdCI ReferenceId => _referenceId;
 
         /// <summary>
         /// Gets the list of associated player ids
@@ -304,6 +297,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public RaceDriverProfileCI RaceDriverProfile => _raceDriverProfile;
 
         /// <summary>
+        /// Gets the short name
+        /// </summary>
+        /// <value>The short name</value>
+        public string ShortName => _shortName;
+
+        /// <summary>
         /// Gets the <see cref="IEnumerable{CultureInfo}"/> specifying the languages for which the current instance has translations
         /// </summary>
         /// <value>The fetched cultures</value>
@@ -445,6 +444,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _dataRouterManager = originalCompetitorCI._dataRouterManager;
             _primaryCulture = originalCompetitorCI._primaryCulture;
             _raceDriverProfile = originalCompetitorCI._raceDriverProfile;
+            _shortName = originalCompetitorCI._shortName;
             _lastTimeCompetitorProfileFetched = originalCompetitorCI._lastTimeCompetitorProfileFetched;
             _cultureCompetitorProfileFetched = originalCompetitorCI._cultureCompetitorProfileFetched;
         }
@@ -496,6 +496,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             }
             _sportId = exportable.SportId != null ? URN.Parse(exportable.SportId) : null;
             _categoryId = exportable.CategoryId != null ? URN.Parse(exportable.CategoryId) : null;
+            _shortName = exportable.ShortName;
         }
 
         /// <summary>
@@ -529,15 +530,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             {
                 _ageGroup = competitor.AgeGroup;
             }
-            //((List<CultureInfo>)_fetchedCultures).Add(culture);
             if (competitor.SportId != null)
             {
                 _sportId = competitor.SportId;
             }
-
             if (competitor.CategoryId != null)
             {
                 _categoryId = competitor.CategoryId;
+            }
+            if(!string.IsNullOrEmpty(competitor.ShortName))
+            {
+                _shortName = competitor.ShortName;
             }
         }
 
@@ -616,6 +619,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 _lastTimeCompetitorProfileFetched = DateTime.Now;
                 _cultureCompetitorProfileFetched.Add(culture);
             }
+
             if (competitorProfile.Competitor.SportId != null)
             {
                 _sportId = competitorProfile.Competitor.SportId;
@@ -626,6 +630,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 _categoryId = competitorProfile.Competitor.CategoryId;
             }
 
+            if(!string.IsNullOrEmpty(competitorProfile.Competitor.ShortName))
+            {
+                _shortName = competitorProfile.Competitor.ShortName;
+            }
 
             ((List<CultureInfo>) _fetchedCultures).Add(culture);
         }
@@ -657,11 +665,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             {
                 _ageGroup = simpleTeamProfile.Competitor.AgeGroup;
             }
-
             if (simpleTeamProfile.Competitor.Players != null && simpleTeamProfile.Competitor.Players.Any())
             {
                 _lastTimeCompetitorProfileFetched = DateTime.Now;
                 _cultureCompetitorProfileFetched.Add(culture);
+            }
+            if(!string.IsNullOrEmpty(simpleTeamProfile.Competitor.ShortName))
+            {
+                _shortName = simpleTeamProfile.Competitor.ShortName;
             }
             ((List<CultureInfo>) _fetchedCultures).Add(culture);
         }
@@ -723,6 +734,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _cultureCompetitorProfileFetched = item._cultureCompetitorProfileFetched?.ToList();
             _sportId = item._sportId ?? _sportId;
             _categoryId = item._categoryId ?? _categoryId;
+            if(!string.IsNullOrEmpty(item.ShortName))
+            {
+                _shortName = item.ShortName;
+            }
         }
 
         private ReferenceIdCI UpdateReferenceIds(URN id, IDictionary<string, string> referenceIds)
@@ -806,7 +821,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                                                      : (DateTime?) null,
                 CultureCompetitorProfileFetched = _cultureCompetitorProfileFetched,
                 SportId = _sportId?.ToString(),
-                CategoryId = _categoryId?.ToString()
+                CategoryId = _categoryId?.ToString(),
+                ShortName = _shortName
             };
 
             return exportable;
@@ -823,8 +839,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="obj">The object to compare with the current object</param>
         public override bool Equals(object obj)
         {
-            var other = obj as CompetitorCI;
-            if (other == null)
+            if (!(obj is CompetitorCI other))
             {
                 return false;
             }

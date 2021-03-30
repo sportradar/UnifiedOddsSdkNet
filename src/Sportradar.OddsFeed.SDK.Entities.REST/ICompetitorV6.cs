@@ -6,12 +6,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST
     /// <summary>
     /// Represents a team competing in a sport event
     /// </summary>
-    public interface ICompetitorV3 : ICompetitorV2
+    public interface ICompetitorV6 : ICompetitorV5
     {
         /// <summary>
-        /// Gets the age group
+        /// Gets the short name
         /// </summary>
-        /// <value>The age group</value>
-        string AgeGroup { get; }
+        /// <value>The short name</value>
+        string ShortName { get; }
     }
 }

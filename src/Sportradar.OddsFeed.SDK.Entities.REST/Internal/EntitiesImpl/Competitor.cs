@@ -23,7 +23,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
     /// <seealso cref="Player" />
     /// <seealso cref="ICompetitor" />
     [DataContract]
-    internal class Competitor : Player, ICompetitorV5
+    internal class Competitor : Player, ICompetitorV6
     {
         private readonly URN _competitorId;
         private CompetitorCI _competitorCI;
@@ -236,6 +236,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         }
 
         /// <summary>
+        /// Gets the short name
+        /// </summary>
+        /// <value>The short name</value>
+        public string ShortName => GetOrLoadCompetitor()?.ShortName;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Competitor"/> class
         /// </summary>
         /// <param name="ci">A <see cref="CompetitorCI"/> used to create new instance</param>
@@ -252,8 +258,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             ICompetitionCI rootCompetitionCI)
             : base(ci.Id, new Dictionary<CultureInfo, string>())
         {
-            //Guard.Argument(ci, nameof(ci)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();
             if (!cultures.Any())
             {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
@@ -294,10 +299,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             IDictionary<URN, ReferenceIdCI> competitorsReferences)
             : base(ci.Id, new Dictionary<CultureInfo, string>())
         {
-            //Guard.Argument(ci, nameof(ci)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();
             if (!cultures.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
+            }
 
             Guard.Argument(sportEntityFactory, nameof(sportEntityFactory)).NotNull();
 

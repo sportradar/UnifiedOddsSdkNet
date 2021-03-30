@@ -1,7 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -108,5 +107,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         /// A <see cref="string"/> representing the category id
         /// </summary>
         public String CategoryId { get; set; }
+
+        /// <summary>
+        /// Gets the short name
+        /// </summary>
+        /// <value>The short name</value>
+        public string ShortName { get; set; }
     }
 }
