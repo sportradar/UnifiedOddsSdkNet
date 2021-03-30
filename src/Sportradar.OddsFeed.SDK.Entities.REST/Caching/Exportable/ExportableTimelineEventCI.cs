@@ -1,7 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-
 using System;
 using System.Collections.Generic;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
@@ -90,14 +89,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public IEnumerable<ExportableEventPlayerAssistCI> Assists { get; set; }
 
         /// <summary>
-        /// A <see cref="ExportableCI" /> specifying the goal scorer
+        /// A <see cref="ExportableEventPlayerCI" /> specifying the goal scorer
         /// </summary>
-        public ExportableCI GoalScorer { get; set; }
+        public ExportableEventPlayerCI GoalScorer { get; set; }
 
         /// <summary>
-        /// A <see cref="ExportableCI" /> specifying the player
+        /// A <see cref="ExportableEventPlayerCI" /> specifying the player
         /// </summary>
-        public ExportableCI Player { get; set; }
+        public ExportableEventPlayerCI Player { get; set; }
 
         /// <summary>
         /// A <see cref="int" /> specifying the match status code

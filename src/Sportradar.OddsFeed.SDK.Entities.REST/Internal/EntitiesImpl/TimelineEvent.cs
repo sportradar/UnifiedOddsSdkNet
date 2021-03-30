@@ -10,10 +10,11 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
 {
-    internal class TimelineEvent : ITimelineEventV1
+    internal class TimelineEvent : ITimelineEventV2
     {
         private readonly int _x;
         private readonly int _y;
+        private readonly IPlayer _player;
         public int Id { get; }
         public decimal? HomeScore { get; }
         public decimal? AwayScore { get; }
@@ -32,7 +33,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public DateTime Time { get; }
         public IEnumerable<IAssist> Assists { get; }
         public IGoalScorer GoalScorer { get; }
-        public IPlayer Player { get; }
+        IPlayer ITimelineEvent.Player => _player;
+        public IEventPlayer Player { get; }
         public int? MatchStatusCode { get; }
         public string MatchClock { get; }
 
@@ -62,11 +64,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             }
             if (ci.GoalScorer != null)
             {
-                GoalScorer = new GoalScorer(ci.GoalScorer.Id, ci.GoalScorer.Name);
+                GoalScorer = new GoalScorer(ci.GoalScorer);
             }
             if (ci.Player != null)
             {
-                Player = new Player(ci.Player.Id, ci.Player.Name);
+                _player = new Player(ci.Player.Id, ci.Player.Name);
+                Player = new EventPlayer(ci.Player);
             }
             MatchStatusCode = ci.MatchStatusCode;
             MatchClock = ci.MatchClock;

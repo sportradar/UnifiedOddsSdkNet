@@ -34,8 +34,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public int? Y;
         public DateTime Time;
         public IEnumerable<EventPlayerAssistCI> Assists;
-        public CacheItem GoalScorer;
-        public CacheItem Player;
+        public EventPlayerCI GoalScorer;
+        public EventPlayerCI Player;
         public int? MatchStatusCode;
         public string MatchClock;
 
@@ -67,8 +67,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Y = exportable.Y;
             Time = exportable.Time;
             Assists = exportable.Assists?.Select(a => new EventPlayerAssistCI(a)).ToList();
-            GoalScorer = exportable.GoalScorer != null ? new CacheItem(exportable.GoalScorer) : null;
-            Player = exportable.Player != null ? new CacheItem(exportable.Player) : null;
+            GoalScorer = exportable.GoalScorer != null ? new EventPlayerCI(exportable.GoalScorer) : null;
+            Player = exportable.Player != null ? new EventPlayerCI(exportable.Player) : null;
             MatchStatusCode = exportable.MatchStatusCode;
             MatchClock = exportable.MatchClock;
         }
@@ -119,7 +119,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             {
                 if (GoalScorer == null)
                 {
-                    GoalScorer = new CacheItem(dto.GoalScorer.Id, dto.GoalScorer.Name, culture);
+                    GoalScorer = new EventPlayerCI(dto.GoalScorer, culture);
                 }
                 else
                 {
@@ -131,7 +131,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             {
                 if (Player == null)
                 {
-                    Player = new CacheItem(dto.Player.Id, dto.Player.Name, culture);
+                    Player = new EventPlayerCI(dto.Player, culture);
                 }
                 else
                 {
@@ -157,11 +157,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 Value = Value,
                 Type = Type,
                 GoalScorer = GoalScorer != null
-                    ? new ExportableCI
+                    ? new ExportableEventPlayerCI
                     {
                         Id = GoalScorer.Id.ToString(),
-                        Name = new Dictionary<CultureInfo, string>(
-                            GoalScorer.Name ?? new Dictionary<CultureInfo, string>())
+                        Name = new Dictionary<CultureInfo, string>(GoalScorer.Name ?? new Dictionary<CultureInfo, string>()),
+                        Bench = GoalScorer.Bench,
+                        Method =  GoalScorer.Method
                     }
                     : null,
                 MatchStatusCode = MatchStatusCode,
@@ -179,10 +180,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 Y = Y,
                 X = X,
                 Player = Player != null
-                    ? new ExportableCI
+                    ? new ExportableEventPlayerCI
                     {
                         Id = Player.Id.ToString(),
-                        Name = new Dictionary<CultureInfo, string>(Player.Name ?? new Dictionary<CultureInfo, string>())
+                        Name = new Dictionary<CultureInfo, string>(Player.Name ?? new Dictionary<CultureInfo, string>()),
+                        Bench = Player.Bench,
+                        Method =  Player.Method
                     }
                     : null
             };

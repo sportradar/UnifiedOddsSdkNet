@@ -1,7 +1,6 @@
 /*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-
 using System;
 using System.Collections.Generic;
 using Dawn;
@@ -36,8 +35,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the provided data</param>
         public CacheItem(URN id, string name, CultureInfo culture)
         {
+            // don not check name, since there were tournaments with empty name
             Guard.Argument(id, nameof(id)).NotNull();
-            //Guard.Argument(name)); // there were tournaments with empty name!
             Guard.Argument(culture, nameof(culture)).NotNull();
 
             Id = id;
@@ -66,17 +65,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <param name="name">The name of the item</param>
         protected CacheItem(URN id, IDictionary<CultureInfo, string> name)
         {
-            if (id == null)
-            {
-                throw new ArgumentNullException(nameof(id));
-            }
-
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            Id = id;
-            Name = name;
+            Id = id ?? throw new ArgumentNullException(nameof(id));
+            Name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
         /// <summary>
@@ -88,9 +78,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         {
             Guard.Argument(culture, nameof(culture)).NotNull();
             Guard.Argument(item, nameof(item)).NotNull();
-            Guard.Argument(item.Name, nameof(item.Name)).NotNull();//.NotEmpty();
+            Guard.Argument(item.Name, nameof(item.Name)).NotNull();
             if (!item.Name.Any())
-                throw new ArgumentOutOfRangeException(nameof(item.Name));
+            {
+                throw new ArgumentException(nameof(item.Name));
+            }
 
             if (item.Name.Count == 1) // must be only 1 name (received from mapper)
             {
