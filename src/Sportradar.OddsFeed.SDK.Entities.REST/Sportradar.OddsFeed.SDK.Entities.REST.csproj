@@ -198,6 +198,7 @@
     <Compile Include="Internal\Mapping\ResultChangesMapper.cs" />
     <Compile Include="Internal\Mapping\ResultChangesMapperFactory.cs" />
     <Compile Include="Internal\MarketNames\MarketHelper.cs" />
+    <Compile Include="IProductInfoV1.cs" />
     <Compile Include="IResultChange.cs" />
     <Compile Include="IGroupV1.cs" />
     <Compile Include="IMatchStatusV2.cs" />

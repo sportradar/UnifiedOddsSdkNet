@@ -11,7 +11,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST
     public interface IProductInfo : IEntityPrinter
     {
         /// <summary>
-        /// TODO: Add comments
+        /// Gets a value indicating whether the sport event is auto traded
         /// </summary>
         bool IsAutoTraded { get; }
 
