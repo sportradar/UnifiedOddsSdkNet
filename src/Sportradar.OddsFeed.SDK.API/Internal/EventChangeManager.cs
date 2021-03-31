@@ -201,6 +201,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                             changes = _sportDataProvider.GetFixtureChangesAsync(LastFixtureChange, null, _config.DefaultLocale).Result;
                         }
 
+                        changes = changes.OrderBy(o => o.UpdateTime);
+
                         foreach (var fixtureChange in changes)
                         {
                             if (!IsRunning)
@@ -278,6 +280,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                             LogExec.Info($"Invoking GetResultChanges. After={LastResultChange}");
                             changes = _sportDataProvider.GetResultChangesAsync(LastResultChange, null, _config.DefaultLocale).Result;
                         }
+
+                        changes = changes.OrderBy(o => o.UpdateTime);
 
                         foreach (var resultChange in changes)
                         {
