@@ -24,7 +24,7 @@
     <KeepLogFile>True</KeepLogFile>
     <DisableCodeBlockComponent>False</DisableCodeBlockComponent>
     <CleanIntermediates>True</CleanIntermediates>
-    <HelpFileVersion>1.40.0.0</HelpFileVersion>
+    <HelpFileVersion>1.41.0.0</HelpFileVersion>
     <MaximumGroupParts>2</MaximumGroupParts>
     <NamespaceGrouping>False</NamespaceGrouping>
     <SyntaxFilters>C#</SyntaxFilters>
@@ -36,7 +36,7 @@
     <HelpTitle>Odds Feed SDK Documentation</HelpTitle>
     <FeedbackEMailLinkText>SDK Team</FeedbackEMailLinkText>
     <FeedbackEMailAddress>sdk%40betradar.com</FeedbackEMailAddress>
-    <CopyrightText>Copyright &amp;#169%3b 2014-2020, Sportradar AG</CopyrightText>
+    <CopyrightText>Copyright &amp;#169%3b 2014-2021, Sportradar AG</CopyrightText>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <TocParentId>-1</TocParentId>
     <TocParentVersion>100</TocParentVersion>

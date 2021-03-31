@@ -114,7 +114,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
             var comps = competitors == null
                 ? "null"
                 : string.Join(", ", competitors.Select(s => s.ToString("f")));
-
+            
             builder.Append(" CompetitionStatus=").Append(competitionStatus?.Status)
                 .Append(" BookingStatus=").Append(bookingStatus == null ? "null" : Enum.GetName(typeof(BookingStatus), bookingStatus))
                 .Append(" Venue=").Append(venue?.Id.ToString() ?? "null")
