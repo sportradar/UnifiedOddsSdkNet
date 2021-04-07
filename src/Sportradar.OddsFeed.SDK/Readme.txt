@@ -9,6 +9,9 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2021-04-07  1.41.1.0
+Fix: parsing TeamStatistics for SportEventStatus
+
 2021-03-31  1.41.0.0
 Added IEventChangeManager to IOddsFeed for periodical fixture and result change updates (extended with IOddsFeedV3)
 Extending ITimelineEvent with ITimeliveEventV2 -  Changed type of property ITimelineEvent.Player from IPlayer to IEventPlayer
