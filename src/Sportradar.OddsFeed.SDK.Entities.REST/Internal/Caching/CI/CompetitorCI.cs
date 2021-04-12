@@ -163,7 +163,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         {
             get
             {
-                FetchProfileIfNeeded(_primaryCulture);
+                if (!_associatedPlayerIds.Any())
+                {
+                    FetchProfileIfNeeded(_primaryCulture);
+                }
                 return _associatedPlayerIds;
             }
         }
@@ -176,7 +179,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         {
             get
             {
-                FetchProfileIfNeeded(_primaryCulture);
+                if (!_jerseys.Any())
+                {
+                    FetchProfileIfNeeded(_primaryCulture);
+                }
                 return _jerseys;
             }
         }
@@ -515,8 +521,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 ? SdkInfo.GetAbbreviationFromName(competitor.Name)
                 : competitor.Abbreviation;
             _referenceId = UpdateReferenceIds(competitor.Id, competitor.ReferenceIds);
-            _countryCode = competitor.CountryCode;
-            _state = competitor.State;
+            if (!string.IsNullOrEmpty(competitor.CountryCode))
+            {
+                _countryCode = competitor.CountryCode;
+            }
+            if (!string.IsNullOrEmpty(competitor.State))
+            {
+                _state = competitor.State;
+            }
             if (competitor.Players != null && competitor.Players.Any())
             {
                 _associatedPlayerIds.Clear();
@@ -561,21 +573,24 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 ? SdkInfo.GetAbbreviationFromName(competitorProfile.Competitor.Name)
                 : competitorProfile.Competitor.Abbreviation;
             _referenceId = UpdateReferenceIds(competitorProfile.Competitor.Id, competitorProfile.Competitor.ReferenceIds);
-            _countryCode = competitorProfile.Competitor.CountryCode;
-            _state = competitorProfile.Competitor.State;
-
+            if (!string.IsNullOrEmpty(competitorProfile.Competitor.CountryCode))
+            {
+                _countryCode = competitorProfile.Competitor.CountryCode;
+            }
+            if (!string.IsNullOrEmpty(competitorProfile.Competitor.State))
+            {
+                _state = competitorProfile.Competitor.State;
+            }
             if (competitorProfile.Players != null && competitorProfile.Players.Any())
             {
                 _associatedPlayerIds.Clear();
                 _associatedPlayerIds.AddRange(competitorProfile.Players.Select(s => s.Id));
             }
-
             if (competitorProfile.Jerseys != null && competitorProfile.Jerseys.Any())
             {
                 _jerseys.Clear();
                 _jerseys.AddRange(competitorProfile.Jerseys.Select(s => new JerseyCI(s)));
             }
-
             if (competitorProfile.Manager != null)
             {
                 if (_manager == null)
@@ -587,7 +602,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                     _manager.Merge(competitorProfile.Manager, culture);
                 }
             }
-
             if (competitorProfile.Venue != null)
             {
                 if (_venue == null)
@@ -603,38 +617,31 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             {
                 _gender = competitorProfile.Competitor.Gender;
             }
-
             if (!string.IsNullOrEmpty(competitorProfile.Competitor.AgeGroup))
             {
                 _ageGroup = competitorProfile.Competitor.AgeGroup;
             }
-
             if (competitorProfile.RaceDriverProfile != null)
             {
                 _raceDriverProfile = new RaceDriverProfileCI(competitorProfile.RaceDriverProfile);
             }
-
             if (competitorProfile.Players != null && competitorProfile.Players.Any())
             {
                 _lastTimeCompetitorProfileFetched = DateTime.Now;
                 _cultureCompetitorProfileFetched.Add(culture);
             }
-
             if (competitorProfile.Competitor.SportId != null)
             {
                 _sportId = competitorProfile.Competitor.SportId;
             }
-
             if (competitorProfile.Competitor.CategoryId != null)
             {
                 _categoryId = competitorProfile.Competitor.CategoryId;
             }
-
             if(!string.IsNullOrEmpty(competitorProfile.Competitor.ShortName))
             {
                 _shortName = competitorProfile.Competitor.ShortName;
             }
-
             ((List<CultureInfo>) _fetchedCultures).Add(culture);
         }
 
@@ -655,8 +662,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 ? SdkInfo.GetAbbreviationFromName(simpleTeamProfile.Competitor.Name)
                 : simpleTeamProfile.Competitor.Abbreviation;
             _referenceId = UpdateReferenceIds(simpleTeamProfile.Competitor.Id, simpleTeamProfile.Competitor.ReferenceIds);
-            _countryCode = simpleTeamProfile.Competitor.CountryCode;
-            _state = simpleTeamProfile.Competitor.State;
+            if (!string.IsNullOrEmpty(simpleTeamProfile.Competitor.CountryCode))
+            {
+                _countryCode = simpleTeamProfile.Competitor.CountryCode;
+            }
+            if (!string.IsNullOrEmpty(simpleTeamProfile.Competitor.State))
+            {
+                _state = simpleTeamProfile.Competitor.State;
+            }
             if (!string.IsNullOrEmpty(simpleTeamProfile.Competitor.Gender))
             {
                 _gender = simpleTeamProfile.Competitor.Gender;
