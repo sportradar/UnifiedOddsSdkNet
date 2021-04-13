@@ -131,8 +131,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                     return null;
                 }
 
+                // select appropriate mappings if found; producer and sport is checked later
+                List<IMarketMappingData> mappings = null;
+                if(variantDescription.Mappings != null)
+                {
+                    mappings = variantDescription.Mappings.Where(s => s.MarketId.Equals(marketDescriptor.Id.ToString())).ToList();
+                    if (!mappings.Any())
+                    {
+                        mappings = null;
+                    }
+                }
+
                 ((MarketDescription) marketDescriptor).SetOutcomes(variantDescription.Outcomes as IReadOnlyCollection<IOutcomeDescription>);
-                ((MarketDescription) marketDescriptor).SetMappings(variantDescription.Mappings as IReadOnlyCollection<IMarketMappingData>);
+                ((MarketDescription) marketDescriptor).SetMappings((mappings ?? variantDescription.Mappings) as IReadOnlyCollection<IMarketMappingData>);
                 var variantCI = ((VariantDescription) variantDescription).VariantDescriptionCacheItem;
                 ((MarketDescription)marketDescriptor).SetFetchInfo(variantCI.SourceCache, variantCI.LastDataReceived);
 
