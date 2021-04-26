@@ -218,6 +218,11 @@ namespace Sportradar.OddsFeed.SDK.Messages.REST
     {
     }
 
+    [OverrideXmlNamespace(RootElementName = "period_summary", IgnoreNamespace = false)]
+    public partial class stagePeriodEndpoint : RestMessage
+    {
+    }
+
     public partial class AvailableSelectionsType : RestMessage
     {
     }

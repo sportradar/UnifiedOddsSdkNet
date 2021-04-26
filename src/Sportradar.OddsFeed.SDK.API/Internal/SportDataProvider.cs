@@ -26,7 +26,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
     /// Provides access to sport related data (sports, tournaments, sport events, ...)
     /// </summary>
     [Log(LoggerType.ClientInteraction)]
-    internal class SportDataProvider : ISportDataProviderV9
+    internal class SportDataProvider : ISportDataProviderV10
     {
         private static readonly ILog LogInt = SdkLoggerFactory.GetLoggerForClientInteraction(typeof(SportDataProvider));
 
@@ -614,6 +614,38 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             LogInt.Info($"GetLotteriesAsync returned 0 results.");
             return new List<ILottery>();
+        }
+
+        /// <summary>
+        /// Get sport event period summary as an asynchronous operation
+        /// </summary>
+        /// <param name="id">The id of the sport event to be fetched</param>
+        /// <param name="culture">The language to be fetched</param>
+        /// <param name="competitorIds">The list of competitor ids to fetch the results for</param>
+        /// <param name="periods">The list of period ids to fetch the results for</param>
+        /// <returns>The period statuses or empty if not found</returns>
+        public async Task<IEnumerable<IPeriodStatus>> GetPeriodStatusesAsync(URN id, CultureInfo culture = null, IEnumerable<URN> competitorIds = null, IEnumerable<int> periods = null)
+        {
+            culture = culture ?? _defaultCultures.First();
+
+            var urns = competitorIds?.ToList();
+            var ints = periods?.ToList();
+            var compIds = urns == null ? "null" : string.Join(", ", urns);
+            var periodIds = ints == null ? "null" : string.Join(", ", ints);
+
+            LogInt.Info($"Invoked GetPeriodStatusesAsync: Id={id}, Culture={culture.TwoLetterISOLanguageName}, Competitors={compIds}, Periods={periodIds}.");
+
+            var periodSummaryDTO = await _dataRouterManager.GetPeriodSummaryAsync(id, culture, null, urns, ints).ConfigureAwait(false);
+
+            if(periodSummaryDTO != null && periodSummaryDTO.PeriodStatuses != null && periodSummaryDTO.PeriodStatuses.Any())
+            {
+                var periodStatuses = periodSummaryDTO.PeriodStatuses.Select(s => new PeriodStatus(s)).ToList();
+                LogInt.Info($"GetPeriodStatusesAsync returned {periodStatuses.Count} results.");
+                return periodStatuses;
+            }
+
+            LogInt.Info("GetPeriodStatusesAsync returned 0 results.");
+            return new List<IPeriodStatus>();
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿using System;
+﻿/*
+* Copyright (C) Sportradar AG. See LICENSE for full license governing this code
+*/
+using System;
 using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
@@ -15,6 +18,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public string Specifiers { get; }
 
         internal CompetitorResultDTO(stageResultCompetitorResult result)
+        {
+            if (result == null)
+            {
+                throw new ArgumentNullException(nameof(result));
+            }
+
+            Type = result.type;
+            Value = result.value;
+            Specifiers = result.specifiers;
+        }
+
+        internal CompetitorResultDTO(periodStatusCompetitorResult result)
         {
             if (result == null)
             {

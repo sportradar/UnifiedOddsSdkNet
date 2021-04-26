@@ -1,7 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-
 using System;
 using System.Collections.Generic;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
@@ -103,6 +102,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// Gets the indicator wither the event is decided by fed
         /// </summary>
         public bool? DecidedByFed => FeedStatusDTO?.DecidedByFed ?? SapiStatusDTO?.DecidedByFed;
+
+        /// <summary>
+        /// Gets the period of ladder.
+        /// </summary>
+        /// <value>The period of ladder.</value>
+        public int? PeriodOfLadder => FeedStatusDTO?.PeriodOfLadder ?? SapiStatusDTO?.PeriodOfLadder;
 
         /// <summary>
         /// Gets the value of the property specified by it's name
