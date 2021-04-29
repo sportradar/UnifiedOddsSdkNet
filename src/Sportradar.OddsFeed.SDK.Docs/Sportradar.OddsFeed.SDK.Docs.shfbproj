@@ -13,7 +13,7 @@
     <RootNamespace>Sportradar.OddsFeed.SDK.Docs</RootNamespace>
     <Name>Sportradar.OddsFeed.SDK.Docs</Name>
     <!-- SHFB properties -->
-    <FrameworkVersion>.NET Framework 4.5</FrameworkVersion>
+    <FrameworkVersion>.NET Framework 4.5.2</FrameworkVersion>
     <OutputPath>.\Help\</OutputPath>
     <HtmlHelpName>Odds Feed SDK Documentation</HtmlHelpName>
     <Language>en-US</Language>
@@ -36,7 +36,7 @@
     <BuildAssemblerVerbosity>OnlyWarningsAndErrors</BuildAssemblerVerbosity>
     <SaveComponentCacheCapacity>100</SaveComponentCacheCapacity>
     <HelpTitle>Odds Feed SDK Documentation</HelpTitle>
-    <HelpFileVersion>1.41.1</HelpFileVersion>
+    <HelpFileVersion>1.42.0</HelpFileVersion>
     <NamingMethod>MemberName</NamingMethod>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <RootNamespaceContainer>False</RootNamespaceContainer>
@@ -60,28 +60,29 @@
     </DocumentationSources>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.API.Internal" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.API.Internal.Replay" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Common.Internal" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Common.Internal.Log" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Common.Internal.Metrics" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Common.Internal.Metrics.Reports" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.Internal" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl.CustomBet" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.EventArguments" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Messages.Internal" isDocumented="False" />
-<NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.API" isDocumented="True" /></NamespaceSummaries>
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.API.Internal.Replay" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Common.Internal" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Common.Internal.Log" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Common.Internal.Metrics" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Common.Internal.Metrics.Reports" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.Internal" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl.CustomBet" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.EventArguments" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.Messages.Internal" isDocumented="False" />
+      <NamespaceSummaryItem name="Sportradar.OddsFeed.SDK.API" isDocumented="True" />
+    </NamespaceSummaries>
   </PropertyGroup>
   <!-- There are no properties for these groups.  AnyCPU needs to appear in order for Visual Studio to perform
 			 the build.  The others are optional common platform types that may appear. -->
