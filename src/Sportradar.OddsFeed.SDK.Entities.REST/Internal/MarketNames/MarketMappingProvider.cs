@@ -168,7 +168,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 }
 
                 ExecutionLog.Warn($"Market with id:{_marketId}, producer:{_producerId}, sportId:{_sportId.Id} has too many mappings [{mappings.Count}].");
-                CacheLog.Warn($"MarketId:{_marketId}, producer:{_producerId}, sportId:{_sportId.Id}, specifiers={MarketHelper.SpecifiersKeysToString(marketDescription.Specifiers)} has too many mappings [{mappings.Count}].");
+                CacheLog.Warn($"MarketId:{_marketId}, producer:{_producerId}, sportId:{_sportId.Id}, specifiers={MarketHelper.SpecifiersKeysToString(marketDescription.Specifiers)} has multiple mappings [{mappings.Count}].");
                 var i = 0;
                 foreach (var mapping in mappings)
                 {
@@ -286,7 +286,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             var mappings = new List<IMarketMapping>();
             foreach (var mappingData in marketMappingDatas)
             {
-                var sov = GetSovValue(mappingData.SovTemplate);
+                var sov = mappingData.SovTemplate;
+                if (!string.IsNullOrEmpty(mappingData.SovTemplate) && !mappingData.SovTemplate.Equals("{id}", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    sov = GetSovValue(mappingData.SovTemplate);
+                }
                 if (mappingData.MarketSubTypeId != null || _producerId == 1)
                 {
                     mappings.Add(new LoMarketMapping(mappingData.MarketTypeId, mappingData.MarketSubTypeId ?? -1, sov));

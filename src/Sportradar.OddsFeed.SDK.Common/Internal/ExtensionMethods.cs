@@ -2,8 +2,10 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
+using System.Collections.Generic;
 using Dawn;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -92,5 +94,16 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
             }
         }
 
+        /// <summary>
+        /// Determines whether [is null or empty] [the specified input].
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="input">The input.</param>
+        /// <returns><c>true</c> if [is null or empty] [the specified input]; otherwise, <c>false</c>.</returns>
+        /// <remarks>Sportradar</remarks>
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T> input)
+        {
+            return input == null || !input.Any();
+        }
     }
 }
