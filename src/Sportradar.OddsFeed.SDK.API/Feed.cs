@@ -632,6 +632,12 @@ namespace Sportradar.OddsFeed.SDK.API
 
                 var interests = Sessions.Select(s => ((OddsFeedSession) s).MessageInterest).ToList();
                 _feedRecoveryManager.Open(interests);
+
+                _log.Info("Producers:");
+                foreach (var p in ProducerManager.Producers.OrderBy(o => o.Id))
+                {
+                    _log.Info($"\tProducer {p.Id}-{p.Name.FixedLength(15)}\tIsAvailable={p.IsAvailable} \tIsEnabled={!p.IsDisabled}");
+                }
             }
             catch (CommunicationException ex)
             {
