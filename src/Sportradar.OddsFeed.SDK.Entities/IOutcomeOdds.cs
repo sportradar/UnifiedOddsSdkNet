@@ -8,7 +8,7 @@ namespace Sportradar.OddsFeed.SDK.Entities
     /// <summary>
     /// Represents an odds for an outcome(selection)
     /// </summary>
-    public interface IOutcomeOdds : IOutcomeProbabilities
+    public interface IOutcomeOdds : IOutcomeProbabilitiesV1
     {
         /// <summary>
         /// Gets the odds for the current <see cref="IOutcomeOdds"/> instance

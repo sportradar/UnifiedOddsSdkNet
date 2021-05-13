@@ -264,7 +264,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                                                                                                     nameProvider,
                                                                                                     mappingProvider,
                                                                                                     cultureInfos,
-                                                                                                    new OutcomeDefinition(marketOddsChange.id, outcomeOdds.id, _marketCacheProvider, specifiers, cultureInfos, _externalExceptionStrategy))),
+                                                                                                    new OutcomeDefinition(marketOddsChange.id, outcomeOdds.id, _marketCacheProvider, specifiers, cultureInfos, _externalExceptionStrategy),
+                                                                                                    GetAdditionalProbabilities(outcomeOdds))),
                                                marketDefinition,
                                                cultureInfos,
                                                marketOddsChange.cashout_statusSpecified ? (CashoutStatus?)MessageMapperHelper.GetEnumValue<CashoutStatus>(marketOddsChange.cashout_status) : null);
@@ -377,13 +378,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 isValidPlayerOutcome = !(match == null || outcome.team < 1 || outcome.team > 2);
             }
 
-            var additionalProbabilities = new AdditionalProbabilities(
-                outcome.win_probabilitiesSpecified ? outcome.win_probabilities : (double?) null,
-                outcome.lose_probabilitiesSpecified ? outcome.lose_probabilities : (double?) null,
-                outcome.half_win_probabilitiesSpecified ? outcome.half_win_probabilities : (double?) null,
-                outcome.half_lose_probabilitiesSpecified ? outcome.half_lose_probabilities : (double?) null,
-                outcome.refund_probabilitiesSpecified ? outcome.refund_probabilities : (double?) null);
-
             if (isValidPlayerOutcome)
             {
                 return new PlayerOutcomeOdds(outcome.id,
@@ -396,7 +390,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                                             outcome.team,
                                             cultures,
                                             outcomeDefinition,
-                                            additionalProbabilities);
+                                            GetAdditionalProbabilities(outcome));
             }
 
             return new OutcomeOdds(outcome.id,
@@ -407,9 +401,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                                     mappingProvider,
                                     cultures,
                                     outcomeDefinition,
-                                    additionalProbabilities);
+                                    GetAdditionalProbabilities(outcome));
         }
 
+        private IAdditionalProbabilities GetAdditionalProbabilities(oddsChangeMarketOutcome outcome)
+        {
+            return new AdditionalProbabilities(
+                outcome.win_probabilitiesSpecified ? outcome.win_probabilities : (double?) null,
+                outcome.lose_probabilitiesSpecified ? outcome.lose_probabilities : (double?) null,
+                outcome.half_win_probabilitiesSpecified ? outcome.half_win_probabilities : (double?) null,
+                outcome.half_lose_probabilitiesSpecified ? outcome.half_lose_probabilities : (double?) null,
+                outcome.refund_probabilitiesSpecified ? outcome.refund_probabilities : (double?) null);
+        }
 
         /// <summary>
         /// Maps (converts) the provided <see cref="alive"/> instance to the <see cref="IAlive"/> instance

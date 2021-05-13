@@ -121,7 +121,7 @@
     <Compile Include="IMarketWithProbabilitiesV1.cs" />
     <Compile Include="Internal\AdditionalProbabilities.cs" />
     <Compile Include="Internal\EntitiesImpl\OutcomeDefinition.cs" />
-    <Compile Include="IOutcomeOddsV2.cs" />
+    <Compile Include="IOutcomeProbabilitiesV1.cs" />
     <Compile Include="IOutcomeSettlementV1.cs" />
     <Compile Include="IOutcomeV1.cs" />
     <Compile Include="IOutcomeDefinition.cs" />

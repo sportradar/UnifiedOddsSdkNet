@@ -167,7 +167,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                     }
                 }
 
-                ExecutionLog.Warn($"Market with id:{_marketId}, producer:{_producerId}, sportId:{_sportId.Id} has too many mappings [{mappings.Count}].");
+                ExecutionLog.Warn($"Market with id:{_marketId}, producer:{_producerId}, sportId:{_sportId.Id} has multiple mappings [{mappings.Count}].");
                 CacheLog.Warn($"MarketId:{_marketId}, producer:{_producerId}, sportId:{_sportId.Id}, specifiers={MarketHelper.SpecifiersKeysToString(marketDescription.Specifiers)} has multiple mappings [{mappings.Count}].");
                 var i = 0;
                 foreach (var mapping in mappings)
