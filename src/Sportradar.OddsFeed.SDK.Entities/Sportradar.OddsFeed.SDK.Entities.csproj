@@ -118,6 +118,7 @@
     <Compile Include="CashoutStatus.cs" />
     <Compile Include="IAdditionalProbabilities.cs" />
     <Compile Include="IMarketCancel.cs" />
+    <Compile Include="IMarketWithProbabilitiesV2.cs" />
     <Compile Include="IMarketWithProbabilitiesV1.cs" />
     <Compile Include="Internal\AdditionalProbabilities.cs" />
     <Compile Include="Internal\EntitiesImpl\OutcomeDefinition.cs" />

@@ -67,7 +67,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <summary>
         /// The outcometext variant value
         /// </summary>
-        public const string OutcometextVariantValue = "pre:outcometext";
+        public const string OutcomeTextVariantValue = "pre:outcometext";
         /// <summary>
         /// The outcometext variant value
         /// </summary>

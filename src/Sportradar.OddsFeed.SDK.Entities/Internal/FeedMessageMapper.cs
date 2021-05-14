@@ -257,18 +257,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                                                nameProvider,
                                                mappingProvider,
                                                MessageMapperHelper.GetEnumValue<MarketStatus>(marketOddsChange.status),
-                                               marketOddsChange.outcome?.Select(outcomeOdds => new OutcomeProbabilities(
-                                                                                                    outcomeOdds.id,
-                                                                                                    outcomeOdds.activeSpecified ? (bool?) (outcomeOdds.active != 0) : null,
-                                                                                                    outcomeOdds.probabilitiesSpecified ? (double?) outcomeOdds.probabilities : null,
-                                                                                                    nameProvider,
-                                                                                                    mappingProvider,
-                                                                                                    cultureInfos,
-                                                                                                    new OutcomeDefinition(marketOddsChange.id, outcomeOdds.id, _marketCacheProvider, specifiers, cultureInfos, _externalExceptionStrategy),
-                                                                                                    GetAdditionalProbabilities(outcomeOdds))),
+                                               marketOddsChange.outcome?.Select(outcomeOdds =>
+                                                   new OutcomeProbabilities(outcomeOdds.id,
+                                                                            outcomeOdds.activeSpecified ? (bool?) (outcomeOdds.active != 0) : null,
+                                                                            outcomeOdds.probabilitiesSpecified ? (double?) outcomeOdds.probabilities : null,
+                                                                            nameProvider,
+                                                                            mappingProvider,
+                                                                            cultureInfos,
+                                                                            new OutcomeDefinition(marketOddsChange.id, outcomeOdds.id, _marketCacheProvider, specifiers, cultureInfos, _externalExceptionStrategy),
+                                                                            GetAdditionalProbabilities(outcomeOdds))),
                                                marketDefinition,
                                                cultureInfos,
-                                               marketOddsChange.cashout_statusSpecified ? (CashoutStatus?)MessageMapperHelper.GetEnumValue<CashoutStatus>(marketOddsChange.cashout_status) : null);
+                                               marketOddsChange.cashout_statusSpecified ? (CashoutStatus?)MessageMapperHelper.GetEnumValue<CashoutStatus>(marketOddsChange.cashout_status) : null,
+                                               GetMarketMetadata(marketOddsChange.market_metadata));
         }
 
         /// <summary>
@@ -290,9 +291,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             var additionalInfo = string.IsNullOrEmpty(marketOddsChange.extended_specifiers)
                 ? null
                 : FeedMapperHelper.GetSpecifiers(marketOddsChange.extended_specifiers);
-
-            var marketMetadata = new MarketMetadata(marketOddsChange.market_metadata);
-
+            
             var nameProvider = _nameProviderFactory.BuildNameProvider(sportEvent, marketOddsChange.id, specifiers);
             var mappingProvider = _mappingProviderFactory.BuildMarketMappingProvider(sportEvent, marketOddsChange.id, specifiers, producerId, sportId);
 
@@ -315,7 +314,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                                     marketOddsChange.cashout_statusSpecified ? (CashoutStatus?)MessageMapperHelper.GetEnumValue<CashoutStatus>(marketOddsChange.cashout_status) : null,
                                     marketOddsChange.favouriteSpecified && marketOddsChange.favourite == 1,
                                     outcomes,
-                                    marketMetadata,
+                                    GetMarketMetadata(marketOddsChange.market_metadata),
                                     marketDefinition,
                                     cultureInfos);
         }
@@ -406,12 +405,35 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
 
         private IAdditionalProbabilities GetAdditionalProbabilities(oddsChangeMarketOutcome outcome)
         {
+            if (!outcome.win_probabilitiesSpecified 
+                && !outcome.lose_probabilitiesSpecified 
+                && !outcome.half_win_probabilitiesSpecified 
+                && !outcome.half_lose_probabilitiesSpecified 
+                && !outcome.refund_probabilitiesSpecified)
+            {
+                return null;
+            }
+
             return new AdditionalProbabilities(
                 outcome.win_probabilitiesSpecified ? outcome.win_probabilities : (double?) null,
                 outcome.lose_probabilitiesSpecified ? outcome.lose_probabilities : (double?) null,
                 outcome.half_win_probabilitiesSpecified ? outcome.half_win_probabilities : (double?) null,
                 outcome.half_lose_probabilitiesSpecified ? outcome.half_lose_probabilities : (double?) null,
                 outcome.refund_probabilitiesSpecified ? outcome.refund_probabilities : (double?) null);
+        }
+
+        private IMarketMetadata GetMarketMetadata(marketMetadata marketMetadata)
+        {
+            if (marketMetadata == null || 
+                !marketMetadata.aams_idSpecified 
+                && !marketMetadata.start_timeSpecified 
+                && !marketMetadata.end_timeSpecified 
+                && !marketMetadata.next_betstopSpecified)
+            {
+                return null;
+            }
+
+            return new MarketMetadata(marketMetadata);
         }
 
         /// <summary>

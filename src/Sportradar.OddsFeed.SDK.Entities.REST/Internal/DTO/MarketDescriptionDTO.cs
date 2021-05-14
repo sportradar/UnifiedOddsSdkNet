@@ -60,7 +60,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             if (includesOutcomesOfType == null)
                 return null;
 
-            if (includesOutcomesOfType == SdkInfo.OutcometextVariantValue)
+            if (includesOutcomesOfType == SdkInfo.OutcomeTextVariantValue)
                 return SdkInfo.FreeTextVariantValue;
 
             if (includesOutcomesOfType.StartsWith("sr:"))

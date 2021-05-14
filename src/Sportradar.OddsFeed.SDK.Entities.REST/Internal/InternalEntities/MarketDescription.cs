@@ -27,7 +27,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
             OutcomeType == null
                 ? null
                 : OutcomeType == SdkInfo.FreeTextVariantValue
-                    ? SdkInfo.OutcometextVariantValue
+                    ? SdkInfo.OutcomeTextVariantValue
                     : "sr:" + OutcomeType;
 
         public string OutcomeType { get; }
