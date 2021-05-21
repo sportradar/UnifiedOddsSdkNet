@@ -216,14 +216,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                 return new List<ICompetitor>();
             }
 
-            var tasks = competitorsIds.Select(s =>
-                                              {
-                                                  var t = _sportEntityFactory.BuildTeamCompetitorAsync(s, Cultures, competitionCI, ExceptionStrategy);
-                                                  t.ConfigureAwait(false);
-                                                  return t;
-                                              }).ToList();
+            var tasks = competitorsIds.Select(s => _sportEntityFactory.BuildTeamCompetitorAsync(s, Cultures, competitionCI, ExceptionStrategy)).ToList();
             await Task.WhenAll(tasks).ConfigureAwait(false);
-
             return tasks.Select(s=>s.Result);
         }
 

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles;
@@ -385,16 +386,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         protected override string PrintC()
         {
             var abbreviations = string.Join(", ", Abbreviations.Select(x => x.Key.TwoLetterISOLanguageName + ":" + x.Value));
-            var associatedPlayers = string.Empty;
-            if (AssociatedPlayers != null && AssociatedPlayers.Any())
+            var associatedPlayersStr = string.Empty;
+            var associatedPlayerIds = _competitorCI?.GetAssociatedPlayerIds();
+            if (!associatedPlayerIds.IsNullOrEmpty())
             {
-                associatedPlayers = string.Join(", ", AssociatedPlayers.Select(s => s.Id + ": " + s.GetName(_cultures.First())));
-                associatedPlayers = $", AssociatedPlayers=[{associatedPlayers}]";
+                associatedPlayersStr = string.Join(", ", associatedPlayerIds);
+                associatedPlayersStr = $", AssociatedPlayers=[{associatedPlayersStr}]";
             }
             var reference = _referenceId?.ReferenceIds == null || !_referenceId.ReferenceIds.Any()
                                 ? string.Empty
                                 : _referenceId.ReferenceIds.Aggregate(string.Empty, (current, item) => current = $"{current}, {item.Key}={item.Value}").Substring(2);
-            return $"{base.PrintC()}, Gender={Gender}, Reference={reference}, Abbreviations=[{abbreviations}]{associatedPlayers}";
+            return $"{base.PrintC()}, Gender={Gender}, Reference={reference}, Abbreviations=[{abbreviations}]{associatedPlayersStr}";
         }
 
         /// <summary>

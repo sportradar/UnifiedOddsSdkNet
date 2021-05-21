@@ -172,6 +172,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         }
 
         /// <summary>
+        /// Get associated player ids if already cached (no competitor profile is fetched)
+        /// </summary>
+        public IEnumerable<URN> GetAssociatedPlayerIds()
+        {
+            return _associatedPlayerIds;
+        }
+
+        /// <summary>
         /// Gets the jerseys of known competitors
         /// </summary>
         /// <value>The jerseys</value>
@@ -309,6 +317,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public string ShortName => _shortName;
 
         /// <summary>
+        /// Gets the type of the root source
+        /// </summary>
+        /// <value>The root source</value>
+        public string RootSource { get; }
+
+        /// <summary>
         /// Gets the <see cref="IEnumerable{CultureInfo}"/> specifying the languages for which the current instance has translations
         /// </summary>
         /// <value>The fetched cultures</value>
@@ -341,6 +355,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _jerseys = new List<JerseyCI>();
             _lastTimeCompetitorProfileFetched = DateTime.MinValue;
             _cultureCompetitorProfileFetched = new List<CultureInfo>();
+            RootSource = "CompetitorDTO";
             Merge(competitor, culture);
         }
 
@@ -368,6 +383,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _jerseys = new List<JerseyCI>();
             _lastTimeCompetitorProfileFetched = DateTime.MinValue;
             _cultureCompetitorProfileFetched = new List<CultureInfo>();
+            RootSource = "CompetitorProfileDTO";
             Merge(competitor, culture);
         }
 
@@ -395,6 +411,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _jerseys = new List<JerseyCI>();
             _lastTimeCompetitorProfileFetched = DateTime.MinValue;
             _cultureCompetitorProfileFetched = new List<CultureInfo>();
+            RootSource = "SimpleTeamProfileDTO";
             Merge(competitor, culture);
         }
 
@@ -423,6 +440,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _jerseys = new List<JerseyCI>();
             _lastTimeCompetitorProfileFetched = DateTime.MinValue;
             _cultureCompetitorProfileFetched = new List<CultureInfo>();
+            RootSource = "PlayerCompetitorDTO";
             Merge(playerCompetitor, culture);
         }
 
@@ -625,11 +643,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             {
                 _raceDriverProfile = new RaceDriverProfileCI(competitorProfile.RaceDriverProfile);
             }
-            if (competitorProfile.Players != null && competitorProfile.Players.Any())
-            {
-                _lastTimeCompetitorProfileFetched = DateTime.Now;
-                _cultureCompetitorProfileFetched.Add(culture);
-            }
             if (competitorProfile.Competitor.SportId != null)
             {
                 _sportId = competitorProfile.Competitor.SportId;
@@ -642,6 +655,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             {
                 _shortName = competitorProfile.Competitor.ShortName;
             }
+            _lastTimeCompetitorProfileFetched = DateTime.Now;
+            _cultureCompetitorProfileFetched.Add(culture);
             ((List<CultureInfo>) _fetchedCultures).Add(culture);
         }
 
@@ -745,6 +760,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _referenceId = item._referenceId ?? _referenceId;
             _lastTimeCompetitorProfileFetched = item._lastTimeCompetitorProfileFetched;
             _cultureCompetitorProfileFetched = item._cultureCompetitorProfileFetched?.ToList();
+            _fetchedCultures = item._fetchedCultures;
             _sportId = item._sportId ?? _sportId;
             _categoryId = item._categoryId ?? _categoryId;
             if(!string.IsNullOrEmpty(item.ShortName))
