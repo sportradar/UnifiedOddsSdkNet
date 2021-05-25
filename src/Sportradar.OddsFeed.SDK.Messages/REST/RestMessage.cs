@@ -223,6 +223,10 @@ namespace Sportradar.OddsFeed.SDK.Messages.REST
     {
     }
 
+    public partial class raceScheduleEndpoint : RestMessage
+    {
+    }
+
     public partial class AvailableSelectionsType : RestMessage
     {
     }

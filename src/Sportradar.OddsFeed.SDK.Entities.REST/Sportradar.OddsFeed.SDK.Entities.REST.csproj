@@ -213,7 +213,10 @@
     <Compile Include="Internal\Mapping\PeriodSummaryMapperFactory.cs" />
     <Compile Include="Internal\Mapping\ResultChangesMapper.cs" />
     <Compile Include="Internal\Mapping\ResultChangesMapperFactory.cs" />
+    <Compile Include="Internal\Mapping\TournamentRaceScheduleMapper.cs" />
+    <Compile Include="Internal\Mapping\TournamentRaceScheduleMapperFactory.cs" />
     <Compile Include="Internal\MarketNames\MarketHelper.cs" />
+    <Compile Include="Internal\TournamentRaceScheduleProvider.cs" />
     <Compile Include="IPeriodCompetitorResult.cs" />
     <Compile Include="IPeriodStatus.cs" />
     <Compile Include="IProductInfoV1.cs" />
