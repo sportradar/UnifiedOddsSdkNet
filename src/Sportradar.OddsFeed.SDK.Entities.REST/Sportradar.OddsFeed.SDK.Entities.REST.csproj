@@ -557,6 +557,7 @@
     <Compile Include="ITeamStatisticsV2.cs" />
     <Compile Include="ITeamStatisticsV1.cs" />
     <Compile Include="ITimelineEventV2.cs" />
+    <Compile Include="ITournamentV2.cs" />
     <Compile Include="ITournamentV1.cs" />
     <Compile Include="ITvChannelV1.cs" />
     <Compile Include="IVenueV2.cs" />
