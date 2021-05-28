@@ -190,20 +190,6 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Utils
             var eventResults = string.Empty;
             var eventStatus = string.Empty;
 
-            if (sport == null)
-            {
-
-            }
-            var soc = match as ISoccerEvent;
-            if (soc == null && sport.Id == 1)
-            {
-                var damn = soc.Id;
-            }
-            else
-            {
-                var damn = sport.Id;
-            }
-
             if (season != null)
             {
                 WriteSeasonInfo(season);

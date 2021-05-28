@@ -9,6 +9,16 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2021-05-28  1.43.0.0
+Extended IMatch with GetEventTimeline for single culture (extended with IMatchV3)
+Property AdditionalProbabilities moved from IOutcomeOddsV2 (deleted) to IOutcomeProbabilitiesV1 (breaking change)
+Now both OutcomeOdds and OutcomeProbabilities has AdditionalProbabilitites
+Added MarketMetaData to IMarketWithProbabilities (extended with IMarketWithProbabilitiesV2)
+Extended ITournament with GetScheduleAsync (extended with ITournamentV2)
+Fix: Issue retrieving child stages from parent using  GetStagesAsync() method
+Fix: corrected which market description is returned for variant markets
+Improvement: optimized fetching of player/competitor profiles
+
 2021-04-29  1.42.0.0
 Added ISportDataProvider.GetPeriodStatusesAsync to fetch period summary for stages (extended with ISportDataProviderV10)
 Added ICompetitionStatus with PeriodOfLadder (extended with ICompetitionStatusV1)
