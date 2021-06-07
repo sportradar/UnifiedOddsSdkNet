@@ -33,6 +33,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         protected readonly ILog ExecutionLog;
 
         /// <summary>
+        /// The cache log
+        /// </summary>
+        protected readonly ILog CacheLog;
+
+        /// <summary>
         /// The cache manager
         /// </summary>
         private readonly ICacheManager _cacheManager;
@@ -51,6 +56,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             RegisterCache();
 
             ExecutionLog = SdkLoggerFactory.GetLoggerForExecution(GetType());
+            CacheLog = SdkLoggerFactory.GetLoggerForCache(GetType());
         }
 
         /// <summary>
