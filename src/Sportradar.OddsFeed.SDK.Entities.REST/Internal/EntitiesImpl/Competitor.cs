@@ -107,10 +107,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public IEnumerable<IPlayer> AssociatedPlayers {
             get
             {
-                var associatedPlayerIds = GetOrLoadCompetitor()?.AssociatedPlayerIds?.ToList();
-                if (associatedPlayerIds != null && associatedPlayerIds.Any())
+                try
                 {
-                    return _sportEntityFactory.BuildPlayersAsync(associatedPlayerIds, _cultures, _exceptionStrategy).Result;
+                    var associatedPlayerIds = GetOrLoadCompetitor()?.AssociatedPlayerIds;
+                    if (associatedPlayerIds != null && associatedPlayerIds.Any())
+                    {
+                        return _sportEntityFactory.BuildPlayersAsync(associatedPlayerIds, _cultures, _exceptionStrategy).Result;
+                    }
+                }
+                catch (Exception e)
+                {
+                    SdkLoggerFactory.GetLoggerForExecution(typeof(Competitor)).Error("Getting Competitor associated players", e);
                 }
 
                 return new List<IPlayer>();
