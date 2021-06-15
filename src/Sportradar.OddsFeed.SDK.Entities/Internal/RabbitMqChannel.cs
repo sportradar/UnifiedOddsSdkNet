@@ -127,7 +127,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             DetachEvents();
 
             _timer.Stop();
-            _timerSemaphoreSlim.Release();
+            _timerSemaphoreSlim.ReleaseSafe();
             _timerSemaphoreSlim.Dispose();
         }
 
@@ -156,7 +156,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         {
             ExecutionLog.Info("Opening the channel ...");
             _channel = _channelFactory.CreateChannel();
-            ExecutionLog.Info($"Channel opened with channelNumber: {_channel.ChannelNumber}");
+            ExecutionLog.Info($"Channel opened with channelNumber: {_channel.ChannelNumber}. MaxAllowedTimeBetweenMessages={_maxTimeBetweenMessages.TotalSeconds}s.");
             var declareResult = _channel.QueueDeclare();
 
             foreach (var routingKey in _routingKeys)
@@ -204,17 +204,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         private async Task OnTimerElapsedAsync()
         {
             await _timerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
+
             if (IsOpened)
             {
                 try
                 {
                     if (_channel == null)
                     {
+                        ExecutionLog.Info("Creating connection channel and attaching events ...");
                         CreateAndAttachEvents();
                     }
 
                     if(_channelFactory.ConnectionCreated > _lastMessageReceived)
                     {
+                        ExecutionLog.Info("Recreating connection channel and attaching events ...");
                         // it means, the connection was reseted in between
                         DetachEvents();
                         CreateAndAttachEvents();
@@ -223,21 +226,23 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                     var lastMessageDiff = DateTime.Now - _lastMessageReceived;
                     if (_lastMessageReceived > DateTime.MinValue && lastMessageDiff > _maxTimeBetweenMessages)
                     {
+                        var channelNumber = _channel?.ChannelNumber;
                         var isOpen = _channelFactory.IsConnectionOpen() ? "s" : string.Empty;
                         ExecutionLog.Warn($"There were no message{isOpen} in more then {_maxTimeBetweenMessages.TotalSeconds}s for the channel with channelNumber: {_channel?.ChannelNumber}. Last message arrived: {_lastMessageReceived}");
                         DetachEvents();
-                        ExecutionLog.Info($"Resetting connection for the channel with channelNumber: {_channel?.ChannelNumber}");
+                        ExecutionLog.Info($"Resetting connection for the channel with channelNumber: {channelNumber}");
                         _channelFactory.ResetConnection();
-                        ExecutionLog.Info($"Resetting connection finished for the channel with channelNumber: {_channel?.ChannelNumber}");
+                        ExecutionLog.Info($"Resetting connection finished for the channel with channelNumber: {channelNumber}");
                         CreateAndAttachEvents();
                     }
                 }
                 catch (Exception e)
                 {
-                    ExecutionLog.Warn("Error checking connection: " + e.Message);
+                    ExecutionLog.Warn($"Error checking connection for channelNumber {_channel?.ChannelNumber}: " + e.Message);
                 }
             }
-            _timerSemaphoreSlim.Release();
+
+            _timerSemaphoreSlim.ReleaseSafe();
         }
     }
 }
