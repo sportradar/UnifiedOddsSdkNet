@@ -9,6 +9,13 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2021-06-15  1.44.0.0
+Added pitcher, batter, pitch_count, pitches_seen, total_hits, total_pitches to SportEventStatus.Properties
+PeriodScore - match status code 120 mapped to penalties
+Improved importing,exporting competitors
+Improved getting competitor players
+Fix: throwing exception when no market description received from API for variant markets
+
 2021-05-28  1.43.0.0
 Extended IMatch with GetEventTimeline for single culture (extended with IMatchV3)
 Property AdditionalProbabilities moved from IOutcomeOddsV2 (deleted) to IOutcomeProbabilitiesV1 (breaking change)
