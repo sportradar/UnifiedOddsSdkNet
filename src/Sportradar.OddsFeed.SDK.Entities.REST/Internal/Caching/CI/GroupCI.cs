@@ -8,6 +8,8 @@ using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Common;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -66,7 +68,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Id = exportable.Id;
             Name = exportable.Name;
             CompetitorsIds = exportable.Competitors?.Select(URN.Parse).ToList();
-            CompetitorsReferences = exportable.CompetitorsReferences?.ToDictionary(c => URN.Parse(c.Key), c => new ReferenceIdCI(c.Value));
+            try
+            {
+                CompetitorsReferences = exportable.CompetitorsReferences?.ToDictionary(
+                                                                                       c => URN.Parse(c.Key),
+                                                                                       c => c.Value != null
+                                                                                                ? new ReferenceIdCI(c.Value)
+                                                                                                : null);
+            }
+            catch (Exception e)
+            {
+                SdkLoggerFactory.GetLoggerForExecution(typeof(GroupCI)).Error("Importing GroupCI", e);
+            }
         }
 
         /// <summary>
@@ -129,12 +142,29 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
         public async Task<ExportableGroupCI> ExportAsync()
         {
+            var cr = new Dictionary<string, Dictionary<string, string>>();
+            if (!CompetitorsReferences.IsNullOrEmpty())
+            {
+                foreach (var competitorsReference in CompetitorsReferences)
+                {
+                    try
+                    {
+                        var refs = competitorsReference.Value.ReferenceIds?.ToDictionary(r => r.Key, r => r.Value);
+                        cr.Add(competitorsReference.Key.ToString(), refs);
+                    }
+                    catch (Exception e)
+                    {
+                        SdkLoggerFactory.GetLoggerForExecution(typeof(GroupCI)).Error("Exporting GroupCI", e);
+                    }
+                }
+            }
+
             return new ExportableGroupCI
             {
                 Id = Id,
+                Name = Name,
                 Competitors = CompetitorsIds?.Select(s=>s.ToString()),
-                CompetitorsReferences = CompetitorsReferences?.ToDictionary(c => c.Key.ToString(), c => c.Value.ReferenceIds.ToDictionary(r => r.Key, r => r.Value)),
-                Name = Name
+                CompetitorsReferences = cr.IsNullOrEmpty() ? null : cr
             };
         }
     }

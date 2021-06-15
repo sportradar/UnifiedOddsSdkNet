@@ -1634,8 +1634,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 {
                     restCallTime = (int) t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
-                    _executionLog.Error($"Error getting period summary for event id={id} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}",
-                        e.InnerException ?? e);
+                    _executionLog.Error($"Error getting period summary for event id={id} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
                     if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW && requester != null)
                     {
                         throw;
