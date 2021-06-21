@@ -140,13 +140,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         {
             if (marketDescription == null)
             {
-                return null;
+                return new List<IMarketMappingData>();
             }
 
             if (marketDescription.Mappings == null || !marketDescription.Mappings.Any())
             {
-                ExecutionLog.Debug($"An error occurred getting mapped marketId for marketId={_marketId} (no mappings exist).");
-                return null;
+                ExecutionLog.Debug($"MarketDescription for marketId={_marketId} has no mappings.");
+                return new List<IMarketMappingData>();
             }
 
             var mappings = marketDescription.Mappings.Where(m => m.CanMap(_producerId, _sportId, _specifiers)).ToList();
@@ -154,7 +154,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             if (!mappings.Any())
             {
                 ExecutionLog.Debug($"Market with id:{_marketId}, producer:{_producerId}, sportId:{_sportId} has no mappings.");
-                return null;
+                return mappings;
             }
 
             if (mappings.Count > 1)

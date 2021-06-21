@@ -376,20 +376,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             catch (Exception ex)
             {
                 ExecutionLog.Error($"Fetching summary for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH EX.", ex);
-                var drm = DataRouterManager as DataRouterManager;
-                if (drm != null)
+                if (DataRouterManager is DataRouterManager drm && drm.ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
                 {
-                    if (drm.ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
-                    {
-                        throw;
-                    }
+                    throw;
                 }
             }
             finally
             {
                 // release semaphore
                 // ReSharper disable once PossibleNullReferenceException
-                semaphore.Release();
+                semaphore.ReleaseSafe();
                 SemaphorePool.Release(id);
             }
         }
@@ -473,7 +469,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 // release semaphore
                 // ReSharper disable once PossibleNullReferenceException
-                semaphore.Release();
+                semaphore.ReleaseSafe();
                 SemaphorePool.Release(id);
             }
         }
