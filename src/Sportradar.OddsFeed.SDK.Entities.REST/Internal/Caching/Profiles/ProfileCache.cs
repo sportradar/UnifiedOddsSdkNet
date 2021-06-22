@@ -70,11 +70,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         /// <summary>
         /// The cache item policy
         /// </summary>
-        private readonly CacheItemPolicy _normalCacheItemPolicy = new CacheItemPolicy {SlidingExpiration = TimeSpan.FromHours(24), RemovedCallback = OnCacheItemRemoval};
-
-        /// <summary>
-        /// The cache item policy
-        /// </summary>
         private readonly CacheItemPolicy _simpleTeamCacheItemPolicy = new CacheItemPolicy {AbsoluteExpiration = DateTimeOffset.MaxValue, Priority = CacheItemPriority.NotRemovable, RemovedCallback = OnCacheItemRemoval};
 
     /// <summary>
@@ -1034,7 +1029,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         {
             return id.IsSimpleTeam()
                 ? _simpleTeamCacheItemPolicy
-                : _normalCacheItemPolicy;
+                : new CacheItemPolicy {SlidingExpiration = OperationManager.ProfileCacheTimeout, RemovedCallback = OnCacheItemRemoval};
         }
 
         /// <summary>

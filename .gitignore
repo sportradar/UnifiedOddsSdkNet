@@ -30,6 +30,7 @@ XsdSchemaFetcher/SchemaFetcher/packages/*
 
 .vs/**
 **/.vs/**
+**/.sonarqube/**
 
 .nuget/**
 

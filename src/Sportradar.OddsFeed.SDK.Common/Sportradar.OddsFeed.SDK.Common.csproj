@@ -146,6 +146,7 @@
     <Compile Include="Internal\TimeProviderAccessor.cs" />
     <Compile Include="IOpenable.cs" />
     <Compile Include="Internal\ISemaphorePool.cs" />
+    <Compile Include="OperationManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ExceptionHandlingStrategy.cs" />
     <Compile Include="SdkEnvironment.cs" />

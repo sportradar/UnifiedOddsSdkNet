@@ -786,6 +786,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new MemoryCache("eventStatusCache"),
                 new ContainerControlledLifetimeManager());
 
+            container.RegisterInstance("IgnoreEventsTimelineCache_Cache",
+                                       new MemoryCache("ignoreEventsTimelineCache"),
+                                       new ContainerControlledLifetimeManager());
+
             container.RegisterType<ISportEventStatusCache, SportEventStatusCache>(
                 new HierarchicalLifetimeManager(),
                 new InjectionConstructor(
@@ -793,7 +797,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<ISingleTypeMapperFactory<sportEventStatus, SportEventStatusDTO>>(),
                     new ResolvedParameter<ISportEventCache>(),
                     new ResolvedParameter<ICacheManager>(),
-                    TimeSpan.FromMinutes(5)));
+                    new ResolvedParameter<MemoryCache>("IgnoreEventsTimelineCache_Cache")));
 
             container.RegisterType<IFeedMessageProcessor, CacheMessageProcessor>(
                 "CacheMessageProcessor",
@@ -802,7 +806,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<ISingleTypeMapperFactory<sportEventStatus, SportEventStatusDTO>>(),
                     new ResolvedParameter<ISportEventCache>(),
                     new ResolvedParameter<ICacheManager>(),
-                    new ResolvedParameter<IFeedMessageHandler>()));
+                    new ResolvedParameter<IFeedMessageHandler>(),
+                    new ResolvedParameter<ISportEventStatusCache>()));
 
             container.RegisterType<CacheMessageProcessor>(
                 new HierarchicalLifetimeManager(),

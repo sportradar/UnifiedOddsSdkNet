@@ -1,6 +1,8 @@
 /*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -19,5 +21,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="eventId">A <see cref="URN"/> representing the id of the sport event whose status to get</param>
         /// <returns>A <see cref="SportEventStatusCI"/> representing the status of the specified sport event</returns>
         Task<SportEventStatusCI> GetSportEventStatusAsync(URN eventId);
+
+        /// <summary>
+        /// Adds the event identifier for timeline ignore
+        /// </summary>
+        /// <param name="eventId">The event identifier.</param>
+        /// <param name="producerId">The producer identifier.</param>
+        /// <param name="messageType">Type of the feed message.</param>
+        /// <remarks>Used for BetPal events to have ignored timeline event status cache</remarks>
+        void AddEventIdForTimelineIgnore(URN eventId, int producerId, Type messageType);
     }
 }

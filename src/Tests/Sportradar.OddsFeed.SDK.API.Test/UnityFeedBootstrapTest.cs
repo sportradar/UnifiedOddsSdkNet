@@ -40,6 +40,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             var container = new UnityContainer();
             var config = TestConfigurationInternal.GetConfig();
             _dispatcher = new Mock<IGlobalEventDispatcher>().Object;
+            
             container.RegisterBaseTypes(config);
 
             // we need to override initial loading of bookmaker details and producers

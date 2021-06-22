@@ -10,6 +10,7 @@ using System.Runtime.Caching;
 using System.Threading;
 using System.Threading.Tasks;
 using Metrics;
+using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal.Metrics;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -35,6 +36,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// A <see cref="ObjectCache"/> used to cache <see cref="ISportEventStatus"/> instances
         /// </summary>
         private readonly ObjectCache _sportEventStatusCache;
+        private readonly MemoryCache _ignoreEventsTimelineCache;
 
         private readonly ISportEventCache _sportEventCache;
 
@@ -54,37 +56,31 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         private readonly object _lock = new object();
 
         /// <summary>
-        /// The cache item expire time
-        /// </summary>
-        private readonly TimeSpan _cacheItemExpireTime;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ISportEventStatusCache"/> class
         /// </summary>
         /// <param name="sportEventStatusCache"> A <see cref="ObjectCache"/> used to cache <see cref="SportEventStatusCI"/> instances</param>
         /// <param name="mapperFactory">A <see cref="ISingleTypeMapperFactory{TIn,TOut}"/> used to created <see cref="ISingleTypeMapper{SportEventStatusDTO}"/> instances</param>
         /// <param name="sportEventCache">A <see cref="ISportEventCache"/> used to cache <see cref="ISportEvent"/></param>
         /// <param name="cacheManager">A <see cref="ICacheManager"/> used to interact among caches</param>
-        /// <param name="cacheItemExpireTime">The time in which cache item expires</param>
+        /// <param name="ignoreEventsTimelineCache">A <see cref="MemoryCache"/> used to cache event ids for which the SES from timeline endpoint should be ignored</param>
         public SportEventStatusCache(ObjectCache sportEventStatusCache,
                                     ISingleTypeMapperFactory<sportEventStatus, SportEventStatusDTO> mapperFactory,
                                     ISportEventCache sportEventCache,
                                     ICacheManager cacheManager,
-                                    TimeSpan cacheItemExpireTime)
+                                    MemoryCache ignoreEventsTimelineCache)
             : base(cacheManager)
         {
             Guard.Argument(sportEventStatusCache, nameof(sportEventStatusCache)).NotNull();
             Guard.Argument(mapperFactory, nameof(mapperFactory)).NotNull();
             Guard.Argument(sportEventCache, nameof(sportEventCache)).NotNull();
+            Guard.Argument(ignoreEventsTimelineCache, nameof(ignoreEventsTimelineCache)).NotNull();
 
             _sportEventStatusCache = sportEventStatusCache;
             _mapperFactory = mapperFactory;
             _sportEventCache = sportEventCache;
+            _ignoreEventsTimelineCache = ignoreEventsTimelineCache;
 
             _isDisposed = false;
-            _cacheItemExpireTime = cacheItemExpireTime <= TimeSpan.Zero
-                                       ? TimeSpan.FromMinutes(5)
-                                       : cacheItemExpireTime;
         }
 
         /// <summary>
@@ -153,6 +149,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             return ((SportEventStatusMapperBase) _mapperFactory).CreateNotStarted();
         }
 
+        /// <inheritdoc />
+        public void AddEventIdForTimelineIgnore(URN eventId, int producerId, Type messageType)
+        {
+            if (producerId == 4) // BetPal
+            {
+                if (_ignoreEventsTimelineCache.Contains(eventId.ToString()))
+                {
+                    _ignoreEventsTimelineCache.Get(eventId.ToString()); // to update sliding expiration
+                }
+                else
+                {
+                    CacheLog.Debug($"Received {messageType.Name} - added {eventId} to the ignore timeline list");
+                    _ignoreEventsTimelineCache.Add(eventId.ToString(),
+                                                   DateTime.Now,
+                                                   new CacheItemPolicy {SlidingExpiration = OperationManager.IgnoreBetPalTimelineSportEventStatusCacheTimeout});
+                }
+            }
+        }
+
         /// <summary>
         /// Adds the sport event status to the internal cache
         /// </summary>
@@ -184,13 +199,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 {
                     if (!string.IsNullOrEmpty(source))
                     {
+                        if (OperationManager.IgnoreBetPalTimelineSportEventStatus && source.Contains("Timeline") && _ignoreEventsTimelineCache.Contains(eventId.ToString()))
+                        {
+                            ExecutionLog.Debug($"Received SES for {eventId} from {source} with EventStatus:{sportEventStatus.Status} (timeline ignored)");
+                            return;
+                        }
+
                         source = $" from {source}";
                     }
                     ExecutionLog.Debug($"Received SES for {eventId}{source} with EventStatus:{sportEventStatus.Status}");
                     var cacheItem = _sportEventStatusCache.AddOrGetExisting(eventId.ToString(),
                                                                             sportEventStatus,
-                                                                            new CacheItemPolicy {AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(_cacheItemExpireTime.TotalSeconds)}) 
-                        as SportEventStatusCI;
+                                                                            new CacheItemPolicy
+                                                                            {
+                                                                                AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(OperationManager.SportEventStatusCacheTimeout.TotalSeconds)
+                                                                            })
+                                        as SportEventStatusCI;
                     if (cacheItem != null)
                     {
                         cacheItem.SetFeedStatus(sportEventStatus.FeedStatusDTO);
