@@ -9,6 +9,11 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2021-06-23  1.45.0.0
+Added OperationManager to provide option to set sdk values
+Added option to ignore sport event status from timeline endpoint for BetPal events
+Fix: exception thrown when no market mappings found
+
 2021-06-15  1.44.0.0
 Added pitcher, batter, pitch_count, pitches_seen, total_hits, total_pitches to SportEventStatus.Properties
 PeriodScore - match status code 120 mapped to penalties
