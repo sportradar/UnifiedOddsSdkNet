@@ -7,6 +7,7 @@ using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -117,12 +118,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
         public async Task<ExportableEventTimelineCI> ExportAsync()
         {
-            var timelineTasks = _timeline?.Select(async t => await t.ExportAsync().ConfigureAwait(false));
+            var timelineTasks = _timeline?.Select(async t => await t.ExportAsync().ConfigureAwait(false)).ToList();
+            if (!timelineTasks.IsNullOrEmpty())
+            {
+                await Task.WhenAll(timelineTasks).ConfigureAwait(false);
+            }
 
             return new ExportableEventTimelineCI
             {
                 FetchedCultures = new List<CultureInfo>(_fetchedCultures ?? new List<CultureInfo>()),
-                Timeline = timelineTasks != null ? await Task.WhenAll(timelineTasks) : null,
+                Timeline = timelineTasks.IsNullOrEmpty() ? null : timelineTasks.Select(s=>s.Result).ToList(),
                 IsFinalized = _isFinalized
             };
         }

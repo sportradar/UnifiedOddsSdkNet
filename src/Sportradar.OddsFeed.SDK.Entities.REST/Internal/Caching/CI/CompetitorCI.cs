@@ -465,7 +465,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             _venue = originalCompetitorCI._venue;
             _gender = originalCompetitorCI._gender;
             _ageGroup = originalCompetitorCI._ageGroup;
-            _fetchedCultures = originalCompetitorCI._fetchedCultures;
+            _fetchedCultures = originalCompetitorCI._fetchedCultures ?? new List<CultureInfo>();
             _dataRouterManager = originalCompetitorCI._dataRouterManager;
             _primaryCulture = originalCompetitorCI._primaryCulture;
             _raceDriverProfile = originalCompetitorCI._raceDriverProfile;
@@ -508,7 +508,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 _venue = exportable.Venue != null ? new VenueCI(exportable.Venue) : null;
                 _gender = exportable.Gender;
                 _ageGroup = exportable.AgeGroup;
-                _fetchedCultures = exportable.FetchedCultures.IsNullOrEmpty() ? null : new List<CultureInfo>(exportable.FetchedCultures);
+                _fetchedCultures = exportable.FetchedCultures.IsNullOrEmpty() ? new List<CultureInfo>() : new List<CultureInfo>(exportable.FetchedCultures);
                 _primaryCulture = exportable.PrimaryCulture;
                 _raceDriverProfile = exportable.RaceDriverProfile != null ? new RaceDriverProfileCI(exportable.RaceDriverProfile) : null;
                 _referenceId = exportable.ReferenceIds.IsNullOrEmpty() ? null : new ReferenceIdCI(exportable.ReferenceIds);
@@ -517,6 +517,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 {
                     _lastTimeCompetitorProfileFetched = exportable.LastTimeCompetitorProfileIsFetched.Value;
                 }
+
+                _cultureCompetitorProfileFetched = new List<CultureInfo>();
                 if (exportable.CultureCompetitorProfileFetched != null)
                 {
                     _cultureCompetitorProfileFetched = exportable.CultureCompetitorProfileFetched.ToList();
@@ -859,20 +861,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                              {
                                  Id = Id.ToString(),
                                  Name = Names.IsNullOrEmpty() ? null : new ReadOnlyDictionary<CultureInfo, string>(Names),
-                                 CountryNames = _countryNames.IsNullOrEmpty() ? null : new ReadOnlyDictionary<CultureInfo, string>(_countryNames),
-                                 Abbreviations = _abbreviations.IsNullOrEmpty() ? null : new ReadOnlyDictionary<CultureInfo, string>(_abbreviations),
-                                 AssociatedPlayerIds = _associatedPlayerIds.IsNullOrEmpty() ? null : new ReadOnlyCollection<string>(_associatedPlayerIds.Select(i => i.ToString()).ToList()),
+                                 CountryNames = _countryNames.IsNullOrEmpty() ? null : new Dictionary<CultureInfo, string>(_countryNames),
+                                 Abbreviations = _abbreviations.IsNullOrEmpty() ? null : new Dictionary<CultureInfo, string>(_abbreviations),
+                                 AssociatedPlayerIds = _associatedPlayerIds.IsNullOrEmpty() ? null : new List<string>(_associatedPlayerIds.Select(i => i.ToString()).ToList()),
                                  IsVirtual = _isVirtual,
-                                 ReferenceIds = _referenceId?.ReferenceIds != null ? new ReadOnlyDictionary<string, string>(_referenceId.ReferenceIds as IDictionary<string, string>) : null,
-                                 Jerseys = jerseysList.IsNullOrEmpty() ? null : new ReadOnlyCollection<ExportableJerseyCI>(jerseysList),
+                                 ReferenceIds = _referenceId?.ReferenceIds == null ? null : new Dictionary<string, string>(_referenceId.ReferenceIds.ToDictionary(d=>d.Key, d=>d.Value)),
+                                 Jerseys = jerseysList.IsNullOrEmpty() ? null : new List<ExportableJerseyCI>(jerseysList),
                                  CountryCode = _countryCode,
                                  State = _state,
-                                 Manager = _manager!= null ? await _manager.ExportAsync().ConfigureAwait(false) : null,
-                                 Venue = _venue != null ? await _venue.ExportAsync().ConfigureAwait(false) : null,
+                                 Manager = _manager == null ? null : await _manager.ExportAsync().ConfigureAwait(false),
+                                 Venue = _venue == null ? null : await _venue.ExportAsync().ConfigureAwait(false),
                                  Gender = _gender,
                                  AgeGroup = _ageGroup,
-                                 RaceDriverProfile = _raceDriverProfile != null ? await _raceDriverProfile.ExportAsync().ConfigureAwait(false) : null,
-                                 FetchedCultures = _fetchedCultures.IsNullOrEmpty() ? null : new ReadOnlyCollection<CultureInfo>(_fetchedCultures.ToList()),
+                                 RaceDriverProfile = _raceDriverProfile == null ? null : await _raceDriverProfile.ExportAsync().ConfigureAwait(false),
+                                 FetchedCultures = _fetchedCultures.IsNullOrEmpty() ? null : new List<CultureInfo>(_fetchedCultures.ToList()),
                                  PrimaryCulture = _primaryCulture,
                                  LastTimeCompetitorProfileIsFetched = _lastTimeCompetitorProfileFetched > DateTime.MinValue
                                                                           ? _lastTimeCompetitorProfileFetched

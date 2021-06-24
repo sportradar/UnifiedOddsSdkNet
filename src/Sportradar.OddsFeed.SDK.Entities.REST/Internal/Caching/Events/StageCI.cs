@@ -350,7 +350,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
 
             stage.CategoryId = _categoryId?.ToString();
             stage.ParentStageId = _parentStageId?.ToString();
-            stage.ChildStages = _childStages?.Select(s => s.ToString());
+            stage.ChildStages = _childStages?.Select(s => s.ToString()).ToList();
             stage.AdditionalParentIds = _additionalParentIds?.Select(s=>s.ToString()).ToList();
 
             return exportable;

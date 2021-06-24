@@ -25,11 +25,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         /// <summary>
         /// A <see cref="IEnumerable{T}"/> representing the child stages
         /// </summary>
-        public IEnumerable<string> ChildStages { get; set; }
+        public List<string> ChildStages { get; set; }
         
         /// <summary>
         /// A list of additional parents ids
         /// </summary>
-        public IEnumerable<string> AdditionalParentIds { get; set; }
+        public List<string> AdditionalParentIds { get; set; }
     }
 }

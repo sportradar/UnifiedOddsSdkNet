@@ -14,9 +14,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
     public class ExportableEventTimelineCI
     {
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representation of the timeline
+        /// A <see cref="List{T}"/> representation of the timeline
         /// </summary>
-        public IEnumerable<ExportableTimelineEventCI> Timeline { get; set; }
+        public List<ExportableTimelineEventCI> Timeline { get; set; }
 
         /// <summary>
         /// A <see cref="bool"/> indicating if the time line is finished
@@ -24,8 +24,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public bool IsFinalized { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representation of the fetched cultures
+        /// A <see cref="List{T}"/> representation of the fetched cultures
         /// </summary>
-        public IEnumerable<CultureInfo> FetchedCultures { get; set; }
+        public List<CultureInfo> FetchedCultures { get; set; }
     }
 }

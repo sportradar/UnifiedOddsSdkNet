@@ -16,17 +16,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         /// <summary>
         /// A <see cref="IDictionary{K, V}"/> containing competitor's country name in different languages
         /// </summary>
-        public IDictionary<CultureInfo, string> CountryNames { get; set; }
+        public Dictionary<CultureInfo, string> CountryNames { get; set; }
 
         /// <summary>
         /// A <see cref="IDictionary{K, V}"/> containing competitor abbreviations in different languages
         /// </summary>
-        public IDictionary<CultureInfo, string> Abbreviations { get; set; }
+        public Dictionary<CultureInfo, string> Abbreviations { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> containing associated player ids
+        /// A <see cref="List{T}"/> containing associated player ids
         /// </summary>
-        public IEnumerable<string> AssociatedPlayerIds { get; set; }
+        public List<string> AssociatedPlayerIds { get; set; }
 
         /// <summary>
         /// A <see cref="bool"/> indicating whether represented competitor is virtual
@@ -36,12 +36,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         /// <summary>
         /// A <see cref="IDictionary{K, V}"/> containing reference ids
         /// </summary>
-        public IDictionary<string, string> ReferenceIds { get; set; }
+        public Dictionary<string, string> ReferenceIds { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> containing jerseys
+        /// A <see cref="List{T}"/> containing jerseys
         /// </summary>
-        public IEnumerable<ExportableJerseyCI> Jerseys { get; set; }
+        public List<ExportableJerseyCI> Jerseys { get; set; }
 
         /// <summary>
         /// A <see cref="string"/> representing the country code
@@ -79,9 +79,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public ExportableRaceDriverProfileCI RaceDriverProfile { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representing the languages for which the current instance has translations
+        /// A <see cref="List{T}"/> representing the languages for which the current instance has translations
         /// </summary>
-        public IEnumerable<CultureInfo> FetchedCultures { get; set; }
+        public List<CultureInfo> FetchedCultures { get; set; }
 
         /// <summary>
         /// A <see cref="CultureInfo"/> representing the primary culture
@@ -96,7 +96,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         /// <summary>
         /// The list of CultureInfo used to fetch competitor profiles
         /// </summary>
-        public IEnumerable<CultureInfo> CultureCompetitorProfileFetched { get; set; }
+        public List<CultureInfo> CultureCompetitorProfileFetched { get; set; }
 
         /// <summary>
         /// A <see cref="string"/> representing the sport id

@@ -67,14 +67,24 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             
             Id = exportable.Id;
             Name = exportable.Name;
-            CompetitorsIds = exportable.Competitors?.Select(URN.Parse).ToList();
             try
             {
-                CompetitorsReferences = exportable.CompetitorsReferences?.ToDictionary(
-                                                                                       c => URN.Parse(c.Key),
-                                                                                       c => c.Value != null
-                                                                                                ? new ReferenceIdCI(c.Value)
-                                                                                                : null);
+                CompetitorsIds = exportable.Competitors?.Select(URN.Parse);
+                if (!exportable.CompetitorsReferences.IsNullOrEmpty())
+                {
+                    CompetitorsReferences = new Dictionary<URN, ReferenceIdCI>();
+                    foreach (var competitorsReference in exportable.CompetitorsReferences)
+                    { 
+                        var referenceIds = new Dictionary<string, string>();
+                        var refs = competitorsReference.Value.Split(',');
+                        foreach (var r in refs)
+                        {
+                            var refKeyValue = r.Split('=');
+                            referenceIds.Add(refKeyValue[0], refKeyValue[1]);
+                        }
+                        CompetitorsReferences.Add(URN.Parse(competitorsReference.Key), new ReferenceIdCI(referenceIds));
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -142,15 +152,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
         public async Task<ExportableGroupCI> ExportAsync()
         {
-            var cr = new Dictionary<string, Dictionary<string, string>>();
+            var cr = new Dictionary<string, string>();
             if (!CompetitorsReferences.IsNullOrEmpty())
             {
                 foreach (var competitorsReference in CompetitorsReferences)
                 {
                     try
                     {
-                        var refs = competitorsReference.Value.ReferenceIds?.ToDictionary(r => r.Key, r => r.Value);
-                        cr.Add(competitorsReference.Key.ToString(), refs);
+                        if (!competitorsReference.Value.ReferenceIds.IsNullOrEmpty())
+                        {
+                            var refs = string.Join(",", competitorsReference.Value.ReferenceIds.Select(s=> $"{s.Key}={s.Value}"));
+                            cr.Add(competitorsReference.Key.ToString(), refs);
+                        }
                     }
                     catch (Exception e)
                     {
@@ -163,7 +176,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             {
                 Id = Id,
                 Name = Name,
-                Competitors = CompetitorsIds?.Select(s=>s.ToString()),
+                Competitors = CompetitorsIds?.Select(s=>s.ToString()).ToList(),
                 CompetitorsReferences = cr.IsNullOrEmpty() ? null : cr
             };
         }

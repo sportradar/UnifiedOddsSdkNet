@@ -29,24 +29,24 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public ExportableSportEventConditionsCI Conditions { get; set; }
 
         /// <summary>
-        /// Gets the <see cref="IEnumerable{T}"/> specifying the competitors
+        /// Gets the <see cref="List{T}"/> specifying the competitors
         /// </summary>
-        public IEnumerable<string> Competitors { get; set; }
+        public List<string> Competitors { get; set; }
 
         /// <summary>
         /// Gets the <see cref="IDictionary{K, V}"/> specifying the reference ids
         /// </summary>
-        public IDictionary<string, string> ReferenceId { get; set; }
+        public Dictionary<string, string> ReferenceId { get; set; }
 
         /// <summary>
         /// Gets the <see cref="IDictionary{K, V}"/> specifying the competitors qualifiers
         /// </summary>
-        public IDictionary<string, string> CompetitorsQualifiers { get; set; }
+        public Dictionary<string, string> CompetitorsQualifiers { get; set; }
 
         /// <summary>
         /// Gets the <see cref="IDictionary{K, V}"/> specifying the competitors qualifiers
         /// </summary>
-        public IDictionary<string, IDictionary<string, string>> CompetitorsReferences { get; set; }
+        public Dictionary<string, IDictionary<string, string>> CompetitorsReferences { get; set; }
 
         /// <summary>
         /// Gets a liveOdds

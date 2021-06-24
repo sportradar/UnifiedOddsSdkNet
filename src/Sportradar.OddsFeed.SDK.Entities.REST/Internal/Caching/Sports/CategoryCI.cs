@@ -93,7 +93,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports
                 Id = Id.ToString(),
                 Name = new ReadOnlyDictionary<CultureInfo, string>(Name),
                 SportId = SportId.ToString(),
-                TournamentIds = TournamentIds != null ? new ReadOnlyCollection<string>(TournamentIds.Select(id => id.ToString()).ToList()) : null,
+                TournamentIds = TournamentIds?.Select(id => id.ToString()).ToList(),
                 CountryCode = CountryCode
             };
             return Task.FromResult<ExportableCI>(exportable);

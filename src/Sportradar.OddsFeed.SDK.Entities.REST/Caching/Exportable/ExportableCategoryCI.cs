@@ -18,9 +18,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public string SportId { get; set; }
 
         /// <summary>
-        /// Gets a <see cref="IEnumerable{T}"/> containing the ids of child tournaments
+        /// Gets a <see cref="List{T}"/> containing the ids of child tournaments
         /// </summary>
-        public IEnumerable<string> TournamentIds { get; set; }
+        public List<string> TournamentIds { get; set; }
 
         /// <summary>
         /// Gets the country code
