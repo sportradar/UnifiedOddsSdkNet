@@ -3,9 +3,11 @@
 */
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Dawn;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.Logging;
 
 namespace Sportradar.OddsFeed.SDK.Common.Internal
 {
@@ -14,12 +16,12 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
     /// </summary>
     public class SemaphorePool : ISemaphorePool
     {
-        //private read-only ILog _executionLog = SdkLoggerFactory.GetLogger(typeof(SemaphorePool));
+        private readonly ILog _executionLog = SdkLoggerFactory.GetLogger(typeof(SemaphorePool));
 
         /// <summary>
         /// A <see cref="List{T}"/> containing pool's semaphores
         /// </summary>
-        private readonly List<SemaphoreHolder> _semaphores;
+        private readonly List<SemaphoreHolder> _semaphoreHolders;
 
         /// <summary>
         /// A <see cref="List{T}"/> containing ids of resources currently available
@@ -52,15 +54,16 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <param name="count">The number of <see cref="SemaphoreSlim"/> instances to be created in the pool</param>
         public SemaphorePool(int count)
         {
-            _semaphores = new List<SemaphoreHolder>();
+            _semaphoreHolders = new List<SemaphoreHolder>();
             _availableSemaphoreIds = new List<string>();
             for (var i = 0; i < count; i++)
             {
-                _semaphores.Add(new SemaphoreHolder(new SemaphoreSlim(1)));
+                _semaphoreHolders.Add(new SemaphoreHolder(new SemaphoreSlim(1)));
             }
             _syncSemaphore = new Semaphore(count, count);
             _spinWait = new SpinWait();
             _syncObject = new object();
+            _executionLog.Debug($"SemaphorePool with size {count} created.");
         }
 
         /// <summary>
@@ -71,16 +74,13 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <exception cref="InvalidOperationException">Semaphore granted entry, but there are no SemaphoreSlim objects available</exception>
         private SemaphoreSlim AcquireInternal(string id)
         {
-            //_executionLog.Debug($"Waiting to enter semaphore for id={id}");
             _syncSemaphore.WaitOne();
-            //_executionLog.Debug($"Semaphore granted entry to id={id}");
             lock (_syncObject)
             {
-                foreach (var holder in _semaphores)
+                foreach (var holder in _semaphoreHolders)
                 {
                     if (holder.Id == id)
                     {
-                        //_executionLog.Debug($"Returning resource for request with id={id}");
                         return holder.Semaphore;
                     }
 
@@ -88,7 +88,6 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
                     {
                         holder.Acquire();
                         holder.Id = id;
-                        //_executionLog.Debug($"Returning resource for request with id={id}");
                         return holder.Semaphore;
                     }
                 }
@@ -100,7 +99,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources</param>
-        protected void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposing || _disposed)
             {
@@ -110,7 +109,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
             lock (_syncObject)
             {
                 _syncSemaphore.Dispose();
-                foreach (var holder in _semaphores)
+                foreach (var holder in _semaphoreHolders)
                 {
                     holder.Semaphore.ReleaseSafe();
                 }
@@ -135,10 +134,8 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
             Guard.Argument(id, nameof(id)).NotNull().NotEmpty();
 
             var idFound = false;
-            //_executionLog.Debug($"Entering lock for request with id={id}");
             lock (_syncObject)
             {
-                //_executionLog.Debug($"Lock for request with id={id} entered");
                 if (_availableSemaphoreIds.Contains(id))
                 {
                     idFound = true;
@@ -151,7 +148,6 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
 
             if (!idFound)
             {
-                //_executionLog.Debug($"Creating new thread for creation of resource for id={id}");
                 return Task.Run(() => AcquireInternal(id));
             }
 
@@ -159,7 +155,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
             {
                 lock (_syncObject)
                 {
-                    foreach (var holder in _semaphores)
+                    foreach (var holder in _semaphoreHolders)
                     {
                         if (holder.Id != id)
                         {
@@ -168,8 +164,12 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
                         holder.Acquire();
                         return Task.FromResult(holder.Semaphore);
                     }
+                    if (!_availableSemaphoreIds.Contains(id))
+                    {
+                        _availableSemaphoreIds.Add(id);
+                        return Task.Run(() => AcquireInternal(id));
+                    }
                 }
-                //_executionLog.Debug($"Spinning while waiting for the semaphore for id={id}");
                 _spinWait.SpinOnce();
             }
         }
@@ -185,7 +185,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
 
             lock (_syncObject)
             {
-                foreach (var holder in _semaphores)
+                foreach (var holder in _semaphoreHolders)
                 {
                     if (holder.Id != id)
                     {
@@ -196,7 +196,6 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
                     {
                         holder.Id = null;
                         _availableSemaphoreIds.Remove(id);
-                        //_executionLog.Debug($"Releasing the resource associated with id={id}");
                         _syncSemaphore.Release();
                     }
                     return;
