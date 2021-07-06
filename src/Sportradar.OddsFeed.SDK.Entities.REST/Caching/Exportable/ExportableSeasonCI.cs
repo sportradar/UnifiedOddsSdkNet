@@ -20,9 +20,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public string SeasonId { get; set; }
 
         /// <summary>
-        /// A <see cref="IDictionary{CultureInfo,String}"/> containing round names in different languages
+        /// A <see cref="Dictionary{CultureInfo,String}"/> containing round names in different languages
         /// </summary>
-        public IDictionary<CultureInfo, string> Names { get; set; }
+        public Dictionary<CultureInfo, string> Names { get; set; }
 
         /// <summary>
         /// Gets the start date of the season represented by the current instance

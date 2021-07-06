@@ -23,7 +23,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public string Name { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representation of the competitors ids
+        /// A <see cref="List{T}"/> representation of the competitors ids
         /// </summary>
         public List<string> Competitors { get; set; }
 

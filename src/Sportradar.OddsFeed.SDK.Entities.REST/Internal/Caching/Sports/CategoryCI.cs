@@ -91,7 +91,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports
             var exportable = new ExportableCategoryCI
             {
                 Id = Id.ToString(),
-                Name = new ReadOnlyDictionary<CultureInfo, string>(Name),
+                Name = new Dictionary<CultureInfo, string>(Name),
                 SportId = SportId.ToString(),
                 TournamentIds = TournamentIds?.Select(id => id.ToString()).ToList(),
                 CountryCode = CountryCode

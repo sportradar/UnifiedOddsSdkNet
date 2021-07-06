@@ -19,8 +19,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public int Id { get; set; }
 
         /// <summary>
-        /// A <see cref="IDictionary{K, V}"/> containing descriptions in different languages
+        /// A <see cref="Dictionary{K, V}"/> containing descriptions in different languages
         /// </summary>
-        public IDictionary<CultureInfo, string> Descriptions { get; set; }
+        public Dictionary<CultureInfo, string> Descriptions { get; set; }
     }
 }

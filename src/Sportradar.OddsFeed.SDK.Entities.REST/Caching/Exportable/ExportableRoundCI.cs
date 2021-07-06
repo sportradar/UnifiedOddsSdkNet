@@ -14,19 +14,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
     public class ExportableRoundCI
     {
         /// <summary>
-        /// A <see cref="IDictionary{K, V}"/> representation of the round names in different languages
+        /// A <see cref="Dictionary{K, V}"/> representation of the round names in different languages
         /// </summary>
-        public IDictionary<CultureInfo, string> Names { get; set; }
+        public Dictionary<CultureInfo, string> Names { get; set; }
 
         /// <summary>
-        /// A <see cref="IDictionary{K, V}"/> representation of the round group names in different languages
+        /// A <see cref="Dictionary{K, V}"/> representation of the round group names in different languages
         /// </summary>
-        public IDictionary<CultureInfo, string> GroupNames { get; set; }
+        public Dictionary<CultureInfo, string> GroupNames { get; set; }
 
         /// <summary>
-        /// A <see cref="IDictionary{K, V}"/> representation of the phase or group long name in different languages
+        /// A <see cref="Dictionary{K, V}"/> representation of the phase or group long name in different languages
         /// </summary>
-        public IDictionary<CultureInfo, string> PhaseOrGroupLongName { get; set; }
+        public Dictionary<CultureInfo, string> PhaseOrGroupLongName { get; set; }
 
         /// <summary>
         /// A <see cref="string"/> representation of the type

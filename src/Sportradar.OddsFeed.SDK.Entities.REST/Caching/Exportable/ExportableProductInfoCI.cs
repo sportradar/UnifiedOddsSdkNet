@@ -38,13 +38,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public bool IsInLiveScore;
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representation of the links
+        /// A <see cref="List{T}"/> representation of the links
         /// </summary>
-        public IEnumerable<ExportableProductInfoLinkCI> Links;
+        public List<ExportableProductInfoLinkCI> Links;
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representation of the channels
+        /// A <see cref="List{T}"/> representation of the channels
         /// </summary>
-        public IEnumerable<ExportableStreamingChannelCI> Channels;
+        public List<ExportableStreamingChannelCI> Channels;
     }
 }

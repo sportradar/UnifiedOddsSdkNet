@@ -33,9 +33,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public ExportableSeasonCoverageCI SeasonCoverage { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representation of the groups
+        /// A <see cref="List{T}"/> representation of the groups
         /// </summary>
-        public IEnumerable<ExportableGroupCI> Groups { get; set; }
+        public List<ExportableGroupCI> Groups { get; set; }
 
         /// <summary>
         /// A <see cref="string"/> representation of the current round
@@ -43,13 +43,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public ExportableRoundCI CurrentRound { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representation of the competitors ids
+        /// A <see cref="List{T}"/> representation of the competitors ids
         /// </summary>
-        public IEnumerable<string> Competitors { get; set; }
+        public List<string> Competitors { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representation of the schedule
+        /// A <see cref="List{T}"/> representation of the schedule
         /// </summary>
-        public IEnumerable<string> Schedule { get; set; }
+        public List<string> Schedule { get; set; }
     }
 }

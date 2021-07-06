@@ -417,7 +417,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                     ? new ExportableCoverageInfoCI
                     {
                         CoveredFrom = _coverageInfo.CoveredFrom,
-                        Includes = _coverageInfo.Includes,
+                        Includes = _coverageInfo.Includes?.ToList(),
                         IsLive = _coverageInfo.IsLive,
                         Level = _coverageInfo.Level
                     }

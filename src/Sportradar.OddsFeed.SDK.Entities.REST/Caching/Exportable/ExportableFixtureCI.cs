@@ -39,14 +39,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public string ReplacedBy { get; set; }
 
         /// <summary>
-        /// A <see cref="IDictionary{K, V}"/> representation of the extra info
+        /// A <see cref="Dictionary{K, V}"/> representation of the extra info
         /// </summary>
-        public IDictionary<string, string> ExtraInfo { get; set; }
+        public Dictionary<string, string> ExtraInfo { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representation of the tv channels
+        /// A <see cref="List{T}"/> representation of the tv channels
         /// </summary>
-        public IEnumerable<ExportableTvChannelCI> TvChannels { get; set; }
+        public List<ExportableTvChannelCI> TvChannels { get; set; }
 
         /// <summary>
         /// A <see cref="ExportableCoverageInfoCI"/> representation of the coverage info
@@ -59,14 +59,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public ExportableProductInfoCI ProductInfo { get; set; }
 
         /// <summary>
-        /// A <see cref="IDictionary{K, V}"/> representation of the references
+        /// A <see cref="Dictionary{K, V}"/> representation of the references
         /// </summary>
-        public IDictionary<string, string> References { get; set; }
+        public Dictionary<string, string> References { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representation of the scheduled start time changes
+        /// A <see cref="List{T}"/> representation of the scheduled start time changes
         /// </summary>
-        public IEnumerable<ExportableScheduledStartTimeChangeCI> ScheduledStartTimeChanges { get; set; }
+        public List<ExportableScheduledStartTimeChangeCI> ScheduledStartTimeChanges { get; set; }
 
         /// <summary>
         /// Gets a id of the parent stage associated with the current instance
@@ -74,8 +74,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public string ParentStageId { get; set; }
 
         /// <summary>
-        /// Gets a <see cref="IEnumerable{T}"/> specifying the additional parent stages associated with the current instance
+        /// Gets a <see cref="List{T}"/> specifying the additional parent stages associated with the current instance
         /// </summary>
-        public IEnumerable<string> AdditionalParentsIds { get; set; }
+        public List<string> AdditionalParentsIds { get; set; }
     }
 }

@@ -7,6 +7,7 @@ using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -91,7 +92,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// Initializes a new instance of the <see cref="CurrentSeasonInfoCI"/> class
         /// </summary>
         /// <param name="exportable">The exportable</param>
-        /// <param name="dataRouterManager">The <see cref="IDataRouterManager"/> used to fetch missing data</param>
         public CurrentSeasonInfoCI(ExportableCurrentSeasonInfoCI exportable)
             : base(exportable)
         {
@@ -148,20 +148,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
         public async Task<ExportableCurrentSeasonInfoCI> ExportAsync()
         {
-            var groupsTask = Groups?.Select(async g => await g.ExportAsync().ConfigureAwait(false));
-            return new ExportableCurrentSeasonInfoCI
+            var groupsTasks = Groups?.Select(async g => await g.ExportAsync().ConfigureAwait(false)).ToList();
+            if (!groupsTasks.IsNullOrEmpty())
             {
-                Id = Id.ToString(),
-                Name = new Dictionary<CultureInfo, string>(Name),
-                Year = Year,
-                StartDate = StartDate,
-                EndDate = EndDate,
-                SeasonCoverage = SeasonCoverage != null ? await SeasonCoverage.ExportAsync().ConfigureAwait(false) : null,
-                Groups = groupsTask != null ? await Task.WhenAll(groupsTask) : null,
-                CurrentRound = CurrentRound != null ? await CurrentRound.ExportAsync().ConfigureAwait(false) : null,
-                Competitors = CompetitorsIds?.Select(s=>s.ToString()),
-                Schedule = Schedule?.Select(s => s.ToString()).ToList()
-            };
+                await Task.WhenAll(groupsTasks).ConfigureAwait(false);
+            }
+
+            return new ExportableCurrentSeasonInfoCI
+                   {
+                       Id = Id.ToString(),
+                       Name = new Dictionary<CultureInfo, string>(Name),
+                       Year = Year,
+                       StartDate = StartDate,
+                       EndDate = EndDate,
+                       SeasonCoverage = SeasonCoverage != null ? await SeasonCoverage.ExportAsync().ConfigureAwait(false) : null,
+                       Groups = groupsTasks.IsNullOrEmpty() ? null : groupsTasks.Select(s=>s.Result).ToList(),
+                       CurrentRound = CurrentRound != null ? await CurrentRound.ExportAsync().ConfigureAwait(false) : null,
+                       Competitors = CompetitorsIds?.Select(s=>s.ToString()).ToList(),
+                       Schedule = Schedule?.Select(s => s.ToString()).ToList()
+                   };
         }
     }
 }

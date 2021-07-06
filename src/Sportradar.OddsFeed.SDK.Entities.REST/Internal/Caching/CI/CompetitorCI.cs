@@ -3,11 +3,9 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Dawn;
 using System.Globalization;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;

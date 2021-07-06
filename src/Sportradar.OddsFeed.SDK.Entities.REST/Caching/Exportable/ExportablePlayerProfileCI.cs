@@ -14,9 +14,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
     public class ExportablePlayerProfileCI : ExportableCI
     {
         /// <summary>
-        /// A <see cref="IDictionary{K, V}"/> containing nationalities in different languages
+        /// A <see cref="Dictionary{K, V}"/> containing nationalities in different languages
         /// </summary>
-        public IDictionary<CultureInfo, string> Nationalities { get; set; }
+        public Dictionary<CultureInfo, string> Nationalities { get; set; }
 
         /// <summary>
         /// A <see cref="string"/> representing the type
@@ -67,6 +67,5 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         /// Gets the nickname of the player
         /// </summary>
         public string Nickname { get; set; }
-
     }
 }

@@ -2,7 +2,6 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Dawn;
 using System.Globalization;
 using System.Linq;
@@ -175,17 +174,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public Task<ExportableVenueCI> ExportAsync()
         {
             return Task.FromResult(new ExportableVenueCI
-            {
-                Id = Id.ToString(),
-                Name = new ReadOnlyDictionary<CultureInfo, string>(_names),
-                CityNames = new ReadOnlyDictionary<CultureInfo, string>(_cityNames),
-                CountryNames = new ReadOnlyDictionary<CultureInfo, string>(_countryNames),
-                Capacity = Capacity,
-                Coordinates =  Coordinates,
-                CountryCode = CountryCode,
-                State = State,
-                Course = Course?.Select(s => new ExportableHoleCI { Number = s.Number, Par = s.Par })
-            });
+                                   {
+                                       Id = Id.ToString(),
+                                       Name = new Dictionary<CultureInfo, string>(_names),
+                                       CityNames = new Dictionary<CultureInfo, string>(_cityNames),
+                                       CountryNames = new Dictionary<CultureInfo, string>(_countryNames),
+                                       Capacity = Capacity,
+                                       Coordinates = Coordinates,
+                                       CountryCode = CountryCode,
+                                       State = State,
+                                       Course = Course?.Select(s => new ExportableHoleCI {Number = s.Number, Par = s.Par}).ToList()
+                                   });
         }
     }
 }

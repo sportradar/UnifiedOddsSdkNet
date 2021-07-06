@@ -24,9 +24,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public ExportableTournamentCoverageCI TournamentCoverage { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representing the competitors ids
+        /// A <see cref="List{T}"/> representing the competitors ids
         /// </summary>
-        public IEnumerable<string> Competitors { get; set; }
+        public List<string> Competitors { get; set; }
 
         /// <summary>
         /// A <see cref="ExportableCurrentSeasonInfoCI"/> representing the season info
@@ -34,14 +34,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public ExportableCurrentSeasonInfoCI CurrentSeasonInfo { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representing the groups
+        /// A <see cref="List{T}"/> representing the groups
         /// </summary>
-        public IEnumerable<ExportableGroupCI> Groups { get; set; }
+        public List<ExportableGroupCI> Groups { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representing the schedule urns
+        /// A <see cref="List{T}"/> representing the schedule urns
         /// </summary>
-        public IEnumerable<string> ScheduleUrns { get; set; }
+        public List<string> ScheduleUrns { get; set; }
 
         /// <summary>
         /// A <see cref="ExportableRoundCI"/> representing the round
@@ -59,9 +59,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public ExportableTournamentInfoBasicCI TournamentInfoBasic { get; set; }
 
         /// <summary>
-        /// A <see cref="IDictionary{K, V}"/> representing the reference id
+        /// A <see cref="Dictionary{K, V}"/> representing the reference id
         /// </summary>
-        public IDictionary<string, string> ReferenceId { get; set; }
+        public Dictionary<string, string> ReferenceId { get; set; }
 
         /// <summary>
         /// A <see cref="ExportableSeasonCoverageCI"/> representing the season coverage
@@ -69,24 +69,24 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public ExportableSeasonCoverageCI SeasonCoverage { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representing the seasons
+        /// A <see cref="List{T}"/> representing the seasons
         /// </summary>
-        public IEnumerable<string> Seasons { get; set; }
+        public List<string> Seasons { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representing the loaded seasons
+        /// A <see cref="List{T}"/> representing the loaded seasons
         /// </summary>
-        public IEnumerable<CultureInfo> LoadedSeasons { get; set; }
+        public List<CultureInfo> LoadedSeasons { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representing the loaded schedules
+        /// A <see cref="List{T}"/> representing the loaded schedules
         /// </summary>
-        public IEnumerable<CultureInfo> LoadedSchedules { get; set; }
+        public List<CultureInfo> LoadedSchedules { get; set; }
 
         /// <summary>
-        /// A <see cref="IDictionary{K, V}"/> representing the competitors references
+        /// A <see cref="Dictionary{K, V}"/> representing the competitors references
         /// </summary>
-        public IDictionary<string, IDictionary<string, string>> CompetitorsReferences { get; set; }
+        public Dictionary<string, Dictionary<string, string>> CompetitorsReferences { get; set; }
 
         /// <summary>
         /// A <see cref="bool"/> representing the exhibition games

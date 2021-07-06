@@ -24,9 +24,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public bool IsLive;
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representation of the includes
+        /// A <see cref="List{T}"/> representation of the includes
         /// </summary>
-        public IEnumerable<string> Includes;
+        public List<string> Includes;
 
         /// <summary>
         /// A <see cref="CoveredFrom"/> representation of the covered from

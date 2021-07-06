@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 
@@ -164,8 +165,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
         public async Task<ExportableProductInfoCI> ExportAsync()
         {
-            var linkTasks = _links?.Select(async l => await ((ProductInfoLink) l).ExportAsync().ConfigureAwait(false));
-            var channelTasks = _channels?.Select(async c => await ((StreamingChannel) c).ExportAsync().ConfigureAwait(false));
+            var linkTasks = _links?.Select(async l => await ((ProductInfoLink) l).ExportAsync().ConfigureAwait(false)).ToList();
+            var channelTasks = _channels?.Select(async c => await ((StreamingChannel) c).ExportAsync().ConfigureAwait(false)).ToList();
+            if (!linkTasks.IsNullOrEmpty())
+            {
+                await Task.WhenAll(linkTasks).ConfigureAwait(false);
+            }
+            if (!channelTasks.IsNullOrEmpty())
+            {
+                await Task.WhenAll(channelTasks).ConfigureAwait(false);
+            }
 
             return new ExportableProductInfoCI
             {
@@ -174,8 +183,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 IsInLiveCenterSoccer = _isInLiveCenterSoccer,
                 IsInLiveMatchTracker = _isInLiveMatchTracker,
                 IsInLiveScore = _isInLiveScore,
-                Links = linkTasks != null ? await Task.WhenAll(linkTasks) : null,
-                Channels = channelTasks != null ? await Task.WhenAll(channelTasks) : null
+                Links = linkTasks.IsNullOrEmpty() ? null : linkTasks.Select(s=>s.Result).ToList(),
+                Channels = channelTasks.IsNullOrEmpty() ? null : channelTasks.Select(s=>s.Result).ToList()
             };
         }
     }

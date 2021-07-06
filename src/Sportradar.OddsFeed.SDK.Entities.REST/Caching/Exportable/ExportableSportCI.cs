@@ -14,14 +14,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
     public class ExportableSportCI : ExportableCI
     {
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> specifying the id's of child categories
+        /// A <see cref="List{T}"/> specifying the id's of child categories
         /// </summary>
         /// 
-        public IEnumerable<string> CategoryIds { get; set; }
+        public List<string> CategoryIds { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> specifying the loaded categories for tournament
+        /// A <see cref="List{T}"/> specifying the loaded categories for tournament
         /// </summary>
-        public IEnumerable<CultureInfo> LoadedCategories { get; set; }
+        public List<CultureInfo> LoadedCategories { get; set; }
     }
 }

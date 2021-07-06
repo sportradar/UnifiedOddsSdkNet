@@ -14,14 +14,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
     public class ExportableVenueCI : ExportableCI
     {
         /// <summary>
-        /// A <see cref="IDictionary{K, V}"/> containing city of the venue in different languages
+        /// A <see cref="Dictionary{K, V}"/> containing city of the venue in different languages
         /// </summary>
-        public IDictionary<CultureInfo, string> CityNames { get; set; }
+        public Dictionary<CultureInfo, string> CityNames { get; set; }
 
         /// <summary>
-        /// A <see cref="IDictionary{K, V}"/> containing country of the venue in different languages
+        /// A <see cref="Dictionary{K, V}"/> containing country of the venue in different languages
         /// </summary>
-        public IDictionary<CultureInfo, string> CountryNames { get; set; }
+        public Dictionary<CultureInfo, string> CountryNames { get; set; }
 
         /// <summary>
         /// Gets the capacity of the venue
@@ -47,6 +47,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         /// Gets the course
         /// </summary>
         /// <value>The course</value>
-        public IEnumerable<ExportableHoleCI> Course { get; set; }
+        public List<ExportableHoleCI> Course { get; set; }
     }
 }

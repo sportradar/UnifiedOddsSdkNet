@@ -84,9 +84,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public DateTime Time { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}" /> specifying the assists
+        /// A <see cref="List{T}" /> specifying the assists
         /// </summary>
-        public IEnumerable<ExportableEventPlayerAssistCI> Assists { get; set; }
+        public List<ExportableEventPlayerAssistCI> Assists { get; set; }
 
         /// <summary>
         /// A <see cref="ExportableEventPlayerCI" /> specifying the goal scorer

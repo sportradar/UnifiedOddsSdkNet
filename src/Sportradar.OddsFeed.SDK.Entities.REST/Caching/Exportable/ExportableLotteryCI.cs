@@ -28,8 +28,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public ExportableDrawInfoCI DrawInfo { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representing the scheduled draws
+        /// A <see cref="List{T}"/> representing the scheduled draws
         /// </summary>
-        public IEnumerable<string> ScheduledDraws { get; set; }
+        public List<string> ScheduledDraws { get; set; }
     }
 }

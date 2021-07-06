@@ -803,10 +803,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
 
             info.CategoryId = _categoryId?.ToString();
             info.TournamentCoverage = _tournamentCoverage != null ? await _tournamentCoverage.ExportAsync().ConfigureAwait(false) : null;
-            info.Competitors = _competitors?.Select(s=>s.ToString());
+            info.Competitors = _competitors?.Select(s=>s.ToString()).ToList();
             info.CurrentSeasonInfo = _currentSeasonInfo != null ? await _currentSeasonInfo.ExportAsync().ConfigureAwait(false) : null;
-            var groupsTasks = _groups?.Select(async g => await g.ExportAsync().ConfigureAwait(false));
-            info.Groups = groupsTasks != null ? await Task.WhenAll(groupsTasks) : null;
+            var groupsTasks = _groups?.Select(async g => await g.ExportAsync().ConfigureAwait(false)).ToList();
+            if (!groupsTasks.IsNullOrEmpty())
+            {
+                await Task.WhenAll(groupsTasks).ConfigureAwait(false);
+            }
+            info.Groups = groupsTasks.IsNullOrEmpty() ? null : groupsTasks.Select(s=>s.Result).ToList();
             info.ScheduleUrns = _scheduleUrns?.Select(s => s.ToString()).ToList();
             info.Round = _round != null ? await _round.ExportAsync().ConfigureAwait(false) : null;
             info.Year = _year;
@@ -816,7 +820,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             info.Seasons = _seasons?.Select(s => s.ToString()).ToList();
             info.LoadedSeasons = new List<CultureInfo>(_loadedSeasons ?? new List<CultureInfo>());
             info.LoadedSchedules = new List<CultureInfo>(_loadedSchedules ?? new List<CultureInfo>());
-            info.CompetitorsReferences = _competitorsReferences?.ToDictionary(r => r.Key.ToString(), r => (IDictionary<string, string>)r.Value.ReferenceIds.ToDictionary(v => v.Key, v => v.Value));
+            info.CompetitorsReferences = _competitorsReferences?.ToDictionary(r => r.Key.ToString(), r => r.Value.ReferenceIds.ToDictionary(v => v.Key, v => v.Value));
             info.ExhibitionGames = _exhibitionGames;
 
             return exportable;

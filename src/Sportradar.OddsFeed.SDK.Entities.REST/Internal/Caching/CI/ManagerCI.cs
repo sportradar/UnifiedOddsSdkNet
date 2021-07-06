@@ -2,10 +2,10 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Dawn;
 using System.Globalization;
 using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -83,8 +83,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             return Task.FromResult(new ExportableManagerCI
             {
                 Id = Id.ToString(),
-                Name = new ReadOnlyDictionary<CultureInfo, string>(Name),
-                Nationality = Nationality != null ? new ReadOnlyDictionary<CultureInfo, string>(Nationality) : null,
+                Name = new Dictionary<CultureInfo, string>(Name),
+                Nationality = Nationality.IsNullOrEmpty() ? null : new Dictionary<CultureInfo, string>(Nationality),
                 CountryCode = CountryCode
             });
         }

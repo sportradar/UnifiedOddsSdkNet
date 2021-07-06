@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Dawn;
 using System.Linq;
 using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -227,8 +228,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
         public async Task<ExportableFixtureCI> ExportAsync()
         {
-            var scheduledTasks = ScheduledStartTimeChanges?.Select(async s => await ((ScheduledStartTimeChange) s).ExportAsync().ConfigureAwait(false));
-            var channelTasks = TvChannels?.Select(async c => await ((TvChannel) c).ExportAsync().ConfigureAwait(false));
+            var scheduledTasks = ScheduledStartTimeChanges?.Select(async s => await ((ScheduledStartTimeChange) s).ExportAsync().ConfigureAwait(false)).ToList();
+            if (!scheduledTasks.IsNullOrEmpty())
+            {
+                await Task.WhenAll(scheduledTasks).ConfigureAwait(false);
+            }
+            var channelTasks = TvChannels?.Select(async c => await ((TvChannel) c).ExportAsync().ConfigureAwait(false)).ToList();
             return new ExportableFixtureCI
             {
                 ExtraInfo = ExtraInfo?.ToDictionary(i => i.Key, i => i.Value),
@@ -238,9 +243,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 References = References?.References?.ToDictionary(r => r.Key, r => r.Value),
                 NextLiveTime = NextLiveTime,
                 StartTimeConfirmed = StartTimeConfirmed,
-                ScheduledStartTimeChanges = scheduledTasks != null ? await Task.WhenAll(scheduledTasks) : null,
+                ScheduledStartTimeChanges = scheduledTasks.IsNullOrEmpty() ? null : scheduledTasks.Select(s=>s.Result).ToList(),
                 StartTime = StartTime,
-                TvChannels = channelTasks != null ? await Task.WhenAll(channelTasks) : null,
+                TvChannels = channelTasks.IsNullOrEmpty() ? null : channelTasks.Select(s=>s.Result).ToList(),
                 StartTimeTBD = StartTimeTBD,
                 ParentStageId = ParentStageId?.ToString(),
                 AdditionalParentsIds = AdditionalParentsIds?.Select(s=>s.ToString()).ToList()

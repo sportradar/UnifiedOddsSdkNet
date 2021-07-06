@@ -29,9 +29,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public bool ResultsChronological { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> representing the results
+        /// A <see cref="List{T}"/> representing the results
         /// </summary>
-        public IEnumerable<ExportableDrawResultCI> Results { get; set; }
+        public List<ExportableDrawResultCI> Results { get; set; }
 
         /// <summary>
         /// A <see cref="int"/> representing the display id

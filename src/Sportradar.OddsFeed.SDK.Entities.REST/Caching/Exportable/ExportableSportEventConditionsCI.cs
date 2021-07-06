@@ -33,8 +33,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         public ExportableWeatherInfoCI WeatherInfo { get; set; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}" /> specifying the pitchers
+        /// A <see cref="List{T}" /> specifying the pitchers
         /// </summary>
-        public IEnumerable<ExportablePitcherCI> Pitchers { get; set; }
+        public List<ExportablePitcherCI> Pitchers { get; set; }
     }
 }

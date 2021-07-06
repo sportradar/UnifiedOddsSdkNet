@@ -3,6 +3,7 @@
 */
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Dawn;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
@@ -41,7 +42,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         internal CoverageInfoCI(ExportableCoverageInfoCI exportable)
         {
             if (exportable == null)
+            {
                 throw new ArgumentNullException(nameof(exportable));
+            }
 
             Level = exportable.Level;
             IsLive = exportable.IsLive;
@@ -59,7 +62,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             {
                 Level = Level,
                 IsLive = IsLive,
-                Includes = Includes,
+                Includes = Includes?.ToList(),
                 CoveredFrom = CoveredFrom
             });
         }

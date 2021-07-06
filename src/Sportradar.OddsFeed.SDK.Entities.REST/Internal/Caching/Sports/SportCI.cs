@@ -127,9 +127,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports
             var exportable = new ExportableSportCI
             {
                 Id = Id.ToString(),
-                Name = new ReadOnlyDictionary<CultureInfo, string>(Name),
-                CategoryIds = CategoryIds != null ? new ReadOnlyCollection<string>(CategoryIds.Select(id => id.ToString()).ToList()) : null,
-                LoadedCategories = new ReadOnlyCollection<CultureInfo>(_loadedCategories)
+                Name = new Dictionary<CultureInfo, string>(Name),
+                CategoryIds = CategoryIds?.Select(id => id.ToString()).ToList(),
+                LoadedCategories = new List<CultureInfo>(_loadedCategories)
             };
             return Task.FromResult<ExportableCI>(exportable);
         }

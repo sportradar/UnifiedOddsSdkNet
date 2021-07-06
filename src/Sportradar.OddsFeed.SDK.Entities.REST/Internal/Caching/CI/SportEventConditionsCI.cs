@@ -7,6 +7,7 @@ using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
@@ -114,16 +115,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
         public async Task<ExportableSportEventConditionsCI> ExportAsync()
         {
-            var pitcherTasks = Pitchers?.Select(async p => await p.ExportAsync().ConfigureAwait(false));
-
-            return new ExportableSportEventConditionsCI
+            var pitcherTasks = Pitchers?.Select(async p => await p.ExportAsync().ConfigureAwait(false)).ToList();
+            if (!pitcherTasks.IsNullOrEmpty())
             {
-                Attendance = Attendance,
-                EventMode = EventMode,
-                Referee = Referee != null ? await Referee.ExportAsync().ConfigureAwait(false) : null,
-                WeatherInfo = WeatherInfo != null ? await WeatherInfo.ExportAsync().ConfigureAwait(false) as ExportableWeatherInfoCI : null,
-                Pitchers = pitcherTasks != null ? await Task.WhenAll(pitcherTasks) : null
-            };
+                await Task.WhenAll(pitcherTasks).ConfigureAwait(false);
+            }
+            return new ExportableSportEventConditionsCI
+                   {
+                       Attendance = Attendance,
+                       EventMode = EventMode,
+                       Referee = Referee != null ? await Referee.ExportAsync().ConfigureAwait(false) : null,
+                       WeatherInfo = WeatherInfo != null ? await WeatherInfo.ExportAsync().ConfigureAwait(false) : null,
+                       Pitchers = pitcherTasks.IsNullOrEmpty() ? null : pitcherTasks.Select(s=>s.Result).ToList()
+                   };
         }
     }
 }

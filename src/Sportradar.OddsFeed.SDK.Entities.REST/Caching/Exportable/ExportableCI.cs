@@ -21,6 +21,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
         /// <summary>
         /// A <see cref="IDictionary{TKey,TValue}"/> containing translated name of the item
         /// </summary>
-        public IDictionary<CultureInfo, string> Name { get; set; }
+        public Dictionary<CultureInfo, string> Name { get; set; }
     }
 }

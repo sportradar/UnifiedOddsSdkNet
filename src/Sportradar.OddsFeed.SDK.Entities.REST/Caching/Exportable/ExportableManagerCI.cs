@@ -14,9 +14,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable
     public class ExportableManagerCI : ExportableCI
     {
         /// <summary>
-        /// A <see cref="IDictionary{K, V}"/> containing translated nationality of the item
+        /// A <see cref="Dictionary{K, V}"/> containing translated nationality of the item
         /// </summary>
-        public IDictionary<CultureInfo, string> Nationality { get; set; }
+        public Dictionary<CultureInfo, string> Nationality { get; set; }
 
         /// <summary>
         /// A <see cref="string"/> representing the country code of the manager
