@@ -109,8 +109,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             {
                 try
                 {
-                    var associatedPlayerIds = GetOrLoadCompetitor()?.AssociatedPlayerIds;
-                    if (associatedPlayerIds != null && associatedPlayerIds.Any())
+                    var associatedPlayerIds = GetOrLoadCompetitor()?.AssociatedPlayerIds?.ToList();
+                    if (!associatedPlayerIds.IsNullOrEmpty())
                     {
                         return _sportEntityFactory.BuildPlayersAsync(associatedPlayerIds, _cultures, _exceptionStrategy).Result;
                     }

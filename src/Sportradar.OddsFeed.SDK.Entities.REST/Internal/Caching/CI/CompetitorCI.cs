@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using Dawn;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
@@ -488,52 +489,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CompetitorCI"/> class
-        /// </summary>
-        /// <param name="exportable">A <see cref="ExportableCompetitorCI"/> containing information about the sport entity</param>
-        internal void Import(ExportableCompetitorCI exportable)
-        {
-            try
-            {
-                Names = exportable.Name.IsNullOrEmpty() ? null : new Dictionary<CultureInfo, string>(exportable.Name);
-                _countryNames = exportable.CountryNames.IsNullOrEmpty() ? null : new Dictionary<CultureInfo, string>(exportable.CountryNames);
-                _abbreviations = exportable.Abbreviations.IsNullOrEmpty() ? null : new Dictionary<CultureInfo, string>(exportable.Abbreviations);
-                _associatedPlayerIds = exportable.AssociatedPlayerIds.IsNullOrEmpty() ? null : new List<URN>(exportable.AssociatedPlayerIds.Select(URN.Parse));
-                _isVirtual = exportable.IsVirtual;
-                _referenceId = exportable.ReferenceIds.IsNullOrEmpty() ? null : new ReferenceIdCI(exportable.ReferenceIds);
-                _jerseys = exportable.Jerseys.IsNullOrEmpty() ? null : new List<JerseyCI>(exportable.Jerseys.Select(j => new JerseyCI(j)));
-                _countryCode = exportable.CountryCode;
-                _state = exportable.State;
-                _manager = exportable.Manager != null ? new ManagerCI(exportable.Manager) : null;
-                _venue = exportable.Venue != null ? new VenueCI(exportable.Venue) : null;
-                _gender = exportable.Gender;
-                _ageGroup = exportable.AgeGroup;
-                _fetchedCultures = exportable.FetchedCultures.IsNullOrEmpty() ? new List<CultureInfo>() : new List<CultureInfo>(exportable.FetchedCultures);
-                _primaryCulture = exportable.PrimaryCulture;
-                _raceDriverProfile = exportable.RaceDriverProfile != null ? new RaceDriverProfileCI(exportable.RaceDriverProfile) : null;
-                _referenceId = exportable.ReferenceIds.IsNullOrEmpty() ? null : new ReferenceIdCI(exportable.ReferenceIds);
-                _lastTimeCompetitorProfileFetched = DateTime.MinValue;
-                if (exportable.LastTimeCompetitorProfileIsFetched.HasValue)
-                {
-                    _lastTimeCompetitorProfileFetched = exportable.LastTimeCompetitorProfileIsFetched.Value;
-                }
-
-                _cultureCompetitorProfileFetched = new List<CultureInfo>();
-                if (exportable.CultureCompetitorProfileFetched != null)
-                {
-                    _cultureCompetitorProfileFetched = exportable.CultureCompetitorProfileFetched.ToList();
-                }
-                _sportId = exportable.SportId != null ? URN.Parse(exportable.SportId) : null;
-                _categoryId = exportable.CategoryId != null ? URN.Parse(exportable.CategoryId) : null;
-                _shortName = exportable.ShortName;
-            }
-            catch (Exception e)
-            {
-                SdkLoggerFactory.GetLoggerForExecution(typeof(CompetitorCI)).Error("Importing CompetitorCI", e);
-            }
-        }
-
-        /// <summary>
         /// Merges the information from the provided <see cref="CompetitorDTO"/> into the current instance
         /// </summary>
         /// <param name="competitor">A <see cref="CompetitorDTO"/> containing information about the competitor</param>
@@ -557,9 +512,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             {
                 _state = competitor.State;
             }
-            if (competitor.Players != null && competitor.Players.Any())
+            if (!competitor.Players.IsNullOrEmpty())
             {
-                _associatedPlayerIds.Clear();
+                ResetAssociatedPlayers();
                 _associatedPlayerIds.AddRange(competitor.Players.Select(s => s.Id));
             }
             if (!string.IsNullOrEmpty(competitor.Gender))
@@ -609,14 +564,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             {
                 _state = competitorProfile.Competitor.State;
             }
-            if (competitorProfile.Players != null && competitorProfile.Players.Any())
+            if (!competitorProfile.Players.IsNullOrEmpty())
             {
-                _associatedPlayerIds.Clear();
+                ResetAssociatedPlayers();
                 _associatedPlayerIds.AddRange(competitorProfile.Players.Select(s => s.Id));
             }
-            if (competitorProfile.Jerseys != null && competitorProfile.Jerseys.Any())
+            if (!competitorProfile.Jerseys.IsNullOrEmpty())
             {
-                _jerseys.Clear();
+                ResetJerseys();
                 _jerseys.AddRange(competitorProfile.Jerseys.Select(s => new JerseyCI(s)));
             }
             if (competitorProfile.Manager != null)
@@ -765,17 +720,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                     _abbreviations[k] = item._abbreviations[k];
                 }
             }
-
-            _associatedPlayerIds.Clear();
+            
             if (!item._associatedPlayerIds.IsNullOrEmpty())
             {
+                ResetAssociatedPlayers();
                 _associatedPlayerIds.AddRange(item._associatedPlayerIds);
             }
             _isVirtual = item.IsVirtual;
             _referenceId = item._referenceId ?? _referenceId;
-            _jerseys.Clear();
             if (!item._jerseys.IsNullOrEmpty())
             {
+                ResetJerseys();
                 _jerseys.AddRange(item._jerseys);
             }
             _countryCode = item._countryCode ?? _countryCode;
@@ -794,6 +749,30 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             if(!string.IsNullOrEmpty(item.ShortName))
             {
                 _shortName = item.ShortName;
+            }
+        }
+
+        private void ResetAssociatedPlayers()
+        {
+            if (_associatedPlayerIds == null)
+            {
+                _associatedPlayerIds = new List<URN>();
+            }
+            else
+            {
+                _associatedPlayerIds.Clear();
+            }
+        }
+
+        private void ResetJerseys()
+        {
+            if (_jerseys == null)
+            {
+                _jerseys = new List<JerseyCI>();
+            }
+            else
+            {
+                _jerseys.Clear();
             }
         }
 
@@ -860,21 +839,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             var exportable = new T
                              {
                                  Id = Id.ToString(),
-                                 Name = Names.IsNullOrEmpty() ? null : new ReadOnlyDictionary<CultureInfo, string>(Names),
-                                 CountryNames = _countryNames.IsNullOrEmpty() ? null : new Dictionary<CultureInfo, string>(_countryNames),
-                                 Abbreviations = _abbreviations.IsNullOrEmpty() ? null : new Dictionary<CultureInfo, string>(_abbreviations),
-                                 AssociatedPlayerIds = _associatedPlayerIds.IsNullOrEmpty() ? null : new List<string>(_associatedPlayerIds.Select(i => i.ToString()).ToList()),
+                                 Name = Names.IsNullOrEmpty() ? new Dictionary<CultureInfo, string>() : new Dictionary<CultureInfo, string>(Names),
+                                 CountryNames = _countryNames.IsNullOrEmpty() ? new Dictionary<CultureInfo, string>() : new Dictionary<CultureInfo, string>(_countryNames),
+                                 Abbreviations = _abbreviations.IsNullOrEmpty() ? new Dictionary<CultureInfo, string>() : new Dictionary<CultureInfo, string>(_abbreviations),
+                                 AssociatedPlayerIds = _associatedPlayerIds.IsNullOrEmpty() ? new List<string>() : new List<string>(_associatedPlayerIds.Select(i => i.ToString()).ToList()),
                                  IsVirtual = _isVirtual,
-                                 ReferenceIds = _referenceId?.ReferenceIds == null ? null : new Dictionary<string, string>(_referenceId.ReferenceIds.ToDictionary(d=>d.Key, d=>d.Value)),
-                                 Jerseys = jerseysList.IsNullOrEmpty() ? null : new List<ExportableJerseyCI>(jerseysList),
+                                 ReferenceIds = _referenceId?.ReferenceIds == null ? new Dictionary<string, string>() : new Dictionary<string, string>((IDictionary<string, string>)_referenceId.ReferenceIds),
+                                 Jerseys = jerseysList.IsNullOrEmpty() ? new List<ExportableJerseyCI>() : new List<ExportableJerseyCI>(jerseysList),
                                  CountryCode = _countryCode,
                                  State = _state,
-                                 Manager = _manager == null ? null : await _manager.ExportAsync().ConfigureAwait(false),
-                                 Venue = _venue == null ? null : await _venue.ExportAsync().ConfigureAwait(false),
+                                 Manager = _manager != null ? await _manager.ExportAsync().ConfigureAwait(false) : null,
+                                 Venue = _venue != null ? await _venue.ExportAsync().ConfigureAwait(false) : null,
                                  Gender = _gender,
                                  AgeGroup = _ageGroup,
-                                 RaceDriverProfile = _raceDriverProfile == null ? null : await _raceDriverProfile.ExportAsync().ConfigureAwait(false),
-                                 FetchedCultures = _fetchedCultures.IsNullOrEmpty() ? null : new List<CultureInfo>(_fetchedCultures.ToList()),
+                                 RaceDriverProfile = _raceDriverProfile != null ? await _raceDriverProfile.ExportAsync().ConfigureAwait(false) : null,
+                                 FetchedCultures = _fetchedCultures.IsNullOrEmpty() ? new List<CultureInfo>() : new List<CultureInfo>(_fetchedCultures.ToList()),
                                  PrimaryCulture = _primaryCulture,
                                  LastTimeCompetitorProfileIsFetched = _lastTimeCompetitorProfileFetched > DateTime.MinValue
                                                                           ? _lastTimeCompetitorProfileFetched
@@ -886,6 +865,52 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                              };
 
             return exportable;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CompetitorCI"/> class
+        /// </summary>
+        /// <param name="exportable">A <see cref="ExportableCompetitorCI"/> containing information about the sport entity</param>
+        internal void Import(ExportableCompetitorCI exportable)
+        {
+            try
+            {
+                Names = exportable.Name.IsNullOrEmpty() ? new Dictionary<CultureInfo, string>() : new Dictionary<CultureInfo, string>(exportable.Name);
+                _countryNames = exportable.CountryNames.IsNullOrEmpty() ? new Dictionary<CultureInfo, string>() : new Dictionary<CultureInfo, string>(exportable.CountryNames);
+                _abbreviations = exportable.Abbreviations.IsNullOrEmpty() ? new Dictionary<CultureInfo, string>() : new Dictionary<CultureInfo, string>(exportable.Abbreviations);
+                _associatedPlayerIds = exportable.AssociatedPlayerIds.IsNullOrEmpty() ? new List<URN>() : new List<URN>(exportable.AssociatedPlayerIds.Select(URN.Parse));
+                _isVirtual = exportable.IsVirtual;
+                _referenceId = exportable.ReferenceIds.IsNullOrEmpty() ? null  : new ReferenceIdCI(exportable.ReferenceIds);
+                _jerseys = exportable.Jerseys.IsNullOrEmpty() ? new List<JerseyCI>() : new List<JerseyCI>(exportable.Jerseys.Select(j => new JerseyCI(j)));
+                _countryCode = exportable.CountryCode;
+                _state = exportable.State;
+                _manager = exportable.Manager == null ? null : new ManagerCI(exportable.Manager);
+                _venue = exportable.Venue == null ? null : new VenueCI(exportable.Venue);
+                _gender = exportable.Gender;
+                _ageGroup = exportable.AgeGroup;
+                _fetchedCultures = exportable.FetchedCultures.IsNullOrEmpty() ? new List<CultureInfo>() : new List<CultureInfo>(exportable.FetchedCultures);
+                _primaryCulture = exportable.PrimaryCulture;
+                _raceDriverProfile = exportable.RaceDriverProfile == null ? null : new RaceDriverProfileCI(exportable.RaceDriverProfile);
+                _referenceId = exportable.ReferenceIds.IsNullOrEmpty() ? null : new ReferenceIdCI(exportable.ReferenceIds);
+                _lastTimeCompetitorProfileFetched = DateTime.MinValue;
+                if (exportable.LastTimeCompetitorProfileIsFetched.HasValue)
+                {
+                    _lastTimeCompetitorProfileFetched = exportable.LastTimeCompetitorProfileIsFetched.Value;
+                }
+
+                _cultureCompetitorProfileFetched = new List<CultureInfo>();
+                if (exportable.CultureCompetitorProfileFetched != null)
+                {
+                    _cultureCompetitorProfileFetched = exportable.CultureCompetitorProfileFetched.ToList();
+                }
+                _sportId = exportable.SportId != null ? URN.Parse(exportable.SportId) : null;
+                _categoryId = exportable.CategoryId != null ? URN.Parse(exportable.CategoryId) : null;
+                _shortName = exportable.ShortName;
+            }
+            catch (Exception e)
+            {
+                SdkLoggerFactory.GetLoggerForExecution(typeof(CompetitorCI)).Error("Importing CompetitorCI", e);
+            }
         }
 
         /// <summary>
