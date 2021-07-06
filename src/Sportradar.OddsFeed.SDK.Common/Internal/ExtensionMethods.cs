@@ -82,10 +82,9 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <returns>True if releasing the semaphore succeeded (e.g. instance was not yet disposed); otherwise false</returns>
         public static bool ReleaseSafe(this SemaphoreSlim semaphore)
         {
-            Guard.Argument(semaphore, nameof(semaphore)).NotNull();
             try
             {
-                semaphore.Release();
+                semaphore?.Release();
                 return true;
             }
             catch (ObjectDisposedException)
