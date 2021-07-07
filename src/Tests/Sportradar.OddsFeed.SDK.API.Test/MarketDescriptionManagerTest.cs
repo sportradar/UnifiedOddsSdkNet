@@ -3,6 +3,7 @@
 */
 using System.Linq;
 using System.Runtime.Caching;
+using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sportradar.OddsFeed.SDK.API.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
@@ -60,12 +61,15 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         [TestMethod]
         public void MarketDescriptionManagerGetMarketDescriptionsTest()
         {
+            //Thread.Sleep(500); // to wait so all OnTimer loading is done
+            // calls from initialization are done
+            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestCalls["GetVariantDescriptionsAsync"]);
+            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestCalls["GetMarketDescriptionsAsync"]);
             var marketDescriptionManager = new MarketDescriptionManager(TestConfigurationInternal.GetConfig(), _marketCacheProvider, _invariantMarketDescriptionCache, _variantDescriptionListCache, _variantMarketDescriptionCache);
             var marketDescriptions = marketDescriptionManager.GetMarketDescriptionsAsync().Result.ToList();
             Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestCalls["GetVariantDescriptionsAsync"]);
             Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestCalls["GetMarketDescriptionsAsync"]);
             Assert.AreEqual(750, marketDescriptions.Count);
-            Assert.AreEqual(115, marketDescriptions[0].Id);
         }
 
         [TestMethod]

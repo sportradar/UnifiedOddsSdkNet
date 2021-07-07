@@ -9,6 +9,12 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2021-07-07  1.45.1.0
+Fix: problem within SemaphorePool not acquiring new semaphore - waiting indefinitely
+Fix: setting configuration via CustomConfigurationBuilder
+Fix: exception with modified competitor players list
+Fix: exporting/importing cache items
+
 2021-06-23  1.45.0.0
 Added OperationManager to provide option to set sdk values
 Added option to ignore sport event status from timeline endpoint for BetPal events
