@@ -15,7 +15,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
     /// </summary>
     public class MarketDescriptionDTO
     {
-        internal long Id { get; }
+        internal long Id { get; private set; }
 
         internal string Name { get; }
 
@@ -67,6 +67,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                 return includesOutcomesOfType.Substring(3);
 
             return null;
+        }
+
+        /// <summary>
+        /// Overrides the identifier.
+        /// </summary>
+        /// <param name="newId">The new identifier.</param>
+        /// <remarks>Used when returned variant market description has different id then the requesting one</remarks>
+        internal void OverrideId(long newId)
+        {
+            if (newId > 0)
+            {
+                Id = newId;
+            }
         }
     }
 }
