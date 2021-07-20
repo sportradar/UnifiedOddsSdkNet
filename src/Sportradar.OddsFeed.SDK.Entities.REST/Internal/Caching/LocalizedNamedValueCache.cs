@@ -13,6 +13,7 @@ using Common.Logging;
 using Metrics;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Common.Internal.Metrics;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -189,7 +190,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             var exists = _namedValues.ContainsKey(id);
             if (!_isDisposed)
             {
-                _semaphore.Release();
+                _semaphore.ReleaseSafe();
             }
             return exists;
         }
@@ -239,7 +240,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             {
                 if (!_isDisposed)
                 {
-                    _semaphore.Release();
+                    _semaphore.ReleaseSafe();
                 }
             }
 

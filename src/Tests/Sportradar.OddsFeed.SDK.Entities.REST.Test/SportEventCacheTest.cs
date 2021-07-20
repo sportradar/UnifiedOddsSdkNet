@@ -304,7 +304,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(2, _memoryCache.Count());
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(150000)]
         public async Task SportEventCacheItemConcurrencyTest()
         {
             var stopWatch = Stopwatch.StartNew();

@@ -176,7 +176,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             //ExecutionLog.Debug($"GetItemFromCache({id}). Exists={cacheItem!=null}.");
             if (!_isDisposed)
             {
-                _semaphoreCacheMerge.Release();
+                _semaphoreCacheMerge.ReleaseSafe();
             }
             return (VariantDescriptionCacheItem) cacheItem?.Value;
         }
@@ -239,7 +239,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             {
                 if (!_isDisposed)
                 {
-                    _semaphore.Release();
+                    _semaphore.ReleaseSafe();
                 }
             }
 
@@ -555,7 +555,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             {
                 if (!_isDisposed)
                 {
-                    _semaphoreCacheMerge.Release();
+                    _semaphoreCacheMerge.ReleaseSafe();
                 }
             }
         }

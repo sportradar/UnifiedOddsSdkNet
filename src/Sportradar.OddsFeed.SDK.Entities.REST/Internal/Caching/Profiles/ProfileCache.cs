@@ -1098,7 +1098,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             }
             finally
             {
-                _exportSemaphore.Release();
+                _exportSemaphore.ReleaseSafe();
             }
 
             return new Dictionary<string, int>

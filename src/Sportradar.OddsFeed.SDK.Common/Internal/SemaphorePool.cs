@@ -66,35 +66,6 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         }
 
         /// <summary>
-        /// Executes the actual acquirement
-        /// </summary>
-        /// <param name="id">The id under which to acquire the semaphore</param>
-        /// <returns>The acquired <see cref="SemaphoreSlim"/></returns>
-        /// <exception cref="InvalidOperationException">Semaphore granted entry, but there are no SemaphoreSlim objects available</exception>
-        private SemaphoreSlim AcquireInternal(string id)
-        {
-            _syncSemaphore.WaitOne();
-            lock (_syncObject)
-            {
-                foreach (var holder in _semaphoreHolders)
-                {
-                    if (holder.Id == id)
-                    {
-                        return holder.Semaphore;
-                    }
-
-                    if (holder.UsageCount == 0)
-                    {
-                        holder.Acquire();
-                        holder.Id = id;
-                        return holder.Semaphore;
-                    }
-                }
-                throw new InvalidOperationException("Semaphore granted entry, but there are no SemaphoreSlim objects available");
-            }
-        }
-
-        /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources</param>
@@ -170,6 +141,35 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
                     }
                 }
                 _spinWait.SpinOnce();
+            }
+        }
+
+        /// <summary>
+        /// Executes the actual acquirement
+        /// </summary>
+        /// <param name="id">The id under which to acquire the semaphore</param>
+        /// <returns>The acquired <see cref="SemaphoreSlim"/></returns>
+        /// <exception cref="InvalidOperationException">Semaphore granted entry, but there are no SemaphoreSlim objects available</exception>
+        private SemaphoreSlim AcquireInternal(string id)
+        {
+            _syncSemaphore.WaitOne();
+            lock (_syncObject)
+            {
+                foreach (var holder in _semaphoreHolders)
+                {
+                    if (holder.Id == id)
+                    {
+                        return holder.Semaphore;
+                    }
+
+                    if (holder.UsageCount == 0)
+                    {
+                        holder.Acquire();
+                        holder.Id = id;
+                        return holder.Semaphore;
+                    }
+                }
+                throw new InvalidOperationException("Semaphore granted entry, but there are no SemaphoreSlim objects available");
             }
         }
 

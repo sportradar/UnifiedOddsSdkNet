@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Metrics;
 using Sportradar.OddsFeed.SDK.Common;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Common.Internal.Metrics;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -141,7 +142,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     //var msg = $"GetSportEventStatusAsync: {eventId} returns status in {t.Elapsed.TotalMilliseconds} ms.";
                     if (!_isDisposed)
                     {
-                        _fetchSemaphore.Release();
+                        _fetchSemaphore.ReleaseSafe();
                     }
                 }
             }

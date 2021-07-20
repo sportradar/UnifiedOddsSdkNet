@@ -198,7 +198,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 }
             }
 
-            _timerSemaphoreSlim.Release();
+            _timerSemaphoreSlim.ReleaseSafe();
         }
 
         /// <summary>
@@ -826,7 +826,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             if (disposing)
             {
                 _timer.Stop();
-                _timerSemaphoreSlim.Release();
+                _timerSemaphoreSlim.ReleaseSafe();
                 _timerSemaphoreSlim.Dispose();
             }
             _isDisposed = true;
