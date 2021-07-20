@@ -209,6 +209,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             {
                 try
                 {
+                    //ExecutionLog.Info($"Connection created={_channelFactory.ConnectionCreated}, ConnectionOpened={_channelFactory.IsConnectionOpen()}, Channel={_channel?.ChannelNumber}, ChannelOpened={_channel?.IsOpen}");
                     if (_channel == null)
                     {
                         ExecutionLog.Info("Creating connection channel and attaching events ...");
