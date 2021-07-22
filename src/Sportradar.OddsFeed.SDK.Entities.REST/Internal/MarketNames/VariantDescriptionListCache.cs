@@ -173,11 +173,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         {
             _semaphoreCacheMerge.Wait();
             var cacheItem = _cache.GetCacheItem(id);
-            //ExecutionLog.Debug($"GetItemFromCache({id}). Exists={cacheItem!=null}.");
-            if (!_isDisposed)
-            {
-                _semaphoreCacheMerge.ReleaseSafe();
-            }
+            _semaphoreCacheMerge.ReleaseSafe();
             return (VariantDescriptionCacheItem) cacheItem?.Value;
         }
 
@@ -195,7 +191,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         {
             Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
             if (!cultures.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
+            }
 
             var cultureList = cultures as List<CultureInfo> ?? cultures.ToList();
 
@@ -504,6 +502,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                     break;
                 case DtoType.AvailableSelections:
                     break;
+                case DtoType.TournamentInfoList:
+                    break;
+                case DtoType.PeriodSummary:
+                    break;
                 default:
                     ExecutionLog.Warn($"Trying to add unchecked dto type: {dtoType} for id: {id}.");
                     break;
@@ -521,7 +523,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             Guard.Argument(culture, nameof(culture)).NotNull();
             Guard.Argument(descriptions, nameof(descriptions)).NotNull();//.NotEmpty();
             if (!descriptions.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(descriptions));
+            }
 
             var descriptionList = descriptions as List<VariantDescriptionDTO> ?? descriptions.ToList();
             try
