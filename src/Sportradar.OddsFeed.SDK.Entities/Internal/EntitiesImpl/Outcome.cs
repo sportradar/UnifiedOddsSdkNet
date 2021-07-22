@@ -35,8 +35,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// </summary>
         private readonly IDictionary<CultureInfo, string> _names = new ConcurrentDictionary<CultureInfo, string>();
 
-        private IOutcomeDefinition _outcomeDefinition;
-
         /// <summary>
         /// Gets the value uniquely identifying the current <see cref="Outcome" /> instance
         /// </summary>
@@ -56,13 +54,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <param name="nameProvider">A <see cref="INameProvider"/> used to generate the outcome name(s)</param>
         /// <param name="mappingProvider">A <see cref="IMarketMappingProvider"/> instance used for providing mapping ids of markets and outcomes</param>
         /// <param name="cultures">A <see cref="IEnumerable{CultureInfo}"/> specifying languages the current instance supports</param>
-        /// <param name="outcomeDefinition"></param>
+        /// <param name="outcomeDefinition">An outcome definition</param>
         protected Outcome(string id, INameProvider nameProvider, IMarketMappingProvider mappingProvider, IEnumerable<CultureInfo> cultures, IOutcomeDefinition outcomeDefinition)
         {
             Guard.Argument(nameProvider, nameof(nameProvider)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();
             if (!cultures.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
+            }
 
             Id = id;
             _nameProvider = nameProvider;
@@ -119,18 +119,5 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
             var mappedIds = await _mappingProvider.GetMappedOutcomeIdAsync(Id, _cultures).ConfigureAwait(false);
             return mappedIds;
         }
-
-        //TODO: remove this
-        //public async Task<IOutcomeDefinition> GetOutcomeDefinitionAsync()
-        //{
-        //    if (_outcomeDefinition != null)
-        //    {
-        //        return _outcomeDefinition;
-        //    }
-
-        //    _outcomeDefinition = await _nameProvider.GetOutcomeNameAsync(Id, _cultures).ConfigureAwait(false);
-
-        //    return _outcomeDefinition;
-        //}
     }
 }

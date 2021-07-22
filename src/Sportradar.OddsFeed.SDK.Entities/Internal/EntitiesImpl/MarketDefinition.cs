@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
@@ -64,12 +65,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <param name="cultures">The cultures</param>
         /// <param name="exceptionHandlingStrategy">The exception handling strategy</param>
         internal MarketDefinition(int marketId, 
-            IMarketCacheProvider marketCacheProvider, 
-            URN sportId, 
-            int producerId, 
-            IReadOnlyDictionary<string, string> specifiers,
-            IEnumerable<CultureInfo> cultures,
-            ExceptionHandlingStrategy exceptionHandlingStrategy)
+                                  IMarketCacheProvider marketCacheProvider, 
+                                  URN sportId, 
+                                  int producerId, 
+                                  IReadOnlyDictionary<string, string> specifiers,
+                                  IEnumerable<CultureInfo> cultures,
+                                  ExceptionHandlingStrategy exceptionHandlingStrategy)
         {
             _marketId = marketId;
             _sportId = sportId;
@@ -91,7 +92,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
             //var marketDescription = _marketCacheProvider.GetMarketDescriptionAsync((int) _marketDescription.Id, _specifiers, new[] {culture}, true).Result;
             //return marketDescription?.GetName(culture);
             GetMarketDefinition();
-            return _marketDescription.GetName(culture);
+            return _marketDescription?.GetName(culture);
         }
 
         /// <summary>
@@ -102,7 +103,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         public string GetIncludesOutcomesOfType()
         {
             GetMarketDefinition();
-            return _marketDescription.IncludesOutcomesOfType;
+            return _marketDescription?.IncludesOutcomesOfType;
         }
 
         /// <summary>
@@ -112,7 +113,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         public string GetOutcomeType()
         {
             GetMarketDefinition();
-            return _marketDescription.OutcomeType;
+            return _marketDescription?.OutcomeType;
         }
 
         /// <summary>
@@ -134,7 +135,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         public IDictionary<string, string> GetAttributes()
         {
             GetMarketDefinition();
-            return _marketDescription.Attributes == null
+            return _marketDescription?.Attributes == null
                 ? null
                 : new ReadOnlyDictionary <string, string> (_marketDescription.Attributes.ToDictionary(k => k.Name, v => v.Description));
         }
