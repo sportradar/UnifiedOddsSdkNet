@@ -9,6 +9,13 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2021-07-23  1.46.0.0
+IStage extended with IStageV3 providing IStageStatus and method for getting match status
+Added Prologue value to StageType enum
+Added improvement for connection recovery when disconnection happens
+FIx: implemented safe release of all internal SemaphoreSlims
+Fix: added handling of variant market description when different market id between requesting and received id
+
 2021-07-07  1.45.1.0
 Fix: problem within SemaphorePool not acquiring new semaphore - waiting indefinitely
 Fix: setting configuration via CustomConfigurationBuilder
