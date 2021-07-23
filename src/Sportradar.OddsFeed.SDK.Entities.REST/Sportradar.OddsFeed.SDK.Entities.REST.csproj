@@ -189,6 +189,8 @@
     <Compile Include="IGoalScorerV1.cs" />
     <Compile Include="IHole.cs" />
     <Compile Include="ILotteryV1.cs" />
+    <Compile Include="Internal\EntitiesImpl\StageStatus.cs" />
+    <Compile Include="IStageStatus.cs" />
     <Compile Include="IMatchV3.cs" />
     <Compile Include="IMatchV2.cs" />
     <Compile Include="Internal\Caching\CI\CoverageInfoCI.cs" />
@@ -552,6 +554,7 @@
     <Compile Include="Internal\EventArguments\TournamentReceivedEventArgs.cs" />
     <Compile Include="ISeasonInfoV1.cs" />
     <Compile Include="ISportEventV1.cs" />
+    <Compile Include="IStageV3.cs" />
     <Compile Include="IStageV2.cs" />
     <Compile Include="ITeamCompetitorV1.cs" />
     <Compile Include="ITeamStatisticsV2.cs" />

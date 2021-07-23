@@ -137,7 +137,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <summary>
         /// Initializes a new instance of the <see cref="SportEventStatusDTO"/> class
         /// </summary>
-        /// <param name="ses">A <see cref="restSportEventStatus" /> instance containing status data about the associated sport event</param>
+        /// <param name="ses">A <see cref="sportEventStatus" /> instance containing status data about the associated sport event</param>
         /// <param name="homeAwayCompetitors">The list of competitors with the indicator if it is a home or away team</param>
         public SportEventStatusDTO(sportEventStatus ses, IDictionary<HomeAway, URN> homeAwayCompetitors)
         {
@@ -452,6 +452,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// Initializes a new instance of the <see cref="SportEventStatusDTO"/> class.
         /// </summary>
         /// <param name="stageSES">A <see cref="restSportEventStatus" /> instance containing status data about the associated sport event</param>
+        /// <remarks>From SportEventSummary</remarks>
         public SportEventStatusDTO(stageSportEventStatus stageSES)
         {
             Guard.Argument(stageSES, nameof(stageSES)).NotNull();

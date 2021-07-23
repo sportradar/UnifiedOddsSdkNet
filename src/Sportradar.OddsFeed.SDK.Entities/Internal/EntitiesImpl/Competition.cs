@@ -36,7 +36,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <summary>
         /// The match statuses cache
         /// </summary>
-        private readonly ILocalizedNamedValueCache _matchStatusesCache;
+        protected readonly ILocalizedNamedValueCache MatchStatusCache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Competition"/> class
@@ -49,7 +49,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <param name="sportEventCache">A <see cref="ISportEventCache"/> instance containing <see cref="CompetitionCI"/></param>
         /// <param name="cultures">A <see cref="IEnumerable{CultureInfo}"/> specifying languages the current instance supports</param>
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how the initialized instance will handle potential exceptions</param>
-        /// <param name="matchStatusesCache">A <see cref="ILocalizedNamedValueCache"/> cache for fetching match statuses</param>
+        /// <param name="matchStatusCache">A <see cref="ILocalizedNamedValueCache"/> cache for fetching match statuses</param>
         internal Competition(ILog executionLog,
                              URN id,
                              URN sportId,
@@ -58,17 +58,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                              ISportEventCache sportEventCache,
                              IEnumerable<CultureInfo> cultures,
                              ExceptionHandlingStrategy exceptionStrategy,
-                             ILocalizedNamedValueCache matchStatusesCache)
+                             ILocalizedNamedValueCache matchStatusCache)
             :base(id, sportId, executionLog, sportEventCache, cultures, exceptionStrategy)
         {
             Guard.Argument(id, nameof(id)).NotNull();
             Guard.Argument(sportEntityFactory, nameof(sportEntityFactory)).NotNull();
             Guard.Argument(sportEventStatusCache, nameof(sportEventStatusCache)).NotNull();
-            Guard.Argument(matchStatusesCache, nameof(matchStatusesCache)).NotNull();
+            Guard.Argument(matchStatusCache, nameof(matchStatusCache)).NotNull();
 
             _sportEntityFactory = sportEntityFactory;
             SportEventStatusCache = sportEventStatusCache;
-            _matchStatusesCache = matchStatusesCache;
+            MatchStatusCache = matchStatusCache;
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
 
             return item == null
                 ? null
-                : new CompetitionStatus(item, _matchStatusesCache);
+                : new CompetitionStatus(item, MatchStatusCache);
         }
 
         /// <summary>
