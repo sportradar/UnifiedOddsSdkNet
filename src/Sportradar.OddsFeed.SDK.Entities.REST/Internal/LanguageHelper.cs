@@ -24,10 +24,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
             if (alreadyUsedCultures == null)
             {
-                return wantedCultures.Distinct();
+                return wantedCultureInfos.Distinct();
             }
 
-            var missingCultures = wantedCultures.Where(c => !alreadyUsedCultures.Contains(c)).ToList();
+            var alreadyUsedCultureInfos = alreadyUsedCultures.ToList();
+            var missingCultures = wantedCultureInfos.Where(c => !alreadyUsedCultureInfos.Contains(c)).ToList();
 
             return missingCultures.Distinct();
         }

@@ -147,7 +147,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             {
                 cachedItem = (PlayerProfileCI) _cache.Get(playerId.ToString());
                 var wantedCultures = cultures.ToList();
-                var missingLanguages = LanguageHelper.GetMissingCultures(wantedCultures, cachedItem?.Names.Keys).ToList();
+                var missingLanguages = LanguageHelper.GetMissingCultures(wantedCultures, cachedItem?.Names.Keys.ToList()).ToList();
                 if (!missingLanguages.Any())
                 {
                     return cachedItem;
@@ -159,7 +159,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                     var competitorCI = (CompetitorCI)_cache.Get(cachedItem.CompetitorId.ToString());
                     if (competitorCI != null &&
                         (competitorCI.LastTimeCompetitorProfileFetched < DateTime.Now.AddSeconds(-30)
-                         || LanguageHelper.GetMissingCultures(wantedCultures, competitorCI.CultureCompetitorProfileFetched).Any()))
+                         || LanguageHelper.GetMissingCultures(wantedCultures, competitorCI.CultureCompetitorProfileFetched.ToList()).Any()))
                     {
                         ExecutionLog.Debug($"Fetching competitor profile for competitor {competitorCI.Id} instead of player {cachedItem.Id} for languages=[{string.Join(",", missingLanguages.Select(s => s.TwoLetterISOLanguageName))}].");
 
@@ -183,7 +183,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                         }
 
                         cachedItem = (PlayerProfileCI)_cache.Get(playerId.ToString());
-                        missingLanguages = LanguageHelper.GetMissingCultures(wantedCultures, cachedItem?.Names.Keys).ToList();
+                        missingLanguages = LanguageHelper.GetMissingCultures(wantedCultures, cachedItem?.Names.Keys.ToList()).ToList();
                         if (!missingLanguages.Any())
                         {
                             return cachedItem;
@@ -205,10 +205,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             }
             finally
             {
-                if (!_isDisposed)
-                {
-                    ReleaseId(_fetchedPlayerProfiles, playerId);
-                }
+                ReleaseId(_fetchedPlayerProfiles, playerId);
             }
             return cachedItem;
         }
@@ -237,7 +234,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             try
             {
                 cachedItem = (CompetitorCI) _cache.Get(competitorId.ToString());
-                var missingLanguages = LanguageHelper.GetMissingCultures(cultures, cachedItem?.Names.Keys).ToList();
+                var missingLanguages = LanguageHelper.GetMissingCultures(cultures, cachedItem?.Names.Keys.ToList()).ToList();
                 if (!missingLanguages.Any())
                 {
                     return cachedItem;
@@ -259,10 +256,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             }
             finally
             {
-                if (!_isDisposed)
-                {
-                    ReleaseId(_fetchedCompetitorProfiles, competitorId);
-                }
+                ReleaseId(_fetchedCompetitorProfiles, competitorId);
             }
             return cachedItem;
         }
