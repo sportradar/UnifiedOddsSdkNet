@@ -60,9 +60,9 @@ namespace Sportradar.OddsFeed.SDK.Messages
         DateTime LastTimestampBeforeDisconnect { get; }
 
         /// <summary>
-        /// Gets the maximum recovery time
+        /// Gets the maximum recovery time (in seconds)
         /// </summary>
-        /// <value>The maximum recovery time</value>
+        /// <value>The maximum recovery time (in seconds)</value>
         int MaxRecoveryTime { get; }
 
         /// <summary>

@@ -102,6 +102,7 @@
     <Compile Include="Feed\PropertyUsage.cs" />
     <Compile Include="Internal\OverrideXmlNamespaceAttribute.cs" />
     <Compile Include="Internal\ProducerExtensions.cs" />
+    <Compile Include="IProducerV2.cs" />
     <Compile Include="REST\MarketDescriptionMessages.cs" />
     <Compile Include="REST\RestMessages.cs" />
     <Compile Include="REST\RestMessage.cs" />

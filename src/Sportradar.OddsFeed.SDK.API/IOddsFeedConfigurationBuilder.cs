@@ -87,7 +87,7 @@ namespace Sportradar.OddsFeed.SDK.API
         IOddsFeedConfigurationBuilder SetUseSsl(bool useSsl);
 
         /// <summary>
-        /// Sets the maximum time in seconds in which recovery must be completed (minimum 900 seconds)
+        /// Sets the maximum time in seconds in which recovery must be completed (minimum 600 seconds)
         /// </summary>
         /// <param name="maxRecoveryTime">Maximum recovery time</param>
         /// <returns>The <see cref="IOddsFeedConfigurationBuilder"/> instance used to set additional values.</returns>
