@@ -447,6 +447,24 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                             _executionLog.Error($"Error getting sport event fixture for id={id} and lang:[{culture.TwoLetterISOLanguageName}]. Message={innerMessage}", exception.InnerException ?? exception);
                         }
                     }
+
+                    if (!useCachedProvider && !e.Message.IsNullOrEmpty() && e.Message.Contains("InternalServerError"))
+                    {
+                        //sometimes on non-cached endpoint (fixture_change_fixture.xml) there can be error 500. In such case try also cached endpoint
+                        try
+                        {
+                            result = await _sportEventFixtureProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
+                            restCallTime = (int) t.Elapsed.TotalMilliseconds;
+                            WriteLog($"Executing GetSportEventFixtureAsync (via cached endpoint) for id={id} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
+                            return;
+                        }
+                        catch (Exception exception)
+                        {
+                            var innerMessage = exception.InnerException?.Message ?? exception.Message;
+                            _executionLog.Error($"Error getting sport event fixture for id={id} and lang:[{culture.TwoLetterISOLanguageName}]. Message (cached endpoint)={innerMessage}", exception.InnerException ?? exception);
+                        }
+                    }
+
                     restCallTime = (int) t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
                     _executionLog.Error($"Error getting sport event fixture for id={id} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
