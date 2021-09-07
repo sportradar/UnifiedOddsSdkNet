@@ -448,7 +448,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                         }
                     }
 
-                    if (!useCachedProvider && !e.Message.IsNullOrEmpty() && e.Message.Contains("InternalServerError"))
+                    if (!useCachedProvider && !e.Message.IsNullOrEmpty() && e.Message != null && e.Message.Contains("InternalServerError"))
                     {
                         //sometimes on non-cached endpoint (fixture_change_fixture.xml) there can be error 500. In such case try also cached endpoint
                         try
