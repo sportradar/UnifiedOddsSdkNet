@@ -34,7 +34,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <summary>
         /// A <see cref="ILog"/> instance used for execution logging
         /// </summary>
-        private static ILog _log = SdkLoggerFactory.GetLoggerForExecution(typeof(Feed));
+        private readonly ILog _log;
 
         /// <summary>
         /// A <see cref="IUnityContainer"/> used to resolve
@@ -409,7 +409,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <summary>
         /// Disposes the current instance and resources associated with it
         /// </summary>
-        void IDisposable.Dispose()
+        public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
@@ -532,7 +532,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// </summary>
         public void Close()
         {
-            ((IDisposable) this).Dispose();
+            Dispose();
         }
 
         /// <summary>

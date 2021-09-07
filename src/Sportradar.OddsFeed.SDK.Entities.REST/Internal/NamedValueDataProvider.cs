@@ -71,7 +71,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
         private EntityList<NamedValueDTO> GetDescriptions(Stream stream, Uri uri)
         {
-            var document = new XmlDocument();
+            var document = new XmlDocument {XmlResolver = null};
             document.Load(stream);
 
             if (document.DocumentElement != null)

@@ -34,11 +34,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         private readonly ISingleTypeMapperFactory<bookmaker_details, BookmakerDetailsDTO> _mapperFactory;
 
         /// <summary>
-        /// The url format specifying the url of the resources fetched by the fetcher
-        /// </summary>
-        private readonly string _uriFormat;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="BookmakerDetailsProvider"/> class
         /// </summary>
         /// <param name="bookmakerDetailsUriFormat">An address format used to retrieve sport event summary</param>
@@ -52,13 +47,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             ISingleTypeMapperFactory<bookmaker_details, BookmakerDetailsDTO> mapperFactory)
             : base(bookmakerDetailsUriFormat, fetcher, deserializer, mapperFactory)
         {
-
             Guard.Argument(bookmakerDetailsUriFormat, nameof(bookmakerDetailsUriFormat)).NotNull().NotEmpty();
             Guard.Argument(fetcher, nameof(fetcher)).NotNull();
             Guard.Argument(deserializer, nameof(deserializer)).NotNull();
             Guard.Argument(mapperFactory, nameof(mapperFactory)).NotNull();
-
-            _uriFormat = bookmakerDetailsUriFormat;
+            
             _fetcher = fetcher;
             _deserializer = deserializer;
             _mapperFactory = mapperFactory;

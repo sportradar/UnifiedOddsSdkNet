@@ -88,10 +88,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             }
 
 
-            IPAddress address;
-            return (IPAddress.TryParse(data, out address))
-                ? address
-                : null;
+            return IPAddress.TryParse(data, out var address)
+                       ? address
+                       : null;
         }
     }
 }

@@ -278,7 +278,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal.Log
                 if(t != null)
                 {
                     t = t.Substring(0, t.IndexOf(",", StringComparison.InvariantCultureIgnoreCase));
-                    if(t.LastIndexOf(".", StringComparison.InvariantCultureIgnoreCase) > 0)
+                    if(t.LastIndexOf(".", StringComparison.InvariantCultureIgnoreCase) >= 0)
                     {
                         t = t.Substring(t.LastIndexOf(".", StringComparison.InvariantCultureIgnoreCase) + 1);
                     }
@@ -293,7 +293,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal.Log
                 if (t != null)
                 {
                     t = t.Substring(0, t.IndexOf(",", StringComparison.InvariantCultureIgnoreCase));
-                    if (t.LastIndexOf(".", StringComparison.InvariantCultureIgnoreCase) > 0)
+                    if (t.LastIndexOf(".", StringComparison.InvariantCultureIgnoreCase) >= 0)
                     {
                         t = t.Substring(t.LastIndexOf(".", StringComparison.InvariantCultureIgnoreCase));
                     }

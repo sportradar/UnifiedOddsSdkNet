@@ -21,7 +21,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         [TestInitialize]
         public void Init()
         {
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
             var config = TestConfigurationInternal.GetConfig();
 
@@ -48,7 +48,8 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         [TestMethod]
         public void AddMessageToReplayQueue()
         {
-            _replayManager.AddMessagesToReplayQueue(StaticRandom.Urn(9934843));
+            var replayResponse = _replayManager.AddMessagesToReplayQueue(StaticRandom.Urn(9934843));
+            Assert.IsNotNull(replayResponse);
         }
     }
 }

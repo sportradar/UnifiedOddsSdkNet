@@ -411,50 +411,50 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <summary>
         /// Merges the specified fixture
         /// </summary>
-        /// <param name="fixture">The fixture</param>
+        /// <param name="fixtureDTO">The fixture</param>
         /// <param name="culture">The culture</param>
         /// <param name="useLock">Should the lock mechanism be used during merge</param>
-        public void MergeFixture(FixtureDTO fixture, CultureInfo culture, bool useLock)
+        public void MergeFixture(FixtureDTO fixtureDTO, CultureInfo culture, bool useLock)
         {
             if (useLock)
             {
                 lock (MergeLock)
                 {
-                    if (fixture.ReferenceIds != null)
+                    if (fixtureDTO.ReferenceIds != null)
                     {
-                        _referenceId = new ReferenceIdCI(fixture.ReferenceIds);
+                        _referenceId = new ReferenceIdCI(fixtureDTO.ReferenceIds);
                     }
-                    if (fixture.BookingStatus != null)
+                    if (fixtureDTO.BookingStatus != null)
                     {
-                        _bookingStatus = fixture.BookingStatus;
+                        _bookingStatus = fixtureDTO.BookingStatus;
                     }
                 }
             }
             else
             {
-                if (fixture.ReferenceIds != null)
+                if (fixtureDTO.ReferenceIds != null)
                 {
-                    _referenceId = new ReferenceIdCI(fixture.ReferenceIds);
+                    _referenceId = new ReferenceIdCI(fixtureDTO.ReferenceIds);
                 }
-                if (fixture.BookingStatus != null)
+                if (fixtureDTO.BookingStatus != null)
                 {
-                    _bookingStatus = fixture.BookingStatus;
+                    _bookingStatus = fixtureDTO.BookingStatus;
                 }
             }
 
-            if (!string.IsNullOrEmpty(fixture.LiveOdds))
+            if (!string.IsNullOrEmpty(fixtureDTO.LiveOdds))
             {
-                _liveOdds = fixture.LiveOdds;
+                _liveOdds = fixtureDTO.LiveOdds;
             }
 
-            if (fixture.Type != null)
+            if (fixtureDTO.Type != null)
             {
-                _sportEventType = fixture.Type;
+                _sportEventType = fixtureDTO.Type;
             }
 
-            if (fixture.StageType != null)
+            if (fixtureDTO.StageType != null)
             {
-                _stageType = fixture.StageType;
+                _stageType = fixtureDTO.StageType;
             }
         }
 

@@ -110,6 +110,7 @@ namespace Sportradar.OddsFeed.SDK.Common
         [Obsolete("This method is no longer required since the SDK uses Common.Logging facade")]
         public static void Configure(FileInfo configFile, string repositoryName = SdkLogRepositoryName)
         {
+            // remains for test
         }
 
         /// <summary>

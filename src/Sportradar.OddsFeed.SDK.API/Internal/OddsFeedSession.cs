@@ -162,13 +162,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             var rawData = eventArgs.RawData as byte[] ?? eventArgs.RawData.ToArray();
             var basicMessageData = _messageDataExtractor.GetBasicMessageData(rawData);
             ExecutionLog.Info($"{WriteMessageInterest()}Extracted the following data from unparsed message data: [{basicMessageData}], raising OnUnparsableMessageReceived event");
-            var dispatchmentEventArgs = new UnparsableMessageEventArgs(basicMessageData.MessageType, basicMessageData.ProducerId, basicMessageData.EventId, rawData);
+            var dispatchEventArgs = new UnparsableMessageEventArgs(basicMessageData.MessageType, basicMessageData.ProducerId, basicMessageData.EventId, rawData);
             var producerId = 0;
             if (!string.IsNullOrEmpty(basicMessageData.ProducerId))
             {
                 int.TryParse(basicMessageData.ProducerId, out producerId);
             }
-            Dispatch(OnUnparsableMessageReceived, dispatchmentEventArgs, "OnUnparsableMessageReceived", producerId);
+            Dispatch(OnUnparsableMessageReceived, dispatchEventArgs, "OnUnparsableMessageReceived", producerId);
         }
 
         /// <summary>
@@ -212,20 +212,20 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <summary>
         /// Dispatches the provided <see cref="FeedMessage"/>
         /// </summary>
-        /// <param name="feedMessage"></param>
+        /// <param name="message"></param>
         /// <param name="rawMessage"></param>
-        public override void Dispatch(FeedMessage feedMessage, byte[] rawMessage)
+        public override void Dispatch(FeedMessage message, byte[] rawMessage)
         {
-            Guard.Argument(feedMessage, nameof(feedMessage)).NotNull();
+            Guard.Argument(message, nameof(message)).NotNull();
 
-            var alive = feedMessage as alive;
+            var alive = message as alive;
             if (alive != null)
             {
                 //ProcessAlive(alive);
                 return;
             }
 
-            var snapShotComplete = feedMessage as snapshot_complete;
+            var snapShotComplete = message as snapshot_complete;
             if (snapShotComplete != null)
             {
                 //ProcessSnapshotComplete(snapShotComplete);
@@ -233,7 +233,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 return;
             }
 
-            base.Dispatch(feedMessage, rawMessage);
+            base.Dispatch(message, rawMessage);
         }
 
         /// <summary>
