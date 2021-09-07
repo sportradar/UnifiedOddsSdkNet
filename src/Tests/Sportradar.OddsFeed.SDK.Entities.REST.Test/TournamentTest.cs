@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
@@ -49,7 +50,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             _timer = new TestTimer(false);
             _sportEventCache = new SportEventCache(_memoryCache, _dataRouterManager,
-                new SportEventCacheItemFactory(_dataRouterManager, new SemaphorePool(5), TestData.Cultures.First(),
+                new SportEventCacheItemFactory(_dataRouterManager, new SemaphorePool(5, ExceptionHandlingStrategy.THROW), TestData.Cultures.First(),
                     new MemoryCache("FixtureTimestampCache")), _timer, TestData.Cultures, _cacheManager);
 
             var deserializer = new Deserializer<tournamentInfoEndpoint>();

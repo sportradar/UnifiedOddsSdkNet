@@ -11,6 +11,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
+using Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.REST;
 using Sportradar.OddsFeed.SDK.Test.Shared;
@@ -209,25 +210,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         [TestMethod]
         public void ProductInfoTest()
         {
-            new CacheItemMergeTest().ProductInfoTest();
+            new CacheItemMergeTests().ProductInfoTest();
         }
 
         [TestMethod]
         public void ProductInfoLinkTest()
         {
-            new CacheItemMergeTest().ProductInfoLinkTest();
+            new CacheItemMergeTests().ProductInfoLinkTest();
         }
 
         [TestMethod]
         public void RefereeTest()
         {
-            new CacheItemMergeTest().RefereeTest();
+            new CacheItemMergeTests().RefereeTest();
         }
 
         [TestMethod]
         public void RoundTest()
         {
-            new CacheItemMergeTest().RoundMergeTest();
+            new CacheItemMergeTests().RoundMergeTest();
         }
 
         [TestMethod]
@@ -242,7 +243,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         [TestMethod]
         public void SeasonTest()
         {
-            new CacheItemMergeTest().SeasonTest();
+            new CacheItemMergeTests().SeasonTest();
         }
 
         [TestMethod]
@@ -277,7 +278,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         [TestMethod]
         public void StreamingChannelTest()
         {
-            new CacheItemMergeTest().StreamingChannelTest();
+            new CacheItemMergeTests().StreamingChannelTest();
         }
 
         [TestMethod]
@@ -320,13 +321,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         [TestMethod]
         public void VenueDTOMappingTest()
         {
-            new CacheItemMergeTest().VenueMergeTest();
+            new CacheItemMergeTests().VenueMergeTest();
         }
 
         [TestMethod]
         public void WeatherInfoDTOMappingTest()
         {
-            new CacheItemMergeTest().WeatherInfoTest();
+            new CacheItemMergeTests().WeatherInfoTest();
         }
 
         private static void ValidateMapping(mappingsMapping msg, MarketMappingDTO dto)

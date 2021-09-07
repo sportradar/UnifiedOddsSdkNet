@@ -1,6 +1,7 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
 using System;
 using System.Globalization;
 using System.Linq;
@@ -15,10 +16,10 @@ using Sportradar.OddsFeed.SDK.Messages.REST;
 using Sportradar.OddsFeed.SDK.Test.Shared;
 using SR = Sportradar.OddsFeed.SDK.Test.Shared.StaticRandom;
 
-namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
+namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
 {
     [TestClass]
-    public class CacheItemMergeTest
+    public class CacheItemMergeTests
     {
         private readonly CultureInfo _cultureFirst = new CultureInfo("en");
         private readonly CultureInfo _cultureSecond = new CultureInfo("de");
@@ -149,16 +150,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(groupType1.competitor[0].id, groupCI.CompetitorsIds.ToList()[0].ToString());
             Assert.AreEqual(groupType1.competitor[1].id, groupCI.CompetitorsIds.ToList()[1].ToString());
             Assert.AreNotEqual(groupCI.CompetitorsIds.ToList()[0].Id, groupCI.CompetitorsIds.ToList()[1]);
-        }
-
-        [TestMethod]
-        public void PlayerTest()
-        {
-            var sportEntityDTO = new SportEntityDTO("sr:player:1", "Sport Entity Name");
-            var playerCI = new SportEntityCI(sportEntityDTO);
-
-            Assert.IsNotNull(playerCI);
-            Assert.AreEqual(sportEntityDTO.Id, playerCI.Id);
         }
 
         [TestMethod]

@@ -895,7 +895,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 {
                     _lastTimeCompetitorProfileFetched = exportable.LastTimeCompetitorProfileIsFetched.Value;
                 }
-
                 _cultureCompetitorProfileFetched = new List<CultureInfo>();
                 if (exportable.CultureCompetitorProfileFetched != null)
                 {

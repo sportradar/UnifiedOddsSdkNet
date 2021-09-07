@@ -51,6 +51,10 @@
       <Project>{400d70d5-c152-4f49-bd8f-ca995bffc188}</Project>
       <Name>Sportradar.OddsFeed.SDK.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Sportradar.OddsFeed.SDK.Test.Shared\Sportradar.OddsFeed.SDK.Test.Shared.csproj">
+      <Project>{F3B33428-1A5D-4E42-8DC7-6E1434D94F36}</Project>
+      <Name>Sportradar.OddsFeed.SDK.Test.Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

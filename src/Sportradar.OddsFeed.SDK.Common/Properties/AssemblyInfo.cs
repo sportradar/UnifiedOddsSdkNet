@@ -2,6 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
@@ -23,6 +24,9 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("6f77b6eb-9d03-4419-8031-6e9a674d8dc0")]
+
+[assembly: InternalsVisibleTo("Sportradar.OddsFeed.SDK.API.Test")]
+[assembly: InternalsVisibleTo("Sportradar.OddsFeed.SDK.Common.Test")]
 
 // Version information for an assembly consists of the following four values:
 //
