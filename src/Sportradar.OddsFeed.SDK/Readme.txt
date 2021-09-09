@@ -9,6 +9,18 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2021-09-09  1.47.0
+Improved exporting/importing and merging of player profile data
+Improved SemaphorePool handling
+Improvement: when fetching non-cached fixture change endpoint fails due to server error, try also normal fixture endpoint
+Improved tracking of last message timestamp per producer
+Fix: DI for SportEventStatusCache
+Fix: wrong max recovery time was used (now default is 1h)
+Fix: issue with concurrency when getting missing languages for competitor profile
+Fix: merging market mapping when no outcome mappings exists
+Fix: how after parameter is checked when adjustAfterAge in config is set
+Other minor improvements and bug fixes
+
 2021-07-23  1.46.0.0
 IStage extended with IStageV3 providing IStageStatus and method for getting match status
 Added Prologue value to StageType enum
