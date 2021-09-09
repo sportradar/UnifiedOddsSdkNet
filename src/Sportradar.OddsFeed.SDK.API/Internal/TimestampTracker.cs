@@ -102,7 +102,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             Guard.Argument(maxMessageAgeInSeconds, nameof(maxMessageAgeInSeconds)).Positive();
             Guard.Argument(allInterests, nameof(allInterests)).NotNull();//.NotEmpty();
             if (!allInterests.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(allInterests));
+            }
 
             _producer = producer;
             _maxInactivitySeconds = maxInactivitySeconds;
@@ -137,8 +139,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             Guard.Argument(interest, nameof(interest)).NotNull();
             Guard.Argument(message, nameof(message)).NotNull();
 
-            MessageTimingInfo timingInfo;
-            if (dictionary.TryGetValue(interest, out timingInfo))
+            if (dictionary.TryGetValue(interest, out var timingInfo))
             {
                 timingInfo.Update(message.GeneratedAt);
             }
@@ -163,8 +164,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             Guard.Argument(interest, nameof(interest)).NotNull();
             Guard.Argument(message, nameof(message)).NotNull();
 
-            MessageTimingInfo timingInfo;
-            if (dictionary.TryGetValue(interest, out timingInfo))
+            if (dictionary.TryGetValue(interest, out var timingInfo))
             {
                 var messageDateTime = SdkInfo.FromEpochTime(message.GeneratedAt);
                 var newLatency = TimeProviderAccessor.Current.Now <= messageDateTime

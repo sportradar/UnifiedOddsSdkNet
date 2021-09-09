@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Dawn;
 using System.Linq;
+using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
@@ -190,7 +191,15 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="timestamp">The timestamp</param>
         internal void SetLastTimestampBeforeDisconnect(DateTime timestamp)
         {
-            LastTimestampBeforeDisconnect = timestamp;
+            if (timestamp >= LastTimestampBeforeDisconnect)
+            {
+                LastTimestampBeforeDisconnect = timestamp;
+            }
+            else if (timestamp < LastTimestampBeforeDisconnect.AddSeconds(-MaxInactivitySeconds))
+            {
+                var logger = SdkLoggerFactory.GetLoggerForExecution(typeof(Producer));
+                logger.Warn($"Suspicious feed message timestamp arrived for producer {Id}. Current={LastTimestampBeforeDisconnect}. Arrived={timestamp}");
+            }
         }
 
         /// <summary>
