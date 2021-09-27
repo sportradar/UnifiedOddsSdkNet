@@ -349,24 +349,22 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 throw new InvalidOperationException("At least one locale must be present in the default locales");
             }
 
-            var apiHost = _apiHost;
-            if (string.IsNullOrEmpty(apiHost))
-            {
-                apiHost = _useIntegrationEnvironment ? SdkInfo.IntegrationApiHost : SdkInfo.ProductionApiHost;
-            }
+            var ufEnvironment = _useIntegrationEnvironment ? SdkEnvironment.Integration : SdkEnvironment.Production;
 
-            var host = _host;
-            if (string.IsNullOrEmpty(host))
-            {
-                host = _useIntegrationEnvironment ? SdkInfo.IntegrationHost : SdkInfo.ProductionHost;
-            }
+            var mqHost = string.IsNullOrEmpty(_host)
+                             ? EnvironmentManager.GetMqHost(ufEnvironment)
+                             : _host;
+            var apiHost = string.IsNullOrEmpty(_apiHost)
+                              ? EnvironmentManager.GetApiHost(ufEnvironment)
+                              : _apiHost;
+
             var config = new OddsFeedConfiguration(
                 _accessToken,
                 _inactivitySeconds,
                 _locales.ToList(),
                 _section?.DisabledProducers?.Split(new[] {","}, StringSplitOptions.RemoveEmptyEntries).Select(value => int.Parse(value.Trim())).ToList(),
                 apiHost,
-                host,
+                mqHost,
                 _virtualHost,
                 _useSsl,
                 _maxRecoveryTime,

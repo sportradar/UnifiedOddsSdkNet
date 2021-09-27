@@ -112,7 +112,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <summary>
         /// Gets a value specifying the host name of the AQMP broker
         /// </summary>
-        public virtual string Host => _useReplay ? SdkInfo.ReplayHost : _publicConfig.Host;
+        public virtual string Host => _useReplay ? EnvironmentManager.GetMqHost(SdkEnvironment.Replay) : _publicConfig.Host;
 
         /// <summary>
         /// Gets a value specifying the virtual host of the AQMP broker
@@ -173,7 +173,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <summary>
         /// Gets the URL of the feed's xReplay Server REST interface
         /// </summary>
-        public string ReplayApiHost => SdkInfo.ReplayApiHost + "/v1/replay";
+        public string ReplayApiHost => EnvironmentManager.GetApiHost(SdkEnvironment.Replay) + "/v1/replay";
 
         /// <summary>
         /// Gets a <see cref="string"/> representation of Replay API base url
@@ -234,8 +234,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="hostName">The host name</param>
         /// <param name="useSsl">Value indicating whether a secure connection should be attempted</param>
         /// <param name="rethrow">Value indicating whether caught exceptions should be rethrown</param>
+        /// <param name="environment">Get data for selected environment</param>
         /// <returns>True if data was successfully retrieved. False otherwise. May throw <see cref="CommunicationException"/></returns>
-        private bool LoadWhoamiData(string hostName, bool useSsl, bool rethrow)
+        private bool LoadWhoamiData(string hostName, bool useSsl, bool rethrow, SdkEnvironment environment)
         {
             Guard.Argument(hostName, nameof(hostName)).NotNull().NotEmpty();
 
@@ -245,9 +246,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             try
             {
-                ExecutionLog.Info($"Attempting to retrieve whoami data. Host URL={hostUrl}, Environment={Enum.GetName(typeof(SdkEnvironment), Environment)}");
+                ExecutionLog.Info($"Attempting to retrieve whoami data. Host URL={hostUrl}, Environment={Enum.GetName(typeof(SdkEnvironment), environment)}");
                 var bookmakerDetailsDTO = _bookmakerDetailsProvider.GetData(hostUrl);
-                ExecutionLog.Info($"Whoami data successfully retrieved. Host URL={hostUrl}, Environment={Enum.GetName(typeof(SdkEnvironment), Environment)}");
+                ExecutionLog.Info($"Whoami data successfully retrieved. Host URL={hostUrl}, Environment={Enum.GetName(typeof(SdkEnvironment), environment)}");
                 _bookmakerDetails = new BookmakerDetails(bookmakerDetailsDTO);
                 ApiHost = hostName;
 
@@ -264,7 +265,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             }
             catch (Exception ex)
             {
-                ExecutionLog.Info($"Failed to retrieve whoami data. Host URL={hostUrl}, Environment={Enum.GetName(typeof(SdkEnvironment), Environment)}", ex);
+                ExecutionLog.Info($"Failed to retrieve whoami data. Host URL={hostUrl}, Environment={Enum.GetName(typeof(SdkEnvironment), environment)}", ex);
                 if (rethrow)
                 {
                     throw;
@@ -290,40 +291,46 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     try
                     {
                         // we have 3 options: production, integration and custom host
-                        LoadWhoamiData(_publicConfig.ApiHost, UseApiSsl, true);
+                        LoadWhoamiData(_publicConfig.ApiHost, UseApiSsl, true, Environment);
                     }
                     catch (Exception ex)
                     {
-                        if (!_publicConfig.ApiHost.Equals(SdkInfo.IntegrationApiHost, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            if (LoadWhoamiData(SdkInfo.IntegrationApiHost, UseApiSsl, false))
-                            {
-                                var message = $"Access denied. The provided access token is for the Integration environment but the SDK is configured to access the {_publicConfig.Environment} environment.";
-                                ExecutionLog.Error(message);
-                                throw new InvalidOperationException(message, ex);
-                            }
-                        }
-                        if (!_publicConfig.ApiHost.Equals(SdkInfo.ProductionApiHost, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            if (LoadWhoamiData(SdkInfo.ProductionApiHost, UseApiSsl, false))
-                            {
-                                var message = $"Access denied. The provided access token is for the Production environment but the SDK is configured to access the {_publicConfig.Environment} environment.";
-                                ExecutionLog.Error(message);
-                                throw new InvalidOperationException(message, ex);
-                            }
-                        }
                         ExecutionLog.Error($"Failed to load whoami data. Environment={Enum.GetName(typeof(SdkEnvironment), Environment)}", ex);
+
+                        var wantedEnvironment = EnvironmentManager.GetSetting(Environment);
+                        if (wantedEnvironment != null && !wantedEnvironment.EnvironmentRetryList.IsNullOrEmpty())
+                        {
+                            foreach (var sdkEnvironment in wantedEnvironment.EnvironmentRetryList)
+                            {
+                                var newSetting = EnvironmentManager.GetSetting(sdkEnvironment);
+                                if (newSetting != null && !string.IsNullOrEmpty(newSetting.ApiHost))
+                                {
+                                    if (newSetting.OnlySsl && !UseApiSsl)
+                                    {
+                                        ExecutionLog.Warn("Configuration set to not use SSL when connecting to API.");
+                                    }
+                                    var result = LoadWhoamiData(newSetting.ApiHost, UseApiSsl, false, sdkEnvironment);
+                                    var message = $"Access denied. The provided access token is not valid for the {sdkEnvironment} environment.";
+                                    if (result)
+                                    {
+                                        message = $"Access granted. The provided access token is valid for the {sdkEnvironment} environment.";
+                                    }
+                                    ExecutionLog.Warn(message);
+                                }
+                            }
+                        }
+
                         throw;
                     }
                 }
                 else
                 {
                     //replay server supports both integration & production tokens, so the token must be checked against both environments
-                    if (!LoadWhoamiData(SdkInfo.IntegrationApiHost, UseApiSsl, false))
+                    if (!LoadWhoamiData(EnvironmentManager.GetApiHost(SdkEnvironment.Integration), UseApiSsl, false, SdkEnvironment.Integration))
                     {
                         try
                         {
-                            LoadWhoamiData(SdkInfo.ProductionApiHost, UseApiSsl, true);
+                            LoadWhoamiData(EnvironmentManager.GetApiHost(SdkEnvironment.Production), UseApiSsl, true, SdkEnvironment.Production);
                         }
                         catch (Exception ex)
                         {

@@ -116,6 +116,8 @@
     <Compile Include="Exceptions\MappingException.cs" />
     <Compile Include="Exceptions\NameExpressionException.cs" />
     <Compile Include="Exceptions\NameGenerationException.cs" />
+    <Compile Include="Internal\EnvironmentSetting.cs" />
+    <Compile Include="Internal\EnvironmentManager.cs" />
     <Compile Include="Internal\ExtensionMethods.cs" />
     <Compile Include="Internal\IDeserializer.cs" />
     <Compile Include="Internal\IncrementalSequenceGenerator.cs" />

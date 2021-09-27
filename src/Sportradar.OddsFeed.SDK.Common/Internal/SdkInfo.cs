@@ -14,36 +14,8 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
     /// <summary>
     /// Class provides information about current executing assembly
     /// </summary>
-    public class SdkInfo
+    public static class SdkInfo
     {
-        /// <summary>
-        /// The production host
-        /// </summary>
-        public const string ProductionHost = "mq.betradar.com";
-        /// <summary>
-        /// The production API host
-        /// </summary>
-        public const string ProductionApiHost = "api.betradar.com";
-        /// <summary>
-        /// The integration host
-        /// </summary>
-        public const string IntegrationHost = "stgmq.betradar.com";
-        /// <summary>
-        /// The integration API host
-        /// </summary>
-        public const string IntegrationApiHost = "stgapi.betradar.com";
-        /// <summary>
-        /// The replay host
-        /// </summary>
-        public const string ReplayHost = "replaymq.betradar.com";
-        /// <summary>
-        /// The replay API host
-        /// </summary>
-        public const string ReplayApiHost = IntegrationApiHost;
-        /// <summary>
-        /// The default host port
-        /// </summary>
-        public const int DefaultHostPort = 5671;
         /// <summary>
         /// The unknown producer identifier
         /// </summary>
