@@ -55,7 +55,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject
             Console.Write(" Enter number: ");
             var k = Console.ReadLine();
 
-            var defaultLocale = Feed.GetConfigurationBuilder().SetAccessTokenFromConfigFile().SelectIntegration().LoadFromConfigFile().Build().DefaultLocale;
+            var defaultLocale = Feed.GetConfigurationBuilder().BuildFromConfigFile().DefaultLocale;
 
             Console.WriteLine(string.Empty);
             Console.WriteLine(string.Empty);

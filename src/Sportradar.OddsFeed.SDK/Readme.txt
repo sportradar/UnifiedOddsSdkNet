@@ -9,6 +9,11 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2021-10-06  1.48.0
+Extended configuration with ufEnvironment attribute
+Extended ITokenSetter and IEnvironmentSelector 
+New values added to SdkEnvironment enum (GlobalIntegration, GlobalProduction, ProxySingapore, ProxyTokyo)
+
 2021-09-09  1.47.0
 Improved exporting/importing and merging of player profile data
 Improved SemaphorePool handling

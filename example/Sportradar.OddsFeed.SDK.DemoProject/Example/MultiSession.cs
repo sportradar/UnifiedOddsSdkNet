@@ -27,7 +27,7 @@ namespace Sportradar.OddsFeed.SDK.DemoProject.Example
         {
             _log.Info("Running the OddsFeed SDK Multi-Session example");
 
-            var configuration = Feed.GetConfigurationBuilder().SetAccessTokenFromConfigFile().SelectIntegration().LoadFromConfigFile().Build();
+            var configuration = Feed.GetConfigurationBuilder().BuildFromConfigFile();
             var oddsFeed = new Feed(configuration);
             AttachToFeedEvents(oddsFeed);
 
