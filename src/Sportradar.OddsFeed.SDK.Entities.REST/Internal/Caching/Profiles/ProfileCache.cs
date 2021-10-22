@@ -132,7 +132,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         public async Task<PlayerProfileCI> GetPlayerProfileAsync(URN playerId, IEnumerable<CultureInfo> cultures)
         {
             Guard.Argument(playerId, nameof(playerId)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();
             if (!cultures.Any())
             {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
@@ -378,7 +378,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         /// <returns><c>true</c> if added, <c>false</c> otherwise</returns>
         protected override bool CacheAddDtoItem(URN id, object item, CultureInfo culture, DtoType dtoType, ISportEventCI requester)
         {
-            //CacheLog.Debug($"Saving {id}.");
             if (_isDisposed)
             {
                 return false;
@@ -568,7 +567,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                     ExecutionLog.Warn($"Trying to add unchecked dto type: {dtoType} for id: {id}.");
                     break;
             }
-            //CacheLog.Debug($"Saving {id} COMPLETED.");
             return saved;
         }
 
@@ -1057,7 +1055,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         /// Imports provided items into the cache
         /// </summary>
         /// <param name="items">Collection of <see cref="ExportableCI"/> to be inserted into the cache</param>
-        public async Task ImportAsync(IEnumerable<ExportableCI> items)
+        public Task ImportAsync(IEnumerable<ExportableCI> items)
         {
             foreach (var exportable in items)
             {
@@ -1076,6 +1074,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                     AddPlayerProfile(exportablePlayerProfile);
                 }
             }
+
+            return Task.Delay(0);
         }
 
         /// <summary>

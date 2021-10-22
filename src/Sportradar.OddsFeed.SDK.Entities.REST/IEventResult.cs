@@ -28,7 +28,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST
         /// Gets the points of the result
         /// </summary>
         /// <value>The points of the result</value>
-        [Obsolete]
+        [Obsolete("Use PointsDecimal")]
         int? Points { get; }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST
         /// Gets the sprint of the result
         /// </summary>
         /// <value>The sprint of the result</value>
-        [Obsolete]
+        [Obsolete("Use SprintDecimal")]
         int? Sprint { get; }
 
         /// <summary>

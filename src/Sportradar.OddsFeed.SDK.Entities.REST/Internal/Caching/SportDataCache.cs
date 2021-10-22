@@ -99,7 +99,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             Guard.Argument(dataRouterManager, nameof(dataRouterManager)).NotNull();
             Guard.Argument(timer, nameof(timer)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull(); //.NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();
             if (!cultures.Any())
             {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
@@ -180,7 +180,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <returns>A <see cref="Task" /> representing the async operation</returns>
         private async Task FetchAndMergeAll(IEnumerable<CultureInfo> cultures, bool clearExistingData)
         {
-            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();
             if (!cultures.Any())
             {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
@@ -549,7 +549,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 {
                     await FetchAndMergeAll(missingCultures, false).ConfigureAwait(false);
                 }
-                //return GetSportForTournamentFromCache(tournamentId, cultureList, false);
             }
             catch (Exception ex)
             {
@@ -906,8 +905,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             {
                 AddSport(lottery.Sport.Id, lottery.Sport, culture);
                 AddCategory(lottery.Category.Id, lottery.Category, lottery.SportId ?? lottery.Sport?.Id, null, culture);
-                // ReSharper disable once RedundantJumpStatement
-                return;
             }
         }
 
@@ -971,10 +968,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             if (cacheItemType == CacheItemType.Sport || cacheItemType == CacheItemType.All)
             {
-                return Sports.ContainsKey(id);
+                return Sports.ContainsKey(id) || Categories.ContainsKey(id);
             }
 
-            if (cacheItemType == CacheItemType.Category || cacheItemType == CacheItemType.All)
+            if (cacheItemType == CacheItemType.Category)
             {
                 return Categories.ContainsKey(id);
             }
@@ -1094,8 +1091,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="culture">The culture</param>
         private void AddCategory(URN id, CategoryDTO item, CultureInfo culture)
         {
-            //WriteLog($"Saving CategoryDTO for id:{id} and lang:[{culture.TwoLetterISOLanguageName}].");
-
             lock (_mergeLock)
             {
                 try
@@ -1116,8 +1111,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     ExecutionLog.Error($"Error saving CategoryDTO for {id} and lang={culture.TwoLetterISOLanguageName}.", e);
                 }
             }
-
-            //WriteLog($"Saving CategoryDTO for id:{id} and lang:[{culture.TwoLetterISOLanguageName}] COMPLETED.");
         }
 
         private void AddCategory(URN id, CategorySummaryDTO item, URN sportId, IEnumerable<URN> tournamentIds, CultureInfo culture)
@@ -1141,6 +1134,31 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 catch (Exception e)
                 {
                     ExecutionLog.Error($"Error saving CategorySummaryDTO for {id} and lang={culture.TwoLetterISOLanguageName}.", e);
+                }
+            }
+        }
+
+        private void AddCategory(ExportableCategoryCI item)
+        {
+            lock (_mergeLock)
+            {
+                try
+                {
+                    var id = URN.Parse(item.Id);
+                    if (Categories.ContainsKey(id))
+                    {
+                        CategoryCI ci;
+                        Categories.TryGetValue(id, out ci);
+                        ci?.Merge(new CategoryCI(item), item.Name.Keys.First());
+                    }
+                    else
+                    {
+                        Categories.Add(id, new CategoryCI(item));
+                    }
+                }
+                catch (Exception e)
+                {
+                    ExecutionLog.Error($"Error importing ExportableCategoryCI for {item.Id}.", e);
                 }
             }
         }
@@ -1172,41 +1190,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             }
         }
 
-        private void AddCategory(ExportableCategoryCI item)
-        {
-            lock (_mergeLock)
-            {
-                try
-                {
-                    var id = URN.Parse(item.Id);
-                    if (Categories.ContainsKey(id))
-                    {
-                        CategoryCI ci;
-                        Categories.TryGetValue(id, out ci);
-                        ci?.Merge(new CategoryCI(item), item.Name.Keys.First());
-                    }
-                    else
-                    {
-                        Categories.Add(id, new CategoryCI(item));
-                    }
-                }
-                catch (Exception e)
-                {
-                    ExecutionLog.Error($"Error importing ExportableCategoryCI for {item.Id}.", e);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Writes the log message
-        /// </summary>
-        /// <param name="text">The text to me logged</param>
-        /// <param name="useDebug">if set to <c>true</c> [use debug].</param>
-        protected override void WriteLog(string text, bool useDebug = false)
-        {
-            base.WriteLog(text, useDebug);
-        }
-
         /// <summary>
         /// Exports current items in the cache
         /// </summary>
@@ -1233,7 +1216,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// Imports provided items into the cache
         /// </summary>
         /// <param name="items">Collection of <see cref="ExportableCI"/> to be inserted into the cache</param>
-        public async Task ImportAsync(IEnumerable<ExportableCI> items)
+        public Task ImportAsync(IEnumerable<ExportableCI> items)
         {
             foreach (var exportable in items)
             {
@@ -1248,6 +1231,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     AddCategory(exportableCategory);
                 }
             }
+
+            return Task.Delay(0);
         }
 
         /// <summary>

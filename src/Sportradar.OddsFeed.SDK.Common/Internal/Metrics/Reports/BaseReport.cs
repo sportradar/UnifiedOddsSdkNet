@@ -131,7 +131,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal.Metrics.Reports
                     PrintFull(item);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException($"Unknown {PrintMode}");
             }
         }
 

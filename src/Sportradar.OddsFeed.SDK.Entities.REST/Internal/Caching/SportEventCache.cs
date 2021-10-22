@@ -15,7 +15,6 @@ using Metrics;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
-using Sportradar.OddsFeed.SDK.Common.Internal.Metrics;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Exportable;
@@ -31,12 +30,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
     /// A implementation of the interface <see cref="ISportEventCache"/>
     /// </summary>
     /// <seealso cref="ISportEventCache" />
-    internal class SportEventCache : SdkCache, ISportEventCache, IHealthStatusProvider, IDisposable, IExportableSdkCache
+    internal class SportEventCache : SdkCache, ISportEventCache
     {
         /// <summary>
         /// A <see cref="ILog"/> instance used for logging
         /// </summary>
-        private static readonly ILog CacheLog = SdkLoggerFactory.GetLoggerForCache(typeof(SportEventCache));
+        private new static readonly ILog CacheLog = SdkLoggerFactory.GetLoggerForCache(typeof(SportEventCache));
 
         /// <summary>
         /// The list of dates already automatically loaded by the timer

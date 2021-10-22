@@ -70,9 +70,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         {
             Guard.Argument(id, nameof(id)).NotNull();
             Guard.Argument(sportEventCache, nameof(sportEventCache)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();
             if (!cultures.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
+            }
 
             Id = id;
             SportId = sportId;
@@ -211,9 +213,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         }
 
         /// <summary>
-        /// Asynchronously gets a <see cref="Nullable{bool}"/> specifying if the start time to be determined is set for the associated sport event.
+        /// Asynchronously gets a <see cref="bool"/> specifying if the start time to be determined is set for the associated sport event.
         /// </summary>
-        /// <returns>A <see cref="Nullable{bool}"/> specifying if the start time to be determined is set for the associated sport event.</returns>
+        /// <returns>A <see cref="bool"/> specifying if the start time to be determined is set for the associated sport event.</returns>
         public async Task<bool?> GetStartTimeTbdAsync()
         {
             var sportEventCI = SportEventCache.GetEventCacheItem(Id);

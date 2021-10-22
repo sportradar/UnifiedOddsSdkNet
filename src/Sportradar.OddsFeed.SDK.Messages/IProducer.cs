@@ -50,7 +50,7 @@ namespace Sportradar.OddsFeed.SDK.Messages
         /// Gets the time of last alive message received from feed
         /// </summary>
         /// <value>The time of last alive message</value>
-        [Obsolete]
+        [Obsolete("Replaced by LastTimestampBeforeDisconnect")]
         DateTime TimeOfLastAlive { get; }
 
         /// <summary>

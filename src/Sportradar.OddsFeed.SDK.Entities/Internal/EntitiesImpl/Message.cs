@@ -30,7 +30,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <summary>
         /// Gets the value specifying when the message was generated in the milliseconds since EPOCH UTC
         /// </summary>
-        [Obsolete]
+        [Obsolete("Use Timestamps")]
         public long Timestamp { get; }
 
         /// <summary>

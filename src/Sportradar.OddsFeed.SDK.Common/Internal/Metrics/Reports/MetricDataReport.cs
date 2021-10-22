@@ -23,8 +23,6 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal.Metrics.Reports
                 return;
             }
 
-            //QueueAdd(FormatHelper.SectionName("MetricsData(s)", ContextName));
-
             base.ReportList(listItems);
         }
 

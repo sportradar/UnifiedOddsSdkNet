@@ -30,6 +30,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// </summary>
         /// <param name="name">The name of the instance</param>
         /// <param name="cache">The cache to be registered</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S3928:Parameter names used into ArgumentException constructors should match an existing one ", Justification = "Invalid argument")]
         public void RegisterCache(string name, ISdkCache cache)
         {
             Guard.Argument(name, nameof(name)).NotNull().NotEmpty();
@@ -45,10 +46,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             }
             if (_caches.ContainsKey(name))
             {
-                //throw new ArgumentException("Cache with this name already added.", nameof(name));
                 ExecLog.Warn($"Cache with the name={name} already added. Removing it.");
                 _caches.Remove(name);
-                //return;
             }
             ExecLog.Debug($"Registering cache with the name={name} to the CacheManager.");
             _caches.Add(name, cache);
@@ -87,11 +86,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             {
                 return;
             }
-
-            //ExecLog.Debug($"Dispatching {id} of type:{dtoType} and lang:[{culture.TwoLetterISOLanguageName}].");
-
+            
             var appropriateCaches = _caches.Where(s => s.Value.RegisteredDtoTypes.Contains(dtoType)).ToList();
-            //ExecLog.Debug($"Dispatching {id} of type:{dtoType} and lang:[{culture.TwoLetterISOLanguageName}] to {appropriateCaches.Count}/{_caches.Count} caches.");
 
             if (!appropriateCaches.Any())
             {
@@ -115,7 +111,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             {
                 ExecLog.Warn("Cannot save data. There is no registered cache.");
             }
-            //ExecLog.Debug($"Dispatching {id} of type:{dtoType} and lang:[{culture.TwoLetterISOLanguageName}] COMPLETED.");
         }
 
         /// <summary>

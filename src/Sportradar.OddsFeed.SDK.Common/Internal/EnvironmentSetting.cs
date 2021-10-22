@@ -5,7 +5,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
     /// <summary>
     /// Class EnvironmentSetting
     /// </summary>
-    public class EnvironmentSetting
+    internal class EnvironmentSetting
     {
         /// <summary>
         /// Gets the environment.

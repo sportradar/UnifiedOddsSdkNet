@@ -24,7 +24,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments
         /// <param name="rawData">the name of the message which could not be deserialized, or a null reference if message name could not be retrieved</param>
         internal MessageDeserializationFailedEventArgs(IEnumerable<byte> rawData)
         {
-            Guard.Argument(rawData, nameof(rawData)).NotNull();//.NotEmpty();
+            Guard.Argument(rawData, nameof(rawData)).NotNull();
             if (!rawData.Any())
             {
                 throw new ArgumentOutOfRangeException(nameof(rawData));

@@ -112,12 +112,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Division = item.Division ?? Division;
         }
 
+        /// <summary>
+        /// Create exportable ci as an asynchronous operation.
+        /// </summary>
         protected override async Task<T> CreateExportableCIAsync<T>()
         {
             var exportable = await base.CreateExportableCIAsync<T>().ConfigureAwait(false);
             var team = exportable as ExportableTeamCompetitorCI;
-            team.Qualifier = Qualifier;
-            team.Division = Division;
+            if (team != null)
+            {
+                team.Qualifier = Qualifier;
+                team.Division = Division;
+            }
 
             return team as T;
         }

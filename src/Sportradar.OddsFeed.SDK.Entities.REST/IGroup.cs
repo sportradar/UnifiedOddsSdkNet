@@ -11,10 +11,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST
     public interface IGroup : IEntityPrinter
     {
         /// <summary>
-        /// Gets the name of the group represented by the current <see cref="IGroup"/> instance
+        /// Gets the name.
         /// </summary>
-        //IDictionary<string, string> Name { get; }
-
+        /// <value>The name.</value>
         string Name { get; }
 
         /// <summary>

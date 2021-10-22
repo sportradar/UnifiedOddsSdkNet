@@ -88,7 +88,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             Guard.Argument(dataProvider, nameof(dataProvider)).NotNull();
             Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
             if (!cultures.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
+            }
 
             _dataProvider = dataProvider;
             _defaultCultures = cultures;
@@ -172,6 +174,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
