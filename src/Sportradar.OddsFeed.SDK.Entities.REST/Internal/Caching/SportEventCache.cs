@@ -1076,7 +1076,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     {
                         //ExecutionLog.Debug($"Saving OLD data for {id} and item type: {item.GetType().Name} and dto type: {dtoType}.");
                         var merged = false;
-                        //var cacheItem = _sportEventCacheItemFactory.Get(Cache.Get(id.ToString()));
                         var fixture = item as FixtureDTO;
                         if (fixture != null)
                         {

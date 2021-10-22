@@ -90,7 +90,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST
         /// Gets the climber
         /// </summary>
         /// <value>The climber</value>
-        [Obsolete]
+        [Obsolete("Use ClimberDecimal")]
         int? Climber { get; }
 
         /// <summary>

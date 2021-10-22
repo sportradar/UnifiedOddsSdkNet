@@ -100,11 +100,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             var timer = Metric.Context($"AddDtoTo_{CacheName}").Timer($"{dtoType}", Unit.Calls);
             using (timer.NewContext($"{id} [{culture.TwoLetterISOLanguageName}]"))
             {
-                //WriteLog($"{CacheName} ::> Saving DTO for id:{id}, lang:[{culture.TwoLetterISOLanguageName}] and type:{dtoType}.");
                 var syncTask = new Task<bool>(() =>
                 {
                     var result = CacheAddDtoItem(id, item, culture, dtoType, requester);
-                    //WriteLog($"{CacheName} ::> Saving DTO for id:{id}, lang:[{culture.TwoLetterISOLanguageName}] and type:{dtoType} COMPLETED.");
                     return result;
                 });
 

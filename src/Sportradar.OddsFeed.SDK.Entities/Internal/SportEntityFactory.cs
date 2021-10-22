@@ -100,7 +100,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         private ISport BuildSportInternal(SportData sportData, IEnumerable<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy)
         {
             Guard.Argument(sportData, nameof(sportData)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();
             if (!cultures.Any())
             {
                 throw new ArgumentOutOfRangeException(nameof(cultures));

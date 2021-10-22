@@ -789,14 +789,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     if (lottery != null)
                     {
                         AddDataFromSportEventSummary(lottery, culture);
-                        //if (lottery.DrawEvents == null || !lottery.DrawEvents.Any())
-                        //{
-                        //    _dataRouterManager.GetLotteryScheduleAsync(lottery.Id, culture);
-                        //}
-                        //else
-                        //{
-                        //    _dataRouterManager.GetDrawFixtureAsync(lottery.DrawEvents.First().Id, culture);
-                        //}
                         saved = true;
                     }
                     else
