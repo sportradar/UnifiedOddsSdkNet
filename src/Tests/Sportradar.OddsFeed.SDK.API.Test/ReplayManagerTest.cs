@@ -1,6 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
 using System.Net;
 using System.Net.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -15,7 +17,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
     [TestClass]
     public class ReplayManagerTest
     {
-        private HttpDataRestful _httpDataRestful;
+        private TestDataFetcher _httpDataRestful;
         private IReplayManager _replayManager;
 
         [TestInitialize]
@@ -34,7 +36,8 @@ namespace Sportradar.OddsFeed.SDK.API.Test
                 15
             };
 
-            _httpDataRestful = LogProxyFactory.Create<HttpDataRestful>(args);
+            //_httpDataRestful = LogProxyFactory.Create<HttpDataRestful>(args);
+            _httpDataRestful = new TestDataFetcher();
 
             object[] args2 =
             {
@@ -48,6 +51,8 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         [TestMethod]
         public void AddMessageToReplayQueue()
         {
+            var matchId = StaticRandom.Urn(9934843);
+            _httpDataRestful.PutResponses.Add(new Tuple<string, int, HttpResponseMessage>($"/{matchId}", 0, new HttpResponseMessage(HttpStatusCode.Accepted)));
             var replayResponse = _replayManager.AddMessagesToReplayQueue(StaticRandom.Urn(9934843));
             Assert.IsNotNull(replayResponse);
         }

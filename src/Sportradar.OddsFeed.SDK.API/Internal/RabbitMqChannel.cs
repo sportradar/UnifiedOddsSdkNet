@@ -1,25 +1,28 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dawn;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Logging;
+using Dawn;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities;
+using Sportradar.OddsFeed.SDK.Entities.Internal;
 
-namespace Sportradar.OddsFeed.SDK.Entities.Internal
+namespace Sportradar.OddsFeed.SDK.API.Internal
 {
     /// <summary>
     /// A class used to connect to the RabbitMQ broker
     /// </summary>
     /// <seealso cref="IRabbitMqChannel" />
-    public class RabbitMqChannel : IRabbitMqChannel
+    internal class RabbitMqChannel : IRabbitMqChannel
     {
         /// <summary>
         /// The <see cref="ILog"/> used execution logging
@@ -27,7 +30,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         private static readonly ILog ExecutionLog = SdkLoggerFactory.GetLogger(typeof(RabbitMqChannel));
 
         /// <summary>
-        /// A <see cref="IChannelFactory"/> used to construct the <see cref="IModel"/> representing Rabbit MQ channel
+        /// A <see cref="Sportradar.OddsFeed.SDK.API.Internal.IChannelFactory"/> used to construct the <see cref="IModel"/> representing Rabbit MQ channel
         /// </summary>
         private readonly IChannelFactory _channelFactory;
 
@@ -56,7 +59,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// </summary>
         public event EventHandler<BasicDeliverEventArgs> Received;
 
+        /// <summary>
+        /// The message interest associated by the channel using this instance
+        /// </summary>
+        private MessageInterest _interest;
+
         private List<string> _routingKeys;
+
+        private DateTime _channelStarted;
 
         private DateTime _lastMessageReceived;
 
@@ -75,7 +85,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <summary>
         /// Initializes a new instance of the <see cref="RabbitMqChannel"/> class.
         /// </summary>
-        /// <param name="channelFactory">A <see cref="IChannelFactory"/> used to construct the <see cref="IModel"/> representing Rabbit MQ channel.</param>
+        /// <param name="channelFactory">A <see cref="Sportradar.OddsFeed.SDK.API.Internal.IChannelFactory"/> used to construct the <see cref="IModel"/> representing Rabbit MQ channel.</param>
         /// <param name="timer">Timer used to check if there is connection</param>
         /// <param name="maxTimeBetweenMessages">Max timeout between messages to check if connection is ok</param>
         public RabbitMqChannel(IChannelFactory channelFactory, ITimer timer, TimeSpan maxTimeBetweenMessages)
@@ -84,6 +94,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
 
             _channelFactory = channelFactory;
             _routingKeys = new List<string>();
+            _lastMessageReceived = DateTime.MinValue;
             _lastMessageReceived = DateTime.MinValue;
 
             _timer = timer;
@@ -144,12 +155,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
 
         private void ConsumerOnShutdown(object sender, ShutdownEventArgs shutdownEventArgs)
         {
-            ExecutionLog.Info($"The consumer {_consumer.ConsumerTag} is shutdown.");
+            ExecutionLog.Info($"The consumer {_consumer.ConsumerTag} is shutdown. Reason={_consumer.ShutdownReason}");
         }
 
         private void ChannelOnModelShutdown(object sender, ShutdownEventArgs shutdownEventArgs)
         {
-            ExecutionLog.Info($"The channel with channelNumber {_channel.ChannelNumber} is shutdown.");
+            ExecutionLog.Info($"The channel with channelNumber {_channel.ChannelNumber} is shutdown. Reason={_channel.CloseReason}");
         }
 
         private void CreateAndAttachEvents()
@@ -171,7 +182,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             _consumer.Shutdown += ConsumerOnShutdown;
             _channel.BasicConsume(declareResult.QueueName, true, _consumer);
 
-            _lastMessageReceived = DateTime.Now;
+            _lastMessageReceived = DateTime.MinValue;
+            _channelStarted = DateTime.Now;
         }
 
         private void DetachEvents()
@@ -189,6 +201,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 _channel.Dispose();
                 _channel = null;
             }
+
+            _channelStarted = DateTime.MinValue;
         }
 
         private void OnTimerElapsed(object sender, EventArgs e)
@@ -216,24 +230,34 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                         CreateAndAttachEvents();
                     }
 
-                    if(_channelFactory.ConnectionCreated > _lastMessageReceived)
+                    // it means, the connection was reset in between
+                    if (_channelFactory.ConnectionCreated > _channelStarted)
                     {
                         ExecutionLog.Info("Recreating connection channel and attaching events ...");
-                        // it means, the connection was reset in between
                         DetachEvents();
                         CreateAndAttachEvents();
                     }
 
+                    // no messages arrived in last _maxTimeBetweenMessages seconds, from the start of the channel
+                    var channelStartedDiff = DateTime.Now - _channelStarted;
+                    if (_lastMessageReceived == DateTime.MinValue && _channelStarted > DateTime.MinValue && channelStartedDiff > _maxTimeBetweenMessages)
+                    {
+                        var isOpen = _channelFactory.IsConnectionOpen() ? "s" : string.Empty;
+                        ExecutionLog.Warn($"There were no message{isOpen} in more then {_maxTimeBetweenMessages.TotalSeconds}s for the channel with channelNumber: {_channel?.ChannelNumber}. Last message arrived: {_lastMessageReceived}. Recreating channel.");
+                        DetachEvents();
+                        CreateAndAttachEvents();
+                    }
+
+                    // we have received messages in the past, but not in last _maxTimeBetweenMessages seconds
                     var lastMessageDiff = DateTime.Now - _lastMessageReceived;
                     if (_lastMessageReceived > DateTime.MinValue && lastMessageDiff > _maxTimeBetweenMessages)
                     {
-                        var channelNumber = _channel?.ChannelNumber;
                         var isOpen = _channelFactory.IsConnectionOpen() ? "s" : string.Empty;
                         ExecutionLog.Warn($"There were no message{isOpen} in more then {_maxTimeBetweenMessages.TotalSeconds}s for the channel with channelNumber: {_channel?.ChannelNumber}. Last message arrived: {_lastMessageReceived}");
                         DetachEvents();
-                        ExecutionLog.Info($"Resetting connection for the channel with channelNumber: {channelNumber}");
+                        ExecutionLog.Info($"Resetting connection for the channel with channelNumber: {_channel?.ChannelNumber}");
                         _channelFactory.ResetConnection();
-                        ExecutionLog.Info($"Resetting connection finished for the channel with channelNumber: {channelNumber}");
+                        ExecutionLog.Info($"Resetting connection finished for the channel with channelNumber: {_channel?.ChannelNumber}");
                         CreateAndAttachEvents();
                     }
                 }

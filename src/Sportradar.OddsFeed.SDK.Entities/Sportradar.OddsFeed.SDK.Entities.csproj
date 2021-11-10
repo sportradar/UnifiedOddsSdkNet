@@ -172,7 +172,6 @@
     <Compile Include="Internal\FeedMessageHandler.cs" />
     <Compile Include="Internal\FeedMesssageValidator.cs" />
     <Compile Include="Internal\FeedRoutingKeyBuilder.cs" />
-    <Compile Include="Internal\IChannelFactory.cs" />
     <Compile Include="Internal\IFeedMessageHandler.cs" />
     <Compile Include="Internal\IFeedMessageValidator.cs" />
     <Compile Include="Internal\IRoutingKeyParser.cs" />
@@ -217,7 +216,6 @@
     <Compile Include="OddsDisplayType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Internal\RabbitMqMessageReceiver.cs" />
-    <Compile Include="Internal\RabbitMqChannel.cs" />
     <Compile Include="Internal\EntitiesImpl\Stage.cs" />
   </ItemGroup>
   <ItemGroup>

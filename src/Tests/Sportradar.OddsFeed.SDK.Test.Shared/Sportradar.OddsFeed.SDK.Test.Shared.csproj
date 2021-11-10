@@ -130,7 +130,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="REST XMLs\bookmaker_details.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>

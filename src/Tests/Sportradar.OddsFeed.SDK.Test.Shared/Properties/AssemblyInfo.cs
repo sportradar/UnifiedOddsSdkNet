@@ -17,6 +17,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
+[assembly: InternalsVisibleTo("Sportradar.OddsFeed.SDK.Test")]
 [assembly: InternalsVisibleTo("Sportradar.OddsFeed.SDK.API.Test")]
 [assembly: InternalsVisibleTo("Sportradar.OddsFeed.SDK.Entities.Test")]
 [assembly: InternalsVisibleTo("Sportradar.OddsFeed.SDK.Entities.REST.Test")]

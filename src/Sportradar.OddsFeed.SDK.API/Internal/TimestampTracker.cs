@@ -52,9 +52,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         private readonly MessageTimingInfo _systemAliveTimingInfo;
 
         /// <summary>
-        /// The <see cref="Producer"/> associated with current instance
+        /// Sdk start time (used for recovery initiation)
         /// </summary>
-        private readonly Producer _producer;
+        public DateTime SdkStartTime { get; }
 
         /// <summary>
         /// Gets a value indicating whether the feed messages are processed in a timely manner
@@ -105,8 +105,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             {
                 throw new ArgumentOutOfRangeException(nameof(allInterests));
             }
-
-            _producer = producer;
+            
             _maxInactivitySeconds = maxInactivitySeconds;
             _maxMessageAgeInSeconds = maxMessageAgeInSeconds;
             _systemAliveTimingInfo = new MessageTimingInfo(SdkInfo.ToEpochTime(TimeProviderAccessor.Current.Now));
@@ -125,6 +124,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             }
             _aliveMessagesTimingInfo = new ReadOnlyDictionary<MessageInterest, MessageTimingInfo>(aliveMessagesTimingInfo);
             _nonAliveMessagesTimingInfo = new ReadOnlyDictionary<MessageInterest, MessageTimingInfo>(nonAliveMessagesTimingInfo);
+            SdkStartTime = DateTime.Now;
         }
 
         /// <summary>

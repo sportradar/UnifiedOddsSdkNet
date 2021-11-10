@@ -91,10 +91,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="sportEventCache">A <see cref="ISportEventCache"/> containing also tournament data</param>
         /// <param name="cacheManager">A <see cref="ICacheManager"/> used to interact among caches</param>
         public SportDataCache(IDataRouterManager dataRouterManager,
-            ITimer timer,
-            IEnumerable<CultureInfo> cultures,
-            ISportEventCache sportEventCache,
-            ICacheManager cacheManager)
+                              ITimer timer,
+                              IEnumerable<CultureInfo> cultures,
+                              ISportEventCache sportEventCache,
+                              ICacheManager cacheManager)
             : base(cacheManager)
         {
             Guard.Argument(dataRouterManager, nameof(dataRouterManager)).NotNull();

@@ -3,9 +3,13 @@
 */
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Dawn;
 using System.Linq;
+using Common.Logging;
+using Sportradar.OddsFeed.SDK.API.EventArguments;
+using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -19,6 +23,16 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
     /// <seealso cref="IProducerManager" />
     public class ProducerManager : IProducerManager
     {
+        /// <summary>
+        /// A <see cref="ILog"/> instance used for logging
+        /// </summary>
+        private static readonly ILog Log = SdkLoggerFactory.GetLoggerForExecution(typeof(ProducerManager));
+
+        /// <summary>
+        /// Occurs when a recovery initiation completes
+        /// </summary>
+        public event EventHandler<RecoveryInitiatedEventArgs> RecoveryInitiated;
+
         /// <summary>
         /// The producers
         /// </summary>
@@ -43,7 +57,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <summary>
         /// Gets the indication whether the after age should be adjusted before executing recovery request
         /// </summary>
-        private bool _adjustAfterAge;
+        private readonly bool _adjustAfterAge;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProducerManager"/> class
@@ -264,6 +278,32 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         public static IProducer GetUnknownProducer()
         {
             return new Producer(id: SdkInfo.UnknownProducerId, name: "Unknown", description: "Unknown producer", apiUrl: "unknown", active: true, maxInactivitySeconds: 20, maxRecoveryTime: 3600, scope: "live|prematch|virtual", 100);
+        }
+
+        /// <summary>
+        /// Dispatches the <code>RecoveryInitiated</code>
+        /// </summary>
+        /// <param name="eventArgs">Event arguments</param>
+        public void InvokeRecoveryInitiated(RecoveryInitiatedEventArgs eventArgs)
+        {
+            if (RecoveryInitiated == null)
+            {
+                Log.Debug("Cannot invoke RecoveryInitiated because no event listeners are attached to associated event handler.");
+                return;
+            }
+
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                RecoveryInitiated(this, eventArgs);
+                stopwatch.Stop();
+                Log.Info($"Successfully called RecoveryInitiated event. Duration: {stopwatch.ElapsedMilliseconds} ms.");
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                Log.Warn($"Event handler throw an exception while invoking RecoveryInitiated. Exception: {ex.Message}", ex);
+            }
         }
     }
 }

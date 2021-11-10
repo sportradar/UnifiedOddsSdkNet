@@ -251,7 +251,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 ExecutionLog.Info($"Whoami data successfully retrieved. Host URL={hostUrl}, Environment={Enum.GetName(typeof(SdkEnvironment), environment)}");
                 _bookmakerDetails = new BookmakerDetails(bookmakerDetailsDTO);
                 ApiHost = hostName;
-
+           
                 if (_bookmakerDetails.ServerTimeDifference > TimeSpan.FromSeconds(5))
                 {
                     ExecutionLog.Error($"Machine time is out of sync for {_bookmakerDetails.ServerTimeDifference.TotalSeconds} sec. It may produce unwanted results with time sensitive operations within sdk.");

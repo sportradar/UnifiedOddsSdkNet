@@ -132,6 +132,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CacheType.cs" />
+    <Compile Include="EventArguments\RecoveryInitiatedEventArgs.cs" />
     <Compile Include="EventArguments\ConnectionExceptionEventArgs.cs" />
     <Compile Include="EventArguments\EventChangeEventArgs.cs" />
     <Compile Include="EventArguments\EventRecoveryCompletedEventArgs.cs" />
@@ -145,6 +146,7 @@
     <Compile Include="IConfigurationBuilder.cs" />
     <Compile Include="IBookingManager.cs" />
     <Compile Include="Internal\EventChangeManager.cs" />
+    <Compile Include="Internal\IChannelFactory.cs" />
     <Compile Include="Internal\MarketDescriptionManager.cs" />
     <Compile Include="Internal\CustomBetManager.cs" />
     <Compile Include="Internal\BookingManager.cs" />
@@ -161,6 +163,7 @@
     <Compile Include="Internal\IRecoveryOperation.cs" />
     <Compile Include="Internal\ITimestampTracker.cs" />
     <Compile Include="Internal\ProducerEqualityComparer.cs" />
+    <Compile Include="Internal\RabbitMqChannel.cs" />
     <Compile Include="Internal\RecoveryInfo.cs" />
     <Compile Include="Internal\RecoveryInitiationException.cs" />
     <Compile Include="Internal\ProducerRecoveryManager.cs" />
@@ -170,6 +173,7 @@
     <Compile Include="Internal\Replay\ReplayEvent.cs" />
     <Compile Include="Internal\TimestampTracker.cs" />
     <Compile Include="Extended\IOddsFeedExt.cs" />
+    <Compile Include="IOddsFeedV5.cs" />
     <Compile Include="IOddsFeedV4.cs" />
     <Compile Include="IOddsFeedV3.cs" />
     <Compile Include="IOddsFeedV2.cs" />

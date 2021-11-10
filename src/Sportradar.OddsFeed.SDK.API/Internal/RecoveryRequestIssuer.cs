@@ -5,6 +5,7 @@ using System;
 using Dawn;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Common.Internal.Log;
@@ -51,6 +52,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         private readonly ISequenceGenerator _sequenceGenerator;
 
         /// <summary>
+        /// Used to invoke RequestInitiated event
+        /// </summary>
+        private readonly ProducerManager _producerManager;
+
+        /// <summary>
         /// The node identifier
         /// </summary>
         private readonly int _nodeId;
@@ -61,14 +67,17 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="dataPoster">A <see cref="IDataPoster"/> instance used to issue the request to the feed API</param>
         /// <param name="sequenceGenerator">A <see cref="ISequenceGenerator"/> used to generate the sequence numbers</param>
         /// <param name="config">The <see cref="IOddsFeedConfiguration"/> used to get nodeId</param>
-        public RecoveryRequestIssuer(IDataPoster dataPoster, ISequenceGenerator sequenceGenerator, IOddsFeedConfiguration config)
+        /// <param name="producerManager">The <see cref="IProducerManager"/> used to invoke RequestInitiated event</param>
+        public RecoveryRequestIssuer(IDataPoster dataPoster, ISequenceGenerator sequenceGenerator, IOddsFeedConfiguration config, IProducerManager producerManager)
         {
             Guard.Argument(dataPoster, nameof(dataPoster)).NotNull();
             Guard.Argument(sequenceGenerator, nameof(sequenceGenerator)).NotNull();
             Guard.Argument(config, nameof(config)).NotNull();
+            Guard.Argument(producerManager, nameof(producerManager)).NotNull();
 
             _dataPoster = dataPoster;
             _sequenceGenerator = sequenceGenerator;
+            _producerManager = (ProducerManager)producerManager;
             _nodeId = config.NodeId;
         }
 
@@ -99,13 +108,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             var responseMessage = await _dataPoster.PostDataAsync(new Uri(url)).ConfigureAwait(false);
             if (!responseMessage.IsSuccessStatusCode)
             {
-                throw new CommunicationException($"Recovery of event messages for Event={eventId}, RequestId={requestNumber}, failed with StatusCode={responseMessage.StatusCode}",
-                                                url,
-                                                responseMessage.StatusCode,
-                                                null);
+                var message = $"Recovery of event messages for Event={eventId}, RequestId={requestNumber}, failed with StatusCode={responseMessage.StatusCode}";
+                _producerManager.InvokeRecoveryInitiated(new RecoveryInitiatedEventArgs(requestNumber, producer.Id, 0, eventId, message));
+                throw new CommunicationException(message, url, responseMessage.StatusCode, null);
             }
 
             myProducer.EventRecoveries.TryAdd(requestNumber, eventId);
+            _producerManager.InvokeRecoveryInitiated(new RecoveryInitiatedEventArgs(requestNumber, producer.Id, 0, eventId, string.Empty));
             return requestNumber;
         }
 
@@ -137,13 +146,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             var responseMessage = await _dataPoster.PostDataAsync(new Uri(url)).ConfigureAwait(false);
             if (!responseMessage.IsSuccessStatusCode)
             {
-                throw new CommunicationException($"Recovery of stateful event messages for Event={eventId}, RequestId={requestNumber}, failed with StatusCode={responseMessage.StatusCode}",
-                                                url,
-                                                responseMessage.StatusCode,
-                                                null);
+                var message = $"Recovery of stateful event messages for Event={eventId}, RequestId={requestNumber}, failed with StatusCode={responseMessage.StatusCode}";
+                _producerManager.InvokeRecoveryInitiated(new RecoveryInitiatedEventArgs(requestNumber, producer.Id, 0, eventId, message));
+                throw new CommunicationException(message, url, responseMessage.StatusCode, null);
             }
 
             myProducer.EventRecoveries.TryAdd(requestNumber, eventId);
+            _producerManager.InvokeRecoveryInitiated(new RecoveryInitiatedEventArgs(requestNumber, producer.Id, 0, eventId, string.Empty));
             return requestNumber;
         }
 
@@ -202,11 +211,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             if (responseMessage == null || !responseMessage.IsSuccessStatusCode)
             {
-                throw new CommunicationException($"Recovery since after timestamp for Producer={producer}, RequestId={requestNumber}, After={dateAfter} failed with StatusCode={responseMessage?.StatusCode}",
-                                                url,
-                                                responseMessage?.StatusCode ?? 0,
-                                                null);
+                var message = $"Recovery since after timestamp for Producer={producer}, RequestId={requestNumber}, After={dateAfter} failed with StatusCode={responseMessage?.StatusCode}";
+                _producerManager.InvokeRecoveryInitiated(new RecoveryInitiatedEventArgs(requestNumber, producer.Id, timestampAfter, null, message));
+                throw new CommunicationException(message, url, responseMessage?.StatusCode ?? 0, null);
             }
+
+            _producerManager.InvokeRecoveryInitiated(new RecoveryInitiatedEventArgs(requestNumber, producer.Id, timestampAfter, null, string.Empty));
             return requestNumber;
         }
 
@@ -255,12 +265,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             if (responseMessage == null || !responseMessage.IsSuccessStatusCode)
             {
-                throw new CommunicationException($"Recovery since after timestamp for Producer={producer}, RequestId={requestNumber}, failed with StatusCode={responseMessage?.StatusCode}",
-                                                url,
-                                                responseMessage?.StatusCode ?? 0,
-                                                null);
+                var message = $"Full odds recovery for Producer={producer}, RequestId={requestNumber}, failed with StatusCode={responseMessage?.StatusCode}";
+                _producerManager.InvokeRecoveryInitiated(new RecoveryInitiatedEventArgs(requestNumber, producer.Id, 0, null, message));
+                throw new CommunicationException(message, url, responseMessage?.StatusCode ?? 0, null);
             }
 
+            _producerManager.InvokeRecoveryInitiated(new RecoveryInitiatedEventArgs(requestNumber, producer.Id, 0, null, string.Empty));
             return requestNumber;
         }
     }

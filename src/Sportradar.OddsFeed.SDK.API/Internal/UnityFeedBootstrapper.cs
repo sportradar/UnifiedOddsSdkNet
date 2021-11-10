@@ -118,16 +118,18 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             container.RegisterType<IDeserializer<bookmaker_details>, Deserializer<bookmaker_details>>(new ContainerControlledLifetimeManager());
             container.RegisterType<ISingleTypeMapperFactory<bookmaker_details, BookmakerDetailsDTO>, BookmakerDetailsMapperFactory>(new ContainerControlledLifetimeManager());
             container.RegisterType<IDataProvider<BookmakerDetailsDTO>, BookmakerDetailsProvider>(
-                new ContainerControlledLifetimeManager(),
-                new InjectionConstructor(
-                    "{0}/v1/users/whoami.xml",
-                    new ResolvedParameter<IDataFetcher>(),
-                    new ResolvedParameter<IDeserializer<bookmaker_details>>(),
-                    new ResolvedParameter<ISingleTypeMapperFactory<bookmaker_details, BookmakerDetailsDTO>>()));
+                                                                                                 "BookmakerDetailsProvider",
+                                                                                                 new ContainerControlledLifetimeManager(),
+                                                                                                 new InjectionConstructor(
+                                                                                                  "{0}/v1/users/whoami.xml",
+                                                                                                  new ResolvedParameter<IDataFetcher>(),
+                                                                                                  new ResolvedParameter<IDeserializer<bookmaker_details>>(),
+                                                                                                  new ResolvedParameter<ISingleTypeMapperFactory<bookmaker_details, BookmakerDetailsDTO>>()));
 
             //container.RegisterInstance(LogProxyFactory.Create<BookmakerDetailsFetcher>(m => m.Name.Contains("Async"), LoggerType.ClientInteraction, true, container.Resolve<IDataProvider<BookmakerDetailsDTO>>()), new ContainerControlledLifetimeManager());
 
-            var config = new OddsFeedConfigurationInternal(userConfig, container.Resolve<BookmakerDetailsProvider>());
+            var bookmakerDetailsProvider = (BookmakerDetailsProvider)container.Resolve<IDataProvider<BookmakerDetailsDTO>>("BookmakerDetailsProvider");
+            var config = new OddsFeedConfigurationInternal(userConfig, bookmakerDetailsProvider);
 
             container.RegisterInstance(config.ExceptionHandlingStrategy, new ContainerControlledLifetimeManager());
             container.RegisterInstance<IOddsFeedConfiguration>(config, new ContainerControlledLifetimeManager());
@@ -161,7 +163,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new InjectionConstructor(
                     new ResolvedParameter<IDataPoster>("RecoveryDataPoster"),
                     new ResolvedParameter<ISequenceGenerator>(),
-                    config));
+                    config,
+                    new ResolvedParameter<IProducerManager>()));
 
             container.RegisterType<IRecoveryRequestIssuer>(
                 new ContainerControlledLifetimeManager(),

@@ -29,7 +29,7 @@ namespace Sportradar.OddsFeed.SDK.API
     /// <summary>
     /// A <see cref="IOddsFeed"/> implementation acting as an entry point to the odds feed SDK
     /// </summary>
-    public class Feed : EntityDispatcherBase, IOddsFeedV4, IGlobalEventDispatcher
+    public class Feed : EntityDispatcherBase, IOddsFeedV5, IGlobalEventDispatcher
     {
         /// <summary>
         /// A <see cref="ILog"/> instance used for execution logging
@@ -65,7 +65,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <summary>
         /// The <see cref="IOddsFeedConfigurationInternal"/> representing internal sdk configuration
         /// </summary>
-        protected readonly IOddsFeedConfigurationInternal InternalConfig;
+        internal IOddsFeedConfigurationInternal InternalConfig;
 
         /// <summary>
         /// Raised when the current instance of <see cref="IOddsFeed"/> loses connection to the feed
@@ -81,6 +81,11 @@ namespace Sportradar.OddsFeed.SDK.API
         /// Occurs when a requested event recovery completes
         /// </summary>
         public event EventHandler<EventRecoveryCompletedEventArgs> EventRecoveryCompleted;
+
+        /// <summary>
+        /// Occurs when a recovery initiation completes
+        /// </summary>
+        public event EventHandler<RecoveryInitiatedEventArgs> RecoveryInitiated;
 
         /// <summary>
         /// Raised when the current <see cref="IOddsFeed" /> instance determines that the <see cref="IProducer" /> associated with
@@ -285,8 +290,15 @@ namespace Sportradar.OddsFeed.SDK.API
                     _log.Error("Token not accepted.");
                     return;
                 }
+
+                UnityContainer.RegisterInstance(InternalConfig.ExceptionHandlingStrategy, new ContainerControlledLifetimeManager());
+                UnityContainer.RegisterInstance<IOddsFeedConfiguration>(InternalConfig, new ContainerControlledLifetimeManager());
+                UnityContainer.RegisterInstance(InternalConfig, new ContainerControlledLifetimeManager());
+
                 UnityContainer.RegisterTypes(this);
-                UnityContainer.RegisterAdditionalTypes();
+                
+                UpdateDependency();
+                UnityContainer.RegisterAdditionalTypes(); 
 
                 _feedRecoveryManager = UnityContainer.Resolve<IFeedRecoveryManager>();
                 _connectionValidator = UnityContainer.Resolve<ConnectionValidator>();
@@ -296,24 +308,17 @@ namespace Sportradar.OddsFeed.SDK.API
         }
 
         /// <summary>
+        /// Option to change/update dependency injection before resolving resources     
+        /// </summary>
+        protected virtual void UpdateDependency() { }
+
+        /// <summary>
         /// Constructs a new instance of the <see cref="Feed"/> class
         /// </summary>
         /// <param name="config">A <see cref="IOddsFeedConfiguration"/> instance representing feed configuration</param>
         public Feed(IOddsFeedConfiguration config)
             : this(config, false)
         {
-        }
-
-        /// <summary>
-        /// Invoked when the connection to the message broken was shutdown
-        /// </summary>
-        /// <param name="sender">The connection that was shutdown</param>
-        /// <param name="shutdownEventArgs">A <see cref="ShutdownEventArgs"/> containing additional event information</param>
-        private void OnConnectionShutdown(object sender, ShutdownEventArgs shutdownEventArgs)
-        {
-            _log.Warn($"The connection is shutdown. Cause: {shutdownEventArgs.Cause}");
-            _feedRecoveryManager.ConnectionShutdown();
-            ((IGlobalEventDispatcher) this).DispatchDisconnected();
         }
 
         /// <summary>
@@ -420,7 +425,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// </summary>
         void IGlobalEventDispatcher.DispatchDisconnected()
         {
-            Dispatch(Disconnected, new EventArgs(), "Disconnected", 0);
+            Dispatch(Disconnected, EventArgs.Empty, "Disconnected", 0);
         }
 
         /// <summary>
@@ -616,6 +621,11 @@ namespace Sportradar.OddsFeed.SDK.API
                 _log.Info($"Feed configuration: [{InternalConfig}]");
 
                 _connectionFactory = (ConfiguredConnectionFactory)UnityContainer.Resolve<IConnectionFactory>();
+                if (_connectionFactory == null)
+                {
+                    throw new MissingFieldException("ConnectionFactory missing.");
+                }
+
                 AttachToConnectionEvents();
 
                 _feedRecoveryManager.ProducerUp += MarkProducerAsUp;
@@ -624,6 +634,8 @@ namespace Sportradar.OddsFeed.SDK.API
                 _feedRecoveryManager.EventRecoveryCompleted += OnEventRecoveryCompleted;
 
                 ((ProducerManager) ProducerManager).Lock();
+
+                ((ProducerManager)ProducerManager).RecoveryInitiated += OnRecoveryInitiated;
 
                 foreach (var session in Sessions)
                 {
@@ -686,8 +698,10 @@ namespace Sportradar.OddsFeed.SDK.API
         {
             if (_connectionFactory != null)
             {
-                _connectionFactory.CreateConnection().ConnectionShutdown += OnConnectionShutdown;
-                _connectionFactory.CreateConnection().CallbackException += OnCallbackException;
+                _connectionFactory.ConnectionShutdown += OnConnectionShutdown;
+                _connectionFactory.CallbackException += OnCallbackException;
+                _connectionFactory.ConnectionBlocked += OnConnectionBlocked;
+                _connectionFactory.ConnectionUnblocked += OnConnectionUnblocked;
             }
         }
 
@@ -695,10 +709,25 @@ namespace Sportradar.OddsFeed.SDK.API
         {
             if (_connectionFactory != null)
             {
-                _connectionFactory.CreateConnection().ConnectionShutdown -= OnConnectionShutdown;
-                _connectionFactory.CreateConnection().CallbackException -= OnCallbackException;
+                _connectionFactory.ConnectionShutdown -= OnConnectionShutdown;
+                _connectionFactory.CallbackException -= OnCallbackException;
+                _connectionFactory.ConnectionBlocked -= OnConnectionBlocked;
+                _connectionFactory.ConnectionUnblocked -= OnConnectionUnblocked;
                 _connectionFactory.Dispose();
             }
+        }
+
+        /// <summary>
+        /// Invoked when the connection to the message broken was shutdown
+        /// </summary>
+        /// <param name="sender">The connection that was shutdown</param>
+        /// <param name="shutdownEventArgs">A <see cref="ShutdownEventArgs"/> containing additional event information</param>
+        private void OnConnectionShutdown(object sender, ShutdownEventArgs shutdownEventArgs)
+        {
+            var cause = shutdownEventArgs?.Cause == null ? string.Empty : $" Cause: {shutdownEventArgs.Cause}";
+            _log.Error($"The connection is shutdown.{cause}");
+            _feedRecoveryManager.ConnectionShutdown();
+            ((IGlobalEventDispatcher)this).DispatchDisconnected();
         }
 
         private void OnCallbackException(object sender, CallbackExceptionEventArgs e)
@@ -706,9 +735,25 @@ namespace Sportradar.OddsFeed.SDK.API
             ((IGlobalEventDispatcher)this).DispatchConnectionException(e);
         }
 
+        private void OnConnectionUnblocked(object sender, EventArgs e)
+        {
+            var cause = e == null || e == EventArgs.Empty ? string.Empty : $" Cause: {e}";
+            _log.Info($"The connection is unblocked.{cause}");
+        }
+
+        private void OnConnectionBlocked(object sender, ConnectionBlockedEventArgs e)
+        {
+            var cause = e == null || e.Reason.IsNullOrEmpty() ? string.Empty : $" Reason: {e.Reason}";
+            _log.Error($"The connection is blocked.{cause}");
+        }
+
         private void OnEventRecoveryCompleted(object sender, EventRecoveryCompletedEventArgs e)
         {
-            ((IGlobalEventDispatcher) this).DispatchEventRecoveryCompleted(e.GetRequestId(), e.GetEventId());
+            ((IGlobalEventDispatcher)this).DispatchEventRecoveryCompleted(e.GetRequestId(), e.GetEventId());
+        }
+        private void OnRecoveryInitiated(object sender, RecoveryInitiatedEventArgs e)
+        {
+            RecoveryInitiated?.Invoke(this, e);
         }
 
         private void LogInit()
