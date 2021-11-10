@@ -101,7 +101,7 @@ namespace Sportradar.OddsFeed.SDK.Test
 
             _feed.Open();
             _rabbitProducer.Send(_fMessageBuilder.BuildAlive(1));
-            WaitAndCheckTillTimeout(() => producer.RecoveryInfo != null, "Producer recovery info is not null", 250);
+            WaitAndCheckTillTimeout(() => producer.RecoveryInfo != null, "Producer recovery info is not null", 500, 20000);
 
             Assert.IsNotNull(producer.RecoveryInfo);
             Assert.IsTrue(producer.IsProducerDown);
