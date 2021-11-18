@@ -9,6 +9,17 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2021-11-18  1.49.0
+Improvements for connection resilience
+Added event RecoveryInitiated to IOddsFeed
+Added RabitConnectionTimeout and RabbitHeartbeat to OperationManager
+Improved logging regarding connection and recovery process
+Changed default UF environment from Integration to GlobalIntegration
+Extended StageType with Run enum value
+Fix: how connection is made
+Fix: case when 2 rabbit connections are made
+Fix: getting the names of category for simple_tournaments
+
 2021-10-06  1.48.0
 Extended configuration with ufEnvironment attribute
 Extended ITokenSetter and IEnvironmentSelector 
