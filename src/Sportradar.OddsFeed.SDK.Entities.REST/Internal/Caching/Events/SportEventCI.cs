@@ -320,7 +320,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
 
             var id = $"{Id}_Summary";
             SemaphoreSlim semaphore = null;
-            Exception potentialException = null;
+            Exception initialException = null;
             try
             {
                 // acquire the lock
@@ -368,13 +368,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 else
                 {
                     ExecutionLog.Warn($"Fetching summary for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH ERROR.");
-                    potentialException = ce;
+                    initialException = ce;
                 }
             }
             catch (Exception ex)
             {
                 ExecutionLog.Error($"Fetching summary for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH EX.", ex);
-                potentialException = ex;
+                initialException = ex;
             }
             finally
             {
@@ -384,9 +384,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 SemaphorePool.Release(id);
             }
 
-            if (potentialException != null && ((DataRouterManager) DataRouterManager).ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+            if (initialException != null && ((DataRouterManager) DataRouterManager).ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
             {
-                throw potentialException;
+                throw initialException;
             }
         }
 
