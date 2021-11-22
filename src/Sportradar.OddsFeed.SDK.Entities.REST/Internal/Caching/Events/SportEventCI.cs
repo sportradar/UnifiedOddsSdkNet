@@ -360,7 +360,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             }
             catch (CommunicationException ce)
             {
-                if (ce.Message.Contains("NotFound")) // especially for tournaments that do not have summary
+                if (this is TournamentInfoCI && ce.Message.Contains("NotFound")) // especially for tournaments that do not have summary
                 {
                     LoadedSummaries.AddRange(missingCultures);
                     ExecutionLog.Warn($"Fetching summary for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH NOT_FOUND.");
@@ -444,7 +444,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             }
             catch (CommunicationException ce)
             {
-                if (ce.Message.Contains("NotFound"))
+                if (this is TournamentInfoCI && ce.Message.Contains("NotFound"))
                 {
                     LoadedFixtures.AddRange(missingCultures);
                     ExecutionLog.Warn($"Fetching fixtures for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH NOT_FOUND.");
