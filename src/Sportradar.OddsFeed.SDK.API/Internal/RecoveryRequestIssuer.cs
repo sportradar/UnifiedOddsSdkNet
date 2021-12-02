@@ -5,7 +5,9 @@ using System;
 using Dawn;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Common.Logging;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
+using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Common.Internal.Log;
@@ -21,6 +23,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
     [Log(LoggerType.ClientInteraction)]
     internal class RecoveryRequestIssuer : MarshalByRefObject, IEventRecoveryRequestIssuer, IRecoveryRequestIssuer
     {
+        /// <summary>
+        /// A <see cref="ILog"/> used for execution logging
+        /// </summary>
+        private static readonly ILog ExecutionLog = SdkLoggerFactory.GetLoggerForExecution(typeof(RecoveryRequestIssuer));
+
         /// <summary>
         /// A format of the URL used to request a recovery of state after the specified timestamp
         /// </summary>
@@ -109,10 +116,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             if (!responseMessage.IsSuccessStatusCode)
             {
                 var message = $"Recovery of event messages for Event={eventId}, RequestId={requestNumber}, failed with StatusCode={responseMessage.StatusCode}";
+                ExecutionLog.Error(message);
                 _producerManager.InvokeRecoveryInitiated(new RecoveryInitiatedEventArgs(requestNumber, producer.Id, 0, eventId, message));
                 throw new CommunicationException(message, url, responseMessage.StatusCode, null);
             }
 
+            var messageOk = $"Recovery request of event messages for Event={eventId}, RequestId={requestNumber} succeeded.";
+            ExecutionLog.Info(messageOk);
             myProducer.EventRecoveries.TryAdd(requestNumber, eventId);
             _producerManager.InvokeRecoveryInitiated(new RecoveryInitiatedEventArgs(requestNumber, producer.Id, 0, eventId, string.Empty));
             return requestNumber;
@@ -147,10 +157,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             if (!responseMessage.IsSuccessStatusCode)
             {
                 var message = $"Recovery of stateful event messages for Event={eventId}, RequestId={requestNumber}, failed with StatusCode={responseMessage.StatusCode}";
+                ExecutionLog.Error(message);
                 _producerManager.InvokeRecoveryInitiated(new RecoveryInitiatedEventArgs(requestNumber, producer.Id, 0, eventId, message));
                 throw new CommunicationException(message, url, responseMessage.StatusCode, null);
             }
 
+            var messageOk = $"Recovery of stateful event messages for Event={eventId}, RequestId={requestNumber} succeeded.";
+            ExecutionLog.Info(messageOk);
             myProducer.EventRecoveries.TryAdd(requestNumber, eventId);
             _producerManager.InvokeRecoveryInitiated(new RecoveryInitiatedEventArgs(requestNumber, producer.Id, 0, eventId, string.Empty));
             return requestNumber;
@@ -212,10 +225,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             if (responseMessage == null || !responseMessage.IsSuccessStatusCode)
             {
                 var message = $"Recovery since after timestamp for Producer={producer}, RequestId={requestNumber}, After={dateAfter} failed with StatusCode={responseMessage?.StatusCode}";
+                ExecutionLog.Error(message);
                 _producerManager.InvokeRecoveryInitiated(new RecoveryInitiatedEventArgs(requestNumber, producer.Id, timestampAfter, null, message));
                 throw new CommunicationException(message, url, responseMessage?.StatusCode ?? 0, null);
             }
 
+            var messageOk = $"Recovery since after timestamp for Producer={producer}, RequestId={requestNumber}, After={dateAfter} succeeded.";
+            ExecutionLog.Info(messageOk);
             _producerManager.InvokeRecoveryInitiated(new RecoveryInitiatedEventArgs(requestNumber, producer.Id, timestampAfter, null, string.Empty));
             return requestNumber;
         }
@@ -266,10 +282,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             if (responseMessage == null || !responseMessage.IsSuccessStatusCode)
             {
                 var message = $"Full odds recovery for Producer={producer}, RequestId={requestNumber}, failed with StatusCode={responseMessage?.StatusCode}";
+                ExecutionLog.Error(message);
                 _producerManager.InvokeRecoveryInitiated(new RecoveryInitiatedEventArgs(requestNumber, producer.Id, 0, null, message));
                 throw new CommunicationException(message, url, responseMessage?.StatusCode ?? 0, null);
             }
 
+            var messageOk = $"Full odds recovery for Producer={producer}, RequestId={requestNumber} succeeded.";
+            ExecutionLog.Info(messageOk);
             _producerManager.InvokeRecoveryInitiated(new RecoveryInitiatedEventArgs(requestNumber, producer.Id, 0, null, string.Empty));
             return requestNumber;
         }
