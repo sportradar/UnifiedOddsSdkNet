@@ -337,5 +337,35 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
 
             return g;
         }
+
+        /// <summary>
+        /// Clear sensitive data (removes part of it)
+        /// </summary>
+        /// <param name="input">Data to clear</param>
+        /// <returns>Cleared input string</returns>
+        public static string ClearSensitiveData(string input)
+        {
+            return !string.IsNullOrEmpty(input) && input.Length > 3
+                       ? input.Substring(0, 3) + "***" + input.Substring(input.Length - 3)
+                       : input;
+        }
+
+        /// <summary>
+        /// Clear sensitive data (removes part of it) from then input text
+        /// </summary>
+        /// <param name="input">Data to clear</param>
+        /// <param name="sensitiveData">Search for this data and replace with cleared input string</param>
+        /// <returns>Cleared input string</returns>
+        public static string ClearSensitiveData(string input, string sensitiveData)
+        {
+            if (input.IsNullOrEmpty())
+            {
+                return input;
+            }
+
+            var clearedData = ClearSensitiveData(sensitiveData);
+
+            return input.Replace(sensitiveData, clearedData);
+        }
     }
 }
