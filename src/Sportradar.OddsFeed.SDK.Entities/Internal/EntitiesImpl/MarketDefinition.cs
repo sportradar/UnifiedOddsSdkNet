@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
@@ -122,7 +123,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         public IList<string> GetGroups()
         {
             GetMarketDefinition();
-            return _marketDescription.Groups == null
+            return _marketDescription?.Groups == null || _marketDescription.Groups.IsNullOrEmpty()
                 ? null
                 : new ReadOnlyCollection<string>(_marketDescription.Groups.ToList());
         }
@@ -134,7 +135,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         public IDictionary<string, string> GetAttributes()
         {
             GetMarketDefinition();
-            return _marketDescription?.Attributes == null
+            return _marketDescription?.Attributes == null || _marketDescription.Attributes.IsNullOrEmpty()
                 ? null
                 : new ReadOnlyDictionary <string, string> (_marketDescription.Attributes.ToDictionary(k => k.Name, v => v.Description));
         }
@@ -146,7 +147,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         public IEnumerable<IMarketMappingData> GetValidMappings()
         {
             GetMarketDefinition();
-            return _producerId == 5 || _marketDescription?.Mappings == null
+            return _producerId == 5 || _marketDescription?.Mappings == null || _marketDescription.Mappings.IsNullOrEmpty()
                 ? Enumerable.Empty<IMarketMappingData>()
                 : _marketDescription.Mappings.Where(m => m.CanMap(_producerId, _sportId, _specifiers));
         }
