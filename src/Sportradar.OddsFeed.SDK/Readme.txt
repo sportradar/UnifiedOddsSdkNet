@@ -9,6 +9,17 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2021-12-10  1.50.0
+Added support for results in sportEventStatus received from api
+Added new log messages during recovery requests
+Improved how merging is done within Competitor
+Improved connection recovery after long disconnect
+Removed unneccessery locks in SportEventStatusCache
+Fix: connecting to replay server with production token
+Fix: some fields in raw feed message was not filled
+Fix: throws exception if match, stage or draw not found exception happens
+Fix: NullReference could happen getting MarketDefinition.Groups 
+
 2021-11-18  1.49.0
 Improvements for connection resilience
 Added event RecoveryInitiated to IOddsFeed
