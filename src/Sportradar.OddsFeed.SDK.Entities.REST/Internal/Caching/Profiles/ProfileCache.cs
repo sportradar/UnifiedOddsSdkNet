@@ -1,16 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using Dawn;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.Caching;
-using System.Threading;
-using System.Threading.Tasks;
 using Common.Logging;
+using Dawn;
 using Metrics;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
@@ -22,6 +14,14 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.Caching;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
 {
@@ -56,7 +56,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         /// The bag of currently fetching competitor profiles
         /// </summary>
         private readonly ConcurrentDictionary<URN, DateTime> _fetchedCompetitorProfiles = new ConcurrentDictionary<URN, DateTime>();
-        
+
         /// <summary>
         /// The bag of currently merging ids
         /// </summary>
@@ -70,18 +70,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         /// <summary>
         /// The cache item policy
         /// </summary>
-        private readonly CacheItemPolicy _simpleTeamCacheItemPolicy = new CacheItemPolicy {AbsoluteExpiration = DateTimeOffset.MaxValue, Priority = CacheItemPriority.NotRemovable, RemovedCallback = OnCacheItemRemoval};
+        private readonly CacheItemPolicy _simpleTeamCacheItemPolicy = new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.MaxValue, Priority = CacheItemPriority.NotRemovable, RemovedCallback = OnCacheItemRemoval };
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ProfileCache"/> class
-    /// </summary>
-    /// <param name="cache">A <see cref="ObjectCache"/> used to store fetched information</param>
-    /// <param name="dataRouterManager">A <see cref="IDataRouterManager"/> used to fetch data</param>
-    /// <param name="cacheManager">A <see cref="ICacheManager"/> used to interact among caches</param>
-    public ProfileCache(ObjectCache cache,
-                        IDataRouterManager dataRouterManager,
-                        ICacheManager cacheManager)
-            : base(cacheManager)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProfileCache"/> class
+        /// </summary>
+        /// <param name="cache">A <see cref="ObjectCache"/> used to store fetched information</param>
+        /// <param name="dataRouterManager">A <see cref="IDataRouterManager"/> used to fetch data</param>
+        /// <param name="cacheManager">A <see cref="ICacheManager"/> used to interact among caches</param>
+        public ProfileCache(ObjectCache cache,
+                            IDataRouterManager dataRouterManager,
+                            ICacheManager cacheManager)
+                : base(cacheManager)
         {
             Guard.Argument(cache, nameof(cache)).NotNull();
             Guard.Argument(dataRouterManager, nameof(dataRouterManager)).NotNull();
@@ -145,7 +145,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             PlayerProfileCI cachedItem;
             try
             {
-                cachedItem = (PlayerProfileCI) _cache.Get(playerId.ToString());
+                cachedItem = (PlayerProfileCI)_cache.Get(playerId.ToString());
                 var wantedCultures = cultures.ToList();
                 var missingLanguages = LanguageHelper.GetMissingCultures(wantedCultures, cachedItem?.Names.Keys.ToList()).ToList();
                 if (!missingLanguages.Any())
@@ -193,7 +193,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
 
                 var cultureTaskDictionary = missingLanguages.ToDictionary(c => c, c => _dataRouterManager.GetPlayerProfileAsync(playerId, c, null));
                 await Task.WhenAll(cultureTaskDictionary.Values).ConfigureAwait(false);
-                cachedItem = (PlayerProfileCI) _cache.Get(playerId.ToString());
+                cachedItem = (PlayerProfileCI)_cache.Get(playerId.ToString());
             }
             catch (Exception ex)
             {
@@ -233,18 +233,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             CompetitorCI cachedItem;
             try
             {
-                cachedItem = (CompetitorCI) _cache.Get(competitorId.ToString());
+                cachedItem = (CompetitorCI)_cache.Get(competitorId.ToString());
                 var missingLanguages = LanguageHelper.GetMissingCultures(cultures, cachedItem?.Names.Keys.ToList()).ToList();
-                if (!missingLanguages.Any())
+                if (missingLanguages.Any())
                 {
-                    return cachedItem;
+                    var cultureTasks = missingLanguages.ToDictionary(c => c, c => _dataRouterManager.GetCompetitorAsync(competitorId, c, null));
+                    await Task.WhenAll(cultureTasks.Values).ConfigureAwait(false);
                 }
 
-                var cultureTasks = missingLanguages.ToDictionary(c => c, c => _dataRouterManager.GetCompetitorAsync(competitorId, c, null));
-
-                await Task.WhenAll(cultureTasks.Values).ConfigureAwait(false);
-
-                cachedItem = (CompetitorCI) _cache.Get(competitorId.ToString());
+                cachedItem = (CompetitorCI)_cache.Get(competitorId.ToString());
             }
             catch (Exception ex)
             {
@@ -266,7 +263,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             var expireDate = DateTime.Now.AddSeconds(5);
             while (bag.ContainsKey(id) && DateTime.Now < expireDate)
             {
-                Thread.Sleep(15);
+                //Thread.Sleep(15);
+                Task.Delay(15);
             }
             if (!bag.ContainsKey(id))
             {
@@ -281,7 +279,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             {
                 if (!bag.TryRemove(id, out _))
                 {
-                    Thread.Sleep(10);
+                    //Thread.Sleep(10);
+                    Task.Delay(10);
                 }
             }
         }
@@ -597,7 +596,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                 return true;
             }
             var stage = item as StageDTO;
-            if(stage != null)
+            if (stage != null)
             {
                 if (stage.Competitors != null && stage.Competitors.Any())
                 {
@@ -618,11 +617,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                         AddCompetitor(competitorDTO.Id, competitorDTO, culture, true);
                     }
                 }
-                if(tour.Groups != null && tour.Groups.Any())
+                if (tour.Groups != null && tour.Groups.Any())
                 {
                     foreach (var tourGroup in tour.Groups)
                     {
-                        if(tourGroup.Competitors != null && tourGroup.Competitors.Any())
+                        if (tourGroup.Competitors != null && tourGroup.Competitors.Any())
                         {
                             foreach (var tourGroupCompetitorDTO in tourGroup.Competitors)
                             {
@@ -681,7 +680,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             }
             else
             {
-                _cache.Add(id.ToString(), new TeamCompetitorCI(item, culture, _dataRouterManager), GetCorrectCacheItemPolicy(id));
+                var teamCompetitor = new TeamCompetitorCI(item, culture, _dataRouterManager);
+                _cache.Add(id.ToString(), teamCompetitor, GetCorrectCacheItemPolicy(id));
             }
 
             if (item?.Players != null && item.Players.Any())
@@ -700,7 +700,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                 var itemId = URN.Parse(item.Id);
                 try
                 {
-                    var competitorCI = (CompetitorCI) _cache.Get(item.Id);
+                    var competitorCI = (CompetitorCI)_cache.Get(item.Id);
                     var teamCI = competitorCI as TeamCompetitorCI;
                     if (teamCI != null)
                     {
@@ -739,7 +739,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             {
                 try
                 {
-                    var ci = (CompetitorCI) _cache.Get(id.ToString());
+                    var ci = (CompetitorCI)_cache.Get(id.ToString());
                     if (useSemaphore)
                     {
                         WaitTillIdIsAvailable(_mergeUrns, id);
@@ -782,7 +782,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                 var itemId = URN.Parse(item.Id);
                 try
                 {
-                    var ci = (CompetitorCI) _cache.Get(item.Id);
+                    var ci = (CompetitorCI)_cache.Get(item.Id);
                     WaitTillIdIsAvailable(_mergeUrns, itemId);
                     ci.Import(item);
                 }
@@ -813,7 +813,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             {
                 try
                 {
-                    var ci = (CompetitorCI) _cache.Get(id.ToString());
+                    var ci = (CompetitorCI)_cache.Get(id.ToString());
                     if (useSemaphore)
                     {
                         WaitTillIdIsAvailable(_mergeUrns, id);
@@ -901,7 +901,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             {
                 try
                 {
-                    var ci = (PlayerProfileCI) _cache.Get(item.Id.ToString());
+                    var ci = (PlayerProfileCI)_cache.Get(item.Id.ToString());
                     if (useSemaphore)
                     {
                         WaitTillIdIsAvailable(_mergeUrns, item.Id);
@@ -936,7 +936,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                 var itemId = URN.Parse(item.Id);
                 try
                 {
-                    var ci = (PlayerProfileCI) _cache.Get(item.Id);
+                    var ci = (PlayerProfileCI)_cache.Get(item.Id);
                     WaitTillIdIsAvailable(_mergeUrns, itemId);
                     ci.Import(item);
                 }
@@ -1021,7 +1021,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         {
             return id.IsSimpleTeam()
                 ? _simpleTeamCacheItemPolicy
-                : new CacheItemPolicy {SlidingExpiration = OperationManager.ProfileCacheTimeout, RemovedCallback = OnCacheItemRemoval};
+                : new CacheItemPolicy { SlidingExpiration = OperationManager.ProfileCacheTimeout, RemovedCallback = OnCacheItemRemoval };
         }
 
         /// <summary>
@@ -1034,7 +1034,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             try
             {
                 await _exportSemaphore.WaitAsync();
-                exportables = _cache.Select(i => (IExportableCI) i.Value);
+                exportables = _cache.Select(i => (IExportableCI)i.Value);
             }
             finally
             {

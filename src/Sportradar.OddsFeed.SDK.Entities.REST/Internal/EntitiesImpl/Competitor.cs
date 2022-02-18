@@ -1,20 +1,20 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Dawn;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles;
 using Sportradar.OddsFeed.SDK.Messages;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
 {
@@ -37,6 +37,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         private readonly object _lock = new object();
         protected string TeamQualifier;
         private DateTime _lastCompetitorFetch;
+        private bool? _isVirtual;
 
         /// <summary>
         /// Gets a <see cref="IReadOnlyDictionary{CultureInfo, String}"/> containing competitor's country name in different languages
@@ -53,7 +54,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <summary>
         /// Gets a value indicating whether the current instance represents a placeholder team
         /// </summary>
-        public bool IsVirtual => GetOrLoadCompetitor().IsVirtual;
+        public bool IsVirtual
+        {
+            get
+            {
+                if (_isVirtual == null)
+                {
+                    FetchEventCompetitorsVirtual();
+                }
+
+                return _isVirtual ?? false;
+            }
+        }
 
         /// <summary>
         /// Gets the reference ids
@@ -104,7 +116,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// Gets the list of associated player ids
         /// </summary>
         /// <value>The associated player ids</value>
-        public IEnumerable<IPlayer> AssociatedPlayers {
+        public IEnumerable<IPlayer> AssociatedPlayers
+        {
             get
             {
                 try
@@ -280,7 +293,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             _cultures = cultures.ToList();
             _sportEntityFactory = sportEntityFactory;
             _exceptionStrategy = exceptionStrategy;
-            _competitionCI = (CompetitionCI) rootCompetitionCI;
+            _competitionCI = (CompetitionCI)rootCompetitionCI;
             _referenceId = null;
         }
 
@@ -470,21 +483,49 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             }
         }
 
+        protected void FetchEventCompetitorsVirtual()
+        {
+            lock (_lock)
+            {
+                if (_competitionCI != null)
+                {
+                    var task = Task.Run(async () =>
+                                        {
+                                            var competitorsVirtual = await _competitionCI.GetCompetitorsVirtualAsync().ConfigureAwait(false);
+                                            _isVirtual = !competitorsVirtual.IsNullOrEmpty() && competitorsVirtual.Contains(_competitorCI.Id);
+                                        });
+                    task.Wait();
+                }
+            }
+        }
+
         private CompetitorCI GetOrLoadCompetitor()
         {
-            if(_competitorId != null && _competitorCI == null && _profileCache != null)
+            if (_competitorId != null && _competitorCI == null && _profileCache != null)
             {
-                _competitorCI = _profileCache.GetCompetitorProfileAsync(_competitorId, _cultures).Result;
+                //_competitorCI = _profileCache.GetCompetitorProfileAsync(_competitorId, _cultures).Result;
+                LoadCompetitorProfileInCache();
                 _lastCompetitorFetch = DateTime.Now;
             }
 
-            if(_competitorCI != null && _profileCache != null && _lastCompetitorFetch < DateTime.Now.AddSeconds(-30))
+            if (_competitorCI != null && _profileCache != null && _lastCompetitorFetch < DateTime.Now.AddSeconds(-30))
             {
-                _competitorCI = _profileCache.GetCompetitorProfileAsync(_competitorCI.Id, _cultures).Result;
+                //_competitorCI = _profileCache.GetCompetitorProfileAsync(_competitorCI.Id, _cultures).Result;
+                LoadCompetitorProfileInCache();
                 _lastCompetitorFetch = DateTime.Now;
             }
 
             return _competitorCI;
+        }
+
+        private void LoadCompetitorProfileInCache()
+        {
+            var task = Task.Run(async () =>
+                                {
+                                    _competitorCI = await _profileCache.GetCompetitorProfileAsync(_competitorId, _cultures).ConfigureAwait(false);
+                                });
+            //Task.WhenAll(task).ConfigureAwait(false);
+            task.Wait();
         }
     }
 }

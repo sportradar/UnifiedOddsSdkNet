@@ -1,18 +1,18 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Collections.Generic;
 using Dawn;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.Caching;
-using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.Caching;
+using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
 {
@@ -51,6 +51,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// The competitors references
         /// </summary>
         private IDictionary<URN, ReferenceIdCI> _competitorsReferences;
+        /// <summary>
+        /// The competitors isVirtual attribute
+        /// </summary>
+        private IList<URN> _competitorsVirtual;
 
         private string _liveOdds;
 
@@ -159,6 +163,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                         exportableCompetition.CompetitorsReferences.ToDictionary(c => URN.Parse(c.Key),
                             c => new ReferenceIdCI(c.Value)))
                     : null;
+                _competitorsVirtual = exportableCompetition.CompetitorsVirtual != null
+                                          ? exportableCompetition.CompetitorsVirtual.Select(URN.Parse).ToList()
+                                          : new List<URN>();
                 _liveOdds = string.IsNullOrEmpty(exportableCompetition.LiveOdds) ? null : exportableCompetition.LiveOdds;
                 _sportEventType = exportableCompetition.SportEventType;
                 _stageType = exportableCompetition.StageType;
@@ -171,7 +178,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <returns>A <see cref="Task{T}"/> representing an async operation</returns>
         public async Task<bool> FetchSportEventStatusAsync()
         {
-            await FetchMissingSummary(new[] {DefaultCulture}, true).ConfigureAwait(false);
+            await FetchMissingSummary(new[] { DefaultCulture }, true).ConfigureAwait(false);
             return true;
         }
 
@@ -275,6 +282,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             }
             return _competitorsQualifiers;
+        }
+
+        /// <summary>
+        /// Asynchronously get the list of competitors marked as virtual
+        /// </summary>
+        /// <returns>A <see cref="Task{T}"/> representing an async operation</returns>
+        public async Task<IList<URN>> GetCompetitorsVirtualAsync()
+        {
+            if (!LoadedSummaries.Any())
+            {
+                await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
+            }
+            return _competitorsVirtual;
         }
 
         /// <summary>
@@ -389,6 +409,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 GenerateMatchName(eventSummary.Competitors, culture);
                 FillCompetitorsQualifiers(eventSummary.Competitors);
                 FillCompetitorsReferences(eventSummary.Competitors);
+                FillCompetitorsVirtual(eventSummary.Competitors);
             }
             if (eventSummary.BookingStatus != null)
             {
@@ -529,6 +550,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             }
         }
 
+        private void FillCompetitorsVirtual(IEnumerable<TeamCompetitorDTO> competitors)
+        {
+            if (competitors == null)
+            {
+                return;
+            }
+            if (_competitorsVirtual == null)
+            {
+                _competitorsVirtual = new List<URN>();
+            }
+            foreach (var competitor in competitors)
+            {
+                if (competitor.IsVirtual && !_competitorsVirtual.Contains(competitor.Id))
+                {
+                    _competitorsVirtual.Add(competitor.Id);
+                }
+            }
+        }
+
         /// <summary>
         /// Change booking status to Booked
         /// </summary>
@@ -552,7 +592,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 competition.CompetitorsQualifiers =
                     _competitorsQualifiers?.ToDictionary(q => q.Key.ToString(), q => q.Value);
                 competition.CompetitorsReferences = _competitorsReferences?.ToDictionary(r => r.Key.ToString(),
-                    r => (IDictionary<string, string>) r.Value.ReferenceIds.ToDictionary(v => v.Key, v => v.Value));
+                    r => (IDictionary<string, string>)r.Value.ReferenceIds.ToDictionary(v => v.Key, v => v.Value));
+                competition.CompetitorsVirtual = _competitorsVirtual.IsNullOrEmpty() ? null : _competitorsVirtual.Select(s => s.ToString()).ToList();
                 competition.LiveOdds = _liveOdds;
                 competition.SportEventType = _sportEventType;
                 competition.StageType = _stageType;
