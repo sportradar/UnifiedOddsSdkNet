@@ -1,15 +1,15 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
 using Dawn;
-using System.Net.Security;
-using System.Security.Authentication;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using System;
+using System.Net.Security;
+using System.Security.Authentication;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -138,26 +138,33 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             {
                 if (_connectionSingleton != null)
                 {
-                    _connectionSingleton.ConnectionBlocked -= OnConnectionBlocked;
-                    _connectionSingleton.ConnectionUnblocked -= OnConnectionUnblocked;
-                    _connectionSingleton.CallbackException -= OnCallbackException;
-                    _connectionSingleton.ConnectionShutdown -= OnConnectionShutdown;
-
-                    if (_connectionSingleton.IsOpen)
+                    try
                     {
+                        _connectionSingleton.ConnectionBlocked -= OnConnectionBlocked;
+                        _connectionSingleton.ConnectionUnblocked -= OnConnectionUnblocked;
+                        _connectionSingleton.CallbackException -= OnCallbackException;
+                        _connectionSingleton.ConnectionShutdown -= OnConnectionShutdown;
+
                         _connectionSingleton.Close();
                     }
-                    _connectionSingleton.Dispose();
-                    _connectionSingleton = null;
-                } 
-                ConnectionCreated = DateTime.MinValue;
+                    catch (Exception e)
+                    {
+                        SdkLoggerFactory.GetLoggerForExecution(typeof(ConfiguredConnectionFactory)).Warn("Error closing connection", e);
+                    }
+                    finally
+                    {
+                        _connectionSingleton.Dispose();
+                        _connectionSingleton = null;
+                        ConnectionCreated = DateTime.MinValue;
+                    }
+                }
             }
         }
 
         /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
         public void Dispose()
         {
-            Dispose(true); 
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
