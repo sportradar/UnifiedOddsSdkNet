@@ -36,7 +36,7 @@
     <BuildAssemblerVerbosity>OnlyWarningsAndErrors</BuildAssemblerVerbosity>
     <SaveComponentCacheCapacity>100</SaveComponentCacheCapacity>
     <HelpTitle>Odds Feed SDK Documentation</HelpTitle>
-    <HelpFileVersion>1.50.0</HelpFileVersion>
+    <HelpFileVersion>1.51.0</HelpFileVersion>
     <NamingMethod>MemberName</NamingMethod>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <RootNamespaceContainer>False</RootNamespaceContainer>
@@ -44,7 +44,7 @@
     <MaximumGroupParts>2</MaximumGroupParts>
     <Preliminary>False</Preliminary>
     <CopyrightHref>http://sdk.sportradar.com</CopyrightHref>
-    <CopyrightText>Copyright &amp;#169%3b 2016-2021, Sportradar AG</CopyrightText>
+    <CopyrightText>Copyright &amp;#169%3b 2016-2022, Sportradar AG</CopyrightText>
     <FeedbackEMailAddress>sdk%40sportradar.com</FeedbackEMailAddress>
     <FeedbackEMailLinkText>SDK Team</FeedbackEMailLinkText>
     <SdkLinkTarget>Top</SdkLinkTarget>

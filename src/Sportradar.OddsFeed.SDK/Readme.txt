@@ -9,12 +9,16 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2022-02-23  1.51.0
+Added BetradarName to IRound (extended with IRoundV3)
+Fix: ICompetition competitors did not expose IsVirtual correctly
+
 2021-12-10  1.50.0
 Added support for results in sportEventStatus received from api
 Added new log messages during recovery requests
 Improved how merging is done within Competitor
 Improved connection recovery after long disconnect
-Removed unneccessery locks in SportEventStatusCache
+Removed unnecessary locks in SportEventStatusCache
 Fix: connecting to replay server with production token
 Fix: some fields in raw feed message was not filled
 Fix: throws exception if match, stage or draw not found exception happens
