@@ -1,9 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Globalization;
-using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
@@ -15,6 +12,9 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.REST;
 using Sportradar.OddsFeed.SDK.Test.Shared;
+using System;
+using System.Globalization;
+using System.Linq;
 using RMF = Sportradar.OddsFeed.SDK.Test.Shared.MessageFactoryRest;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
@@ -408,7 +408,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(msg.name, dto.Name);
             Assert.AreEqual(msg.abbreviation, dto.Abbreviation);
             Assert.AreEqual(msg.country, dto.CountryName);
-            Assert.AreEqual(msg.state, dto.State); 
+            Assert.AreEqual(msg.state, dto.State);
             Assert.AreEqual(msg.@virtual, dto.IsVirtual);
         }
 
@@ -418,7 +418,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(msg.name, dto.Name);
             Assert.AreEqual(msg.abbreviation, dto.Abbreviation);
             Assert.AreEqual(msg.country, dto.CountryName);
-            Assert.AreEqual(msg.state, dto.State); 
+            Assert.AreEqual(msg.state, dto.State);
             Assert.AreEqual(msg.@virtual, dto.IsVirtual);
             //Assert.AreEqual(msg.@qualifier, dto.); //TODO: qualifier missing in dto
         }
@@ -478,6 +478,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(msg.cup_round_matches, dto.CupRoundMatches);
             Assert.AreEqual(msg.number, dto.Number);
             Assert.AreEqual(msg.type, dto.Type);
+            Assert.AreEqual(msg.betradar_name, dto.BetradarName);
         }
 
         private static void ValidateTournament(tournament msg, TournamentDTO dto)

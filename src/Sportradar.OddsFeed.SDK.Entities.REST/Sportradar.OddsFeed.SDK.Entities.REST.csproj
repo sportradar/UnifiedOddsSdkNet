@@ -188,6 +188,7 @@
     <Compile Include="IHole.cs" />
     <Compile Include="ILotteryV1.cs" />
     <Compile Include="Internal\EntitiesImpl\StageStatus.cs" />
+    <Compile Include="IRoundV3.cs" />
     <Compile Include="IStageStatus.cs" />
     <Compile Include="IMatchV3.cs" />
     <Compile Include="IMatchV2.cs" />

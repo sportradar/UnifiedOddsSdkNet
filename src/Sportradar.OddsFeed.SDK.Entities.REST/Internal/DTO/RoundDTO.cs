@@ -20,6 +20,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
 
         internal string Group { get; }
 
+        //TODO: group_name was removed from xsd
         internal string GroupName { get; }
 
         internal URN GroupId { get; }
@@ -35,6 +36,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         internal string PhaseOrGroupLongName { get; }
 
         internal string Phase { get; }
+
+        internal string BetradarName { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RoundDTO"/> class
@@ -68,6 +71,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             BetradarId = round.betradar_idSpecified
                 ? (int?)round.betradar_id
                 : null;
+            BetradarName = round.betradar_name;
         }
     }
 }
