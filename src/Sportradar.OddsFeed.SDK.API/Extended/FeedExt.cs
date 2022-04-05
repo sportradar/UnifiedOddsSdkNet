@@ -1,15 +1,16 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
 using Common.Logging;
+using Metrics;
+using Microsoft.Practices.Unity;
 using Sportradar.OddsFeed.SDK.API.Internal;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Messages.EventArguments;
-using Microsoft.Practices.Unity;
+using System;
 
 namespace Sportradar.OddsFeed.SDK.API.Extended
 {
@@ -54,25 +55,45 @@ namespace Sportradar.OddsFeed.SDK.API.Extended
 
         private void OnRawApiDataReceived(object sender, RawApiDataEventArgs e)
         {
-            try
+            if (RawApiDataReceived == null)
             {
-                RawApiDataReceived?.Invoke(sender, e);
+                return;
             }
-            catch (Exception ex)
+
+            var timer = Metric.Context("FeedExt").Timer("OnRawApiDataReceived", Unit.Items);
+            using (var t = timer.NewContext($"{e.RestMessage?.GetType().Name} - {e.Language}"))
             {
-                Log.Error($"Error dispatching raw api data for {e.Uri}", ex);
+                try
+                {
+                    RawApiDataReceived?.Invoke(sender, e);
+                    Log.Info($"Dispatching raw api message for {e.Uri} took {t.Elapsed.TotalMilliseconds}ms.");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"Error dispatching raw api data for {e.Uri}. Took {t.Elapsed.TotalMilliseconds}ms.", ex);
+                }
             }
         }
 
         private void OnRawFeedMessageReceived(object sender, RawFeedMessageEventArgs e)
         {
-            try
+            if (RawFeedMessageReceived == null)
             {
-                RawFeedMessageReceived?.Invoke(sender, e);
+                return;
             }
-            catch (Exception ex)
+
+            var timer = Metric.Context("FeedExt").Timer("OnRawFeedMessageReceived", Unit.Items);
+            using (var t = timer.NewContext($"{e.MessageInterest} - {e.FeedMessage?.EventId}"))
             {
-                Log.Error($"Error dispatching raw feed message for {e.RoutingKey} and {e.FeedMessage?.EventId}", ex);
+                try
+                {
+                    RawFeedMessageReceived?.Invoke(sender, e);
+                    Log.Info($"Dispatching raw feed message [{e.MessageInterest}]: {e.FeedMessage?.GetType().Name} for event {e.FeedMessage?.EventId} took {t.Elapsed.TotalMilliseconds}ms.");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"Error dispatching raw feed message [{e.MessageInterest}] for {e.RoutingKey} and {e.FeedMessage?.EventId}. Took {t.Elapsed.TotalMilliseconds}ms.", ex);
+                }
             }
         }
 
@@ -118,11 +139,11 @@ namespace Sportradar.OddsFeed.SDK.API.Extended
         /// </exception>
         public new void Open()
         {
-            if(Sessions != null)
+            if (Sessions != null)
             {
                 foreach (var session in Sessions)
                 {
-                    var s = (OddsFeedSession) session;
+                    var s = (OddsFeedSession)session;
                     s.MessageReceiver.RawFeedMessageReceived += OnRawFeedMessageReceived;
                 }
             }

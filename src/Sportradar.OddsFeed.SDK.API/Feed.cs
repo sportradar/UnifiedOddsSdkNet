@@ -1,14 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using Dawn;
-using System.Globalization;
-using System.Linq;
-using System.Threading;
 using Common.Logging;
+using Dawn;
 using Microsoft.Practices.Unity;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -23,6 +17,12 @@ using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Messages;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Globalization;
+using System.Linq;
+using System.Threading;
 
 namespace Sportradar.OddsFeed.SDK.API
 {
@@ -107,7 +107,8 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <summary>
         /// Gets a <see cref="IEventRecoveryRequestIssuer"/> instance used to issue recovery requests to the feed
         /// </summary>
-        public IEventRecoveryRequestIssuer EventRecoveryRequestIssuer {
+        public IEventRecoveryRequestIssuer EventRecoveryRequestIssuer
+        {
             get
             {
                 InitFeed();
@@ -119,7 +120,8 @@ namespace Sportradar.OddsFeed.SDK.API
         /// Gets a <see cref="ISportDataProvider" /> instance used to retrieve sport related data from the feed
         /// </summary>
         /// <value>The sport data provider</value>
-        public ISportDataProvider SportDataProvider {
+        public ISportDataProvider SportDataProvider
+        {
             get
             {
                 InitFeed();
@@ -141,7 +143,7 @@ namespace Sportradar.OddsFeed.SDK.API
                     var producerManager = UnityContainer.Resolve<IProducerManager>();
                     if (InternalConfig.Environment == SdkEnvironment.Replay)
                     {
-                        ((ProducerManager) producerManager).SetIgnoreRecovery(0);
+                        ((ProducerManager)producerManager).SetIgnoreRecovery(0);
                     }
                     return producerManager;
                 }
@@ -251,7 +253,7 @@ namespace Sportradar.OddsFeed.SDK.API
         protected Feed(IOddsFeedConfiguration config, bool isReplay)
         {
             Guard.Argument(config, nameof(config)).NotNull();
-            
+
             FeedInitialized = false;
 
             UnityContainer = new UnityContainer();
@@ -296,9 +298,9 @@ namespace Sportradar.OddsFeed.SDK.API
                 UnityContainer.RegisterInstance(InternalConfig, new ContainerControlledLifetimeManager());
 
                 UnityContainer.RegisterTypes(this);
-                
+
                 UpdateDependency();
-                UnityContainer.RegisterAdditionalTypes(); 
+                UnityContainer.RegisterAdditionalTypes();
 
                 _feedRecoveryManager = UnityContainer.Resolve<IFeedRecoveryManager>();
                 _connectionValidator = UnityContainer.Resolve<ConnectionValidator>();
@@ -329,7 +331,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <param name="e">The <see cref="ProducerStatusChangeEventArgs"/> instance containing the event data</param>
         private void MarkProducerAsDown(object sender, ProducerStatusChangeEventArgs e)
         {
-            ((IGlobalEventDispatcher) this).DispatchProducerDown(e.GetProducerStatusChange());
+            ((IGlobalEventDispatcher)this).DispatchProducerDown(e.GetProducerStatusChange());
         }
 
         /// <summary>
@@ -339,7 +341,7 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <param name="e">The <see cref="ProducerStatusChangeEventArgs"/> instance containing the event data</param>
         private void MarkProducerAsUp(object sender, ProducerStatusChangeEventArgs e)
         {
-            ((IGlobalEventDispatcher) this).DispatchProducerUp(e.GetProducerStatusChange());
+            ((IGlobalEventDispatcher)this).DispatchProducerUp(e.GetProducerStatusChange());
         }
 
         private void OnCloseFeed(object sender, FeedCloseEventArgs e)
@@ -406,7 +408,7 @@ namespace Sportradar.OddsFeed.SDK.API
             InitFeed();
             var childContainer = UnityContainer.CreateChildContainer();
             Func<OddsFeedSession, IEnumerable<string>> func = GetSessionRoutingKeys;
-            var session = (OddsFeedSession) childContainer.Resolve<IOddsFeedSession>(new ParameterOverride("messageInterest", msgInterest), new ParameterOverride("getRoutingKeys", func));
+            var session = (OddsFeedSession)childContainer.Resolve<IOddsFeedSession>(new ParameterOverride("messageInterest", msgInterest), new ParameterOverride("getRoutingKeys", func));
             Sessions.Add(session);
             return session;
         }
@@ -564,7 +566,7 @@ namespace Sportradar.OddsFeed.SDK.API
                 _feedRecoveryManager.EventRecoveryCompleted -= OnEventRecoveryCompleted;
                 _feedRecoveryManager.Close();
             }
-            
+
             foreach (var session in Sessions)
             {
                 session.Close();
@@ -633,7 +635,7 @@ namespace Sportradar.OddsFeed.SDK.API
                 _feedRecoveryManager.CloseFeed += OnCloseFeed;
                 _feedRecoveryManager.EventRecoveryCompleted += OnEventRecoveryCompleted;
 
-                ((ProducerManager) ProducerManager).Lock();
+                ((ProducerManager)ProducerManager).Lock();
 
                 ((ProducerManager)ProducerManager).RecoveryInitiated += OnRecoveryInitiated;
 
@@ -642,7 +644,7 @@ namespace Sportradar.OddsFeed.SDK.API
                     session.Open();
                 }
 
-                var interests = Sessions.Select(s => ((OddsFeedSession) s).MessageInterest).ToList();
+                var interests = Sessions.Select(s => ((OddsFeedSession)s).MessageInterest).ToList();
                 _feedRecoveryManager.Open(interests);
 
                 _log.Info("Producers:");
