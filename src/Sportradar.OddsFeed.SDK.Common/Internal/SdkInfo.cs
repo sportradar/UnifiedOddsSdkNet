@@ -1,13 +1,13 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using Common.Logging;
+using Sportradar.OddsFeed.SDK.Messages;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using Common.Logging;
-using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Common.Internal
 {
@@ -371,6 +371,12 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
             var clearedData = ClearSensitiveData(sensitiveData);
 
             return input.Replace(sensitiveData, clearedData);
+        }
+
+        public static bool IsNumeric(object expression)
+        {
+            var isNum = double.TryParse(Convert.ToString(expression), NumberStyles.Any, NumberFormatInfo.InvariantInfo, out _);
+            return isNum;
         }
     }
 }
