@@ -1,14 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Globalization;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Runtime.Caching;
 using Common.Logging;
 using Dawn;
 using Metrics;
@@ -35,6 +27,14 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.Feed;
 using Sportradar.OddsFeed.SDK.Messages.REST;
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Globalization;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Runtime.Caching;
 using cashout = Sportradar.OddsFeed.SDK.Messages.REST.cashout;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
@@ -54,7 +54,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             container.RegisterType<HttpClient, HttpClient>(new ContainerControlledLifetimeManager(), new InjectionFactory(
                 unityContainer =>
                 {
-                    var httpClient = new HttpClient {Timeout = TimeSpan.FromSeconds(userConfig.HttpClientTimeout)};
+                    var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(userConfig.HttpClientTimeout) };
                     return httpClient;
                 }));
             container.RegisterType<HttpClient, HttpClient>("RecoveryHttpClient", new ContainerControlledLifetimeManager(), new InjectionFactory(
@@ -345,6 +345,26 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
         private static void RegisterDataRouterManager(IUnityContainer container, IOddsFeedConfigurationInternal config)
         {
+            container.RegisterType<HttpClient, HttpClient>("CriticalHttpClient", new ContainerControlledLifetimeManager(), new InjectionFactory(
+                                                            unityContainer =>
+                                                            {
+                                                                var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
+                                                                return httpClient;
+                                                            }));
+
+            container.RegisterType<LogHttpDataFetcher, LogHttpDataFetcher>(
+                                                                           "CriticalLogHttpDataFetcher",
+                                                                           new ContainerControlledLifetimeManager(),
+                                                                           new InjectionConstructor(
+                                                                                                    new ResolvedParameter<HttpClient>("CriticalHttpClient"),
+                                                                                                    config.AccessToken,
+                                                                                                    new ResolvedParameter<ISequenceGenerator>(),
+                                                                                                    new ResolvedParameter<IDeserializer<response>>(),
+                                                                                                    SdkInfo.RestConnectionFailureLimit,
+                                                                                                    SdkInfo.RestConnectionFailureTimeoutInSec));
+            var criticalLogFetcher = container.Resolve<LogHttpDataFetcher>("CriticalLogHttpDataFetcher");
+            container.RegisterInstance<IDataFetcher>("CriticalDataFetcher", criticalLogFetcher, new ContainerControlledLifetimeManager());
+
             var nodeIdStr = config.NodeId != 0
                                 ? "?node_id=" + config.NodeId
                                 : string.Empty;
@@ -359,7 +379,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ContainerControlledLifetimeManager(),
                     new InjectionConstructor(
                         summaryEndpoint,
-                        new ResolvedParameter<IDataFetcher>(),
+                        new ResolvedParameter<IDataFetcher>("CriticalDataFetcher"),
                         new ResolvedParameter<IDeserializer<RestMessage>>(),
                         new ResolvedParameter<ISingleTypeMapperFactory<RestMessage, SportEventSummaryDTO>>()));
 
@@ -484,7 +504,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ContainerControlledLifetimeManager(),
                     new InjectionConstructor(
                         config.ApiBaseUri + "/v1/sports/{1}/players/{0}/profile.xml",
-                        new ResolvedParameter<IDataFetcher>(),
+                        new ResolvedParameter<IDataFetcher>("CriticalDataFetcher"),
                         new ResolvedParameter<IDeserializer<playerProfileEndpoint>>(),
                         new ResolvedParameter<ISingleTypeMapperFactory<playerProfileEndpoint, PlayerProfileDTO>>()));
 
@@ -495,7 +515,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ContainerControlledLifetimeManager(),
                     new InjectionConstructor(
                         config.ApiBaseUri + "/v1/sports/{1}/competitors/{0}/profile.xml",
-                        new ResolvedParameter<IDataFetcher>(),
+                        new ResolvedParameter<IDataFetcher>("CriticalDataFetcher"),
                         new ResolvedParameter<IDeserializer<competitorProfileEndpoint>>(),
                         new ResolvedParameter<ISingleTypeMapperFactory<competitorProfileEndpoint, CompetitorProfileDTO>>()));
 
@@ -571,7 +591,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             // invariant market descriptions provider
             container.RegisterType<IDeserializer<market_descriptions>, Deserializer<market_descriptions>>(new ContainerControlledLifetimeManager());
             container.RegisterType<ISingleTypeMapperFactory<market_descriptions, EntityList<MarketDescriptionDTO>>, MarketDescriptionsMapperFactory>(new ContainerControlledLifetimeManager());
-            container.RegisterType <IDataProvider<EntityList<MarketDescriptionDTO>>, DataProvider<market_descriptions, EntityList<MarketDescriptionDTO>>>(
+            container.RegisterType<IDataProvider<EntityList<MarketDescriptionDTO>>, DataProvider<market_descriptions, EntityList<MarketDescriptionDTO>>>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     config.ApiBaseUri + "/v1/descriptions/{0}/markets.xml?include_mappings=true",
@@ -586,7 +606,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ContainerControlledLifetimeManager(),
                     new InjectionConstructor(
                         config.ApiBaseUri + "/v1/descriptions/{1}/markets/{0}/variants/{2}?include_mappings=true",
-                        new ResolvedParameter<IDataFetcher>(),
+                        new ResolvedParameter<IDataFetcher>("CriticalDataFetcher"),
                         new ResolvedParameter<IDeserializer<market_descriptions>>(),
                         new ResolvedParameter<ISingleTypeMapperFactory<market_descriptions, MarketDescriptionDTO>>()));
 
