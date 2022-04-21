@@ -1,13 +1,15 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using Common.Logging;
+using Dawn;
+using Metrics;
+using Sportradar.OddsFeed.SDK.Common.Internal.Metrics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dawn;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.Logging;
 
 namespace Sportradar.OddsFeed.SDK.Common.Internal
 {
@@ -112,44 +114,51 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         {
             Guard.Argument(id, nameof(id)).NotNull().NotEmpty();
 
-            var idFound = false;
-            lock (_syncObject)
+            using (var t = MetricsSettings.TimerSemaphorePool.NewContext($"{id}"))
             {
-                if (AvailableSemaphoreIds.Contains(id))
-                {
-                    idFound = true;
-                }
-                else
-                {
-                    AvailableSemaphoreIds.Add(id);
-                }
-            }
-
-            if (!idFound)
-            {
-                return Task.Run(() => AcquireInternal(id));
-            }
-
-            while(true)
-            {
+                var idFound = false;
                 lock (_syncObject)
                 {
-                    foreach (var holder in SemaphoreHolders)
+                    if (AvailableSemaphoreIds.Contains(id))
                     {
-                        if (holder.Id != id)
-                        {
-                            continue;
-                        }
-                        holder.Acquire();
-                        return Task.FromResult(holder.Semaphore);
+                        idFound = true;
                     }
-                    if (!AvailableSemaphoreIds.Contains(id))
+                    else
                     {
                         AvailableSemaphoreIds.Add(id);
-                        return Task.Run(() => AcquireInternal(id));
                     }
                 }
-                _spinWait.SpinOnce();
+
+                if (!idFound)
+                {
+                    return Task.Run(() => AcquireInternal(id));
+                }
+
+                while (true)
+                {
+                    lock (_syncObject)
+                    {
+                        foreach (var holder in SemaphoreHolders)
+                        {
+                            if (holder.Id != id)
+                            {
+                                continue;
+                            }
+
+                            holder.Acquire();
+                            return Task.FromResult(holder.Semaphore);
+                        }
+
+                        if (!AvailableSemaphoreIds.Contains(id))
+                        {
+                            AvailableSemaphoreIds.Add(id);
+                            Metric.Context(MetricsSettings.McUfSemaphorePool).Gauge("SemaphorePoolAcquire", UsedSemaphoreIds, Unit.Items);
+                            return Task.Run(() => AcquireInternal(id));
+                        }
+                    }
+
+                    _spinWait.SpinOnce();
+                }
             }
         }
 
@@ -175,11 +184,18 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
                     {
                         holder.Acquire();
                         holder.Id = id;
+                        Metric.Context(MetricsSettings.McUfSemaphorePool).Gauge("SemaphorePoolAcquire", UsedSemaphoreIds, Unit.Items);
                         return holder.Semaphore;
                     }
                 }
                 throw new InvalidOperationException("Semaphore granted entry, but there are no SemaphoreSlim objects available");
             }
+        }
+
+        private double UsedSemaphoreIds()
+        {
+            var used = AvailableSemaphoreIds.Count;
+            return used;
         }
 
         /// <summary>
@@ -208,7 +224,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
                     }
                     return;
                 }
-                _executionLog.Warn($"No semaphores are acquired with Id:{id} (used: {SemaphoreHolders.Where(c=>!c.Id.IsNullOrEmpty())}/{SemaphoreHolders.Count})");
+                _executionLog.Warn($"No semaphores are acquired with Id:{id} (used: {SemaphoreHolders.Where(c => !c.Id.IsNullOrEmpty())}/{SemaphoreHolders.Count})");
                 if (_exceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
                 {
                     throw new ArgumentException($"No semaphores are acquired with Id:{id}", nameof(id));
