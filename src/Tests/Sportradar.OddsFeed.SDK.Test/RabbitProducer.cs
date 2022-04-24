@@ -1,21 +1,21 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using EasyNetQ.Management.Client;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Framing;
 using Sportradar.OddsFeed.SDK.API.Internal;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Messages;
+using Sportradar.OddsFeed.SDK.Test.Messages;
 using Sportradar.OddsFeed.SDK.Test.Shared;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Newtonsoft.Json;
-using EasyNetQ.Management.Client;
-using Sportradar.OddsFeed.SDK.Test.Messages;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.Test
 {
@@ -25,7 +25,7 @@ namespace Sportradar.OddsFeed.SDK.Test
     /// <remarks>On rabbit server there should be additional user:testuser/testpass and virtual host: /virtualhost with read/write permission</remarks>
     class RabbitProducer
     {
-        public const string RabbitIp = "192.168.64.100";
+        public const string RabbitIp = "192.168.64.101";
         private const string UfExchange = "unifiedfeed";
         private const string VirtualHostName = "/virtualhost";
         private IConnection _connection;
@@ -253,10 +253,10 @@ namespace Sportradar.OddsFeed.SDK.Test
             using (var httpClient = new HttpClient(httpClientHandler))
             {
                 var mqUser = new MqUser
-                             {
-                                 password = newPassword,
-                                 tags = "administrator"
-                             };
+                {
+                    password = newPassword,
+                    tags = "administrator"
+                };
 
                 var info = JsonConvert.SerializeObject(mqUser);
                 var content = new StringContent(info, Encoding.UTF8, "application/json");
