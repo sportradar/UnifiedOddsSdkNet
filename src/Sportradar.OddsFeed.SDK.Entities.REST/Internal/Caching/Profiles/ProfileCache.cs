@@ -643,7 +643,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                 try
                 {
                     var ci = (CompetitorCI)_cache.Get(id.ToString());
-                    var teamCI = ci as TeamCompetitorCI;
+                    var teamCI = ci == null ? (TeamCompetitorCI)_cache.Get(id.ToString()) : ci as TeamCompetitorCI;
                     if (teamCI != null)
                     {
                         if (useSemaphore)
@@ -700,8 +700,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                 var itemId = URN.Parse(item.Id);
                 try
                 {
-                    var competitorCI = (CompetitorCI)_cache.Get(item.Id);
-                    var teamCI = competitorCI as TeamCompetitorCI;
+                    var ci = (CompetitorCI)_cache.Get(item.Id);
+                    var teamCI = ci == null ? (TeamCompetitorCI)_cache.Get(item.Id) : ci as TeamCompetitorCI;
                     if (teamCI != null)
                     {
                         WaitTillIdIsAvailable(_mergeUrns, itemId);
@@ -710,7 +710,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                     else
                     {
                         WaitTillIdIsAvailable(_mergeUrns, itemId);
-                        teamCI = new TeamCompetitorCI(competitorCI);
+                        teamCI = new TeamCompetitorCI(ci);
                         teamCI.Import(item);
                         _cache.Set(item.Id, teamCI, GetCorrectCacheItemPolicy(URN.Parse(item.Id)));
                     }

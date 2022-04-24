@@ -1,17 +1,17 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Collections.Generic;
 using Dawn;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 
 // ReSharper disable FieldCanBeMadeReadOnly.Global
 
@@ -120,7 +120,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// Gets the <see cref="IEnumerable{CultureInfo}"/> specifying the languages for which the current instance has translations
         /// </summary>
         /// <value>The fetched cultures</value>
-        private IEnumerable<CultureInfo> _fetchedCultures;
+        private IList<CultureInfo> _fetchedCultures;
 
         private readonly object _lock = new object();
         private CultureInfo _primaryCulture;
@@ -251,7 +251,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 _competitorId = competitorId;
             }
 
-            ((List<CultureInfo>)_fetchedCultures).Add(culture);
+            if (_fetchedCultures.IsNullOrEmpty())
+            {
+                _fetchedCultures = new List<CultureInfo>();
+            }
+
+            if (!_fetchedCultures.Contains(culture))
+            {
+                _fetchedCultures.Add(culture);
+            }
         }
 
         /// <summary>
