@@ -252,6 +252,7 @@
     <Compile Include="IReplayResponse.cs" />
     <Compile Include="IReplayStatus.cs" />
     <Compile Include="ISpecificEntityDispatcher.cs" />
+    <Compile Include="ISportDataProviderV11.cs" />
     <Compile Include="ISportDataProviderV10.cs" />
     <Compile Include="ISportDataProviderV9.cs" />
     <Compile Include="ISportDataProviderV8.cs" />

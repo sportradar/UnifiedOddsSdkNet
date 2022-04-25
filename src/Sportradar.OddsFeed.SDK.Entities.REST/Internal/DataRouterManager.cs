@@ -1,14 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Collections.Generic;
-using Dawn;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web;
 using Common.Logging;
+using Dawn;
 using Metrics;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
@@ -23,6 +17,12 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.EventArguments;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -356,7 +356,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
         private void OnRawApiDataReceived(object sender, RawApiDataEventArgs e)
         {
-           RawApiDataReceived?.Invoke(sender, e);
+            RawApiDataReceived?.Invoke(sender, e);
         }
 
         /// <summary>
@@ -424,7 +424,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                                        ? _sportEventFixtureProvider
                                        : _sportEventFixtureChangeFixtureProvider;
                     result = await provider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
-                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)
                 {
@@ -454,7 +454,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                         try
                         {
                             result = await _sportEventFixtureProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
-                            restCallTime = (int) t.Elapsed.TotalMilliseconds;
+                            restCallTime = (int)t.Elapsed.TotalMilliseconds;
                             WriteLog($"Executing GetSportEventFixtureAsync (via cached endpoint) for id={id} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
                             return;
                         }
@@ -465,7 +465,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                         }
                     }
 
-                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
                     _executionLog.Error($"Error getting sport event fixture for id={id} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
                     if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
@@ -555,11 +555,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 try
                 {
                     result = await _sportCategoriesProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
-                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)
                 {
-                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
                     _executionLog.Error($"Error getting sport categories for id={id} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
                     if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
@@ -594,11 +594,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 try
                 {
                     result = await _allSportsProvider.GetDataAsync(culture.TwoLetterISOLanguageName).ConfigureAwait(false);
-                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)
                 {
-                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
                     _executionLog.Error($"Error getting all sports for lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
                     if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
@@ -851,11 +851,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                     {
                         competitorResult = await _competitorProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
                     }
-                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)
                 {
-                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
                     _executionLog.Error($"Error getting competitor profile for id={id} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}",
                                         e.InnerException ?? e);
@@ -894,7 +894,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             var timer = Metric.Context("DataRouterManager").Timer("GetSeasonsForTournamentAsync", Unit.Requests);
             using (var t = timer.NewContext($"{id} [{culture.TwoLetterISOLanguageName}]"))
             {
-               WriteLog($"Executing GetSeasonsForTournamentAsync for tournament id={id} and culture={culture.TwoLetterISOLanguageName}.", true);
+                WriteLog($"Executing GetSeasonsForTournamentAsync for tournament id={id} and culture={culture.TwoLetterISOLanguageName}.", true);
 
                 TournamentSeasonsDTO result = null;
                 int restCallTime;
@@ -949,14 +949,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="id">The id of the sport event</param>
         /// <param name="culture">The culture to be fetched</param>
         /// <param name="requester">The cache item which invoked request</param>
-        /// <returns>Task</returns>
-        public async Task GetInformationAboutOngoingEventAsync(URN id, CultureInfo culture, ISportEventCI requester)
+        /// <returns>The match timeline data object</returns>
+        public async Task<MatchTimelineDTO> GetInformationAboutOngoingEventAsync(URN id, CultureInfo culture, ISportEventCI requester)
         {
             Metric.Context("DataRouterManager").Meter("GetInformationAboutOngoingEventAsync", Unit.Calls);
             var timer = Metric.Context("DataRouterManager").Timer("GetInformationAboutOngoingEventAsync", Unit.Requests);
             using (var t = timer.NewContext($"{id} [{culture.TwoLetterISOLanguageName}]"))
             {
-               WriteLog($"Executing GetInformationAboutOngoingEventAsync for id={id} and culture={culture.TwoLetterISOLanguageName}.", true);
+                WriteLog($"Executing GetInformationAboutOngoingEventAsync for id={id} and culture={culture.TwoLetterISOLanguageName}.", true);
 
                 MatchTimelineDTO result = null;
                 int restCallTime;
@@ -992,6 +992,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                     await _cacheManager.SaveDtoAsync(result.SportEvent.Id, result, culture, DtoType.MatchTimeline, requester).ConfigureAwait(false);
                 }
                 WriteLog($"Executing GetInformationAboutOngoingEventAsync for id={id} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
+
+                return result;
             }
         }
 
@@ -1006,7 +1008,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             var timer = Metric.Context("DataRouterManager").Timer("GetMarketDescriptionsAsync", Unit.Requests);
             using (var t = timer.NewContext($"[{culture.TwoLetterISOLanguageName}]"))
             {
-               WriteLog($"Executing GetMarketDescriptionsAsync for culture={culture.TwoLetterISOLanguageName}.", true);
+                WriteLog($"Executing GetMarketDescriptionsAsync for culture={culture.TwoLetterISOLanguageName}.", true);
 
                 EntityList<MarketDescriptionDTO> result = null;
                 int restCallTime;
@@ -1048,7 +1050,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             var timer = Metric.Context("DataRouterManager").Timer("GetVariantMarketDescriptionAsync", Unit.Requests);
             using (var t = timer.NewContext($"{id} [{culture.TwoLetterISOLanguageName}]"))
             {
-               WriteLog($"Executing GetVariantMarketDescriptionAsync for id={id}, variant={variant} and culture={culture.TwoLetterISOLanguageName}.", true);
+                WriteLog($"Executing GetVariantMarketDescriptionAsync for id={id}, variant={variant} and culture={culture.TwoLetterISOLanguageName}.", true);
 
                 MarketDescriptionDTO result = null;
                 int restCallTime;
@@ -1112,7 +1114,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             var timer = Metric.Context("DataRouterManager").Timer("GetVariantDescriptionsAsync", Unit.Requests);
             using (var t = timer.NewContext($"[{culture.TwoLetterISOLanguageName}]"))
             {
-               WriteLog($"Executing GetVariantDescriptionsAsync for culture={culture.TwoLetterISOLanguageName}.", true);
+                WriteLog($"Executing GetVariantDescriptionsAsync for culture={culture.TwoLetterISOLanguageName}.", true);
 
                 EntityList<VariantDescriptionDTO> result = null;
                 int restCallTime;
@@ -1527,7 +1529,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 try
                 {
                     result = await _availableSportTournamentsProvider.GetDataAsync(culture.TwoLetterISOLanguageName, sportId.ToString()).ConfigureAwait(false);
-                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)
                 {
@@ -1652,11 +1654,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 try
                 {
                     result = await _stagePeriodSummaryProvider.GetDataAsync(culture.TwoLetterISOLanguageName, id.ToString(), query).ConfigureAwait(false);
-                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)
                 {
-                    restCallTime = (int) t.Elapsed.TotalMilliseconds;
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
                     _executionLog.Error($"Error getting period summary for event id={id} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
                     if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW && requester != null)
@@ -1670,7 +1672,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                     await _cacheManager.SaveDtoAsync(id, result, culture, DtoType.SportEventSummary, requester).ConfigureAwait(false);
                 }
 
-                WriteLog($"Executing GetPeriodSummaryAsync for event id={id} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int) t.Elapsed.TotalMilliseconds)}");
+                WriteLog($"Executing GetPeriodSummaryAsync for event id={id} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
 
                 return result;
             }

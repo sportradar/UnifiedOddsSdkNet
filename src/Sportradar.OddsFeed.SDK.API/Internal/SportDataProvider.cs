@@ -10,6 +10,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
@@ -27,7 +28,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
     /// Provides access to sport related data (sports, tournaments, sport events, ...)
     /// </summary>
     [Log(LoggerType.ClientInteraction)]
-    internal class SportDataProvider : ISportDataProviderV10
+    internal class SportDataProvider : ISportDataProviderV11
     {
         private static readonly ILog LogInt = SdkLoggerFactory.GetLoggerForClientInteraction(typeof(SportDataProvider));
 
@@ -772,6 +773,46 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             LogInt.Info("GetPeriodStatusesAsync returned 0 results.");
             return new List<IPeriodStatus>();
+        }
+
+        /// <summary>
+        /// Get the associated event timeline for single culture
+        /// </summary>
+        /// <param name="id">The id of the sport event to be fetched</param>
+        /// <param name="culture">The language to be fetched</param>
+        /// <returns>The event timeline or empty if not found</returns>
+        public async Task<IEnumerable<ITimelineEvent>> GetTimelineEventsAsync(URN id, CultureInfo culture = null)
+        {
+            if (culture == null)
+            {
+                culture = _defaultCultures.First();
+            }
+
+            try
+            {
+                LogInt.Info($"Invoked GetTimelineEventsAsync: Id={id}, Culture={culture.TwoLetterISOLanguageName}.");
+
+                var matchTimelineDTO = await _dataRouterManager.GetInformationAboutOngoingEventAsync(id, culture, null).ConfigureAwait(false);
+
+                if (matchTimelineDTO != null && !matchTimelineDTO.BasicEvents.IsNullOrEmpty())
+                {
+                    var matchTimeline = new EventTimeline(new EventTimelineCI(matchTimelineDTO, culture));
+                    LogInt.Info($"GetTimelineEventsAsync returned {matchTimeline.TimelineEvents?.Count() ?? 0} results.");
+                    return matchTimeline.TimelineEvents;
+                }
+            }
+            catch (Exception e)
+            {
+                LogInt.Error("Error executing GetTimelineEventsAsync", e);
+                if (_exceptionStrategy == ExceptionHandlingStrategy.THROW)
+                {
+                    throw;
+                }
+                return null;
+            }
+
+            LogInt.Info("GetTimelineEventsAsync returned 0 results.");
+            return new List<ITimelineEvent>();
         }
     }
 }
