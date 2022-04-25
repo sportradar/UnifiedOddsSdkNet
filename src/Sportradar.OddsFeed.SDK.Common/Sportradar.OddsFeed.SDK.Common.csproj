@@ -133,6 +133,7 @@
     <Compile Include="Internal\Metrics\FormatHelper.cs" />
     <Compile Include="Internal\Metrics\IHealthStatusProvider.cs" />
     <Compile Include="Internal\Metrics\MetricsReporter.cs" />
+    <Compile Include="Internal\Metrics\MetricsSettings.cs" />
     <Compile Include="Internal\Metrics\Reports\BaseReport.cs" />
     <Compile Include="Internal\Metrics\Reports\CounterReport.cs" />
     <Compile Include="Internal\Metrics\Reports\EnvironmentReport.cs" />

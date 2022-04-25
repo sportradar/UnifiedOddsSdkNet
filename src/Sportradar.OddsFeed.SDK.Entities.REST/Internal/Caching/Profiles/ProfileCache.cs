@@ -299,7 +299,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         public HealthCheckResult StartHealthCheck()
         {
             var keys = _cache.Select(w => w.Key).ToList();
-            var details = $" [Players: {keys.Count(c => c.Contains("player"))}, CompetitorsIds: {keys.Count(c => c.Contains("competitor"))}, Teams: {keys.Count(c => c.Equals("team"))}, SimpleTeams: {keys.Count(URN.IsSimpleTeam)}]";
+            var details = $" [Players: {keys.Count(c => c.Contains("player"))}, Competitors: {keys.Count(c => c.Contains("competitor"))}, Teams: {keys.Count(c => c.Equals("team"))}, SimpleTeams: {keys.Count(URN.IsSimpleTeam)}]";
             return _cache.Any() ? HealthCheckResult.Healthy($"Cache has {_cache.Count()} items{details}.") : HealthCheckResult.Unhealthy("Cache is empty.");
         }
 
@@ -1021,7 +1021,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
         {
             return id.IsSimpleTeam()
                 ? _simpleTeamCacheItemPolicy
-                : new CacheItemPolicy { SlidingExpiration = OperationManager.ProfileCacheTimeout, RemovedCallback = OnCacheItemRemoval };
+                : new CacheItemPolicy { SlidingExpiration = SdkInfo.AddVariableNumber(OperationManager.ProfileCacheTimeout, 20), RemovedCallback = OnCacheItemRemoval };
         }
 
         /// <summary>

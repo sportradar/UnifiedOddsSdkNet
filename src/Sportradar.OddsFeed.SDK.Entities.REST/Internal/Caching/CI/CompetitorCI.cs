@@ -617,7 +617,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             }
             _lastTimeCompetitorProfileFetched = DateTime.Now;
             _cultureCompetitorProfileFetched.Add(culture);
-            ((List<CultureInfo>)_fetchedCultures).Add(culture);
+            _fetchedCultures.Add(culture);
         }
 
         /// <summary>
@@ -662,7 +662,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             {
                 _shortName = simpleTeamProfile.Competitor.ShortName;
             }
-            ((List<CultureInfo>)_fetchedCultures).Add(culture);
+            _fetchedCultures.Add(culture);
         }
 
         /// <summary>
