@@ -1,19 +1,19 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Dawn;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.Caching;
-using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Messages;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.Caching;
+using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
 {
@@ -165,7 +165,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             ObjectCache fixtureTimestampCache)
             : base(exportable, dataRouterManager, semaphorePool, defaultCulture, fixtureTimestampCache)
         {
-            _categoryId = exportable.CategoryId==null ? null : URN.Parse(exportable.CategoryId);
+            _categoryId = exportable.CategoryId == null ? null : URN.Parse(exportable.CategoryId);
             _tournamentCoverage = exportable.TournamentCoverage != null
                 ? new TournamentCoverageCI(exportable.TournamentCoverage)
                 : null;
@@ -193,10 +193,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         }
 
         /// <summary>
-    /// Get category identifier as an asynchronous operation
-    /// </summary>
-    /// <returns>A <see cref="Task{URN}" /> representing the asynchronous operation</returns>
-    public async Task<URN> GetCategoryIdAsync()
+        /// Get category identifier as an asynchronous operation
+        /// </summary>
+        /// <returns>A <see cref="Task{URN}" /> representing the asynchronous operation</returns>
+        public async Task<URN> GetCategoryIdAsync()
         {
             if (_categoryId != null)
             {
@@ -231,10 +231,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             wantedCultures = LanguageHelper.GetMissingCultures(wantedCultures, LoadedSummaries).ToList();
             if (_competitors != null && !wantedCultures.Any())
             {
-                return await PrepareCompetitorList(_competitors, wantedCultures);
+                return await PrepareCompetitorList(_competitors, wantedCultures).ConfigureAwait(false);
             }
             await FetchMissingSummary(wantedCultures, false).ConfigureAwait(false);
-            return await PrepareCompetitorList(_competitors, wantedCultures);
+            return await PrepareCompetitorList(_competitors, wantedCultures).ConfigureAwait(false);
         }
 
         private async Task<IEnumerable<URN>> PrepareCompetitorList(IEnumerable<URN> competitors, IEnumerable<CultureInfo> cultures)
@@ -244,7 +244,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 return competitors;
             }
 
-            var groups = await GetGroupsAsync(cultures);
+            var groups = await GetGroupsAsync(cultures).ConfigureAwait(false);
             return groups?.SelectMany(g => g.CompetitorsIds).Distinct();
         }
 
@@ -409,10 +409,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         {
             if (_competitorsReferences != null)
             {
-                return await PrepareCompetitorsReferences(_competitorsReferences);
+                return await PrepareCompetitorsReferences(_competitorsReferences).ConfigureAwait(false);
             }
             await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
-            return await PrepareCompetitorsReferences(_competitorsReferences);
+            return await PrepareCompetitorsReferences(_competitorsReferences).ConfigureAwait(false);
         }
 
         private async Task<IDictionary<URN, ReferenceIdCI>> PrepareCompetitorsReferences(IDictionary<URN, ReferenceIdCI> competitorsReferences)
@@ -422,7 +422,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 return competitorsReferences;
             }
 
-            var groups = await GetGroupsAsync(new[] { DefaultCulture });
+            var groups = await GetGroupsAsync(new[] { DefaultCulture }).ConfigureAwait(false);
             return groups?.SelectMany(g => g.CompetitorsReferences).Distinct().ToDictionary(c => c.Key, c => c.Value);
         }
 
@@ -689,7 +689,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                     {
                         tmpGroups.Clear();
                     }
-                    else if(tmpGroups.Any(c => string.IsNullOrEmpty(c.Id) && string.IsNullOrEmpty(c.Name)) && !groupDTOs.Any(c => string.IsNullOrEmpty(c.Id) && string.IsNullOrEmpty(c.Name)))
+                    else if (tmpGroups.Any(c => string.IsNullOrEmpty(c.Id) && string.IsNullOrEmpty(c.Name)) && !groupDTOs.Any(c => string.IsNullOrEmpty(c.Id) && string.IsNullOrEmpty(c.Name)))
                     {
                         tmpGroups.Clear();
                     }
@@ -729,7 +729,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
 
                             // if no group with matching competitors
                             var groupExists = MergerHelper.FindExistingGroup(groupDTOs, tmpGroup);
-                            if(groupExists == null)
+                            if (groupExists == null)
                             {
                                 tmpGroups.Remove(tmpGroup);
                             }
@@ -751,7 +751,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
 
             foreach (var group in groupDTOs)
             {
-                var tempGroup =  MergerHelper.FindExistingGroup(tmpGroups, group);
+                var tempGroup = MergerHelper.FindExistingGroup(tmpGroups, group);
                 if (tempGroup == null)
                 {
                     tmpGroups.Add(new GroupCI(group, culture));
@@ -803,14 +803,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
 
             info.CategoryId = _categoryId?.ToString();
             info.TournamentCoverage = _tournamentCoverage != null ? await _tournamentCoverage.ExportAsync().ConfigureAwait(false) : null;
-            info.Competitors = _competitors?.Select(s=>s.ToString()).ToList();
+            info.Competitors = _competitors?.Select(s => s.ToString()).ToList();
             info.CurrentSeasonInfo = _currentSeasonInfo != null ? await _currentSeasonInfo.ExportAsync().ConfigureAwait(false) : null;
             var groupsTasks = _groups?.Select(async g => await g.ExportAsync().ConfigureAwait(false)).ToList();
             if (!groupsTasks.IsNullOrEmpty())
             {
                 await Task.WhenAll(groupsTasks).ConfigureAwait(false);
             }
-            info.Groups = groupsTasks.IsNullOrEmpty() ? null : groupsTasks.Select(s=>s.Result).ToList();
+            info.Groups = groupsTasks.IsNullOrEmpty() ? null : groupsTasks.Select(s => s.Result).ToList();
             info.ScheduleUrns = _scheduleUrns?.Select(s => s.ToString()).ToList();
             info.Round = _round != null ? await _round.ExportAsync().ConfigureAwait(false) : null;
             info.Year = _year;

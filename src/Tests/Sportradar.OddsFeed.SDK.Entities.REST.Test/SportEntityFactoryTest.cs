@@ -1,18 +1,18 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Test.Shared;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 {
@@ -142,7 +142,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             var tourCount = _sef.SportEventCache.Cache.Count(c => c.Key.Contains("season") || c.Key.Contains("tournament"));
             Assert.IsNotNull(_sef.Tournament);
 
-            var tournamentCI = (TournamentInfoCI) _sef.SportEventCache.GetEventCacheItem(tournamentId);
+            var tournamentCI = (TournamentInfoCI)_sef.SportEventCache.GetEventCacheItem(tournamentId);
             Assert.AreEqual(tourCount, _sef.SportEventCache.Cache.Count(c => c.Key.Contains("season") || c.Key.Contains("tournament")));
 
             _sef.SportEventCache.CacheDeleteItem(tournamentId, CacheItemType.Tournament);
@@ -176,14 +176,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 IEnumerable<IEnumerable<Tuple<URN, URN>>> results = null;
                 Task.Run(async () =>
                 {
-                    results = await Task.WhenAll(tasks);
+                    results = await Task.WhenAll(tasks).ConfigureAwait(false);
                     events = results.First();
                 }).GetAwaiter().GetResult();
 
                 Assert.IsNotNull(events);
                 Assert.IsNotNull(results);
                 var listEvents = events as IList<Tuple<URN, URN>> ?? events.ToList();
-                Assert.AreEqual(listEvents.Count, _sef.SportEventCache.Cache.Count(c=>c.Key.Contains("match")));
+                Assert.AreEqual(listEvents.Count, _sef.SportEventCache.Cache.Count(c => c.Key.Contains("match")));
                 Assert.IsTrue(listEvents.Any());
             }
         }

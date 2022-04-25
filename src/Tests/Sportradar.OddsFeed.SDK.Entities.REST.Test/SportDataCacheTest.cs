@@ -1,13 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.Caching;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
@@ -16,6 +9,13 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Test.Shared;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.Caching;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 {
@@ -225,7 +225,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Task.Run(async () =>
             {
                 await _sportDataCache.GetSportsAsync(TestData.Cultures).ConfigureAwait(false); // initial load
-                var sprts = await _sportDataCache.GetSportsAsync(new [] { _cultureNl }).ConfigureAwait(false);
+                var sprts = await _sportDataCache.GetSportsAsync(new[] { _cultureNl }).ConfigureAwait(false);
                 sportsNl = sprts.ToList();
                 sprts = await _sportDataCache.GetSportsAsync(TestData.Cultures).ConfigureAwait(false);
                 sports = sprts.ToList();
@@ -306,7 +306,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Task.Run(async () =>
             {
                 await _sportDataCache.GetSportsAsync(TestData.Cultures).ConfigureAwait(false); // initial load
-                dataNl = await _sportDataCache.GetSportAsync(SportId, new [] { _cultureNl }); // add new locale
+                dataNl = await _sportDataCache.GetSportAsync(SportId, new[] { _cultureNl }); // add new locale
                 data01 = await _sportDataCache.GetSportAsync(SportId, TestData.Cultures); // get all translations
             }).GetAwaiter().GetResult();
 
@@ -332,8 +332,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Task.Run(async () =>
             {
                 await _sportDataCache.GetSportsAsync(TestData.Cultures).ConfigureAwait(false); // initial load
-                dataNl = await _sportDataCache.GetSportForTournamentAsync(TournamentId, new[] { _cultureNl }); //add new locale
-                data01 = await _sportDataCache.GetSportForTournamentAsync(TournamentId, TestData.Cultures); // get all translations
+                dataNl = await _sportDataCache.GetSportForTournamentAsync(TournamentId, new[] { _cultureNl }).ConfigureAwait(false); //add new locale
+                data01 = await _sportDataCache.GetSportForTournamentAsync(TournamentId, TestData.Cultures).ConfigureAwait(false); // get all translations
             }).GetAwaiter().GetResult();
 
             Assert.IsNotNull(dataNl);
@@ -361,7 +361,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(callType), $"{callType} should be called exactly {TestData.Cultures.Count} times.");
             Assert.AreEqual(TestData.CacheSportCount, _sportDataCache.Sports.Count);
             Assert.AreEqual(TestData.CacheCategoryCountPlus, _sportDataCache.Categories.Count);
-            
+
             Assert.AreEqual(0, _dataRouterManager.GetCallCount("GetSportEventSummaryAsync"), "GetSportEventSummaryAsync should be called exactly 0 times.");
             var data01 = _sportDataCache.GetSportForTournamentAsync(TournamentIdExtra, TestData.Cultures).Result;
             Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(callType), $"{callType} should be called exactly {TestData.Cultures.Count} times.");

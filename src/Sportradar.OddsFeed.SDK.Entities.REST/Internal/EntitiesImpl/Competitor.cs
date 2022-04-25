@@ -233,8 +233,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             var sportId = GetOrLoadCompetitor()?.SportId;
             if (sportId != null)
             {
-                return await _sportEntityFactory.BuildSportAsync(sportId, _cultures, _exceptionStrategy)
-                    .ConfigureAwait(false);
+                return await _sportEntityFactory.BuildSportAsync(sportId, _cultures, _exceptionStrategy).ConfigureAwait(false);
             }
 
             return null;
@@ -249,8 +248,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             var categoryId = GetOrLoadCompetitor()?.CategoryId;
             if (categoryId != null)
             {
-                return await _sportEntityFactory.BuildCategoryAsync(categoryId, _cultures)
-                    .ConfigureAwait(false);
+                return await _sportEntityFactory.BuildCategoryAsync(categoryId, _cultures).ConfigureAwait(false);
             }
 
             return null;
