@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.ICompetition">
-    <Position X="7.25" Y="3.5" Width="3.5" />
+    <Position X="14.25" Y="3.5" Width="3.5" />
     <TypeIdentifier>
       <HashCode>AAAIAAAAAAAAAAAQAAAEAAIAAAAAAAAAAAAAAAAAAEA=</HashCode>
       <FileName>ICompetition.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.ISoccerEvent">
-    <Position X="13" Y="9.75" Width="2.75" />
+    <Position X="15.75" Y="6.5" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ISoccerEvent.cs</FileName>
@@ -63,22 +63,22 @@
       <FileName>IBasicTournament.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.ITournamentInfo" Collapsed="true">
-    <Position X="39.25" Y="0.5" Width="1.5" />
+  <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.ITournamentInfo">
+    <Position X="27.5" Y="0.5" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAACgAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAADAA=</HashCode>
       <FileName>ITournamentInfo.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.ICurrentSeasonInfo" Collapsed="true">
-    <Position X="37.5" Y="0.5" Width="1.5" />
+  <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.ICurrentSeasonInfo">
+    <Position X="30.5" Y="0.5" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAACgEAAJAAACAAAAAAAAAAgAEAAAAAAAAAAAEAABAA=</HashCode>
       <FileName>ICurrentSeasonInfo.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.IDraw">
-    <Position X="14.5" Y="3.5" Width="3.25" />
+    <Position X="14.5" Y="0.75" Width="3.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAgAAAAAAAAAAgAAAIAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>IDraw.cs</FileName>
@@ -91,74 +91,109 @@
       <FileName>ILottery.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.ISportEventV1" Collapsed="true">
-    <Position X="18.5" Y="3.5" Width="1.5" />
+  <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.ISportEventV1">
+    <Position X="18.5" Y="3.5" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAAQABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ISportEventV1.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.ICompetitionV1">
-    <Position X="4.25" Y="6.25" Width="1.5" />
+    <Position X="12" Y="3.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ICompetitionV1.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.IStageV1">
-    <Position X="6.25" Y="9" Width="1.5" />
+    <Position X="6.5" Y="9" Width="3.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>IStageV1.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.IStageV2">
-    <Position X="5" Y="11.25" Width="1.75" />
+    <Position X="6.5" Y="10.75" Width="3.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAA=</HashCode>
       <FileName>IStageV2.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.ICompetitionV2">
-    <Position X="10.25" Y="11" Width="1.5" />
+    <Position X="9.75" Y="3.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAACABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ICompetitionV2.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.IMatchV1">
-    <Position X="7.25" Y="10.75" Width="1.5" />
+    <Position X="10.75" Y="9.75" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>IMatchV1.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.IMatchV2">
-    <Position X="7.25" Y="12.75" Width="1.5" />
+    <Position X="10.75" Y="11.5" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAA=</HashCode>
       <FileName>IMatchV2.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.IBasicTournamentV1" Collapsed="true">
-    <Position X="21.75" Y="7.75" Width="1.5" />
+  <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.IBasicTournamentV1">
+    <Position X="20.75" Y="7.25" Width="3.5" />
     <TypeIdentifier>
       <HashCode>IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>IBasicTournamentV1.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.IBasicTournamentV2" Collapsed="true">
-    <Position X="21.75" Y="9.25" Width="1.5" />
+  <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.IBasicTournamentV2">
+    <Position X="20.75" Y="8.75" Width="3.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAA=</HashCode>
       <FileName>IBasicTournamentV2.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.IDrawV1">
-    <Position X="15.25" Y="5.75" Width="1.5" />
+    <Position X="12.25" Y="0.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAA=</HashCode>
       <FileName>IDrawV1.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.IStageV3">
+    <Position X="6.5" Y="13" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IStageV3.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.IMatchV3">
+    <Position X="10.75" Y="13.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IMatchV3.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.ILotteryV1">
+    <Position X="25" Y="8" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ILotteryV1.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.ITournamentV1">
+    <Position X="29" Y="7.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ITournamentV1.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.ITournamentV2">
+    <Position X="29" Y="9.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>ITournamentV2.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Font Name="Segoe UI" Size="9" />

@@ -3,16 +3,18 @@
   <Class Name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI.PlayerProfileCI">
     <Position X="7.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAIBgABABACBAAQgBAAAAEBAAGAQAQAAAQAAAAAQBBA=</HashCode>
+      <HashCode>ACIBkABABACBAISgJAAAAkBAAGgQAQAAAQAAAAAQBBA=</HashCode>
       <FileName>Internal\Caching\CI\PlayerProfileCI.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI.CompetitorCI">
     <Position X="12" Y="1.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AGAAgCAACIAIAAAgFAEIAURAAAgERQAQIAYQAAAABBA=</HashCode>
+      <HashCode>BGQAkCAAiIAYggDgtAEICUxCACgERYCSIAYABAAABBA=</HashCode>
       <FileName>Internal\Caching\CI\CompetitorCI.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI.SportEntityCI">
     <Position X="9.75" Y="0.5" Width="1.5" />
@@ -75,6 +77,13 @@
     <TypeIdentifier>
       <HashCode>ACAAAAAAAIAIAAAQAAEAAQQAAAASBAAAAAIAAAAAAAA=</HashCode>
       <FileName>ICompetitor.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Sportradar.OddsFeed.SDK.Entities.REST.ITeamCompetitorV1">
+    <Position X="3" Y="8.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ITeamCompetitorV1.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Font Name="Segoe UI" Size="9" />
