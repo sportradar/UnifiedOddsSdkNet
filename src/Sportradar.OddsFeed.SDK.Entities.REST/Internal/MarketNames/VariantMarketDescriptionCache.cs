@@ -401,7 +401,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         }
 
         /// <summary>
-        /// Adds the dto item to cache
+        /// Asynchronously adds the dto item to registered cache
         /// </summary>
         /// <param name="id">The identifier of the object</param>
         /// <param name="item">The item to be added</param>
@@ -410,7 +410,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <param name="requester">The cache item which invoked request</param>
         /// <returns><c>true</c> if added, <c>false</c> otherwise</returns>
         /// <exception cref="ArgumentOutOfRangeException">dtoType - null</exception>
-        protected override bool CacheAddDtoItem(URN id, object item, CultureInfo culture, DtoType dtoType, ISportEventCI requester)
+        protected override async Task<bool> CacheAddDtoItemAsync(URN id, object item, CultureInfo culture, DtoType dtoType, ISportEventCI requester)
         {
             if (_isDisposed)
             {
@@ -435,7 +435,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                     if (marketDescription != null)
                     {
                         //WriteLog($"Saving {marketDescription.Id} variant description for lang: [{culture.TwoLetterISOLanguageName}].");
-                        Merge(culture, marketDescription);
+                        await MergeAsync(culture, marketDescription).ConfigureAwait(false);
                         saved = true;
                         //WriteLog($"Saving {marketDescription.Id} variant description for lang: [{culture.TwoLetterISOLanguageName}] COMPLETED.");
                     }
@@ -502,7 +502,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// </summary>
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the <code>descriptions</code></param>
         /// <param name="description">A <see cref="MarketDescriptionDTO"/> containing market description in specified language</param>
-        private void Merge(CultureInfo culture, MarketDescriptionDTO description)
+        private async Task MergeAsync(CultureInfo culture, MarketDescriptionDTO description)
         {
             Guard.Argument(culture, nameof(culture)).NotNull();
             Guard.Argument(description, nameof(description)).NotNull();
@@ -514,14 +514,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
             try
             {
-                _semaphoreCacheMerge.Wait();
+                await _semaphoreCacheMerge.WaitAsync().ConfigureAwait(false);
                 var cachedItem = _cache.GetCacheItem(GetCacheKey(description.Id, description.Variant));
                 if (cachedItem == null)
                 {
-
                     cachedItem = new CacheItem(GetCacheKey(description.Id, description.Variant), MarketDescriptionCacheItem.Build(description, _mappingValidatorFactory, culture, CacheName));
                     _cache.Add(cachedItem, new CacheItemPolicy {SlidingExpiration = OperationManager.VariantMarketDescriptionCacheTimeout});
-
                 }
                 else
                 {

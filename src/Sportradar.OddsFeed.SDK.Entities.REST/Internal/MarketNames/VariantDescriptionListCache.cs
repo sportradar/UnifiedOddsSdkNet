@@ -417,7 +417,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         }
 
         /// <summary>
-        /// Adds the dto item to cache
+        /// Asynchronously adds the dto item to registered cache
         /// </summary>
         /// <param name="id">The identifier of the object</param>
         /// <param name="item">The item to be added</param>
@@ -426,7 +426,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <param name="requester">The cache item which invoked request</param>
         /// <returns><c>true</c> if added, <c>false</c> otherwise</returns>
         /// <exception cref="ArgumentOutOfRangeException">dtoType - null</exception>
-        protected override bool CacheAddDtoItem(URN id, object item, CultureInfo culture, DtoType dtoType, ISportEventCI requester)
+        protected override async Task<bool> CacheAddDtoItemAsync(URN id, object item, CultureInfo culture, DtoType dtoType, ISportEventCI requester)
         {
             if (_isDisposed)
             {
@@ -481,7 +481,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                     if (variantDescriptionList != null)
                     {
                         //WriteLog($"Saving {variantDescriptionList.Items.Count()} variant descriptions for lang: [{culture.TwoLetterISOLanguageName}].");
-                        Merge(culture, variantDescriptionList.Items);
+                        await MergeAsync(culture, variantDescriptionList.Items).ConfigureAwait(false);
                         saved = true;
                         //WriteLog($"Saving {variantDescriptionList.Items.Count()} variant descriptions for lang: [{culture.TwoLetterISOLanguageName}] COMPLETED.");
                     }
@@ -518,7 +518,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// </summary>
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the <code>descriptions</code></param>
         /// <param name="descriptions">A <see cref="IEnumerable{MarketDescriptionDTO}"/> containing market descriptions in specified language</param>
-        private void Merge(CultureInfo culture, IEnumerable<VariantDescriptionDTO> descriptions)
+        private async Task MergeAsync(CultureInfo culture, IEnumerable<VariantDescriptionDTO> descriptions)
         {
             Guard.Argument(culture, nameof(culture)).NotNull();
             Guard.Argument(descriptions, nameof(descriptions)).NotNull();//.NotEmpty();
@@ -530,7 +530,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             var descriptionList = descriptions as List<VariantDescriptionDTO> ?? descriptions.ToList();
             try
             {
-                _semaphoreCacheMerge.Wait();
+                await _semaphoreCacheMerge.WaitAsync().ConfigureAwait(false);
                 foreach (var marketDescription in descriptionList)
                 {
                     var cachedItem = _cache.GetCacheItem(marketDescription.Id);

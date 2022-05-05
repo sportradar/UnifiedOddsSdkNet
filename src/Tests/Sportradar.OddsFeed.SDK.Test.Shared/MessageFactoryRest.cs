@@ -63,12 +63,14 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                 players.Add(GetPlayerExtended());
             }
 
+            var cUrn = id == 0 ? SR.Urn("competitor", 100000) : SR.Urn(id, "competitor");
+
             return new competitorProfileEndpoint
             {
                 competitor = new teamExtended
                 {
-                    id = id == 0 ? SR.Urn("competitor", 100000).ToString() : SR.Urn(id, "competitor").ToString(),
-                    name = "my name",
+                    id = cUrn.ToString(),
+                    name = "my name" + cUrn.Id,
                     abbreviation = SR.S1000,
                     @virtual = true,
                     virtualSpecified = true,
