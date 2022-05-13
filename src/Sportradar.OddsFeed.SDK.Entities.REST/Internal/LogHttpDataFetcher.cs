@@ -78,14 +78,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 {
                     var commException = (CommunicationException) ex;
                     logBuilder.Append(" ResponseCode:").Append(commException.ResponseCode);
-                    logBuilder.Append(" Duration:").Append(watch.Elapsed);
-                    logBuilder.Append(" Response:").Append(commException.Response?.Replace("\n", string.Empty));
+                    logBuilder.Append(" Duration: ").Append(watch.ElapsedMilliseconds);
+                    logBuilder.Append(" ms Response:").Append(commException.Response?.Replace("\n", string.Empty));
                     RestLog.Error(logBuilder);
                 }
                 throw;
             }
 
-            logBuilder.Append(" Duration:").Append(watch.Elapsed);
+            logBuilder.Append(" Duration: ").Append(watch.ElapsedMilliseconds).Append(" ms");
             if (!RestLog.IsDebugEnabled)
             {
                 RestLog.Info(logBuilder);
@@ -135,14 +135,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 {
                     var commException = (CommunicationException)ex;
                     logBuilder.Append(" ResponseCode:").Append(commException.ResponseCode);
-                    logBuilder.Append(" Duration:").Append(watch.Elapsed);
-                    logBuilder.Append(" Response:").Append(commException.Response?.Replace("\n", string.Empty));
+                    logBuilder.Append(" Duration: ").Append(watch.ElapsedMilliseconds);
+                    logBuilder.Append(" ms Response:").Append(commException.Response?.Replace("\n", string.Empty));
                     RestLog.Error(logBuilder);
                 }
                 throw;
             }
 
-            logBuilder.Append(" Duration:").Append(watch.Elapsed);
+            logBuilder.Append(" Duration: ").Append(watch.ElapsedMilliseconds).Append(" ms");
             if (!RestLog.IsDebugEnabled)
             {
                 RestLog.Info(logBuilder);
