@@ -30,7 +30,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         private static readonly ILog ExecutionLog = SdkLoggerFactory.GetLogger(typeof(RabbitMqChannel));
 
         /// <summary>
-        /// A <see cref="Sportradar.OddsFeed.SDK.API.Internal.IChannelFactory"/> used to construct the <see cref="IModel"/> representing Rabbit MQ channel
+        /// A <see cref="IChannelFactory"/> used to construct the <see cref="IModel"/> representing Rabbit MQ channel
         /// </summary>
         private readonly IChannelFactory _channelFactory;
 

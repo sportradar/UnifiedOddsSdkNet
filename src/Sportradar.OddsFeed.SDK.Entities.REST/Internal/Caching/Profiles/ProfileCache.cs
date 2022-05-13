@@ -518,10 +518,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                     var sportEventSummaryList = item as EntityList<SportEventSummaryDTO>;
                     if (sportEventSummaryList != null)
                     {
-                        foreach (var sportEventSummary in sportEventSummaryList.Items)
-                        {
-                            await SaveCompetitorsFromSportEventAsync(sportEventSummary, culture).ConfigureAwait(false);
-                        }
+                        var tasks = sportEventSummaryList.Items.Select(s => SaveCompetitorsFromSportEventAsync(s, culture));
+                        await Task.WhenAll(tasks).ConfigureAwait(false);
                         saved = true;
                     }
                     else
@@ -551,10 +549,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                     var ts = item as EntityList<TournamentInfoDTO>;
                     if (ts != null)
                     {
-                        foreach (var t1 in ts.Items)
-                        {
-                            await SaveCompetitorsFromSportEventAsync(t1, culture).ConfigureAwait(false);
-                        }
+                        var tasks = ts.Items.Select(s => SaveCompetitorsFromSportEventAsync(s, culture));
+                        await Task.WhenAll(tasks).ConfigureAwait(false);
                         saved = true;
                     }
                     else
@@ -576,10 +572,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             {
                 if (fixture.Competitors != null && fixture.Competitors.Any())
                 {
-                    foreach (var teamCompetitorDTO in fixture.Competitors)
-                    {
-                        await AddTeamCompetitorAsync(teamCompetitorDTO.Id, teamCompetitorDTO, culture, true).ConfigureAwait(false);
-                    }
+                    var tasks = fixture.Competitors.Select(s => AddTeamCompetitorAsync(s.Id, s, culture, true));
+                    await Task.WhenAll(tasks).ConfigureAwait(false);
                 }
                 return true;
             }
@@ -588,10 +582,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             {
                 if (match.Competitors != null && match.Competitors.Any())
                 {
-                    foreach (var teamCompetitorDTO in match.Competitors)
-                    {
-                        await AddTeamCompetitorAsync(teamCompetitorDTO.Id, teamCompetitorDTO, culture, true).ConfigureAwait(false);
-                    }
+                    var tasks = match.Competitors.Select(s => AddTeamCompetitorAsync(s.Id, s, culture, true));
+                    await Task.WhenAll(tasks).ConfigureAwait(false);
                 }
                 return true;
             }
@@ -600,10 +592,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             {
                 if (stage.Competitors != null && stage.Competitors.Any())
                 {
-                    foreach (var teamCompetitorDTO in stage.Competitors)
-                    {
-                        await AddTeamCompetitorAsync(teamCompetitorDTO.Id, teamCompetitorDTO, culture, true).ConfigureAwait(false);
-                    }
+                    var tasks = stage.Competitors.Select(s => AddTeamCompetitorAsync(s.Id, s, culture, true));
+                    await Task.WhenAll(tasks).ConfigureAwait(false);
                 }
                 return true;
             }
@@ -612,10 +602,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
             {
                 if (tour.Competitors != null && tour.Competitors.Any())
                 {
-                    foreach (var competitorDTO in tour.Competitors)
-                    {
-                        await AddCompetitorAsync(competitorDTO.Id, competitorDTO, culture, true).ConfigureAwait(false);
-                    }
+                    var tasks = tour.Competitors.Select(s => AddCompetitorAsync(s.Id, s, culture, true));
+                    await Task.WhenAll(tasks).ConfigureAwait(false);
                 }
                 if (tour.Groups != null && tour.Groups.Any())
                 {
@@ -623,10 +611,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                     {
                         if (tourGroup.Competitors != null && tourGroup.Competitors.Any())
                         {
-                            foreach (var tourGroupCompetitorDTO in tourGroup.Competitors)
-                            {
-                                await AddCompetitorAsync(tourGroupCompetitorDTO.Id, tourGroupCompetitorDTO, culture, true).ConfigureAwait(false);
-                            }
+                            var tasks = tourGroup.Competitors.Select(s => AddCompetitorAsync(s.Id, s, culture, true));
+                            await Task.WhenAll(tasks).ConfigureAwait(false);
                         }
                     }
                 }
@@ -686,10 +672,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
 
             if (item?.Players != null && item.Players.Any())
             {
-                foreach (var player in item.Players)
-                {
-                    await AddPlayerCompetitorAsync(player, item.Id, culture, false).ConfigureAwait(false);
-                }
+                var tasks = item.Players.Select(s => AddPlayerCompetitorAsync(s, item.Id, culture, false));
+                await Task.WhenAll(tasks).ConfigureAwait(false);
             }
         }
 
@@ -768,10 +752,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
 
             if (item?.Players != null && item.Players.Any())
             {
-                foreach (var player in item.Players)
-                {
-                    await AddPlayerCompetitorAsync(player, item.Id, culture, false).ConfigureAwait(false);
-                }
+                var tasks = item.Players.Select(s => AddPlayerCompetitorAsync(s, item.Id, culture, false));
+                await Task.WhenAll(tasks).ConfigureAwait(false);
             }
         }
 
@@ -837,10 +819,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
 
                 if (item?.Players != null && item.Players.Any())
                 {
-                    foreach (var player in item.Players)
-                    {
-                        await AddPlayerProfileAsync(player, id, culture, false).ConfigureAwait(false);
-                    }
+                    var tasks = item.Players.Select(s => AddPlayerProfileAsync(s, id, culture, false));
+                    await Task.WhenAll(tasks).ConfigureAwait(false);
                 }
             }
             else
@@ -849,10 +829,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
 
                 if (item.Players != null && item.Players.Any())
                 {
-                    foreach (var player in item.Players)
-                    {
-                        await AddPlayerProfileAsync(player, id, culture, false).ConfigureAwait(false);
-                    }
+                    var tasks = item.Players.Select(s => AddPlayerProfileAsync(s, id, culture, false));
+                    await Task.WhenAll(tasks).ConfigureAwait(false);
                 }
             }
         }
