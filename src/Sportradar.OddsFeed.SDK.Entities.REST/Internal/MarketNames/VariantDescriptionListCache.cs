@@ -155,7 +155,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 }
                 if (ex is TaskCanceledException)
                 {
-                    ExecutionLog.Warn("An error occurred while periodically fetching variant market descriptions because the object graph is being disposed.");
+                    ExecutionLog.Warn("An error occurred while periodically fetching variant market descriptions because the object graph is being disposed.", ex);
                     return;
                 }
                 ExecutionLog.Warn("An error occurred while periodically fetching variant market description.", ex);
@@ -320,7 +320,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             }
             catch (Exception ex)
             {
-                ExecutionLog.Warn($"An error occurred while fetching market descriptions variant list. The exception:{ex.Message}");
+                ExecutionLog.Warn($"An error occurred while fetching market descriptions variant list.", ex);
                 return false;
             }
             return true;

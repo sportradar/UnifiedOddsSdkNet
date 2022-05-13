@@ -147,7 +147,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             }
             catch (FeedSdkException ex)
             {
-                ExecutionLog.Warn($"An exception occurred while attempting to retrieve match statuses. Exception was: {ex}");
+                ExecutionLog.Warn("An exception occurred while attempting to retrieve match statuses.", ex);
             }
             catch (ObjectDisposedException ex)
             {

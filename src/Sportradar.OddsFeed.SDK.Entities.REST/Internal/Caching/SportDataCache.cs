@@ -152,19 +152,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             }
             catch (FeedSdkException ex)
             {
-                ExecutionLog.Warn($"An exception occurred while attempting to fetch sport data for: {string.Join(",", cultureInfos)}. Exception was: {ex}");
+                ExecutionLog.Warn($"An exception occurred while attempting to fetch sport data for: {string.Join(",", cultureInfos)}.", ex);
             }
             catch (ObjectDisposedException)
             {
                 ExecutionLog.Warn($"An exception occurred while attempting to fetch sport data for: {string.Join(",", cultureInfos)}. DataProvider was already disposed.");
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException ex)
             {
-                ExecutionLog.Warn($"An exception occurred while attempting to fetch sport data for: {string.Join(",", cultureInfos)}. Task canceled. DataProvider was already disposed.");
+                ExecutionLog.Warn($"An exception occurred while attempting to fetch sport data for: {string.Join(",", cultureInfos)}. Task canceled.", ex);
             }
             catch (Exception ex)
             {
-                ExecutionLog.Warn($"An exception occurred while attempting to fetch sport data for: {string.Join(",", cultureInfos)}. Exception: {ex}");
+                ExecutionLog.Warn($"An exception occurred while attempting to fetch sport data for: {string.Join(",", cultureInfos)}.", ex);
             }
             finally
             {
@@ -426,7 +426,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             }
             catch (Exception ex)
             {
-                ExecutionLog.Warn($"An exception occurred while attempting to fetch sports data for: {string.Join(",", missingCultures)}. Exception: {ex}");
+                ExecutionLog.Warn($"An exception occurred while attempting to fetch sports data for: {string.Join(",", missingCultures)}.", ex);
                 throw;
             }
             finally
@@ -468,7 +468,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             }
             catch (Exception ex)
             {
-                ExecutionLog.Warn($"An exception occurred while attempting to fetch sport data for: id={id}, cultures={string.Join(",", cultureList)}. Exception: {ex}");
+                ExecutionLog.Warn($"An exception occurred while attempting to fetch sport data for: id={id}, cultures={string.Join(",", cultureList)}.", ex);
                 throw;
             }
             finally
@@ -512,7 +512,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             }
             catch (Exception ex)
             {
-                ExecutionLog.Warn($"An exception occurred while attempting to fetch category data for: id={id}, cultures={string.Join(",", cultureList)}. Exception: {ex}");
+                ExecutionLog.Warn($"An exception occurred while attempting to fetch category data for: id={id}, cultures={string.Join(",", cultureList)}.", ex);
             }
             finally
             {
@@ -552,7 +552,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             }
             catch (Exception ex)
             {
-                ExecutionLog.Warn($"An exception occurred while attempting to fetch sport data for tournament: id={tournamentId}, cultures={string.Join(",", cultureList)}. Exception: {ex}");
+                ExecutionLog.Warn($"An exception occurred while attempting to fetch sport data for tournament: id={tournamentId}, cultures={string.Join(",", cultureList)}.", ex);
                 return null;
             }
             finally

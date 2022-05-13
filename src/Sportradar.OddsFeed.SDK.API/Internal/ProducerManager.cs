@@ -302,7 +302,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                Log.Warn($"Event handler throw an exception while invoking RecoveryInitiated. Exception: {ex.Message}", ex);
+                Log.Warn($"Event handler throw an exception while invoking RecoveryInitiated.", ex);
             }
         }
     }

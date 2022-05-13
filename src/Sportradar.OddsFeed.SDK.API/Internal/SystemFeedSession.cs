@@ -195,7 +195,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             }
             catch (Exception ex)
             {
-                _log.Warn($"Client threw an exception when handling event {eventName}. Exception: {ex}");
+                _log.Warn($"Client threw an exception when handling event {eventName}.", ex);
             }
         }
 

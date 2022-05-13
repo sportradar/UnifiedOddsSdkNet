@@ -175,13 +175,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 {
                     ExecutionLog.Warn($"Periodic events schedule retrieval failed because the instance {ex.ObjectName} is being disposed.");
                 }
-                catch (TaskCanceledException)
+                catch (TaskCanceledException ex)
                 {
-                    ExecutionLog.Warn("Periodic events schedule retrieval failed because the instance is being disposed.");
+                    ExecutionLog.Warn("Periodic events schedule retrieval failed because the task was canceled.", ex);
                 }
                 catch (FeedSdkException ex)
                 {
-                    ExecutionLog.Warn($"An exception occurred while attempting to retrieve schedule.", ex);
+                    ExecutionLog.Warn("An exception occurred while attempting to retrieve schedule.", ex);
                 }
                 catch (AggregateException ex)
                 {
@@ -193,7 +193,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 }
                 catch (Exception ex)
                 {
-                    ExecutionLog.Warn($"An exception occurred while attempting to retrieve schedule.", ex);
+                    ExecutionLog.Warn("An exception occurred while attempting to retrieve schedule.", ex);
                 }
             }
 

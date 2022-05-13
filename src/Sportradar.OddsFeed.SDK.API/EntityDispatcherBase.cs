@@ -37,7 +37,7 @@ namespace Sportradar.OddsFeed.SDK.API
         {
             if (handler == null)
             {
-                Log.Warn($"Cannot dispatch message {message.GetType().Name} because no event listeners are attached to associated event handler. Dropping message[{message}]");
+                Log.Warn($"Cannot dispatch message {message.GetType().Name} because no event listeners are attached to associated event handler. Dropping message [{message}]");
                 return;
             }
 
@@ -46,12 +46,12 @@ namespace Sportradar.OddsFeed.SDK.API
             {
                 handler(this, eventArgs);
                 stopwatch.Stop();
-                Log.Info($"Successfully dispatched message[{message}]. Duration: {stopwatch.ElapsedMilliseconds} ms.");
+                Log.Info($"Successfully dispatched message [{message}]. Duration: {stopwatch.ElapsedMilliseconds} ms.");
             }
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                Log.Warn($"Event handler throw an exception while processing message[{message}]. Exception: {ex.Message}", ex);
+                Log.Warn($"Event handler throw an exception while processing message [{message}].", ex);
             }
         }
 
@@ -85,7 +85,7 @@ namespace Sportradar.OddsFeed.SDK.API
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                Log.Warn($"Event handler throw an exception while processing message {messageName}. Exception: {ex.Message}", ex);
+                Log.Warn($"Event handler throw an exception while processing message {messageName}.", ex);
             }
         }
     }

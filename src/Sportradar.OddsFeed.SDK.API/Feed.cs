@@ -364,7 +364,7 @@ namespace Sportradar.OddsFeed.SDK.API
             }
             catch (Exception ex)
             {
-                _log.Warn($"Error happened during closing feed. Exception: {ex}");
+                _log.Warn("Error happened during closing feed.", ex);
 
                 if (InternalConfig.ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
                 {
@@ -582,7 +582,7 @@ namespace Sportradar.OddsFeed.SDK.API
                 }
                 catch (Exception ex)
                 {
-                    _log.Warn("An exception has occurred while disposing the feed instance. Exception: ", ex);
+                    _log.Warn("An exception has occurred while disposing the feed instance.", ex);
                 }
             }
 

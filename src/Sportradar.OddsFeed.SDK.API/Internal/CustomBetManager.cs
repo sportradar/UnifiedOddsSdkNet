@@ -48,7 +48,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             }
             catch (CommunicationException ce)
             {
-                _executionLog.Warn($"Event[{eventId}] getting available selections failed, CommunicationException: {ce.Message}");
+                _executionLog.Warn($"Event[{eventId}] getting available selections failed, CommunicationException: {ce.Message}", ce);
                 throw;
             }
             catch (Exception e)
@@ -72,12 +72,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             }
             catch (CommunicationException ce)
             {
-                _executionLog.Warn($"Calculating probabilities failed, CommunicationException: {ce.Message}");
+                _executionLog.Warn($"Calculating probabilities failed, CommunicationException: {ce.Message}", ce);
                 throw;
             }
             catch (Exception e)
             {
-                _executionLog.Warn($"Calculating probabilities failed.", e);
+                _executionLog.Warn("Calculating probabilities failed.", e);
                 throw;
             }
         }

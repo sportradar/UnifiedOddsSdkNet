@@ -74,7 +74,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             }
             catch (CommunicationException ce)
             {
-                _executionLog.Warn($"Event[{eventId}] booking failed, CommunicationException: {ce.Message}");
+                _executionLog.Warn($"Event[{eventId}] booking failed, CommunicationException: {ce.Message}", ce);
             }
             catch (Exception e)
             {

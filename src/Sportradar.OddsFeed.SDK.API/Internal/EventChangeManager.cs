@@ -238,7 +238,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 }
                 catch (Exception ex)
                 {
-                    LogExec.Error($"Error fetching fixture changes. Exception={ex.Message}");
+                    LogExec.Error("Error fetching fixture changes.", ex);
                 }
             }
 
@@ -318,7 +318,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 }
                 catch (Exception ex)
                 {
-                    LogExec.Error($"Error fetching result changes. Exception={ex.Message}");
+                    LogExec.Error("Error fetching result changes.", ex);
                 }
             }
 
@@ -366,9 +366,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
                     _eventUpdates.TryRemove(eventUpdate.Key, out bool _);
                 }
-                catch (Exception exception)
+                catch (Exception ex)
                 {
-                    LogExec.Warn($"Error during user processing of event {updateStr} change message: {exception.Message}");
+                    LogExec.Warn($"Error during user processing of event {updateStr} change message.", ex);
                 }
             }
             _isDispatching = false;

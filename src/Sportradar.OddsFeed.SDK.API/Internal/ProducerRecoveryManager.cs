@@ -341,7 +341,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 }
                 catch (Exception ex)
                 {
-                    ExecutionLog.Error($"An unexpected exception occurred while processing user message. Producer={_producer.Id}, Session={interest.Name}, Message={message}, Exception:", ex);
+                    ExecutionLog.Error($"An unexpected exception occurred while processing user message. Producer={_producer.Id}, Session={interest.Name}, Message={message}", ex);
                 }
 
                 if (newStatus != null && newStatus.Value != Status)
@@ -459,7 +459,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 }
                 catch (Exception ex)
                 {
-                    ExecutionLog.Error($"An unexpected exception occurred while processing system message. Producer={_producer.Id}, message={message}. Exception:", ex);
+                    ExecutionLog.Error($"An unexpected exception occurred while processing system message. Producer={_producer.Id}, message={message}", ex);
                 }
 
                 if (newStatus != null && newStatus.Value != Status)

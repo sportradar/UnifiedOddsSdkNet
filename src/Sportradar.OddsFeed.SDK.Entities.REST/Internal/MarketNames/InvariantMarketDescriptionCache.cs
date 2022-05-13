@@ -346,7 +346,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             }
             catch (Exception ex)
             {
-                ExecutionLog.Warn($"An error occurred while fetching market descriptions. The exception:{ex.Message}");
+                ExecutionLog.Warn($"An error occurred while fetching market descriptions.", ex);
                 return false;
             }
             return true;
