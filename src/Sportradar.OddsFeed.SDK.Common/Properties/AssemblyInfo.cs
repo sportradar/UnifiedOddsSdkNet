@@ -25,6 +25,8 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("6f77b6eb-9d03-4419-8031-6e9a674d8dc0")]
 
+[assembly: InternalsVisibleTo("Sportradar.OddsFeed.SDK.API")]
+[assembly: InternalsVisibleTo("Sportradar.OddsFeed.SDK.Entities")]
 [assembly: InternalsVisibleTo("Sportradar.OddsFeed.SDK.API.Test")]
 [assembly: InternalsVisibleTo("Sportradar.OddsFeed.SDK.Common.Test")]
 

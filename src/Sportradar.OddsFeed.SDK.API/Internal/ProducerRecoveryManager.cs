@@ -184,7 +184,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 // the recovery was interrupted
                 if (recoveryResult.InterruptedAt.HasValue)
                 {
-                    ExecutionLog.Warn($"Recovery with requestId={snapshotCompleted.request_id} for producer={Producer.Id} completed with interruption at:{recoveryResult.InterruptedAt.Value}");
+                    ExecutionLog.Warn($"Recovery with requestId={snapshotCompleted.request_id} for producer={Producer.Id} completed with interruption at: {recoveryResult.InterruptedAt.Value}");
                     _producer.SetLastTimestampBeforeDisconnect(recoveryResult.InterruptedAt.Value);
                     return ProducerRecoveryStatus.Error;
                 }
@@ -428,7 +428,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                             {
                                 Debug.Assert(Status == ProducerRecoveryStatus.Started);
                                 var timestamp = SdkInfo.FromEpochTime(previousAliveTimestamp);
-                                ExecutionLog.Info($"Producer={_producer.Id}: Recovery operation interrupted. Current status={Enum.GetName(typeof(ProducerRecoveryStatus), Status)}, Timestamp={timestamp}.");
+                                ExecutionLog.Warn($"Producer={_producer.Id}: Recovery operation interrupted. Current status={Enum.GetName(typeof(ProducerRecoveryStatus), Status)}, Timestamp={timestamp}.");
                                 _recoveryOperation.Interrupt(timestamp);
                             }
                             else

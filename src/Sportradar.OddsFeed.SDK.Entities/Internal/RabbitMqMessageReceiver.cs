@@ -8,11 +8,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Common.Logging;
-using Metrics;
 using RabbitMQ.Client.Events;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Common.Internal.Metrics;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.EventArguments;
@@ -130,9 +130,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             string messageName;
             try
             {
-                using (var t = Metric.Context("FEED")
-                    .Timer("Message deserialization time", Unit.Items, SamplingType.Default, TimeUnit.Minutes)
-                    .NewContext(eventArgs.RoutingKey))
+                using (var t = MetricsSettings.TimerMessageDeserialize.NewContext(eventArgs.RoutingKey))
                 {
                     messageBody = Encoding.UTF8.GetString(eventArgs.Body);
                     feedMessage = _deserializer.Deserialize(new MemoryStream(eventArgs.Body));
@@ -162,8 +160,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                             outcomeCounts = betSettlement.outcomes?.Where(w=> w.Items!=null).SelectMany(list => list.Items).Count() ?? 0;
                         }
 
-                        ExecutionLog.Debug(
-                            $"Deserialization of {feedMessage.GetType().Name} for {feedMessage.EventId} ({feedMessage.GeneratedAt}) and sport {sportId} took {t.Elapsed.TotalMilliseconds}ms. Markets={marketCounts}, Outcomes={outcomeCounts}");
+                        ExecutionLog.Debug($"Deserialization of {feedMessage.GetType().Name} for {feedMessage.EventId} ({feedMessage.GeneratedAt}) and sport {sportId} took {t.Elapsed.TotalMilliseconds}ms. Markets={marketCounts}, Outcomes={outcomeCounts}");
                     }
                 }
 
@@ -186,19 +183,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                                              : feedMessage.GeneratedAt;
                 }
                 feedMessage.ReceivedAt = receivedAt;
-                Metric.Context("FEED").Meter("Message received", Unit.Items).Mark(messageName);
+                MetricsSettings.MeterMessageConsume.Mark(messageName);
             }
             catch (DeserializationException ex)
             {
                 ExecutionLog.Error($"Failed to parse message. RoutingKey={eventArgs.RoutingKey} Message: {messageBody}", ex);
-                Metric.Context("FEED").Meter("Message deserialization exception", Unit.Items).Mark();
+                MetricsSettings.MeterMessageDeserializeException.Mark(eventArgs.RoutingKey);
                 RaiseDeserializationFailed(eventArgs.Body);
                 return;
             }
             catch (Exception ex)
             {
                 ExecutionLog.Error($"Error consuming feed message. RoutingKey={eventArgs.RoutingKey} Message: {messageBody}", ex);
-                Metric.Context("FEED").Meter("Exception consuming feed message", Unit.Items).Mark(eventArgs.RoutingKey);
+                MetricsSettings.MeterMessageConsumeException.Mark(eventArgs.RoutingKey);
                 RaiseDeserializationFailed(eventArgs.Body);
                 return;
             }
@@ -206,11 +203,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             // send RawFeedMessage if needed
             try
             {
-                if (producer.IsAvailable && !producer.IsDisabled)
+                if (producer.IsAvailable && !producer.IsDisabled && RawFeedMessageReceived != null)
                 {
-                    //ExecutionLog.LogDebug($"Raw msg [{_interest}]: {feedMessage.GetType().Name} for event {feedMessage.EventId}.");
-                    var args = new RawFeedMessageEventArgs(eventArgs.RoutingKey, feedMessage, sessionName);
-                    RawFeedMessageReceived?.Invoke(this, args);
+                    using (MetricsSettings.TimerRawFeedDataDispatch.NewContext(eventArgs.RoutingKey))
+                    {
+                        var args = new RawFeedMessageEventArgs(eventArgs.RoutingKey, feedMessage, sessionName);
+                        RawFeedMessageReceived?.Invoke(this, args);
+                    }
                 }
             }
             catch (Exception e)
