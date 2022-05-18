@@ -106,11 +106,28 @@ namespace Sportradar.OddsFeed.SDK.Messages.Feed
             builder.Append(", GeneratedAt=").Append(GeneratedAt);
             //builder.Append(", SentAt=").Append(SentAt);
             builder.Append(", ReceivedAt=").Append(ReceivedAt);
+            builder.Append(", Age=").Append(GetMessageAge(GeneratedAt, ReceivedAt));
             if (RequestId.HasValue)
             {
                 builder.Append(", RequestId=").Append(RequestId.Value);
             }
             return builder.ToString();
+        }
+
+        /// <summary>
+        /// Get the feed message age; how behind is at the time of consuming by the sdk
+        /// </summary>
+        /// <param name="generatedAt">The generatedAt timestamp from the message</param>
+        /// <param name="receivedAt">The timestamp when message consumed by the sdk</param>
+        /// <returns>The difference in ms</returns>
+        private long GetMessageAge(long generatedAt, long receivedAt)
+        {
+            var age = receivedAt - generatedAt;
+            if (age < 0)
+            {
+                age = 0;
+            }
+            return age;
         }
     }
 
