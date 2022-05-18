@@ -198,7 +198,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
                 var dateTime = FromEpochTime(epochTime);
                 return dateTime;
             }
-            catch (Exception)
+            catch
             {
                 //ignored
             }
@@ -390,6 +390,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <param name="baseValue">The base value</param>
         /// <param name="variablePercent">The max percent to deviate from base value</param>
         /// <returns>The new value within min-max</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "SCS0005:Weak random number generator.", Justification = "Not critical")]
         public static int GetVariableNumber(int baseValue, int variablePercent = 5)
         {
             if (baseValue < 1 || variablePercent == 0)
@@ -428,6 +429,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <param name="baseValue">The base value</param>
         /// <param name="variablePercent">The max percent to deviate from base value</param>
         /// <returns>The new value within base-max</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "SCS0005:Weak random number generator.", Justification = "Not critical")]
         public static int AddVariableNumber(int baseValue, int variablePercent = 5)
         {
             if (baseValue < 1 || variablePercent == 0)
