@@ -1,15 +1,15 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
 using Sportradar.OddsFeed.SDK.Messages.EventArguments;
+using System;
 
 namespace Sportradar.OddsFeed.SDK.API.Extended
 {
     /// <summary>
     /// Represent an extended unified odds feed
     /// </summary>
-    public interface IOddsFeedExt : IOddsFeedV5
+    public interface IOddsFeedExt : IOddsFeedV6
     {
         /// <summary>
         /// Occurs when any feed message arrives

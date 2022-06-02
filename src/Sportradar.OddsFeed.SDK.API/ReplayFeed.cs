@@ -1,8 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using Sportradar.OddsFeed.SDK.API.Internal;
 using Microsoft.Practices.Unity;
+using Sportradar.OddsFeed.SDK.API.Internal;
 
 namespace Sportradar.OddsFeed.SDK.API
 {
@@ -40,7 +40,7 @@ namespace Sportradar.OddsFeed.SDK.API
                 return;
             }
             base.InitFeed();
-            ((ProducerManager) ProducerManager).SetIgnoreRecovery(0);
+            ((ProducerManager)ProducerManager).SetIgnoreRecovery(0);
         }
     }
 }

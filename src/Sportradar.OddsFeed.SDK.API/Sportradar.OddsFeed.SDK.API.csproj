@@ -173,6 +173,7 @@
     <Compile Include="Internal\Replay\ReplayEvent.cs" />
     <Compile Include="Internal\TimestampTracker.cs" />
     <Compile Include="Extended\IOddsFeedExt.cs" />
+    <Compile Include="IOddsFeedV6.cs" />
     <Compile Include="IOddsFeedV5.cs" />
     <Compile Include="IOddsFeedV4.cs" />
     <Compile Include="IOddsFeedV3.cs" />

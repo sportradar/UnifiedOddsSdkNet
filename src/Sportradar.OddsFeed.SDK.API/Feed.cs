@@ -29,7 +29,7 @@ namespace Sportradar.OddsFeed.SDK.API
     /// <summary>
     /// A <see cref="IOddsFeed"/> implementation acting as an entry point to the odds feed SDK
     /// </summary>
-    public class Feed : EntityDispatcherBase, IOddsFeedV5, IGlobalEventDispatcher
+    public class Feed : EntityDispatcherBase, IOddsFeedV6, IGlobalEventDispatcher
     {
         /// <summary>
         /// A <see cref="ILog"/> instance used for execution logging
@@ -535,61 +535,6 @@ namespace Sportradar.OddsFeed.SDK.API
         }
 
         /// <summary>
-        /// Closes the current <see cref="Feed"/> instance and disposes resources used by it
-        /// </summary>
-        public void Close()
-        {
-            Dispose();
-        }
-
-        /// <summary>
-        /// Disposes the current instance and resources associated with it
-        /// </summary>
-        /// <param name="disposing">Value indicating whether the managed resources should also be disposed</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_isDisposed)
-            {
-                return;
-            }
-
-            if (_connectionFactory != null)
-            {
-                DetachFromConnectionEvents();
-            }
-
-            if (_feedRecoveryManager != null)
-            {
-                _feedRecoveryManager.ProducerDown -= MarkProducerAsDown;
-                _feedRecoveryManager.ProducerUp -= MarkProducerAsUp;
-                _feedRecoveryManager.CloseFeed -= OnCloseFeed;
-                _feedRecoveryManager.EventRecoveryCompleted -= OnEventRecoveryCompleted;
-                _feedRecoveryManager.Close();
-            }
-
-            foreach (var session in Sessions)
-            {
-                session.Close();
-            }
-
-            EventChangeManager.Stop();
-
-            if (disposing)
-            {
-                try
-                {
-                    UnityContainer.Dispose();
-                }
-                catch (Exception ex)
-                {
-                    _log.Warn("An exception has occurred while disposing the feed instance.", ex);
-                }
-            }
-
-            _isDisposed = true;
-        }
-
-        /// <summary>
         /// Opens the current feed by opening all created sessions
         /// </summary>
         /// <exception cref="ObjectDisposedException"></exception>
@@ -694,6 +639,67 @@ namespace Sportradar.OddsFeed.SDK.API
                 Interlocked.CompareExchange(ref _opened, 0, 1);
                 throw;
             }
+        }
+
+        /// <inheritdoc />
+        public bool IsOpen()
+        {
+            return _opened == 1;
+        }
+
+        /// <summary>
+        /// Closes the current <see cref="Feed"/> instance and disposes resources used by it
+        /// </summary>
+        public void Close()
+        {
+            Dispose();
+        }
+
+        /// <summary>
+        /// Disposes the current instance and resources associated with it
+        /// </summary>
+        /// <param name="disposing">Value indicating whether the managed resources should also be disposed</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_isDisposed)
+            {
+                return;
+            }
+
+            if (_connectionFactory != null)
+            {
+                DetachFromConnectionEvents();
+            }
+
+            if (_feedRecoveryManager != null)
+            {
+                _feedRecoveryManager.ProducerDown -= MarkProducerAsDown;
+                _feedRecoveryManager.ProducerUp -= MarkProducerAsUp;
+                _feedRecoveryManager.CloseFeed -= OnCloseFeed;
+                _feedRecoveryManager.EventRecoveryCompleted -= OnEventRecoveryCompleted;
+                _feedRecoveryManager.Close();
+            }
+
+            foreach (var session in Sessions)
+            {
+                session.Close();
+            }
+
+            EventChangeManager.Stop();
+
+            if (disposing)
+            {
+                try
+                {
+                    UnityContainer.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    _log.Warn("An exception has occurred while disposing the feed instance.", ex);
+                }
+            }
+
+            _isDisposed = true;
         }
 
         private void AttachToConnectionEvents()
