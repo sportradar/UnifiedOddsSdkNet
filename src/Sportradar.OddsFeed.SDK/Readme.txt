@@ -9,6 +9,14 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2022-06-02  1.53.0
+Improvements for saving api data within caches (single item and for list of items)
+Changed the timestamp for periodic deletion of old event from cache (to now-12h)
+Improved logging format in LogHttpDataFetcher and SportDataProvider
+Improved logging for exceptions and warnings
+Added Age to FeedMessage string
+Added isOpen to OddsFeed (extended with IOddsFeedV6)
+
 2022-04-26  1.52.0
 Separate HttpClient for critical (summary, player profile, competitor profile and variant market description) and other requests
 Added configuration option for fast HttpClient in OperationManager (default timeout 5s)
