@@ -2,11 +2,6 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Common.Logging;
 using Dawn;
 using RabbitMQ.Client;
@@ -15,6 +10,11 @@ using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -76,7 +76,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         private readonly ITimer _timer;
 
         private readonly TimeSpan _maxTimeBetweenMessages;
-        
+
         private readonly string _accessToken;
 
         /// <summary>
@@ -187,10 +187,11 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             var interestName = _interest == null ? "system" : _interest.Name;
             _channel.ModelShutdown += ChannelOnModelShutdown;
             _consumer = new EventingBasicConsumer(_channel);
-            _consumer.ConsumerTag = $"UfSdk-Net|{SdkInfo.GetVersion()}|{interestName}|{_channel.ChannelNumber}|{DateTime.Now:yyyyMMdd-HHmmss}";
+            _consumer.ConsumerTag = $"UfSdk-Net|{SdkInfo.GetVersion()}|{interestName}|{_channel.ChannelNumber}|{DateTime.Now:yyyyMMdd-HHmmss}|{SdkInfo.GetGuid(8)}";
             _consumer.Received += ConsumerOnDataReceived;
             _consumer.Shutdown += ConsumerOnShutdown;
             _channel.BasicConsume(declareResult.QueueName, true, _consumer.ConsumerTag, _consumer);
+            ExecutionLog.Info($"BasicConsume for channel={_channel.ChannelNumber}, queue={declareResult.QueueName} and consumer tag {_consumer.ConsumerTag} executed.");
 
             _lastMessageReceived = DateTime.MinValue;
             _channelStarted = DateTime.Now;
@@ -217,7 +218,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
         private void OnTimerElapsed(object sender, EventArgs e)
         {
-            Task.Run(async () => {
+            Task.Run(async () =>
+            {
                 await OnTimerElapsedAsync().ConfigureAwait(false);
             });
         }
