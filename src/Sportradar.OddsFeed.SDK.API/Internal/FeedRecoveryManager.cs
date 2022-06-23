@@ -1,12 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Collections.Generic;
-using Dawn;
-using System.Linq;
-using System.Threading;
 using Common.Logging;
+using Dawn;
 using Metrics;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.Common;
@@ -15,6 +11,10 @@ using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
 using Sportradar.OddsFeed.SDK.Messages;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -179,7 +179,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="e">The <see cref="TrackerStatusChangeEventArgs"/>Additional information about the event.</param>
         private void OnRecoveryTrackerStatusChanged(object sender, TrackerStatusChangeEventArgs e)
         {
-            var tracker = (IProducerRecoveryManager) sender;
+            var tracker = (IProducerRecoveryManager)sender;
             if (e.NewStatus == ProducerRecoveryStatus.Started)
             {
                 foreach (var sessionMessageManager in _sessionMessageManagers)
@@ -230,17 +230,19 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         {
             Guard.Argument(interests, nameof(interests)).NotNull();//.NotEmpty();
             if (!interests.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(interests));
+            }
 
             var interestList = interests as List<MessageInterest> ?? interests.ToList();
 
             // the LINQ query below might produce a list with same entries (one producer found more than once)
             var producersToOpen = from producer in _producerManager.Producers
-                where !producer.IsDisabled && producer.IsAvailable
-                let producerScopes = ((Producer) producer).Scope.Select(MessageInterest.FromScope).ToList()
-                from interest in interestList
-                where !interest.IsScopeInterest || producerScopes.Contains(interest)
-                select producer;
+                                  where !producer.IsDisabled && producer.IsAvailable
+                                  let producerScopes = ((Producer)producer).Scope.Select(MessageInterest.FromScope).ToList()
+                                  from interest in interestList
+                                  where !interest.IsScopeInterest || producerScopes.Contains(interest)
+                                  select producer;
 
             var producerRecoveryManagers = producersToOpen.Distinct(new ProducerEqualityComparer()).Select(p => _producerRecoveryManagerFactory.GetRecoveryTracker(p, interestList)).ToList();
 

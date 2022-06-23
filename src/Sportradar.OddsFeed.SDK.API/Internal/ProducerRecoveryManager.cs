@@ -1,19 +1,19 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using Dawn;
-using System.Threading.Tasks;
 using Common.Logging;
+using Dawn;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.Feed;
+using System;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -44,7 +44,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// A <see cref="object"/> used to ensure synchronous access to critical regions
         /// </summary>
         private readonly object _syncLock = new object();
-        
+
         /// <summary>
         /// A <see cref="SemaphoreSlim"/> used to synchronize status changes
         /// </summary>
@@ -125,7 +125,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 ExecutionLog.Debug($"{Producer.Name}: Attempting to set status to an existing value {Status}. Aborting ...");
                 return;
             }
-            
+
             ExecutionLog.Info($"{Producer.Name} Status changed from {oldStatus} to {newStatus}.");
 
             Status = newStatus;
@@ -587,6 +587,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
         private bool? StartRecovery()
         {
+            if (!_connectionDownTimestamp.Equals(DateTime.MinValue))
+            {
+                ExecutionLog.Warn($"Producer={_producer.Id}: Recovery operation skipped (feed connection is down).");
+                return null;
+            }
+
             var duration = TimeProviderAccessor.Current.Now - _recoveryOperation.LastAttemptTime;
 
             if (duration.TotalSeconds > _minIntervalBetweenRecoveryRequests)
