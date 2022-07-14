@@ -1,20 +1,20 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Diagnostics;
-using Dawn;
-using System.IO;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using Common.Logging;
+using Dawn;
 using Metrics;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Common.Internal.Metrics;
 using Sportradar.OddsFeed.SDK.Messages.REST;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -39,7 +39,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="connectionFailureLimit">Indicates the limit of consecutive request failures, after which it goes in "blocking mode"</param>
         /// <param name="connectionFailureTimeout">indicates the timeout after which comes out of "blocking mode" (in seconds)</param>
         public LogHttpDataFetcher(HttpClient client, string accessToken, ISequenceGenerator sequenceGenerator, IDeserializer<response> responseDeserializer, int connectionFailureLimit = 5, int connectionFailureTimeout = 15)
-            :base(client, accessToken, responseDeserializer, connectionFailureLimit, connectionFailureTimeout)
+            : base(client, accessToken, responseDeserializer, connectionFailureLimit, connectionFailureTimeout)
         {
             Guard.Argument(sequenceGenerator, nameof(sequenceGenerator)).NotNull();
             Guard.Argument(connectionFailureLimit, nameof(connectionFailureLimit)).Positive();
@@ -76,7 +76,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 watch.Stop();
                 if (ex.GetType() == typeof(CommunicationException))
                 {
-                    var commException = (CommunicationException) ex;
+                    var commException = (CommunicationException)ex;
                     logBuilder.Append(" ResponseCode:").Append(commException.ResponseCode);
                     logBuilder.Append(" Duration: ").Append(watch.ElapsedMilliseconds);
                     logBuilder.Append(" ms Response:").Append(commException.Response?.Replace("\n", string.Empty));
@@ -208,7 +208,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             watch.Stop();
             if (RestLog.IsDebugEnabled)
             {
-                RestLog.Debug($"Id:{dataId} Posting took {watch.ElapsedMilliseconds} ms. Response code: {(int) response.StatusCode}-{response.ReasonPhrase}.");
+                RestLog.Debug($"Id:{dataId} Posting took {watch.ElapsedMilliseconds} ms. Response code: {(int)response.StatusCode}-{response.ReasonPhrase}.");
             }
             else
             {

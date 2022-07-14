@@ -138,6 +138,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     _semaphoreStatusChange.Wait();
                     StatusChanged?.Invoke(this, new TrackerStatusChangeEventArgs(requestId, oldStatus, newStatus));
                 }
+                catch (Exception ex)
+                {
+                    ExecutionLog.Error($"{Producer.Name} Status change event failed.", ex);
+                }
                 finally
                 {
                     _semaphoreStatusChange.ReleaseSafe();
@@ -167,8 +171,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 return null;
             }
 
-            //Debug.Assert(Status == ProducerRecoveryStatus.Started);
-
             RecoveryResult recoveryResult;
             ExecutionLog.Debug($"SnapshotComplete[{"requestId" + snapshotCompleted.request_id}] for producer=[{"id=" + Producer.Id}] on session {interest.Name} received");
             if (!_recoveryOperation.TryComplete(interest, out recoveryResult))
@@ -184,13 +186,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 // the recovery was interrupted
                 if (recoveryResult.InterruptedAt.HasValue)
                 {
-                    ExecutionLog.Warn($"Recovery with requestId={snapshotCompleted.request_id} for producer={Producer.Id} completed with interruption at: {recoveryResult.InterruptedAt.Value}");
+                    ExecutionLog.Warn($"Recovery with requestId={snapshotCompleted.request_id} for producer={Producer.Id} completed with interruption at {recoveryResult.InterruptedAt.Value}");
                     _producer.SetLastTimestampBeforeDisconnect(recoveryResult.InterruptedAt.Value);
                     return ProducerRecoveryStatus.Error;
                 }
                 // the recovery was not interrupted
                 var recoveryDuration = TimeProviderAccessor.Current.Now - recoveryResult.StartTime;
-                ExecutionLog.Info($"Recovery with requestId={snapshotCompleted.request_id} for producer={Producer.Id} completed in {recoveryDuration.TotalSeconds} sec.");
+                ExecutionLog.Info($"Recovery with requestId={snapshotCompleted.request_id} for producer={Producer.Id} completed in {(int)recoveryDuration.TotalMilliseconds} ms.");
                 _producer.SetLastTimestampBeforeDisconnect(SdkInfo.FromEpochTime(snapshotCompleted.timestamp));
                 return _timestampTracker.IsBehind
                            ? ProducerRecoveryStatus.Delayed

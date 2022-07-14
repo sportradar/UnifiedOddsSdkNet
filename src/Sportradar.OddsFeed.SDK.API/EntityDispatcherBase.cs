@@ -1,11 +1,11 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Diagnostics;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Messages.Feed;
+using System;
+using System.Diagnostics;
 
 namespace Sportradar.OddsFeed.SDK.API
 {
@@ -51,7 +51,7 @@ namespace Sportradar.OddsFeed.SDK.API
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                Log.Warn($"Event handler throw an exception while processing message [{message}].", ex);
+                Log.Warn($"Event handler throw an exception while processing message [{message}]. Duration: {stopwatch.ElapsedMilliseconds} ms.", ex);
             }
         }
 
@@ -85,7 +85,7 @@ namespace Sportradar.OddsFeed.SDK.API
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                Log.Warn($"Event handler throw an exception while processing message {messageName}.", ex);
+                Log.Warn($"Event handler throw an exception while processing message {messageName}. Duration: {stopwatch.ElapsedMilliseconds} ms.", ex);
             }
         }
     }
