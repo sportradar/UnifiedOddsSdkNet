@@ -126,6 +126,8 @@
     <Compile Include="Internal\IncrementalSequenceGenerator.cs" />
     <Compile Include="Internal\ISequenceGenerator.cs" />
     <Compile Include="Internal\ITimer.cs" />
+    <Compile Include="Internal\LockHelper.cs" />
+    <Compile Include="Internal\LockManager.cs" />
     <Compile Include="Internal\Log\LogAttribute.cs" />
     <Compile Include="Internal\Log\LoggerType.cs" />
     <Compile Include="Internal\Log\LogProxy.cs" />

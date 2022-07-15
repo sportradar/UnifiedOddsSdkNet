@@ -1,16 +1,8 @@
 /*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using Dawn;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.Caching;
-using System.Threading;
-using System.Threading.Tasks;
 using Common.Logging;
+using Dawn;
 using Metrics;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
@@ -22,6 +14,14 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.Caching;
+using System.Threading;
+using System.Threading.Tasks;
 // ReSharper disable InconsistentlySynchronizedField
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
@@ -63,11 +63,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         private readonly IEnumerable<CultureInfo> _cultures;
 
         /// <summary>
-        /// A <see cref="object"/> to ensure thread safety when adding items to cache
-        /// </summary>
-        private readonly object _addLock = new object();
-
-        /// <summary>
         /// A <see cref="ITimer"/> instance used to trigger periodic cache refresh-es
         /// </summary>
         private readonly ITimer _timer;
@@ -86,6 +81,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// The special tournaments, which are not listed on All tournaments list, but are introduced by events on feed messages
         /// </summary>
         internal readonly ConcurrentBag<URN> SpecialTournaments;
+
+        internal LockManager LockManager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SportEventCache"/> class
@@ -109,7 +106,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             Guard.Argument(sportEventCacheItemFactory, nameof(sportEventCacheItemFactory)).NotNull();
             Guard.Argument(timer, nameof(timer)).NotNull();
             if (cultures == null || !cultures.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
+            }
 
             Cache = cache;
             _dataRouterManager = dataRouterManager;
@@ -122,6 +121,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
 
             SpecialTournaments = new ConcurrentBag<URN>();
 
+            LockManager = new LockManager(new ConcurrentDictionary<string, DateTime>(), TimeSpan.FromSeconds(30), TimeSpan.FromMilliseconds(200));
+
             _timer = timer;
             _timer.Elapsed += OnTimerElapsed;
             _timer.Start();
@@ -129,8 +130,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
 
         private void OnTimerElapsed(object sender, EventArgs e)
         {
-            Task.Run(async () => {
+            Task.Run(async () =>
+            {
                 await OnTimerElapsedAsync().ConfigureAwait(false);
+                LockManager.Clean();
             });
         }
 
@@ -147,7 +150,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             var date = DateTime.Now;
             for (var i = 0; i < 3; i++)
             {
-                if (_fetchedDates.Any(d=> (date-d).TotalDays < 1))
+                if (_fetchedDates.Any(d => (date - d).TotalDays < 1))
                 {
                     continue;
                 }
@@ -188,7 +191,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     var baseException = ex.GetBaseException();
                     if (baseException.GetType() == typeof(ObjectDisposedException))
                     {
-                        ExecutionLog.Warn($"Error happened during fetching schedule, because the instance {((ObjectDisposedException) baseException).ObjectName} is being disposed.");
+                        ExecutionLog.Warn($"Error happened during fetching schedule, because the instance {((ObjectDisposedException)baseException).ObjectName} is being disposed.");
                     }
                 }
                 catch (Exception ex)
@@ -226,32 +229,34 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             Metric.Context("CACHE").Meter("SportEventCache->GetEventCacheItem", Unit.Calls);
 
-            lock (_addLock)
+            LockManager.Wait(id.ToString());
+            try
             {
-                try
+                var item = (SportEventCI)Cache.Get(id.ToString());
+                if (item != null)
                 {
-                    var item = (SportEventCI) Cache.Get(id.ToString());
-                    if (item != null)
-                    {
-                        return item;
-                    }
-
-                    item = _sportEventCacheItemFactory.Build(id);
-
-                    AddNewCacheItem(item);
-
-                    // if there are events for non-standard tournaments (tournaments not on All tournaments for all sports)
-                    if (item is TournamentInfoCI && !SpecialTournaments.Contains(item.Id))
-                    {
-                        SpecialTournaments.Add(item.Id);
-                    }
-
                     return item;
                 }
-                catch (Exception ex)
+
+                item = _sportEventCacheItemFactory.Build(id);
+
+                AddNewCacheItem(item);
+
+                // if there are events for non-standard tournaments (tournaments not on All tournaments for all sports)
+                if (item is TournamentInfoCI && !SpecialTournaments.Contains(item.Id))
                 {
-                    ExecutionLog.Error($"Error getting cache item for id={id}", ex);
+                    SpecialTournaments.Add(item.Id);
                 }
+
+                return item;
+            }
+            catch (Exception ex)
+            {
+                ExecutionLog.Error($"Error getting cache item for id={id}", ex);
+            }
+            finally
+            {
+                LockManager.Release(id.ToString());
             }
             return null;
         }
@@ -335,7 +340,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             {
                 try
                 {
-                    tours.Add((TournamentInfoCI) _sportEventCacheItemFactory.Get(Cache.Get(key)));
+                    tours.Add((TournamentInfoCI)_sportEventCacheItemFactory.Get(Cache.Get(key)));
                 }
                 catch (Exception)
                 {
@@ -358,15 +363,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <returns>Number of deleted items</returns>
         public int DeleteSportEventsFromCache(DateTime before)
         {
-            lock (_addLock)
+            LockManager.Wait();
+            try
             {
                 var startCount = Cache.Count();
                 foreach (var keyValuePair in Cache)
                 {
                     try
                     {
-
-                        var ci = (SportEventCI) keyValuePair.Value;
+                        var ci = (SportEventCI)keyValuePair.Value;
                         if (ci.Scheduled != null)
                         {
                             if (ci.Scheduled < before)
@@ -382,7 +387,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                             }
                         }
                     }
-                    catch (Exception)
+                    catch
                     {
                         // ignored
                     }
@@ -391,6 +396,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 ExecutionLog.Info($"Deleted {startCount - endCount} items from cache (before={before}).");
                 return startCount - endCount;
             }
+            catch (Exception e)
+            {
+                ExecutionLog.Error("Error during DeleteSportEventsFromCache.", e);
+            }
+            finally
+            {
+                LockManager.Release();
+            }
+            return 0;
         }
 
         /// <summary>
@@ -612,7 +626,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     if (tourSeasons?.Tournament != null)
                     {
                         AddSportEvent(id, tourSeasons.Tournament, culture, requester, dtoType);
-                        var cacheItem = (TournamentInfoCI) _sportEventCacheItemFactory.Get(Cache.Get(id.ToString()));
+                        var cacheItem = (TournamentInfoCI)_sportEventCacheItemFactory.Get(Cache.Get(id.ToString()));
                         cacheItem.Merge(tourSeasons, culture, true);
 
                         if (tourSeasons.Seasons != null && tourSeasons.Seasons.Any())
@@ -665,7 +679,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     {
                         foreach (var l in lotteryList.Items)
                         {
-                           AddSportEvent(l.Id, l, culture, requester, dtoType);
+                            AddSportEvent(l.Id, l, culture, requester, dtoType);
                         }
                         saved = true;
                     }
@@ -743,14 +757,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="cacheItemType">The cache item type to be deleted</param>
         public override void CacheDeleteItem(URN id, CacheItemType cacheItemType)
         {
-            lock (_addLock)
+            if (cacheItemType == CacheItemType.All || cacheItemType == CacheItemType.SportEvent || cacheItemType == CacheItemType.Tournament)
             {
-                if (cacheItemType == CacheItemType.All
-                    || cacheItemType == CacheItemType.SportEvent
-                    || cacheItemType == CacheItemType.Tournament)
-                {
-                    Cache.Remove(id.ToString());
-                }
+                LockManager.Wait(id.ToString());
+                Cache.Remove(id.ToString());
+                LockManager.Release(id.ToString());
             }
         }
 
@@ -762,16 +773,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <returns><c>true</c> if exists, <c>false</c> otherwise</returns>
         public override bool CacheHasItem(URN id, CacheItemType cacheItemType)
         {
-            lock (_addLock)
+            var result = false;
+            if (cacheItemType == CacheItemType.All || cacheItemType == CacheItemType.SportEvent || cacheItemType == CacheItemType.Tournament)
             {
-                if (cacheItemType == CacheItemType.All
-                    || cacheItemType == CacheItemType.SportEvent
-                    || cacheItemType == CacheItemType.Tournament)
-                {
-                    return Cache.Contains(id.ToString());
-                }
-                return false;
+                LockManager.Wait(id.ToString());
+                result = Cache.Contains(id.ToString());
+                LockManager.Release(id.ToString());
             }
+
+            return result;
         }
 
         /// <summary>
@@ -856,7 +866,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             if (secondId != null && !Equals(tournamentDto.Id, secondId))
             {
                 var tourInfoDto = new TournamentInfoDTO(tournamentDto);
-                var newTournamentDto = new TournamentInfoDTO(tourInfoDto, tourInfoDto.Season != null, tourInfoDto.CurrentSeason!= null);
+                var newTournamentDto = new TournamentInfoDTO(tourInfoDto, tourInfoDto.Season != null, tourInfoDto.CurrentSeason != null);
                 await CacheAddDtoItemAsync(secondId, newTournamentDto, culture, DtoType.TournamentInfo, null).ConfigureAwait(false);
             }
         }
@@ -867,8 +877,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
 
             if (secondId != null && !Equals(tournamentDto.Id, secondId))
             {
-                var newTournamentDto = new TournamentInfoDTO(tournamentDto, tournamentDto.Season != null, tournamentDto.CurrentSeason!= null);
-               await CacheAddDtoItemAsync(secondId, newTournamentDto, culture, DtoType.TournamentInfo, null).ConfigureAwait(false);
+                var newTournamentDto = new TournamentInfoDTO(tournamentDto, tournamentDto.Season != null, tournamentDto.CurrentSeason != null);
+                await CacheAddDtoItemAsync(secondId, newTournamentDto, culture, DtoType.TournamentInfo, null).ConfigureAwait(false);
             }
         }
 
@@ -937,150 +947,31 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         private void AddSportEvent(URN id, SportEventSummaryDTO item, CultureInfo culture, ISportEventCI requester, DtoType dtoType)
         {
             TournamentInfoDTO tournamentInfoDTO = null;
-            lock (_addLock)
+            LockManager.Wait(id.ToString());
+            try
             {
-                try
+                var cacheItem = _sportEventCacheItemFactory.Get(Cache.Get(id.ToString()));
+
+                if (requester != null && !Equals(requester, cacheItem) && id.Equals(requester.Id))
                 {
-                    var cacheItem = _sportEventCacheItemFactory.Get(Cache.Get(id.ToString()));
-
-                    if (requester != null && !Equals(requester, cacheItem) && id.Equals(requester.Id))
+                    try
                     {
-                        try
-                        {
-                            var requesterMerged = false;
-                            var fixture = item as FixtureDTO;
-                            if (fixture != null)
-                            {
-                                if (requester.Id.TypeGroup == ResourceTypeGroup.MATCH)
-                                {
-                                    ((MatchCI) requester).MergeFixture(fixture, culture, true);
-                                }
-                                else if (requester.Id.TypeGroup == ResourceTypeGroup.STAGE)
-                                {
-                                    ((StageCI) requester).MergeFixture(fixture, culture, true);
-                                    if (fixture.ParentStage != null)
-                                    {
-                                        SaveParentStage(fixture.ParentStage.Id, fixture.ParentStage, fixture.Tournament, culture);
-                                    }
-                                    if (fixture.AdditionalParents != null && fixture.AdditionalParents.Any())
-                                    {
-                                        foreach (var parent in fixture.AdditionalParents)
-                                        {
-                                            SaveParentStage(parent.Id, parent, fixture.Tournament, culture);
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    ((TournamentInfoCI) requester).MergeFixture(fixture, culture, true);
-                                }
-                                requesterMerged = true;
-                            }
-                            if (!requesterMerged)
-                            {
-                                var match = item as MatchDTO;
-                                if (match != null)
-                                {
-                                    ((MatchCI) requester).Merge(match, culture, true);
-                                    requesterMerged = true;
-                                }
-                            }
-                            if (!requesterMerged)
-                            {
-                                var stage = item as StageDTO;
-                                if (stage != null)
-                                {
-                                    ((StageCI) requester).Merge(stage, culture, true);
-                                    if (stage.ParentStage != null)
-                                    {
-                                        SaveParentStage(stage.ParentStage.Id, stage.ParentStage, stage.Tournament, culture);
-                                    }
-                                    if (stage.AdditionalParents != null && stage.AdditionalParents.Any())
-                                    {
-                                        foreach (var parent in stage.AdditionalParents)
-                                        {
-                                            SaveParentStage(parent.Id, parent, stage.Tournament, culture);
-                                        }
-                                    }
-                                    requesterMerged = true;
-                                }
-                            }
-                            if (!requesterMerged)
-                            {
-                                var tour = item as TournamentInfoDTO;
-                                if (tour != null)
-                                {
-                                    var stageCI = requester as StageCI;
-                                    if (stageCI != null)
-                                    {
-                                        stageCI.Merge(tour, culture, true);
-                                        requesterMerged = true;
-                                    }
-                                    else
-                                    {
-                                        var tourCI = requester as TournamentInfoCI;
-                                        if (tourCI != null)
-                                        {
-                                            tourCI.Merge(tour, culture, true);
-                                            requesterMerged = true;
-                                        }
-                                    }
-                                }
-                            }
-                            if (!requesterMerged)
-                            {
-                                var draw = item as DrawDTO;
-                                if (draw != null)
-                                {
-                                    ((DrawCI) requester).Merge(draw, culture, true);
-                                    requesterMerged = true;
-                                }
-                            }
-                            if (!requesterMerged)
-                            {
-                                var lottery = item as LotteryDTO;
-                                if (lottery != null)
-                                {
-                                    ((LotteryCI) requester).Merge(lottery, culture, true);
-                                    if (lottery.DrawEvents != null && !lottery.DrawEvents.Any())
-                                    {
-                                        foreach (var drawEvent in lottery.DrawEvents)
-                                        {
-                                            SaveLotteryDraw(drawEvent, culture);
-                                        }
-                                    }
-                                    requesterMerged = true;
-                                }
-                            }
-                            if (!requesterMerged)
-                            {
-                                requester.Merge(item, culture, true);
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            ExecutionLog.Debug($"Merging failed for {id} and item type: {item.GetType().Name} and dto type: {dtoType} for requester: {requester.Id}.");
-                        }
-                    }
-
-                    if (cacheItem != null)
-                    {
-                        //ExecutionLog.Debug($"Saving OLD data for {id} and item type: {item.GetType().Name} and dto type: {dtoType}.");
-                        var merged = false;
+                        var requesterMerged = false;
                         var fixture = item as FixtureDTO;
                         if (fixture != null)
                         {
-                            if (cacheItem.Id.TypeGroup == ResourceTypeGroup.MATCH)
+                            if (requester.Id.TypeGroup == ResourceTypeGroup.MATCH)
                             {
-                                ((MatchCI)cacheItem).MergeFixture(fixture, culture, true);
+                                ((MatchCI)requester).MergeFixture(fixture, culture, true);
                             }
-                            else if (cacheItem.Id.TypeGroup == ResourceTypeGroup.STAGE)
+                            else if (requester.Id.TypeGroup == ResourceTypeGroup.STAGE)
                             {
-                                ((StageCI)cacheItem).MergeFixture(fixture, culture, true);
+                                ((StageCI)requester).MergeFixture(fixture, culture, true);
                                 if (fixture.ParentStage != null)
                                 {
                                     SaveParentStage(fixture.ParentStage.Id, fixture.ParentStage, fixture.Tournament, culture);
                                 }
+
                                 if (fixture.AdditionalParents != null && fixture.AdditionalParents.Any())
                                 {
                                     foreach (var parent in fixture.AdditionalParents)
@@ -1091,25 +982,33 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                             }
                             else
                             {
-                                ((TournamentInfoCI)cacheItem).MergeFixture(fixture, culture, true);
+                                ((TournamentInfoCI)requester).MergeFixture(fixture, culture, true);
                             }
-                            if (fixture.Tournament != null)
-                            {
-                                tournamentInfoDTO = new TournamentInfoDTO(fixture.Tournament);
-                            }
-                            merged = true;
+
+                            requesterMerged = true;
                         }
-                        if (!merged)
+
+                        if (!requesterMerged)
+                        {
+                            var match = item as MatchDTO;
+                            if (match != null)
+                            {
+                                ((MatchCI)requester).Merge(match, culture, true);
+                                requesterMerged = true;
+                            }
+                        }
+
+                        if (!requesterMerged)
                         {
                             var stage = item as StageDTO;
                             if (stage != null)
                             {
-                                ((StageCI) cacheItem).Merge(stage, culture, true);
-                                merged = true;
+                                ((StageCI)requester).Merge(stage, culture, true);
                                 if (stage.ParentStage != null)
                                 {
                                     SaveParentStage(stage.ParentStage.Id, stage.ParentStage, stage.Tournament, culture);
                                 }
+
                                 if (stage.AdditionalParents != null && stage.AdditionalParents.Any())
                                 {
                                     foreach (var parent in stage.AdditionalParents)
@@ -1117,58 +1016,50 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                                         SaveParentStage(parent.Id, parent, stage.Tournament, culture);
                                     }
                                 }
+
+                                requesterMerged = true;
                             }
                         }
-                        if (!merged)
+
+                        if (!requesterMerged)
                         {
                             var tour = item as TournamentInfoDTO;
                             if (tour != null)
                             {
-                                var stageCI = cacheItem as StageCI;
+                                var stageCI = requester as StageCI;
                                 if (stageCI != null)
                                 {
                                     stageCI.Merge(tour, culture, true);
-                                    merged = true;
+                                    requesterMerged = true;
                                 }
                                 else
                                 {
-                                    var tourCI = cacheItem as TournamentInfoCI;
+                                    var tourCI = requester as TournamentInfoCI;
                                     if (tourCI != null)
                                     {
                                         tourCI.Merge(tour, culture, true);
-                                        merged = true;
+                                        requesterMerged = true;
                                     }
                                 }
                             }
                         }
-                        if (!merged)
-                        {
-                            var match = item as MatchDTO;
-                            if (match != null)
-                            {
-                                ((MatchCI)cacheItem).Merge(match, culture, true);
-                                merged = true;
-                                if (match.Tournament != null)
-                                {
-                                    tournamentInfoDTO = new TournamentInfoDTO(match.Tournament);
-                                }
-                            }
-                        }
-                        if (!merged)
+
+                        if (!requesterMerged)
                         {
                             var draw = item as DrawDTO;
                             if (draw != null)
                             {
-                                ((DrawCI)cacheItem).Merge(draw, culture, true);
-                                merged = true;
+                                ((DrawCI)requester).Merge(draw, culture, true);
+                                requesterMerged = true;
                             }
                         }
-                        if (!merged)
+
+                        if (!requesterMerged)
                         {
                             var lottery = item as LotteryDTO;
                             if (lottery != null)
                             {
-                                ((LotteryCI)cacheItem).Merge(lottery, culture, true);
+                                ((LotteryCI)requester).Merge(lottery, culture, true);
                                 if (lottery.DrawEvents != null && !lottery.DrawEvents.Any())
                                 {
                                     foreach (var drawEvent in lottery.DrawEvents)
@@ -1176,49 +1067,193 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                                         SaveLotteryDraw(drawEvent, culture);
                                     }
                                 }
-                                merged = true;
+
+                                requesterMerged = true;
                             }
                         }
-                        if (!merged)
+
+                        if (!requesterMerged)
                         {
-                            cacheItem.Merge(item, culture, true);
+                            requester.Merge(item, culture, true);
                         }
                     }
-                    else
+                    catch (Exception)
                     {
-                        //ExecutionLog.Debug($"Saving NEW data for {id} and item type: {item.GetType().Name} and dto type: {dtoType}.");
-                        var ci = _sportEventCacheItemFactory.Build(item, culture);
-                        if (dtoType == DtoType.SportEventSummary || dtoType == DtoType.LotteryDraw || dtoType == DtoType.MatchSummary)
+                        ExecutionLog.Debug($"Merging failed for {id} and item type: {item.GetType().Name} and dto type: {dtoType} for requester: {requester.Id}.");
+                    }
+                }
+
+                if (cacheItem != null)
+                {
+                    //ExecutionLog.Debug($"Saving OLD data for {id} and item type: {item.GetType().Name} and dto type: {dtoType}.");
+                    var merged = false;
+                    var fixture = item as FixtureDTO;
+                    if (fixture != null)
+                    {
+                        if (cacheItem.Id.TypeGroup == ResourceTypeGroup.MATCH)
                         {
-                            ci.LoadedSummaries.Add(culture);
+                            ((MatchCI)cacheItem).MergeFixture(fixture, culture, true);
                         }
-                        else if (dtoType == DtoType.Fixture)
+                        else if (cacheItem.Id.TypeGroup == ResourceTypeGroup.STAGE)
                         {
-                            ci.LoadedFixtures.Add(culture);
-                        }
-                        AddNewCacheItem(ci);
-                        if (!ci.Id.Equals(id))
-                        {
-                            var tInfo = item as TournamentInfoDTO;
-                            if (tInfo != null)
+                            ((StageCI)cacheItem).MergeFixture(fixture, culture, true);
+                            if (fixture.ParentStage != null)
                             {
-                                var newTournamentDto = new TournamentInfoDTO(tInfo, tInfo.Season != null, tInfo.CurrentSeason!= null);
-                                var ci2 = _sportEventCacheItemFactory.Build(newTournamentDto, culture);
-                                AddNewCacheItem(ci2);
+                                SaveParentStage(fixture.ParentStage.Id, fixture.ParentStage, fixture.Tournament, culture);
+                            }
+
+                            if (fixture.AdditionalParents != null && fixture.AdditionalParents.Any())
+                            {
+                                foreach (var parent in fixture.AdditionalParents)
+                                {
+                                    SaveParentStage(parent.Id, parent, fixture.Tournament, culture);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ((TournamentInfoCI)cacheItem).MergeFixture(fixture, culture, true);
+                        }
+
+                        if (fixture.Tournament != null)
+                        {
+                            tournamentInfoDTO = new TournamentInfoDTO(fixture.Tournament);
+                        }
+
+                        merged = true;
+                    }
+
+                    if (!merged)
+                    {
+                        var stage = item as StageDTO;
+                        if (stage != null)
+                        {
+                            ((StageCI)cacheItem).Merge(stage, culture, true);
+                            merged = true;
+                            if (stage.ParentStage != null)
+                            {
+                                SaveParentStage(stage.ParentStage.Id, stage.ParentStage, stage.Tournament, culture);
+                            }
+
+                            if (stage.AdditionalParents != null && stage.AdditionalParents.Any())
+                            {
+                                foreach (var parent in stage.AdditionalParents)
+                                {
+                                    SaveParentStage(parent.Id, parent, stage.Tournament, culture);
+                                }
+                            }
+                        }
+                    }
+
+                    if (!merged)
+                    {
+                        var tour = item as TournamentInfoDTO;
+                        if (tour != null)
+                        {
+                            var stageCI = cacheItem as StageCI;
+                            if (stageCI != null)
+                            {
+                                stageCI.Merge(tour, culture, true);
+                                merged = true;
                             }
                             else
                             {
-                                var ci2 = _sportEventCacheItemFactory.Build(item, culture);
-                                ci2.Id = id;
-                                AddNewCacheItem(ci2);
+                                var tourCI = cacheItem as TournamentInfoCI;
+                                if (tourCI != null)
+                                {
+                                    tourCI.Merge(tour, culture, true);
+                                    merged = true;
+                                }
                             }
                         }
                     }
+
+                    if (!merged)
+                    {
+                        var match = item as MatchDTO;
+                        if (match != null)
+                        {
+                            ((MatchCI)cacheItem).Merge(match, culture, true);
+                            merged = true;
+                            if (match.Tournament != null)
+                            {
+                                tournamentInfoDTO = new TournamentInfoDTO(match.Tournament);
+                            }
+                        }
+                    }
+
+                    if (!merged)
+                    {
+                        var draw = item as DrawDTO;
+                        if (draw != null)
+                        {
+                            ((DrawCI)cacheItem).Merge(draw, culture, true);
+                            merged = true;
+                        }
+                    }
+
+                    if (!merged)
+                    {
+                        var lottery = item as LotteryDTO;
+                        if (lottery != null)
+                        {
+                            ((LotteryCI)cacheItem).Merge(lottery, culture, true);
+                            if (lottery.DrawEvents != null && !lottery.DrawEvents.Any())
+                            {
+                                foreach (var drawEvent in lottery.DrawEvents)
+                                {
+                                    SaveLotteryDraw(drawEvent, culture);
+                                }
+                            }
+
+                            merged = true;
+                        }
+                    }
+
+                    if (!merged)
+                    {
+                        cacheItem.Merge(item, culture, true);
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    ExecutionLog.Error($"Error adding sport event for id={id}, dto type={item?.GetType().Name} and lang={culture.TwoLetterISOLanguageName}.", ex);
+                    //ExecutionLog.Debug($"Saving NEW data for {id} and item type: {item.GetType().Name} and dto type: {dtoType}.");
+                    var ci = _sportEventCacheItemFactory.Build(item, culture);
+                    if (dtoType == DtoType.SportEventSummary || dtoType == DtoType.LotteryDraw || dtoType == DtoType.MatchSummary)
+                    {
+                        ci.LoadedSummaries.Add(culture);
+                    }
+                    else if (dtoType == DtoType.Fixture)
+                    {
+                        ci.LoadedFixtures.Add(culture);
+                    }
+
+                    AddNewCacheItem(ci);
+                    if (!ci.Id.Equals(id))
+                    {
+                        var tInfo = item as TournamentInfoDTO;
+                        if (tInfo != null)
+                        {
+                            var newTournamentDto = new TournamentInfoDTO(tInfo, tInfo.Season != null, tInfo.CurrentSeason != null);
+                            var ci2 = _sportEventCacheItemFactory.Build(newTournamentDto, culture);
+                            AddNewCacheItem(ci2);
+                        }
+                        else
+                        {
+                            var ci2 = _sportEventCacheItemFactory.Build(item, culture);
+                            ci2.Id = id;
+                            AddNewCacheItem(ci2);
+                        }
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                ExecutionLog.Error($"Error adding sport event for id={id}, dto type={item?.GetType().Name} and lang={culture.TwoLetterISOLanguageName}.", ex);
+            }
+            finally
+            {
+                LockManager.Release(id.ToString());
             }
 
             // if there are events for non-standard tournaments (tournaments not on All tournaments for all sports)
@@ -1242,16 +1277,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             AddSportEvent(item.SportEvent.Id, item.SportEvent, culture, requester, dtoType);
 
-            lock (_addLock)
+            LockManager.Wait();
+            try
             {
-                try
-                {
-                    UpdateMatchWithTimeline(item, culture);
-                }
-                catch (Exception ex)
-                {
-                    ExecutionLog.Error($"Error adding timeline for id={item.SportEvent.Id}, dto type={item.GetType().Name} and lang={culture.TwoLetterISOLanguageName}.", ex);
-                }
+                UpdateMatchWithTimeline(item, culture);
+            }
+            catch (Exception ex)
+            {
+                ExecutionLog.Error($"Error adding timeline for id={item.SportEvent.Id}, dto type={item.GetType().Name} and lang={culture.TwoLetterISOLanguageName}.", ex);
+            }
+            finally
+            {
+                LockManager.Release(item.SportEvent.Id.ToString());
             }
         }
 
@@ -1281,10 +1318,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         public async Task<IEnumerable<ExportableCI>> ExportAsync()
         {
             IEnumerable<IExportableCI> exportables;
-            lock (_addLock)
-            {
-                exportables = Cache.ToList().Select(i => (IExportableCI) i.Value);
-            }
+            LockManager.Wait();
+            exportables = Cache.ToList().Select(i => (IExportableCI)i.Value);
+            LockManager.Release();
 
             var tasks = exportables.Select(e =>
             {
@@ -1304,7 +1340,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         public async Task ImportAsync(IEnumerable<ExportableCI> items)
 #pragma warning restore 1998
         {
-            lock (_addLock)
+            LockManager.Wait();
+            try
             {
                 foreach (var exportable in items)
                 {
@@ -1314,6 +1351,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                         AddNewCacheItem(sportEventCI);
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                ExecutionLog.Error("Error importing items.", e);
+            }
+            finally
+            {
+                LockManager.Release();
             }
         }
 
@@ -1329,10 +1374,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             };
 
             List<KeyValuePair<string, object>> items;
-            lock (_addLock)
-            {
-                items = Cache.ToList();
-            }
+            LockManager.Wait();
+            items = Cache.ToList();
+            LockManager.Release();
 
             var status = items.GroupBy(i => i.Value.GetType().Name).ToDictionary(g => g.Key, g => g.Count());
 

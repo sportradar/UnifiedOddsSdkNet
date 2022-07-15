@@ -1145,13 +1145,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <summary>
         /// Gets the <see cref="DrawDTO" /> from lottery draw summary endpoint
         /// </summary>
-        /// <param name="drawId">The id of the draw to be fetched</param>
+        /// <param name="id">The id of the draw to be fetched</param>
         /// <param name="culture">The language to be fetched</param>
         /// <param name="requester">The cache item which invoked request</param>
         /// <returns>Task</returns>
         /// <exception cref="NotImplementedException"></exception>
         /// <remarks>This gets called only if WNS is available</remarks>
-        public async Task GetDrawSummaryAsync(URN drawId, CultureInfo culture, ISportEventCI requester)
+        public async Task GetDrawSummaryAsync(URN id, CultureInfo culture, ISportEventCI requester)
         {
             if (!_isWnsAvailable)
             {
@@ -1160,22 +1160,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             }
             Metric.Context("DataRouterManager").Meter("GetDrawSummaryAsync", Unit.Calls);
             var timer = Metric.Context("DataRouterManager").Timer("GetDrawSummaryAsync", Unit.Requests);
-            using (var t = timer.NewContext($"{drawId} [{culture.TwoLetterISOLanguageName}]"))
+            using (var t = timer.NewContext($"{id} [{culture.TwoLetterISOLanguageName}]"))
             {
-                WriteLog($"Executing GetDrawSummaryAsync for id={drawId} and culture={culture.TwoLetterISOLanguageName}.", true);
+                WriteLog($"Executing GetDrawSummaryAsync for id={id} and culture={culture.TwoLetterISOLanguageName}.", true);
 
                 DrawDTO result = null;
                 int restCallTime;
                 try
                 {
-                    result = await _lotteryDrawSummaryProvider.GetDataAsync(drawId.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
+                    result = await _lotteryDrawSummaryProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
                     restCallTime = (int)t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)
                 {
                     restCallTime = (int)t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
-                    _executionLog.Error($"Error getting draw summary for id={drawId} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
+                    _executionLog.Error($"Error getting draw summary for id={id} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
                     if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
                     {
                         throw;
@@ -1186,20 +1186,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 {
                     await _cacheManager.SaveDtoAsync(result.Id, result, culture, DtoType.LotteryDraw, requester).ConfigureAwait(false);
                 }
-                WriteLog($"Executing GetDrawSummaryAsync for id={drawId} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
+                WriteLog($"Executing GetDrawSummaryAsync for id={id} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }
         }
 
         /// <summary>
         /// Gets the <see cref="DrawDTO" /> from the lottery draw fixture endpoint
         /// </summary>
-        /// <param name="drawId">The id of the draw to be fetched</param>
+        /// <param name="id">The id of the draw to be fetched</param>
         /// <param name="culture">The language to be fetched</param>
         /// <param name="requester">The cache item which invoked request</param>
         /// <returns>Task</returns>
         /// <exception cref="NotImplementedException"></exception>
         /// <remarks>This gets called only if WNS is available</remarks>
-        public async Task GetDrawFixtureAsync(URN drawId, CultureInfo culture, ISportEventCI requester)
+        public async Task GetDrawFixtureAsync(URN id, CultureInfo culture, ISportEventCI requester)
         {
             if (!_isWnsAvailable)
             {
@@ -1208,22 +1208,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             }
             Metric.Context("DataRouterManager").Meter("GetDrawFixtureAsync", Unit.Calls);
             var timer = Metric.Context("DataRouterManager").Timer("GetDrawFixtureAsync", Unit.Requests);
-            using (var t = timer.NewContext($"{drawId} [{culture.TwoLetterISOLanguageName}]"))
+            using (var t = timer.NewContext($"{id} [{culture.TwoLetterISOLanguageName}]"))
             {
-                WriteLog($"Executing GetDrawFixtureAsync for id={drawId} and culture={culture.TwoLetterISOLanguageName}.", true);
+                WriteLog($"Executing GetDrawFixtureAsync for id={id} and culture={culture.TwoLetterISOLanguageName}.", true);
 
                 DrawDTO result = null;
                 int restCallTime;
                 try
                 {
-                    result = await _lotteryDrawFixtureProvider.GetDataAsync(drawId.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
+                    result = await _lotteryDrawFixtureProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName).ConfigureAwait(false);
                     restCallTime = (int)t.Elapsed.TotalMilliseconds;
                 }
                 catch (Exception e)
                 {
                     restCallTime = (int)t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
-                    _executionLog.Error($"Error getting draw fixture for id={drawId} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
+                    _executionLog.Error($"Error getting draw fixture for id={id} and lang:[{culture.TwoLetterISOLanguageName}]. Message={message}", e.InnerException ?? e);
                     if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
                     {
                         throw;
@@ -1234,7 +1234,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 {
                     await _cacheManager.SaveDtoAsync(result.Id, result, culture, DtoType.LotteryDraw, requester).ConfigureAwait(false);
                 }
-                WriteLog($"Executing GetDrawFixtureAsync for id={drawId} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
+                WriteLog($"Executing GetDrawFixtureAsync for id={id} and culture={culture.TwoLetterISOLanguageName} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
             }
         }
 
