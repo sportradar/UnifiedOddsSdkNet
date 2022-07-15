@@ -9,6 +9,11 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2022-07-15  1.54.0
+Improved API data distribution to SportEventCache
+Setup that each API endpoint on critical path has its own HttpClient
+Fix: recovery request url when configuring custom environment
+
 2022-06-02  1.53.0
 Improvements for saving api data within caches (single item and for list of items)
 Changed the timestamp for periodic deletion of old event from cache (to now-12h)
