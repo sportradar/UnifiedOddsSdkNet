@@ -1277,7 +1277,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             AddSportEvent(item.SportEvent.Id, item.SportEvent, culture, requester, dtoType);
 
-            LockManager.Wait();
+            LockManager.Wait(item.SportEvent.Id.ToString());
             try
             {
                 UpdateMatchWithTimeline(item, culture);

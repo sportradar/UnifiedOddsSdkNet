@@ -1058,6 +1058,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 {
                     result = await _variantMarketDescriptionProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName, variant).ConfigureAwait(false);
                     restCallTime = (int)t.Elapsed.TotalMilliseconds;
+
+                    if (!result.Id.Equals(id) || !result.Variant.Equals(variant))
+                    {
+                        _executionLog.Debug($"Received different market variant description then requested. ({id}?{variant} - {result.Id}?{result.Variant})");
+                    }
                 }
                 catch (Exception e)
                 {

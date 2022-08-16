@@ -456,7 +456,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     ExecutionLog.Warn($"Trying to add unchecked dto type: {dtoType} for id: {id}.");
                     break;
             }
-            //CacheLog.Debug($"Saving {id} COMPLETED. Saved={saved}.");
+            //CacheLog.Debug($"SportEventStatusCache saving {id}, dto type={dtoType} ... COMPLETED. Saved={saved}.");
             return saved;
         }
 
