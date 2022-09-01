@@ -1,15 +1,15 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Entities.REST.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Messages;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -22,6 +22,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         private readonly ILog _executionLog = SdkLoggerFactory.GetLoggerForExecution(typeof(CustomBetManager));
 
         private readonly IDataRouterManager _dataRouterManager;
+
+        public ICustomBetSelectionBuilder CustomBetSelectionBuilder { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CustomBetManager"/> class
@@ -82,6 +84,28 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             }
         }
 
-        public ICustomBetSelectionBuilder CustomBetSelectionBuilder { get; }
+        public async Task<ICalculationFilter> CalculateProbabilityFilterAsync(IEnumerable<ISelection> selections)
+        {
+            if (selections == null)
+            {
+                throw new ArgumentNullException(nameof(selections));
+            }
+
+            try
+            {
+                _clientLog.Info($"Invoking CustomBetManager.CalculateProbabilityFilter({selections})");
+                return await _dataRouterManager.CalculateProbabilityFiltered(selections).ConfigureAwait(false);
+            }
+            catch (CommunicationException ce)
+            {
+                _executionLog.Warn($"Calculating probabilities filtered failed, CommunicationException: {ce.Message}", ce);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _executionLog.Warn("Calculating probabilities filtered failed.", e);
+                throw;
+            }
+        }
     }
 }

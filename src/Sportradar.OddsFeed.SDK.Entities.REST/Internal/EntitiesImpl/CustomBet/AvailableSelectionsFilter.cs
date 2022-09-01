@@ -1,8 +1,4 @@
-﻿/*
-* Copyright (C) Sportradar AG. See LICENSE for full license governing this code
-*/
-using Sportradar.OddsFeed.SDK.Entities.REST.CustomBet;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet;
+﻿using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet;
 using Sportradar.OddsFeed.SDK.Messages;
 using System;
 using System.Collections.Generic;
@@ -13,13 +9,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl.CustomBet
     /// <summary>
     /// Implements methods used to access available selections for the event
     /// </summary>
-    public class AvailableSelections : IAvailableSelections
+    public class AvailableSelectionsFilter : REST.CustomBet.IAvailableSelectionsFilter
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AvailableSelections"/> class
         /// </summary>
         /// <param name="availableSelections">a <see cref="AvailableSelectionsDto"/> representing the available selections</param>
-        internal AvailableSelections(AvailableSelectionsDto availableSelections)
+        internal AvailableSelectionsFilter(FilteredAvailableSelectionsDto availableSelections)
         {
             if (availableSelections == null)
             {
@@ -27,11 +23,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl.CustomBet
             }
 
             Event = availableSelections.Event;
-            Markets = availableSelections.Markets.Select(m => new Market(m));
+            Markets = availableSelections.Markets.Select(m => new MarketFilter(m));
         }
 
         public URN Event { get; }
 
-        public IEnumerable<IMarket> Markets { get; }
+        public IEnumerable<REST.CustomBet.IMarketFilter> Markets { get; }
     }
 }

@@ -1,7 +1,4 @@
-﻿/*
-* Copyright (C) Sportradar AG. See LICENSE for full license governing this code
-*/
-using Sportradar.OddsFeed.SDK.Common.Internal;
+﻿using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Messages.REST;
 using System;
 using System.Collections.Generic;
@@ -12,7 +9,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet
     /// <summary>
     /// Defines a data-transfer-object for available selections for the market
     /// </summary>
-    public class MarketDto
+    public class FilteredMarketDto
     {
         /// <summary>
         /// Gets the id of the market
@@ -27,9 +24,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet
         /// <summary>
         /// Gets the outcomes for this market
         /// </summary>
-        public IEnumerable<string> Outcomes { get; }
+        public IEnumerable<FilteredOutcomeDto> Outcomes { get; }
 
-        internal MarketDto(MarketType market)
+        /// <summary>
+        /// Value indicating if this market is in conflict
+        /// </summary>
+        public bool? IsConflict { get; }
+
+        internal FilteredMarketDto(FilteredMarketType market)
         {
             if (market == null)
             {
@@ -38,7 +40,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet
 
             Id = market.id;
             Specifiers = market.specifiers;
-            Outcomes = market.outcome.IsNullOrEmpty() ? new List<string>() : market.outcome.Select(o => o.id);
+            IsConflict = market.conflictSpecified ? market.conflict : (bool?)null;
+            Outcomes = market.outcome.IsNullOrEmpty()
+                           ? new List<FilteredOutcomeDto>()
+                           : market.outcome.Select(o => new FilteredOutcomeDto(o)).ToList();
         }
     }
 }

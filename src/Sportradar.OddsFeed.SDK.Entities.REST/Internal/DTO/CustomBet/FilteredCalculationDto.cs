@@ -1,7 +1,4 @@
-﻿/*
-* Copyright (C) Sportradar AG. See LICENSE for full license governing this code
-*/
-using Sportradar.OddsFeed.SDK.Messages.REST;
+﻿using Sportradar.OddsFeed.SDK.Messages.REST;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +8,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet
     /// <summary>
     /// Defines a data-transfer-object for probability calculations
     /// </summary>
-    public class CalculationDto
+    public class FilteredCalculationDto
     {
         /// <summary>
         /// Gets the odds
@@ -28,24 +25,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet
         /// </summary>
         public string GeneratedAt { get; }
 
-        public IList<AvailableSelectionsDto> AvailableSelections { get; }
+        public IList<FilteredAvailableSelectionsDto> AvailableSelections { get; }
 
-        internal CalculationDto(CalculationResponseType calculation)
+        internal FilteredCalculationDto(FilteredCalculationResponseType calculation)
         {
             if (calculation == null)
             {
                 throw new ArgumentNullException(nameof(calculation));
             }
 
-            AvailableSelections = new List<AvailableSelectionsDto>();
             Odds = calculation.calculation.odds;
             Probability = calculation.calculation.probability;
             GeneratedAt = calculation.generated_at;
 
-            if (calculation.available_selections != null && calculation.available_selections.Any())
-            {
-                AvailableSelections = calculation.available_selections.Select(s => new AvailableSelectionsDto(s, calculation.generated_at)).ToList();
-            }
+            AvailableSelections = calculation.available_selections != null && calculation.available_selections.Any()
+                                      ? calculation.available_selections.Select(s => new FilteredAvailableSelectionsDto(s)).ToList()
+                                      : new List<FilteredAvailableSelectionsDto>();
         }
     }
 }

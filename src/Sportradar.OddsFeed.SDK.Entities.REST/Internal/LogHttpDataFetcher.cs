@@ -59,15 +59,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Metric.Context("FEED").Meter("LogHttpDataFetcher->GetDataAsync", Unit.Requests).Mark();
 
             var dataId = _sequenceGenerator.GetNext().ToString("D7"); // because request can take long time, there may be several request at the same time; Id to know what belongs together.
-            var watch = new Stopwatch();
 
             var logBuilder = new StringBuilder();
             logBuilder.Append("Id:").Append(dataId).Append(" Fetching url: ").Append(uri.AbsoluteUri);
 
+            var watch = Stopwatch.StartNew();
             Stream responseStream;
             try
             {
-                watch.Start();
                 responseStream = await base.GetDataAsync(uri).ConfigureAwait(false);
                 watch.Stop();
             }
@@ -116,15 +115,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Metric.Context("FEED").Meter("LogHttpDataFetcher->GetData", Unit.Requests).Mark();
 
             var dataId = _sequenceGenerator.GetNext().ToString("D7"); // because request can take long time, there may be several request at the same time; Id to know what belongs together
-            var watch = new Stopwatch();
 
             var logBuilder = new StringBuilder();
             logBuilder.Append("Id:").Append(dataId).Append(" Fetching url: ").Append(uri.AbsoluteUri);
 
+            var watch = Stopwatch.StartNew();
             Stream responseStream;
             try
             {
-                watch.Start();
                 responseStream = base.GetData(uri);
                 watch.Stop();
             }
@@ -175,15 +173,31 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
             var dataId = _sequenceGenerator.GetNext().ToString("D7");
 
-            RestLog.Info($"Id:{dataId} Posting url: {uri.AbsoluteUri}");
             if (content != null)
             {
-                //var s = await content.ReadAsStringAsync().ConfigureAwait(false);
-                //RestLog.Info($"Id:{dataId} Content: {s}");
+                try
+                {
+                    if (RestLog.IsDebugEnabled)
+                    {
+                        var s = await content.ReadAsStringAsync().ConfigureAwait(false);
+                        RestLog.Debug($"Id:{dataId} Posting url: {uri.AbsoluteUri} {s}");
+                    }
+                    else
+                    {
+                        RestLog.Info($"Id:{dataId} Posting url: {uri.AbsoluteUri}");
+                    }
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+            }
+            else
+            {
+                RestLog.Info($"Id:{dataId} Posting url: {uri.AbsoluteUri}");
             }
 
-            var watch = new Stopwatch();
-            watch.Start();
+            var watch = Stopwatch.StartNew();
 
             HttpResponseMessage response;
             try
@@ -200,15 +214,27 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 RestLog.Error($"Id:{dataId} Posting error at {watch.ElapsedMilliseconds} ms.");
                 if (ex.GetType() != typeof(ObjectDisposedException) && ex.GetType() != typeof(TaskCanceledException))
                 {
-                    RestLog.Error(ex);
+                    RestLog.Error(ex.Message, ex);
                 }
                 throw;
             }
 
             watch.Stop();
+            var responseContent = string.Empty;
+            if (response.Content != null)
+            {
+                try
+                {
+                    responseContent = response.Content.ReadAsStringAsync().Result;
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+            }
             if (RestLog.IsDebugEnabled)
             {
-                RestLog.Debug($"Id:{dataId} Posting took {watch.ElapsedMilliseconds} ms. Response code: {(int)response.StatusCode}-{response.ReasonPhrase}.");
+                RestLog.Debug($"Id:{dataId} Posting took {watch.ElapsedMilliseconds} ms. Response: {(int)response.StatusCode}-{response.ReasonPhrase} {responseContent}");
             }
             else
             {
