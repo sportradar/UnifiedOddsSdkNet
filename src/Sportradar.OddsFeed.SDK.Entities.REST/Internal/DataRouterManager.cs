@@ -1392,7 +1392,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             }
         }
 
-        public async Task<ICalculation> CalculateProbability(IEnumerable<ISelection> selections)
+        public async Task<ICalculation> CalculateProbabilityAsync(IEnumerable<ISelection> selections)
         {
             Metric.Context("DataRouterManager").Meter("CalculateProbability", Unit.Calls);
             var timer = Metric.Context("DataRouterManager").Timer("CalculateProbability", Unit.Requests);
@@ -1423,7 +1423,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             }
         }
 
-        public async Task<ICalculationFilter> CalculateProbabilityFiltered(IEnumerable<ISelection> selections)
+        public async Task<ICalculationFilter> CalculateProbabilityFilteredAsync(IEnumerable<ISelection> selections)
         {
             Metric.Context("DataRouterManager").Meter("CalculateProbabilityFiltered", Unit.Calls);
             var timer = Metric.Context("DataRouterManager").Timer("CalculateProbabilityFiltered", Unit.Requests);

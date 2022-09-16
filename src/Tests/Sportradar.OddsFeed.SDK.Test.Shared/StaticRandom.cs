@@ -1,23 +1,18 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using Sportradar.OddsFeed.SDK.Messages;
 using System;
 using System.Threading;
-using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Test.Shared
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "SCS0005:Weak random number generator.", Justification = "Good enough for tests")]
     public static class StaticRandom
     {
-        private static int _seed;
+        private static int _seed = Environment.TickCount;
 
-        private static readonly ThreadLocal<Random> ThreadLocal = new ThreadLocal<Random>
-            (() => new Random(Interlocked.Increment(ref _seed)));
-
-        static StaticRandom()
-        {
-            _seed = Environment.TickCount;
-        }
+        private static readonly ThreadLocal<Random> ThreadLocal = new ThreadLocal<Random>(() => new Random(Interlocked.Increment(ref _seed)));
 
         public static Random Instance => ThreadLocal.Value;
 
@@ -31,13 +26,18 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             return limit > 1 ? Instance.Next(1, limit) : Instance.Next();
         }
 
+        public static double D(int limit = 0)
+        {
+            return limit > 1 ? Instance.Next(0, limit) + Instance.NextDouble() : Instance.NextDouble();
+        }
+
         public static URN Urn(string type = "", int limit = 0)
         {
             if (string.IsNullOrEmpty(type))
             {
                 type = "match";
             }
-            var id = limit > 1 ?  Instance.Next(1, limit) : Instance.Next();
+            var id = limit > 1 ? Instance.Next(1, limit) : Instance.Next();
 
             return new URN("sr", type, id);
         }
@@ -67,5 +67,9 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         public static URN U1000 => Urn(string.Empty, 1000);
 
         public static bool B => I(100) > 49;
+
+        public static double D0 => D();
+
+        public static double D100 => D(100);
     }
 }

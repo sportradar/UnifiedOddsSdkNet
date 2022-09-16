@@ -91,6 +91,7 @@
     <Compile Include="CacheExportTest.cs" />
     <Compile Include="CacheItems\PlayerProfileTests.cs" />
     <Compile Include="CategorySummaryTest.cs" />
+    <Compile Include="CustomBetEntityTests.cs" />
     <Compile Include="CompositeMappingValidatorTests.cs" />
     <Compile Include="DecimalValueMappingValidatorTests.cs" />
     <Compile Include="EntityPrinterTest.cs" />
