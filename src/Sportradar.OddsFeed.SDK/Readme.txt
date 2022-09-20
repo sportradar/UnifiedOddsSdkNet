@@ -9,6 +9,10 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2022-09-20  1.55.0
+CustomBet - added support for calculate-filter endpoint
+Fixed saving match timeline
+
 2022-07-15  1.54.0
 Improved API data distribution to SportEventCache
 Setup that each API endpoint on critical path has its own HttpClient
