@@ -1,13 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Collections.Generic;
-using Dawn;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using Common.Logging;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
@@ -15,6 +10,11 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities;
 using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 {
@@ -133,7 +133,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
                 // select appropriate mappings if found; producer and sport is checked later
                 List<IMarketMappingData> mappings = null;
-                if(variantDescription.Mappings != null)
+                if (variantDescription.Mappings != null)
                 {
                     mappings = variantDescription.Mappings.Where(s => s.MarketId.Equals(marketDescription.Id.ToString())).ToList();
                     if (!mappings.Any())
@@ -146,16 +146,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 {
                     if (!mappings.IsNullOrEmpty() || !variantDescription.Mappings.IsNullOrEmpty())
                     {
-                        ((MarketDescription) marketDescription).SetMappings((mappings ?? variantDescription.Mappings) as IReadOnlyCollection<IMarketMappingData>);
-                        var variantCI = ((VariantDescription) variantDescription).VariantDescriptionCacheItem;
-                        ((MarketDescription) marketDescription).SetFetchInfo(variantCI.SourceCache, variantCI.LastDataReceived);
+                        ((MarketDescription)marketDescription).SetMappings((mappings ?? variantDescription.Mappings) as IReadOnlyCollection<IMarketMappingData>);
+                        var variantCI = ((VariantDescription)variantDescription).VariantDescriptionCacheItem;
+                        ((MarketDescription)marketDescription).SetFetchInfo(variantCI.SourceCache, variantCI.LastDataReceived);
                     }
 
                     if (!variantDescription.Outcomes.IsNullOrEmpty())
                     {
-                        ((MarketDescription) marketDescription).SetOutcomes(variantDescription.Outcomes as IReadOnlyCollection<IOutcomeDescription>);
-                        var variantCI = ((VariantDescription) variantDescription).VariantDescriptionCacheItem;
-                        ((MarketDescription) marketDescription).SetFetchInfo(variantCI.SourceCache, variantCI.LastDataReceived);
+                        ((MarketDescription)marketDescription).SetOutcomes(variantDescription.Outcomes as IReadOnlyCollection<IOutcomeDescription>);
+                        var variantCI = ((VariantDescription)variantDescription).VariantDescriptionCacheItem;
+                        ((MarketDescription)marketDescription).SetFetchInfo(variantCI.SourceCache, variantCI.LastDataReceived);
                     }
                 }
 
@@ -163,7 +163,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             }
             catch (Exception e)
             {
-                var langs = string.Join(",", locales.Select(s=>s.TwoLetterISOLanguageName));
+                var langs = string.Join(",", locales.Select(s => s.TwoLetterISOLanguageName));
                 _executionLog.Warn($"There was an error providing the variant market description -> marketId:{marketId}, variantValue: {variantValue}, locales: [{langs}]", e);
             }
             return null;
@@ -182,7 +182,31 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 _executionLog.Warn($"There was an error providing the explicit variant market description -> marketId:{marketId}, variantValue: {variantValue}, locales: [{langs}]", e);
             }
 
-            return variantDescription ?? marketDescription;
+            if (variantDescription == null)
+            {
+                return null;
+            }
+
+            // select appropriate mappings if found; producer and sport is checked later
+            List<IMarketMappingData> mappings = null;
+            if (variantDescription.Mappings != null)
+            {
+                mappings = variantDescription.Mappings.Where(s => s.MarketId.Equals(marketDescription.Id.ToString())).ToList();
+                if (!mappings.Any())
+                {
+                    mappings = null;
+                }
+            }
+
+            if (marketDescription != null)
+            {
+                if (!mappings.IsNullOrEmpty() || !marketDescription.Mappings.IsNullOrEmpty())
+                {
+                    ((MarketDescription)variantDescription).SetMappings((mappings ?? marketDescription.Mappings) as IReadOnlyCollection<IMarketMappingData>);
+                }
+            }
+
+            return variantDescription;
         }
 
         private static bool IsMarketPlayerProps(IMarketDescription marketDescriptor)
