@@ -233,7 +233,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return await PrepareCompetitorList(_competitors, wantedCultures).ConfigureAwait(false);
             }
-            await FetchMissingSummary(wantedCultures, false).ConfigureAwait(false);
+            if (wantedCultures.Any())
+            {
+                await FetchMissingSummary(wantedCultures, false).ConfigureAwait(false);
+            }
             return await PrepareCompetitorList(_competitors, wantedCultures).ConfigureAwait(false);
         }
 
@@ -260,7 +263,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _currentSeasonInfo;
             }
-            await FetchMissingSummary(wantedCultures, false).ConfigureAwait(false);
+            if (wantedCultures.Any())
+            {
+                await FetchMissingSummary(wantedCultures, false).ConfigureAwait(false);
+            }
             return _currentSeasonInfo;
         }
 
@@ -276,7 +282,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _groups;
             }
-            await FetchMissingSummary(wantedCultures, false).ConfigureAwait(false);
+            if (wantedCultures.Any())
+            {
+                await FetchMissingSummary(wantedCultures, false).ConfigureAwait(false);
+            }
             return _groups;
         }
 
@@ -323,7 +332,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _round;
             }
-            await FetchMissingSummary(wantedCultures, false).ConfigureAwait(false);
+            if (wantedCultures.Any())
+            {
+                await FetchMissingSummary(wantedCultures, false).ConfigureAwait(false);
+            }
             return _round;
         }
 
