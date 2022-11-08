@@ -35,7 +35,8 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         public static readonly URN SimpleTournamentId = URN.Parse("sr:simple_tournament:1");
         public static readonly URN SeasonId = URN.Parse("sr:season:1");
 
-        public static readonly URN EventId = URN.Parse("sr:match:9210275");
+        public static readonly URN EventMatchId = URN.Parse("sr:match:9210275");
+        public static readonly URN EventStageId = URN.Parse("sr:stage:940265");
         public static readonly URN SimpleTournamentId11111 = URN.Parse("sr:simple_tournament:11111");
 
         public static readonly CultureInfo Culture = new CultureInfo("en");
@@ -57,7 +58,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         public static void ValidateTestEventId(MatchCI ci, IEnumerable<CultureInfo> cultures, bool canHaveOtherLanguage)
         {
             Assert.IsNotNull(ci, "Cached item not found.");
-            Assert.AreEqual(EventId, ci.Id);
+            Assert.AreEqual(EventMatchId, ci.Id);
             if (cultures == null)
             {
                 Assert.IsNull(ci);

@@ -1,16 +1,16 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Globalization;
-using System.Linq;
-using System.Runtime.Caching;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Test.Shared;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.Caching;
+using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 {
@@ -40,202 +40,174 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void fixture_provider_is_called_only_once_for_each_locale()
+        public async Task FixtureProviderIsCalledOnlyOnceForEachLanguage()
         {
-            var cacheItem = (IMatchCI) _sportEventCache.GetEventCacheItem(TestData.EventId);
+            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventMatchId);
 
-            var task = Task.Run(async () =>
-            {
-                await cacheItem.GetBookingStatusAsync();
-                await cacheItem.GetScheduledAsync();
-                await cacheItem.GetScheduledEndAsync();
-                await cacheItem.GetCompetitorsIdsAsync(TestData.Cultures);
-                await cacheItem.GetTournamentRoundAsync(TestData.Cultures);
-                await cacheItem.GetSeasonAsync(TestData.Cultures);
-                await cacheItem.GetTournamentIdAsync(TestData.Cultures);
-                await cacheItem.GetVenueAsync(TestData.Cultures);
-                await cacheItem.GetFixtureAsync(TestData.Cultures);
-                await cacheItem.GetReferenceIdsAsync();
-            });
+            await cacheItem.GetBookingStatusAsync();
+            await cacheItem.GetScheduledAsync();
+            await cacheItem.GetScheduledEndAsync();
+            await cacheItem.GetCompetitorsIdsAsync(TestData.Cultures);
+            await cacheItem.GetTournamentRoundAsync(TestData.Cultures);
+            await cacheItem.GetSeasonAsync(TestData.Cultures);
+            await cacheItem.GetTournamentIdAsync(TestData.Cultures);
+            await cacheItem.GetVenueAsync(TestData.Cultures);
+            await cacheItem.GetFixtureAsync(TestData.Cultures);
+            await cacheItem.GetReferenceIdsAsync();
 
-            Task.WaitAll(task);
-
-            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly {TestData.Cultures.Count} times.");
-            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(SportEventFixture), $"{SportEventFixture} should be called exactly {TestData.Cultures.Count} times.");
+            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(SportEventSummary));
+            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(SportEventFixture));
         }
 
         [TestMethod]
-        public void details_provider_is_called_only_once_for_each_locale()
+        public async Task DetailsProviderIsCalledOnlyOnceForEachLanguage()
         {
-            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventId);
+            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventMatchId);
+            var cultures = new[] { new CultureInfo("en") };
 
-            var cultures = new[] {new CultureInfo("en")};
-            var task = Task.Run(async () =>
-            {
-                await cacheItem.GetConditionsAsync(cultures);
-                await cacheItem.GetConditionsAsync(cultures);
-                await cacheItem.GetConditionsAsync(cultures);
-            });
+            await cacheItem.GetConditionsAsync(cultures);
+            await cacheItem.GetConditionsAsync(cultures);
+            await cacheItem.GetConditionsAsync(cultures);
 
-            Task.WaitAll(task);
-
-            Assert.AreEqual(cultures.Length, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly {cultures.Length} times.");
-            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventFixture), $"{SportEventFixture} should be called exactly 0 times.");
+            Assert.AreEqual(cultures.Length, _dataRouterManager.GetCallCount(SportEventSummary));
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventFixture));
         }
 
         [TestMethod]
-        public void get_booking_status_calls_provider_with_default_locale()
+        public async Task GetBookingStatusCallsProviderWithDefaultLanguage()
         {
-            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventId);
+            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventMatchId);
 
-            var task = Task.Run(async () =>
-            {
-                await cacheItem.GetBookingStatusAsync();
-                await cacheItem.GetVenueAsync(new[] { new CultureInfo("de") });
-            });
+            await cacheItem.GetBookingStatusAsync();
+            await cacheItem.GetVenueAsync(new[] { new CultureInfo("de") });
 
-            Task.WaitAll(task);
-
-            Assert.AreEqual(1, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly 1 times.");
-            Assert.AreEqual(1, _dataRouterManager.GetCallCount(SportEventFixture), $"{SportEventFixture} should be called exactly 1 times.");
+            Assert.AreEqual(1, _dataRouterManager.GetCallCount(SportEventSummary));
+            Assert.AreEqual(1, _dataRouterManager.GetCallCount(SportEventFixture));
         }
 
         [TestMethod]
-        public void get_booking_status_calls_provider_calls_only_once()
+        public async Task GetBookingStatusCallsProviderCallsOnlyOnce()
         {
-            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventId);
+            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventMatchId);
 
-            var task = Task.Run(async () =>
-            {
-                await cacheItem.GetBookingStatusAsync();
-                await cacheItem.GetVenueAsync(TestData.Cultures);
-            });
+            await cacheItem.GetBookingStatusAsync();
+            await cacheItem.GetVenueAsync(TestData.Cultures);
 
-            Task.WaitAll(task);
-
-            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly {TestData.Cultures.Count} times.");
-            Assert.AreEqual(1, _dataRouterManager.GetCallCount(SportEventFixture), $"{SportEventFixture} should be called exactly 1 times.");
+            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(SportEventSummary));
+            Assert.AreEqual(1, _dataRouterManager.GetCallCount(SportEventFixture));
         }
 
         [TestMethod]
-        public void get_schedule_async_calls_provider_with_default_locale()
+        public async Task GetBookingStatusForStageCallsProviderCallsOnlyOnce()
         {
-            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventId);
+            var cacheItem = (IStageCI)_sportEventCache.GetEventCacheItem(TestData.EventStageId);
 
-            var task = Task.Run(async () =>
-            {
-                await cacheItem.GetScheduledAsync();
-                await cacheItem.GetVenueAsync(new[] { new CultureInfo("de") });
-            });
+            await cacheItem.GetBookingStatusAsync();
 
-            Task.WaitAll(task);
-
-            Assert.AreEqual(2, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly 2 times.");
-            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventFixture), $"{SportEventFixture} should be called exactly 0 times.");
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventSummary));
+            Assert.AreEqual(1, _dataRouterManager.GetCallCount(SportEventFixture));
         }
 
         [TestMethod]
-        public void get_schedule_end_async_calls_provider_with_default_locale()
+        public async Task GetBookingStatusForStageCallsProviderCallsOnlyOnceRepeated()
         {
-            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventId);
+            var cacheItem = (IStageCI)_sportEventCache.GetEventCacheItem(TestData.EventStageId);
 
-            var task = Task.Run(async () =>
-            {
-                await cacheItem.GetScheduledEndAsync();
-                await cacheItem.GetVenueAsync(new[] { new CultureInfo("de") });
-            });
+            await cacheItem.GetBookingStatusAsync();
 
-            Task.WaitAll(task);
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventSummary));
+            Assert.AreEqual(1, _dataRouterManager.GetCallCount(SportEventFixture));
 
-            Assert.AreEqual(2, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly 2 times.");
-            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventFixture), $"{SportEventFixture} should be called exactly 0 times.");
+            await cacheItem.GetBookingStatusAsync();
+
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventSummary));
+            Assert.AreEqual(1, _dataRouterManager.GetCallCount(SportEventFixture));
         }
 
         [TestMethod]
-        public void get_tournament_id_async_calls_provider_with_default_locale()
+        public async Task GetScheduleAsyncCallsProviderWithDefaultLanguage()
         {
-            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventId);
+            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventMatchId);
 
-            var task = Task.Run(async () =>
-            {
-                await cacheItem.GetTournamentIdAsync(TestData.Cultures);
-                await cacheItem.GetVenueAsync(new[] { new CultureInfo("de") });
-            });
+            await cacheItem.GetScheduledAsync();
+            await cacheItem.GetVenueAsync(new[] { new CultureInfo("de") });
 
-            Task.WaitAll(task);
-
-            Assert.AreEqual(3, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly {TestData.Cultures.Count} times.");
-            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventFixture), $"{SportEventFixture} should be called exactly 0 times.");
+            Assert.AreEqual(2, _dataRouterManager.GetCallCount(SportEventSummary));
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventFixture));
         }
 
         [TestMethod]
-        public void number_of_calls_to_fixture_provider_is_equal_to_number_of_locals_when_accessing_the_same_property()
+        public async Task get_schedule_end_async_calls_provider_with_default_locale()
         {
-            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventId);
+            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventMatchId);
 
-            var task = Task.Run(async () =>
-            {
-                await cacheItem.GetVenueAsync(TestData.Cultures);
-            });
+            await cacheItem.GetScheduledEndAsync();
+            await cacheItem.GetVenueAsync(new[] { new CultureInfo("de") });
 
-            Task.WaitAll(task);
-
-            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly {TestData.Cultures.Count} times.");
-            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventFixture), $"{SportEventFixture} should be called exactly 0 times.");
+            Assert.AreEqual(2, _dataRouterManager.GetCallCount(SportEventSummary));
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventFixture));
         }
 
         [TestMethod]
-        public void number_of_calls_to_summary_provider_is_equal_number_of_locals()
+        public async Task GetTournamentIdAsyncCallsProviderWithAllLanguage()
         {
-            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventId);
+            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventMatchId);
 
-            var task = Task.Run(async () =>
-            {
-                await cacheItem.GetVenueAsync(new[] { new CultureInfo("en") });
-                await cacheItem.GetVenueAsync(new[] { new CultureInfo("de") });
-                await cacheItem.GetVenueAsync(new[] { new CultureInfo("fr") });
-            });
+            await cacheItem.GetTournamentIdAsync(TestData.Cultures);
+            await cacheItem.GetVenueAsync(new[] { new CultureInfo("de") });
 
-            Task.WaitAll(task);
-
-            Assert.AreEqual(3, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly 3 times.");
-            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventFixture), $"{SportEventFixture} should be called exactly 0 times.");
+            Assert.AreEqual(3, _dataRouterManager.GetCallCount(SportEventSummary));
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventFixture));
         }
 
         [TestMethod]
-        public void number_of_calls_to_summary_provider_for_non_translatable_property()
+        public async Task NumberOfCallsToFixtureProviderIsEqualToNumberOfLocalsWhenAccessingTheSameProperty()
         {
-            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventId);
+            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventMatchId);
 
-            var task = Task.Run(async () =>
-            {
-                await cacheItem.FetchSportEventStatusAsync();
-                await cacheItem.FetchSportEventStatusAsync();
-                await cacheItem.FetchSportEventStatusAsync();
-            });
+            await cacheItem.GetVenueAsync(TestData.Cultures);
 
-            Task.WaitAll(task);
-
-            Assert.AreEqual(3, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly 1 times.");
-            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventFixture), $"{SportEventFixture} should be called exactly 0 times.");
+            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(SportEventSummary));
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventFixture));
         }
 
         [TestMethod]
-        public void number_of_calls_to_fixture_provider_is_equal_to_number_of_locals_when_accessing_different_properties()
+        public async Task NumberOfCallsToSummaryProviderIsEqualNumberOfLanguage()
         {
-            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventId);
+            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventMatchId);
 
-            var task = Task.Run(async () =>
-            {
-                await cacheItem.GetVenueAsync(new[] { new CultureInfo("en") });
-                await cacheItem.GetFixtureAsync(new[] { new CultureInfo("de") });
-                await cacheItem.GetTournamentRoundAsync(new[] { new CultureInfo("fr") });
-            });
+            await cacheItem.GetVenueAsync(new[] { new CultureInfo("en") });
+            await cacheItem.GetVenueAsync(new[] { new CultureInfo("de") });
+            await cacheItem.GetVenueAsync(new[] { new CultureInfo("hu") });
 
-            Task.WaitAll(task);
+            Assert.AreEqual(3, _dataRouterManager.GetCallCount(SportEventSummary));
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventFixture));
+        }
 
-            Assert.AreEqual(2, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly 2 times.");
-            Assert.AreEqual(1, _dataRouterManager.GetCallCount(SportEventFixture), $"{SportEventFixture} should be called exactly 1 times.");
+        [TestMethod]
+        public async Task NumberOfCallsToSummaryProviderForNonTranslatableProperty()
+        {
+            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventMatchId);
+
+            await cacheItem.FetchSportEventStatusAsync();
+            await cacheItem.FetchSportEventStatusAsync();
+            await cacheItem.FetchSportEventStatusAsync();
+
+            Assert.AreEqual(3, _dataRouterManager.GetCallCount(SportEventSummary));
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventFixture));
+        }
+
+        [TestMethod]
+        public async Task NumberOfCallsToFixtureProviderIsEqualToNumberOfLocalsWhenAccessingDifferentProperties()
+        {
+            var cacheItem = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventMatchId);
+
+            await cacheItem.GetVenueAsync(new[] { new CultureInfo("en") });
+            await cacheItem.GetFixtureAsync(new[] { new CultureInfo("de") });
+            await cacheItem.GetTournamentRoundAsync(new[] { new CultureInfo("hu") });
+
+            Assert.AreEqual(2, _dataRouterManager.GetCallCount(SportEventSummary));
+            Assert.AreEqual(1, _dataRouterManager.GetCallCount(SportEventFixture));
         }
     }
 }

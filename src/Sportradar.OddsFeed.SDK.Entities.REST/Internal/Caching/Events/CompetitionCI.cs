@@ -188,7 +188,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
         /// <returns>Asynchronously returns the <see cref="BookingStatus"/> if available</returns>
         public async Task<BookingStatus?> GetBookingStatusAsync()
         {
-            if (LoadedFixtures.Any() || Id.TypeGroup == ResourceTypeGroup.STAGE || _bookingStatus != null)
+            if (_bookingStatus != null || LoadedFixtures.Any())
             {
                 return _bookingStatus;
             }

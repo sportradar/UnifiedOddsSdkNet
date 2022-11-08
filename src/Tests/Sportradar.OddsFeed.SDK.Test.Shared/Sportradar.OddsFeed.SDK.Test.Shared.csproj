@@ -765,6 +765,18 @@
     <Content Include="REST XMLs\Summarys\summary_sr_season_80242.nl.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="REST XMLs\Summarys\summary_sr_stage_940265_de.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="REST XMLs\Summarys\summary_sr_stage_940265_en.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="REST XMLs\Summarys\summary_sr_stage_940265_hu.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="REST XMLs\Summarys\summary_sr_stage_940265_nl.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <Content Include="REST XMLs\Summarys\summary_sr_tournament_40.de.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

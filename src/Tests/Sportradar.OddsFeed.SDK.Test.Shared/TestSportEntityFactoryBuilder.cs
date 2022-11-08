@@ -76,7 +76,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             }
             var time = watch.Elapsed.TotalMilliseconds;
             Debug.WriteLine($"Init time: {time}");
-            Competition = SportEntityFactory.BuildSportEvent<ICompetition>(TestData.EventId, URN.Parse("sr:sport:3"), TestData.Cultures3, TestData.ThrowingStrategy);
+            Competition = SportEntityFactory.BuildSportEvent<ICompetition>(TestData.EventMatchId, URN.Parse("sr:sport:3"), TestData.Cultures3, TestData.ThrowingStrategy);
             Debug.WriteLine($"Competition time: {watch.Elapsed.TotalMilliseconds - time}");
             time = watch.Elapsed.TotalMilliseconds;
             Sport = SportEntityFactory.BuildSportAsync(TestData.SportId, TestData.Cultures3, TestData.ThrowingStrategy).Result;

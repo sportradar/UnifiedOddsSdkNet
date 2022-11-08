@@ -35,7 +35,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
         private void InitializeSportEntities()
         {
-            _sef.Competition = _sef.SportEntityFactory.BuildSportEvent<ICompetition>(TestData.EventId, URN.Parse("sr:sport:3"), TestData.Cultures, TestData.ThrowingStrategy);
+            _sef.Competition = _sef.SportEntityFactory.BuildSportEvent<ICompetition>(TestData.EventMatchId, URN.Parse("sr:sport:3"), TestData.Cultures, TestData.ThrowingStrategy);
             _sef.Sport = _sef.SportEntityFactory.BuildSportAsync(TestData.SportId, TestData.Cultures, TestData.ThrowingStrategy).Result;
             _sef.Sports = _sef.SportEntityFactory.BuildSportsAsync(TestData.Cultures, TestData.ThrowingStrategy).Result?.ToList();
             _sef.Tournament = _sef.SportEntityFactory.BuildSportEvent<ITournament>(TestData.TournamentId, URN.Parse("sr:sport:3"), TestData.Cultures, TestData.ThrowingStrategy);
@@ -191,7 +191,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         private static void ValidateSportEvent(ICompetition item, bool ignoreDate = false)
         {
             Assert.IsNotNull(item, "Sport event not found.");
-            Assert.AreEqual(TestData.EventId, item.Id, "Id not correct.");
+            Assert.AreEqual(TestData.EventMatchId, item.Id, "Id not correct.");
 
             var date = item.GetScheduledTimeAsync().Result;
             var competitors = item.GetCompetitorsAsync().Result?.ToList();

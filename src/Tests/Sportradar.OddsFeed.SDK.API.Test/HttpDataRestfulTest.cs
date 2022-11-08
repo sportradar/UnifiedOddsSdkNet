@@ -1,8 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Net.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sportradar.OddsFeed.SDK.API.Internal.Replay;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
@@ -10,6 +8,8 @@ using Sportradar.OddsFeed.SDK.Common.Internal.Log;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Messages.REST;
 using Sportradar.OddsFeed.SDK.Test.Shared;
+using System;
+using System.Net.Http;
 
 namespace Sportradar.OddsFeed.SDK.API.Test
 {

@@ -74,14 +74,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         public void SportEventBaseDataIsCachedCorrectly()
         {
             TestDataIsCaching();
-            var e = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventId);
+            var e = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventMatchId);
             ValidateSportEventCacheItem(e);
         }
 
         [TestMethod]
         public void SportEventCacheItemMergeFixture()
         {
-            var item = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventId);
+            var item = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventMatchId);
             Assert.IsNotNull(item); // empty with providers
 
             var tourId = item.GetTournamentIdAsync(TestData.Cultures).Result;
@@ -96,7 +96,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         [TestMethod]
         public void SportEventCacheItemMergeDetails()
         {
-            var item = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventId);
+            var item = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventMatchId);
             Assert.IsNotNull(item); // empty with providers
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(DateSchedule), $"{DateSchedule} should be called exactly 0 times.");
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly 0 times.");
@@ -127,7 +127,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(TestData.Cultures.Count * 3, _dataRouterManager.GetCallCount(DateSchedule), $"{DateSchedule} should be called exactly {TestData.Cultures.Count * 3} times.");
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly 0 times.");
 
-            var item = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventId);
+            var item = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventMatchId);
             Assert.IsNotNull(item); // preloaded with event summary with providers
             Assert.AreEqual(TestData.Cultures.Count * 3, _dataRouterManager.GetCallCount(DateSchedule), $"{DateSchedule} should be called exactly {TestData.Cultures.Count * 3} times.");
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly 0 times.");
@@ -180,7 +180,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(1, _dataRouterManager.GetCallCount(DateSchedule), $"{DateSchedule} should be called exactly 1 times.");
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly 0 times.");
 
-            var a = _sportEventCache.GetEventCacheItem(TestData.EventId);
+            var a = _sportEventCache.GetEventCacheItem(TestData.EventMatchId);
             Assert.IsNotNull(a, "Cached item not found.");
         }
 
@@ -204,7 +204,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(ScheduleEventCount, _sportEventCache.Cache.Count(c => c.Key.Contains("match")));
             Assert.AreEqual(TestData.Cultures.Count * 3 + 1, _dataRouterManager.GetCallCount(DateSchedule), $"{DateSchedule} should be called exactly {TestData.Cultures.Count * 3 + 1} times.");
 
-            var a = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventId);
+            var a = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventMatchId);
             ValidateSportEventCacheItem(a);
             Assert.IsNotNull(a, "Cached item not found.");
         }
@@ -221,7 +221,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 Assert.AreEqual(TournamentEventCount, _memoryCache.Count());
                 Assert.AreEqual(1, _dataRouterManager.GetCallCount(TournamentSchedule), $"{TournamentSchedule} should be called exactly 1 times.");
 
-                var a = _sportEventCache.GetEventCacheItem(TestData.EventId);
+                var a = _sportEventCache.GetEventCacheItem(TestData.EventMatchId);
                 Assert.IsNotNull(a, "Cached item not found.");
             }).GetAwaiter().GetResult();
         }
@@ -237,7 +237,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(TournamentEventCount, events.Count());
             Assert.AreEqual(1, _dataRouterManager.GetCallCount(TournamentSchedule), $"{TournamentSchedule} should be called exactly 1 times.");
 
-            var a = _sportEventCache.GetEventCacheItem(TestData.EventId);
+            var a = _sportEventCache.GetEventCacheItem(TestData.EventMatchId);
             Assert.IsNotNull(a, "Cached item not found.");
         }
 
@@ -262,9 +262,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             {
                 i--;
 
-                var ci = await GetMatchCacheItemAsync(TestData.EventId, culture, stopWatch, i).ConfigureAwait(false);
+                var ci = await GetMatchCacheItemAsync(TestData.EventMatchId, culture, stopWatch, i).ConfigureAwait(false);
                 Assert.IsNotNull(ci);
-                Assert.AreEqual(TestData.EventId, ci.Id);
+                Assert.AreEqual(TestData.EventMatchId, ci.Id);
 
                 if (i % 10 != 3)
                 {
@@ -288,7 +288,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             while (i > 0)
             {
                 i--;
-                tasks.Add(GetMatchCacheItemAsync(TestData.EventId, culture, stopWatch, i));
+                tasks.Add(GetMatchCacheItemAsync(TestData.EventMatchId, culture, stopWatch, i));
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
@@ -899,7 +899,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         private static void ValidateSportEventCacheItem(IMatchCI item, bool ignoreDate = false)
         {
             Assert.IsNotNull(item, "Cached item not found.");
-            Assert.AreEqual(TestData.EventId, item.Id);
+            Assert.AreEqual(TestData.EventMatchId, item.Id);
             var date = new DateTime?();
             List<URN> competitors = null;
             TeamCompetitorCI comp = null;
