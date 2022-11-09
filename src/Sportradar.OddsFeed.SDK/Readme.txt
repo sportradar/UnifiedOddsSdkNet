@@ -9,6 +9,11 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2022-11-09  1.56.0
+Enabled BookingStatus for stages fetches fixture
+Fix for variant market descriptions (to ignore default static market description - effects playerprops markets)
+Fix for fetching missing summary only if required (effects ILongTermEvent entities)
+
 2022-09-20  1.55.0
 CustomBet - added support for calculate-filter endpoint
 Fixed saving match timeline

@@ -25,6 +25,11 @@ The package contains:
 For more information please contact support@sportradar.com or visit https://iodocs.betradar.com/unifiedsdk/index.html
 
 CHANGE LOG:
+2022-11-09  1.56.0
+Enabled BookingStatus for stages fetches fixture
+Fix for variant market descriptions (to ignore default static market description - effects playerprops markets)
+Fix for fetching missing summary only if required (effects ILongTermEvent entities)
+
 2022-09-20  1.55.0
 CustomBet - added support for calculate-filter endpoint
 Fixed saving match timeline
