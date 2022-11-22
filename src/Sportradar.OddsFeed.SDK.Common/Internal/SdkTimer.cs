@@ -67,8 +67,15 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <param name="state">A <see cref="object"/> instance passed to the timer when it was constructed</param>
         private void OnTick(object state)
         {
-            var handler = Elapsed;
-            handler?.Invoke(this, new EventArgs());
+            try
+            {
+                var handler = Elapsed;
+                handler?.Invoke(this, EventArgs.Empty);
+            }
+            catch (Exception e)
+            {
+                SdkLoggerFactory.GetLoggerForExecution(typeof(SdkTimer)).Error("Error invoking SdkTimer.OnTick", e);
+            }
         }
 
         /// <summary>

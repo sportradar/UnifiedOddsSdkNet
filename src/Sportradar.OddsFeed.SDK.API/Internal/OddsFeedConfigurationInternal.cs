@@ -1,19 +1,19 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
-using System.Collections.Generic;
-using Dawn;
-using System.Globalization;
-using System.Linq;
-using System.Text;
 using Common.Logging;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -251,7 +251,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 ExecutionLog.Info($"Whoami data successfully retrieved. Host URL={hostUrl}, Environment={Enum.GetName(typeof(SdkEnvironment), environment)}");
                 _bookmakerDetails = new BookmakerDetails(bookmakerDetailsDTO);
                 ApiHost = hostName;
-           
+
                 if (_bookmakerDetails.ServerTimeDifference > TimeSpan.FromSeconds(5))
                 {
                     ExecutionLog.Error($"Machine time is out of sync for {_bookmakerDetails.ServerTimeDifference.TotalSeconds} sec. It may produce unwanted results with time sensitive operations within sdk.");
@@ -365,7 +365,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 ? string.Join(",", DisabledProducers)
                 : string.Empty;
             var token = SdkInfo.ClearSensitiveData(AccessToken);
-            
+
             var sb = new StringBuilder();
             sb.Append("AccessToken=").Append(token)
               .Append(" Username=").Append(Username == AccessToken ? token : Username)
