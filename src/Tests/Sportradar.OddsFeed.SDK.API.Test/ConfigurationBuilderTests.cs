@@ -27,12 +27,12 @@ namespace Sportradar.OddsFeed.SDK.API.Test
 
         private static List<int> GetIntList(string value)
         {
-            return value.Split(new[] {","}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
+            return value.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
         }
 
         private static List<CultureInfo> GetCultureList(string cultureNames)
         {
-            return cultureNames.Split(new[] {","}, StringSplitOptions.RemoveEmptyEntries).Select(name => new CultureInfo(name)).ToList();
+            return cultureNames.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries).Select(name => new CultureInfo(name)).ToList();
         }
 
         private static IConfigurationBuilder IntegrationBuilder(IOddsFeedConfigurationSection section)
@@ -726,7 +726,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
                                   string.Empty);
         }
 
-        
+
         [TestMethod]
         public void BuilderEnvironmentProxyTokyo()
         {
@@ -777,8 +777,92 @@ namespace Sportradar.OddsFeed.SDK.API.Test
                                   true,
                                   true,
                                   45,
-                                  750, 
-                                  45, 
+                                  750,
+                                  45,
+                                  11,
+                                  0,
+                                  ExceptionHandlingStrategy.THROW,
+                                  true,
+                                  45,
+                                  65);
+        }
+
+        [TestMethod]
+        public void BuilderEnvironmentGlobalIntegration()
+        {
+            var accessToken = "AccessToken";
+            var section = $"<oddsFeedSection accessToken='{accessToken}' supportedLanguages='en,de' nodeId='11' />".ToSection();
+            var config = new TokenSetter(new TestSectionProvider(section))
+                         .SetAccessTokenFromConfigFile()
+                         .SelectEnvironment(SdkEnvironment.GlobalIntegration)
+                         .LoadFromConfigFile()
+                         .SetAdjustAfterAge(true)
+                         .SetExceptionHandlingStrategy(ExceptionHandlingStrategy.THROW)
+                         .SetHttpClientTimeout(45)
+                         .SetInactivitySeconds(45)
+                         .SetMaxRecoveryTime(750)
+                         .SetMinIntervalBetweenRecoveryRequests(45)
+                         .SetRecoveryHttpClientTimeout(65)
+                         .Build();
+            ValidateConfiguration(config,
+                                  accessToken,
+                                  SdkEnvironment.GlobalIntegration,
+                                  "en",
+                                  2,
+                                  EnvironmentManager.GetMqHost(SdkEnvironment.GlobalIntegration),
+                                  EnvironmentManager.GetApiHost(SdkEnvironment.GlobalIntegration),
+                                  EnvironmentManager.DefaultMqHostPort,
+                                  accessToken,
+                                  null,
+                                  null,
+                                  true,
+                                  true,
+                                  45,
+                                  750,
+                                  45,
+                                  11,
+                                  0,
+                                  ExceptionHandlingStrategy.THROW,
+                                  true,
+                                  45,
+                                  65);
+        }
+
+        [TestMethod]
+        public void BuilderEnvironmentReplay()
+        {
+            var accessToken = "AccessToken";
+            var section = $"<oddsFeedSection accessToken='{accessToken}' supportedLanguages='en,de' nodeId='11' />".ToSection();
+            var config = new TokenSetter(new TestSectionProvider(section))
+                         .SetAccessTokenFromConfigFile()
+                         .SelectEnvironment(SdkEnvironment.Replay)
+                         .LoadFromConfigFile()
+                         .SetAdjustAfterAge(true)
+                         .SetExceptionHandlingStrategy(ExceptionHandlingStrategy.THROW)
+                         .SetHttpClientTimeout(45)
+                         .SetInactivitySeconds(45)
+                         .SetMaxRecoveryTime(750)
+                         .SetMinIntervalBetweenRecoveryRequests(45)
+                         .SetRecoveryHttpClientTimeout(65)
+                         .Build();
+            Assert.AreEqual(SdkEnvironment.Replay, config.Environment);
+            Assert.AreEqual(EnvironmentManager.GetApiHost(SdkEnvironment.GlobalIntegration), config.ApiHost);
+            ValidateConfiguration(config,
+                                  accessToken,
+                                  SdkEnvironment.Replay,
+                                  "en",
+                                  2,
+                                  EnvironmentManager.GetMqHost(SdkEnvironment.Replay),
+                                  EnvironmentManager.GetApiHost(SdkEnvironment.Replay),
+                                  EnvironmentManager.DefaultMqHostPort,
+                                  accessToken,
+                                  null,
+                                  null,
+                                  true,
+                                  true,
+                                  45,
+                                  750,
+                                  45,
                                   11,
                                   0,
                                   ExceptionHandlingStrategy.THROW,
@@ -841,7 +925,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
                                            bool useMqSsl = true,
                                            bool useApiSsl = true,
                                            int inactivitySeconds = SdkInfo.MinInactivitySeconds,
-                                           int maxRecoveryExecutionInSeconds=SdkInfo.MaxRecoveryExecutionInSeconds,
+                                           int maxRecoveryExecutionInSeconds = SdkInfo.MaxRecoveryExecutionInSeconds,
                                            int minIntervalBetweenRecoveryRequests = SdkInfo.DefaultIntervalBetweenRecoveryRequests,
                                            int nodeId = 0,
                                            int disabledProducers = 0,
