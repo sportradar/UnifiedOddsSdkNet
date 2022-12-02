@@ -45,6 +45,7 @@
     <Compile Include="LockManagerTests.cs" />
     <Compile Include="OperationManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SdkTimerTests.cs" />
     <Compile Include="SemaphorePoolTests.cs" />
   </ItemGroup>
   <ItemGroup>

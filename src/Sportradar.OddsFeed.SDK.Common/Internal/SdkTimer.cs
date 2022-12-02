@@ -54,11 +54,22 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         }
 
         /// <summary>
-        /// Disposes un-managed resources associated with the current instance
+        /// Disposes unmanaged resources associated with the current instance
         /// </summary>
         ~SdkTimer()
         {
             Dispose(false);
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="SdkTimer"/> class.
+        /// </summary>
+        /// <param name="dueTime">A <see cref="TimeSpan"/> specifying a time period before the <see cref="Elapsed"/> event will be raised for the first time.</param>
+        /// <param name="period">A <see cref="TimeSpan"/> specifying a period between subsequent raises of the <see cref="Elapsed"/> event.</param>
+        /// <returns>New timer instance</returns>
+        public static SdkTimer Create(TimeSpan dueTime, TimeSpan period)
+        {
+            return new SdkTimer(dueTime, period);
         }
 
         /// <summary>
