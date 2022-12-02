@@ -1,13 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sportradar.OddsFeed.SDK.Common;
-using Sportradar.OddsFeed.SDK.Common.Internal;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
-using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.Feed;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,6 +8,13 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sportradar.OddsFeed.SDK.Common;
+using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
+using Sportradar.OddsFeed.SDK.Messages;
+using Sportradar.OddsFeed.SDK.Messages.Feed;
 
 namespace Sportradar.OddsFeed.SDK.Test.Shared
 {
@@ -41,6 +41,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         public static readonly CultureInfo Culture = new CultureInfo("en");
         public static List<CultureInfo> Cultures => Cultures3;
+        public static List<CultureInfo> Cultures1 => new List<CultureInfo> { Culture };
         public static readonly List<CultureInfo> Cultures3 = new List<CultureInfo>(new[] { new CultureInfo("en"), new CultureInfo("de"), new CultureInfo("hu") });
         public static readonly List<CultureInfo> Cultures4 = new List<CultureInfo>(new[] { new CultureInfo("en"), new CultureInfo("de"), new CultureInfo("hu"), new CultureInfo("nl") });
 

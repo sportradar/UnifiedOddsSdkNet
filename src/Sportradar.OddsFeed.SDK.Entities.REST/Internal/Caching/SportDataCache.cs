@@ -1,6 +1,14 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Dawn;
 using Metrics;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
@@ -14,14 +22,6 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.REST;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Globalization;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 // ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 
@@ -263,14 +263,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 return null;
             }
 
-            CategoryCI cachedCategory;
-            if (!(Categories.TryGetValue(cachedTournament.GetCategoryIdAsync().Result, out cachedCategory) && cachedCategory.HasTranslationsFor(cultureList)))
+            if (!(Categories.TryGetValue(cachedTournament.GetCategoryIdAsync().Result, out var cachedCategory) && cachedCategory.HasTranslationsFor(cultureList)))
             {
                 return null;
             }
 
-            SportCI cachedSport;
-            if (!(Sports.TryGetValue(cachedCategory.SportId, out cachedSport) && cachedSport.HasTranslationsFor(cultureList)))
+            if (!(Sports.TryGetValue(cachedCategory.SportId, out var cachedSport) && cachedSport.HasTranslationsFor(cultureList)))
             {
                 return null;
             }
@@ -303,8 +301,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
 
             lock (_mergeLock)
             {
-                SportCI cachedSport;
-                if (!(Sports.TryGetValue(id, out cachedSport) && cachedSport.HasTranslationsFor(cultureList)))
+                if (!(Sports.TryGetValue(id, out var cachedSport) && cachedSport.HasTranslationsFor(cultureList)))
                 {
                     return null;
                 }
@@ -316,8 +313,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                         categories = new List<CategoryData>();
                         foreach (var categoryId in cachedSport.CategoryIds)
                         {
-                            CategoryCI cachedCategory;
-                            if (!(Categories.TryGetValue(categoryId, out cachedCategory) && cachedCategory.HasTranslationsFor(cultureList)))
+                            if (!(Categories.TryGetValue(categoryId, out var cachedCategory) && cachedCategory.HasTranslationsFor(cultureList)))
                             {
                                 ExecutionLog.Warn($"An error occurred while retrieving sport from cache.For sportId = {id} and lang =[{string.Join(",", cultureList)}] we are missing category {categoryId}.");
                                 continue;
@@ -350,8 +346,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="cultures">A <see cref="IEnumerable{CultrureInfo}"/> specifying the languages to which the categories must be translated</param>
         private async Task FetchSportCategoriesIfNeededAsync(URN id, IList<CultureInfo> cultures)
         {
-            SportCI cachedSport;
-            if (!Sports.TryGetValue(id, out cachedSport))
+            if (!Sports.TryGetValue(id, out var cachedSport))
             {
                 return;
             }
@@ -624,7 +619,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     var fixture = item as FixtureDTO;
                     if (fixture?.Tournament != null)
                     {
-                        AddSport(fixture.SportId, fixture.Tournament.Sport, culture);
+                        AddSport(fixture.SportId, fixture.Tournament.Sport, fixture.Tournament.Category.Id, culture);
                         AddCategory(fixture.Tournament.Category.Id, fixture.Tournament.Category, fixture.SportId, new List<URN> { fixture.Tournament.Id }, culture);
                     }
                     else
@@ -638,7 +633,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     var match = item as MatchDTO;
                     if (match?.Tournament != null)
                     {
-                        AddSport(match.SportId, match.Tournament.Sport, culture);
+                        AddSport(match.SportId, match.Tournament.Sport, match.Tournament.Category.Id, culture);
                         AddCategory(match.Tournament.Category.Id, match.Tournament.Category, match.SportId, new List<URN> { match.Tournament.Id }, culture);
                     }
                     else
@@ -735,7 +730,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     var tour = item as TournamentDTO;
                     if (tour != null)
                     {
-                        AddSport(tour.Sport.Id, tour.Sport, culture);
+                        AddSport(tour.Sport.Id, tour.Sport, tour.Category.Id, culture);
                         AddCategory(tour.Category.Id, tour.Category, tour.Sport.Id, new List<URN> { tour.Id }, culture);
                     }
                     else
@@ -747,7 +742,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     var tourInfo = item as TournamentInfoDTO;
                     if (tourInfo != null)
                     {
-                        AddSport(tourInfo.SportId, tourInfo.Sport, culture);
+                        AddSport(tourInfo.SportId, tourInfo.Sport, tourInfo.Category.Id, culture);
                         AddCategory(tourInfo.Category.Id, tourInfo.Category, tourInfo.Sport.Id, new List<URN> { tourInfo.Id }, culture);
                     }
                     else
@@ -760,7 +755,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     if (tourSeasons?.Tournament != null)
                     {
                         var tourSeasonsTournament = tourSeasons.Tournament;
-                        AddSport(tourSeasonsTournament.SportId, tourSeasonsTournament.Sport, culture);
+                        AddSport(tourSeasonsTournament.SportId, tourSeasonsTournament.Sport, tourSeasonsTournament.Category.Id, culture);
                         AddCategory(tourSeasonsTournament.Category.Id, tourSeasonsTournament.Category, tourSeasonsTournament.Sport.Id, new List<URN> { tourSeasonsTournament.Id }, culture);
                         saved = true;
                     }
@@ -843,14 +838,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             var match = dto as MatchDTO;
             if (match?.Tournament != null)
             {
-                AddSport(match.SportId, match.Tournament.Sport, culture);
+                AddSport(match.SportId, match.Tournament.Sport, match.Tournament.Category.Id, culture);
                 AddCategory(match.Tournament.Category.Id, match.Tournament.Category, match.SportId, new List<URN> { match.Tournament.Id }, culture);
                 return;
             }
             var tour = dto as TournamentInfoDTO;
             if (tour != null)
             {
-                AddSport(tour.SportId, tour.Sport, culture);
+                AddSport(tour.SportId, tour.Sport, tour.Category.Id, culture);
                 AddCategory(tour.Category.Id, tour.Category, tour.SportId, new List<URN> { tour.Id }, culture);
 
                 if (tour.TournamentInfo != null)
@@ -864,10 +859,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             {
                 if (stage.Tournament?.Sport != null)
                 {
-                    AddSport(stage.Tournament.Sport.Id, stage.Tournament.Sport, culture);
+                    AddSport(stage.Tournament.Sport.Id, stage.Tournament.Sport, stage.Tournament.Category.Id, culture);
                 }
 
-                if (stage.Tournament.Category != null)
+                if (stage.Tournament?.Category != null)
                 {
                     AddCategory(stage.Tournament.Category.Id, stage.Tournament.Category, stage.SportId, new List<URN> { stage.Id }, culture);
                 }
@@ -967,16 +962,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             {
                 try
                 {
-                    if (Sports.ContainsKey(id))
+                    if (Sports.ContainsKey(id) && Sports.TryGetValue(id, out var ci))
                     {
-                        SportCI ci;
-                        Sports.TryGetValue(id, out ci);
-                        ci?.Merge(new SportCI(item, _dataRouterManager, culture), culture);
+                        ci.Merge(new SportCI(item, _dataRouterManager, culture), culture);
                     }
                     else
                     {
                         Sports.Add(id, new SportCI(item, _dataRouterManager, culture));
                     }
+
                     if (item.Categories != null)
                     {
                         foreach (var categoryData in item.Categories)
@@ -992,21 +986,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             }
         }
 
-        private void AddSport(URN id, SportEntityDTO item, CultureInfo culture)
+        private void AddSport(URN id, SportEntityDTO sport, URN sportCategoryId, CultureInfo culture)
         {
             lock (_mergeLock)
             {
                 try
                 {
-                    if (Sports.ContainsKey(id))
+                    if (Sports.ContainsKey(id) && Sports.TryGetValue(id, out var ci))
                     {
-                        SportCI ci;
-                        Sports.TryGetValue(id, out ci);
-                        ci?.Merge(new SportCI(new SportDTO(item.Id.ToString(), item.Name, (IEnumerable<tournamentExtended>)null), _dataRouterManager, culture), culture);
+                        ci.Merge(new SportCI(new SportDTO(sport.Id.ToString(), sport.Name, (IEnumerable<tournamentExtended>)null), _dataRouterManager, culture), culture);
+                        if (ci.CategoryIds.IsNullOrEmpty() || !ci.CategoryIds.Contains(sportCategoryId))
+                        {
+                            ci.CategoryIds.Add(sportCategoryId);
+                        }
                     }
                     else
                     {
-                        Sports.Add(id, new SportCI(new SportDTO(item.Id.ToString(), item.Name, (IEnumerable<tournamentExtended>)null), _dataRouterManager, culture));
+                        var sportCi = new SportCI(new SportDTO(sport.Id.ToString(), sport.Name, (IEnumerable<tournamentExtended>)null), _dataRouterManager, culture);
+                        sportCi.CategoryIds.Add(sportCategoryId);
+                        Sports.Add(id, sportCi);
                     }
                 }
                 catch (Exception e)
@@ -1024,8 +1022,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 {
                     if (Sports.ContainsKey(id))
                     {
-                        SportCI ci;
-                        Sports.TryGetValue(id, out ci);
+                        Sports.TryGetValue(id, out var ci);
                         ci?.Merge(new SportCI(new SportDTO(item.Sport.Id.ToString(), item.Sport.Name, item.Categories), _dataRouterManager, culture), culture);
                     }
                     else
@@ -1049,8 +1046,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     var id = URN.Parse(item.Id);
                     if (Sports.ContainsKey(id))
                     {
-                        SportCI ci;
-                        Sports.TryGetValue(id, out ci);
+                        Sports.TryGetValue(id, out var ci);
                         ci?.Merge(new SportCI(item), item.Name.Keys.First());
                     }
                     else
@@ -1080,8 +1076,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 {
                     if (Categories.ContainsKey(item.Id))
                     {
-                        CategoryCI ci;
-                        Categories.TryGetValue(item.Id, out ci);
+                        Categories.TryGetValue(item.Id, out var ci);
                         ci?.Merge(new CategoryCI(item, culture, item.Tournaments?.FirstOrDefault()?.Sport.Id ?? id), culture);
                     }
                     else
@@ -1105,8 +1100,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 {
                     if (Categories.ContainsKey(id))
                     {
-                        CategoryCI ci;
-                        Categories.TryGetValue(id, out ci);
+                        Categories.TryGetValue(id, out var ci);
                         ci?.Merge(new CategoryCI(item, culture, sportId, tournamentIds), culture);
                     }
                     else
@@ -1130,8 +1124,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     var id = URN.Parse(item.Id);
                     if (Categories.ContainsKey(id))
                     {
-                        CategoryCI ci;
-                        Categories.TryGetValue(id, out ci);
+                        Categories.TryGetValue(id, out var ci);
                         ci?.Merge(new CategoryCI(item), item.Name.Keys.First());
                     }
                     else
@@ -1156,8 +1149,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     {
                         if (Categories.ContainsKey(category.Id))
                         {
-                            CategoryCI ci;
-                            Categories.TryGetValue(category.Id, out ci);
+                            Categories.TryGetValue(category.Id, out var ci);
                             ci?.Merge(new CategoryCI(category, culture, item.Sport.Id), culture);
                         }
                         else

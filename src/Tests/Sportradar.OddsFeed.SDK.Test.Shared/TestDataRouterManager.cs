@@ -1,6 +1,13 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Dawn;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST;
@@ -17,13 +24,6 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping.Lottery;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.EventArguments;
 using Sportradar.OddsFeed.SDK.Messages.REST;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 // ReSharper disable UnusedMember.Local
 
@@ -233,13 +233,14 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         public async Task GetSportCategoriesAsync(URN id, CultureInfo culture)
         {
             RecordCall("GetSportCategoriesAsync");
+
+            await ExecuteDelayAsync("sportcategories", culture).ConfigureAwait(false);
+
             var filePath = GetFile(SportCategoriesXml, culture);
             var restDeserializer = new Deserializer<sportCategoriesEndpoint>();
             var mapper = new SportCategoriesMapperFactory();
             var stream = FileHelper.OpenFile(filePath);
             var result = mapper.CreateMapper(restDeserializer.Deserialize(stream)).Map();
-
-            await ExecuteDelayAsync(id, culture).ConfigureAwait(false);
 
             if (result?.Categories != null)
             {

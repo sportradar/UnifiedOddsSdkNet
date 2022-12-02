@@ -1,13 +1,13 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using Sportradar.OddsFeed.SDK.Common.Internal;
-using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.REST;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Messages;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 using SR = Sportradar.OddsFeed.SDK.Test.Shared.StaticRandom;
 // ReSharper disable UnusedMember.Local
 
@@ -35,10 +35,21 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         public static category GetCategory(int id = 0)
         {
+            id = id == 0 ? SR.I1000 : id;
             return new category
             {
-                id = id == 0 ? SR.Urn("category").ToString() : SR.Urn(id, "category").ToString(),
-                name = $"Category name {SR.S1000}"
+                id = SR.Urn(id, "category").ToString(),
+                name = $"Category name {id}",
+                country_code = "en"
+            };
+        }
+
+        public static sport GetSport(int id = 0)
+        {
+            return new sport
+            {
+                id = id == 0 ? SR.Urn("sport", 100).ToString() : SR.Urn(id, "sport").ToString(),
+                name = $"Sport {SR.S1000}"
             };
         }
 
@@ -429,15 +440,6 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                 start_date = DateTime.Now,
                 tournament_id = SR.Urn("tournament", SR.I100).ToString(),
                 year = DateTime.Now.Year.ToString()
-            };
-        }
-
-        public static sport GetSport(int id = 0)
-        {
-            return new sport
-            {
-                id = id == 0 ? SR.Urn("sport", 100).ToString() : SR.Urn(id, "sport").ToString(),
-                name = $"Sport {SR.S1000}",
             };
         }
 

@@ -756,6 +756,12 @@
     <None Include="REST XMLs\CustomBet\calculate_response.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <EmbeddedResource Include="REST XMLs\Summarys\summary_sr_match_123456.en.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="REST XMLs\Summarys\summary_sr_match_654321.en.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <Content Include="REST XMLs\Summarys\summary_sr_season_80242.de.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

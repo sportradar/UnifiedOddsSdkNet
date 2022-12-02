@@ -1,14 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sportradar.OddsFeed.SDK.Common;
-using Sportradar.OddsFeed.SDK.Common.Internal;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports;
-using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Test.Shared;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -16,6 +8,17 @@ using System.Linq;
 using System.Runtime.Caching;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sportradar.OddsFeed.SDK.Common;
+using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
+using Sportradar.OddsFeed.SDK.Messages;
+using Sportradar.OddsFeed.SDK.Messages.REST;
+using Sportradar.OddsFeed.SDK.Test.Shared;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 {
@@ -128,8 +131,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
                 var tournamentSport = await _sportDataCache.GetSportForTournamentAsync(URN.Parse("sr:tournament:146"), TestData.Cultures);
                 Assert.IsNotNull(tournamentSport, "tournamentSport cannot be a null reference");
-                Assert.AreEqual(tournamentSport.Categories.Count(), 1, "The number of categories must be 1");
-                Assert.AreEqual(tournamentSport.Categories.First().Tournaments.Count(), 1, "the number of tournaments must be 1");
+                Assert.AreEqual(1, tournamentSport.Categories.Count(), "The number of categories must be 1");
+                Assert.AreEqual(1, tournamentSport.Categories.First().Tournaments.Count(), "the number of tournaments must be 1");
             }).GetAwaiter().GetResult();
             Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(callType), $"{callType} should be called exactly {TestData.Cultures.Count} times.");
         }
@@ -270,8 +273,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         public void GetSportAsyncReturnKnownId2Test()
         {
             const string callType = "GetAllSportsAsync";
-            List<SportData> sportsList = _sportDataCache.GetSportsAsync(TestData.Cultures).Result.ToList(); // initial load
-            SportData data = _sportDataCache.GetSportAsync(SportId, TestData.Cultures).Result;
+            var sportsList = _sportDataCache.GetSportsAsync(TestData.Cultures).Result.ToList(); // initial load
+            var data = _sportDataCache.GetSportAsync(SportId, TestData.Cultures).Result;
 
             Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(callType), $"{callType} should be called exactly {TestData.Cultures.Count} times.");
             Assert.AreEqual(SportId, data.Id);
@@ -375,6 +378,281 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             BaseSportDataValidation(data01, TestData.Cultures.Count);
         }
 
+        [TestMethod]
+        public async Task RetrievingNonExistingSportTest()
+        {
+            const string callType = "GetAllSportsAsync";
+            var sportId = URN.Parse("sr:sport:12345");
+            Assert.AreEqual(0, _sportDataCache.Sports.Count);
+            Assert.AreEqual(0, _sportDataCache.Categories.Count);
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(callType));
+
+            var sportData = await _sportDataCache.GetSportAsync(sportId, TestData.Cultures); // initial load
+            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(callType));
+            Assert.AreEqual(TestData.CacheSportCount, _sportDataCache.Sports.Count);
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount("GetSportEventSummaryAsync"));
+
+            Assert.IsNull(sportData);
+        }
+
+        [TestMethod]
+        public async Task RetrievingNonExistingCategoryTest()
+        {
+            const string callType = "GetAllSportsAsync";
+            var categoryId = URN.Parse("sr:category:12345");
+            Assert.AreEqual(0, _sportDataCache.Sports.Count);
+            Assert.AreEqual(0, _sportDataCache.Categories.Count);
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(callType));
+
+            var categoryData = await _sportDataCache.GetCategoryAsync(categoryId, TestData.Cultures); // initial load
+            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(callType));
+            Assert.AreEqual(TestData.CacheSportCount, _sportDataCache.Sports.Count);
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount("GetSportEventSummaryAsync"));
+
+            Assert.IsNull(categoryData);
+        }
+
+        [TestMethod]
+        public async Task AddNewSportWithCategoryFromSummaryTest()
+        {
+            const string callType = "GetAllSportsAsync";
+            var eventId = URN.Parse("sr:match:123456");
+            var sportId = URN.Parse("sr:sport:1888");
+            var categoryId = URN.Parse("sr:category:204");
+            Assert.AreEqual(0, _sportDataCache.Sports.Count);
+            Assert.AreEqual(0, _sportDataCache.Categories.Count);
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(callType));
+
+            // first it is not cached
+            var sportData = await _sportDataCache.GetSportAsync(sportId, TestData.Cultures1); // initial load
+            Assert.AreEqual(TestData.Cultures1.Count, _dataRouterManager.GetCallCount(callType));
+            Assert.AreEqual(TestData.CacheSportCount, _sportDataCache.Sports.Count);
+            Assert.AreEqual(TestData.CacheCategoryCount, _sportDataCache.Categories.Count);
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount("GetSportEventSummaryAsync"));
+            Assert.IsNull(sportData);
+
+            // adding from summary
+            var sportEvent = _sportEventCache.GetEventCacheItem(eventId);
+            Assert.IsNotNull(sportEvent);
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount("GetSportEventSummaryAsync"));
+            Assert.AreEqual(sportId, sportEvent.GetSportIdAsync().Result);
+            Assert.AreEqual(1, _dataRouterManager.GetCallCount("GetSportEventSummaryAsync"));
+
+            Assert.AreEqual(TestData.CacheSportCount + 1, _sportDataCache.Sports.Count);
+            Assert.AreEqual(TestData.CacheCategoryCount + 1, _sportDataCache.Categories.Count);
+
+            sportData = await _sportDataCache.GetSportAsync(sportId, TestData.Cultures1);
+            Assert.IsNotNull(sportData);
+            Assert.AreEqual(sportId, sportData.Id);
+            Assert.IsNotNull(sportData.Categories);
+            Assert.AreEqual(1, sportData.Categories.Count());
+            Assert.IsTrue(sportData.Categories.Select(s => s.Id).Contains(categoryId));
+
+            var categoryData = await _sportDataCache.GetCategoryAsync(categoryId, TestData.Cultures1);
+            Assert.IsNotNull(categoryData);
+            Assert.AreEqual(categoryId, categoryData.Id);
+            Assert.AreEqual(1, categoryData.Names.Count);
+        }
+
+        [TestMethod]
+        public async Task AddNewCategoryForExistingSportSummaryTest()
+        {
+            const string callType = "GetAllSportsAsync";
+            var eventId = URN.Parse("sr:match:654321");
+            var sportId = URN.Parse("sr:sport:18");
+            var categoryId = URN.Parse("sr:category:204");
+            Assert.AreEqual(0, _sportDataCache.Sports.Count);
+            Assert.AreEqual(0, _sportDataCache.Categories.Count);
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(callType));
+
+            // first it is not cached
+            var sportData = await _sportDataCache.GetSportAsync(sportId, TestData.Cultures1); // initial load
+            Assert.AreEqual(TestData.Cultures1.Count, _dataRouterManager.GetCallCount(callType));
+            Assert.AreEqual(TestData.CacheSportCount, _sportDataCache.Sports.Count);
+            Assert.AreEqual(TestData.CacheCategoryCountPlus, _sportDataCache.Categories.Count);
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount("GetSportEventSummaryAsync"));
+            Assert.IsNotNull(sportData);
+            Assert.AreEqual(0, sportData.Categories.Count());
+
+            // adding from summary
+            var sportEvent = _sportEventCache.GetEventCacheItem(eventId);
+            Assert.IsNotNull(sportEvent);
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount("GetSportEventSummaryAsync"));
+            Assert.AreEqual(sportId, sportEvent.GetSportIdAsync().Result);
+            Assert.AreEqual(1, _dataRouterManager.GetCallCount("GetSportEventSummaryAsync"));
+
+            Assert.AreEqual(TestData.CacheSportCount, _sportDataCache.Sports.Count);
+            Assert.AreEqual(TestData.CacheCategoryCountPlus + 1, _sportDataCache.Categories.Count);
+
+            sportData = await _sportDataCache.GetSportAsync(sportId, TestData.Cultures1);
+            Assert.IsNotNull(sportData);
+            Assert.AreEqual(sportId, sportData.Id);
+            Assert.IsNotNull(sportData.Categories);
+            Assert.AreEqual(1, sportData.Categories.Count());
+            Assert.IsTrue(sportData.Categories.Select(s => s.Id).Contains(categoryId));
+
+            var categoryData = await _sportDataCache.GetCategoryAsync(categoryId, TestData.Cultures1);
+            Assert.IsNotNull(categoryData);
+            Assert.AreEqual(categoryId, categoryData.Id);
+            Assert.AreEqual(1, categoryData.Names.Count);
+        }
+
+        [TestMethod]
+        public async Task AddNewCategoryFromCategoryDtoTest()
+        {
+            const string callType = "GetAllSportsAsync";
+            var sportId = URN.Parse("sr:sport:1234");
+            var categoryId = URN.Parse("sr:category:4321");
+            Assert.AreEqual(0, _sportDataCache.Sports.Count);
+            Assert.AreEqual(0, _sportDataCache.Categories.Count);
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(callType));
+
+            // first it is not cached
+            var sportData = await _sportDataCache.GetSportAsync(sportId, TestData.Cultures1);
+            Assert.AreEqual(TestData.Cultures1.Count, _dataRouterManager.GetCallCount(callType));
+            Assert.AreEqual(TestData.CacheSportCount, _sportDataCache.Sports.Count);
+            Assert.AreEqual(TestData.CacheCategoryCount, _sportDataCache.Categories.Count);
+            Assert.IsNull(sportData);
+
+            // adding from CategoryDto
+            var category = MessageFactoryRest.GetCategory((int)categoryId.Id);
+            var categoryDto = new CategoryDTO(category.id, category.name, category.country_code, new List<tournamentExtended>());
+            await _cacheManager.SaveDtoAsync(categoryDto.Id, categoryDto, TestData.Cultures1.First(), DtoType.Category, null);
+
+            Assert.AreEqual(TestData.CacheSportCount, _sportDataCache.Sports.Count);
+            Assert.AreEqual(TestData.CacheCategoryCount + 1, _sportDataCache.Categories.Count);
+
+            sportData = await _sportDataCache.GetSportAsync(sportId, TestData.Cultures1);
+            Assert.IsNull(sportData);
+
+            var categoryData = await _sportDataCache.GetCategoryAsync(categoryId, TestData.Cultures1);
+            Assert.IsNotNull(categoryData);
+            Assert.AreEqual(categoryId, categoryData.Id);
+            Assert.AreEqual(1, categoryData.Names.Count);
+        }
+
+        [TestMethod]
+        public async Task AddNewSportWithCategoryFromCategoryDtoTest()
+        {
+            const string callType = "GetAllSportsAsync";
+            var sportId = URN.Parse("sr:sport:1234");
+            var categoryId = URN.Parse("sr:category:4321");
+            Assert.AreEqual(0, _sportDataCache.Sports.Count);
+            Assert.AreEqual(0, _sportDataCache.Categories.Count);
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(callType));
+
+            // first it is not cached
+            var sportData = await _sportDataCache.GetSportAsync(sportId, TestData.Cultures1);
+            Assert.AreEqual(TestData.Cultures1.Count, _dataRouterManager.GetCallCount(callType));
+            Assert.AreEqual(TestData.CacheSportCount, _sportDataCache.Sports.Count);
+            Assert.AreEqual(TestData.CacheCategoryCount, _sportDataCache.Categories.Count);
+            Assert.IsNull(sportData);
+
+            // adding from CategoryDto
+            var category = MessageFactoryRest.GetCategory((int)categoryId.Id);
+            var sport = MessageFactoryRest.GetSport((int)sportId.Id);
+            var categoryDto = new CategoryDTO(category.id, category.name, category.country_code, new List<tournamentExtended>());
+            var sportDto = new SportDTO(sport.id, sport.name, new List<CategoryDTO> { categoryDto });
+            await _cacheManager.SaveDtoAsync(sportDto.Id, sportDto, TestData.Cultures1.First(), DtoType.Sport, null);
+
+            Assert.AreEqual(TestData.CacheSportCount + 1, _sportDataCache.Sports.Count);
+            Assert.AreEqual(TestData.CacheCategoryCount + 1, _sportDataCache.Categories.Count);
+
+            sportData = await _sportDataCache.GetSportAsync(sportId, TestData.Cultures1);
+            Assert.IsNotNull(sportData);
+            Assert.AreEqual(sportId, sportData.Id);
+            Assert.IsNotNull(sportData.Categories);
+            Assert.AreEqual(1, sportData.Categories.Count());
+            Assert.IsTrue(sportData.Categories.Select(s => s.Id).Contains(categoryId));
+
+            var categoryData = await _sportDataCache.GetCategoryAsync(categoryId, TestData.Cultures1);
+            Assert.IsNotNull(categoryData);
+            Assert.AreEqual(categoryId, categoryData.Id);
+            Assert.AreEqual(1, categoryData.Names.Count);
+        }
+
+        [TestMethod]
+        public async Task AddNewSportWithCategoryFromTournamentTest()
+        {
+            const string callType = "GetAllSportsAsync";
+            var sportId = URN.Parse("sr:sport:1234");
+            var categoryId = URN.Parse("sr:category:4321");
+            Assert.AreEqual(0, _sportDataCache.Sports.Count);
+            Assert.AreEqual(0, _sportDataCache.Categories.Count);
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(callType));
+
+            // first it is not cached
+            var sportData = await _sportDataCache.GetSportAsync(sportId, TestData.Cultures1);
+            Assert.AreEqual(TestData.Cultures1.Count, _dataRouterManager.GetCallCount(callType));
+            Assert.AreEqual(TestData.CacheSportCount, _sportDataCache.Sports.Count);
+            Assert.AreEqual(TestData.CacheCategoryCount, _sportDataCache.Categories.Count);
+            Assert.IsNull(sportData);
+
+            // adding 
+            var tournament = MessageFactoryRest.GetTournament();
+            tournament.category.id = categoryId.ToString();
+            tournament.sport.id = sportId.ToString();
+            var tournamentDto = new TournamentDTO(tournament);
+            await _cacheManager.SaveDtoAsync(tournamentDto.Id, tournamentDto, TestData.Cultures1.First(), DtoType.Tournament, null);
+
+            Assert.AreEqual(TestData.CacheSportCount + 1, _sportDataCache.Sports.Count);
+            Assert.AreEqual(TestData.CacheCategoryCount + 1, _sportDataCache.Categories.Count);
+
+            sportData = await _sportDataCache.GetSportAsync(sportId, TestData.Cultures1);
+            Assert.IsNotNull(sportData);
+            Assert.AreEqual(sportId, sportData.Id);
+            Assert.IsNotNull(sportData.Categories);
+            Assert.AreEqual(1, sportData.Categories.Count());
+            Assert.IsTrue(sportData.Categories.Select(s => s.Id).Contains(categoryId));
+
+            var categoryData = await _sportDataCache.GetCategoryAsync(categoryId, TestData.Cultures1);
+            Assert.IsNotNull(categoryData);
+            Assert.AreEqual(categoryId, categoryData.Id);
+            Assert.AreEqual(1, categoryData.Names.Count);
+        }
+
+        [TestMethod]
+        public async Task AddNewCategoryForExistingSportFromTournamentTest()
+        {
+            const string callType = "GetAllSportsAsync";
+            var sportId = URN.Parse("sr:sport:18");
+            var categoryId = URN.Parse("sr:category:204");
+            Assert.AreEqual(0, _sportDataCache.Sports.Count);
+            Assert.AreEqual(0, _sportDataCache.Categories.Count);
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(callType));
+
+            // first it is not cached
+            var sportData = await _sportDataCache.GetSportAsync(sportId, TestData.Cultures1); // initial load
+            Assert.AreEqual(TestData.Cultures1.Count, _dataRouterManager.GetCallCount(callType));
+            Assert.AreEqual(TestData.CacheSportCount, _sportDataCache.Sports.Count);
+            Assert.AreEqual(TestData.CacheCategoryCountPlus, _sportDataCache.Categories.Count);
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount("GetSportEventSummaryAsync"));
+            Assert.IsNotNull(sportData);
+            Assert.IsFalse(sportData.Categories.Any());
+
+            // adding
+            var tournament = MessageFactoryRest.GetTournament();
+            tournament.category.id = categoryId.ToString();
+            tournament.sport.id = sportId.ToString();
+            var tournamentDto = new TournamentDTO(tournament);
+            await _cacheManager.SaveDtoAsync(tournamentDto.Id, tournamentDto, TestData.Cultures1.First(), DtoType.Tournament, null);
+
+            Assert.AreEqual(TestData.CacheSportCount, _sportDataCache.Sports.Count);
+            Assert.AreEqual(TestData.CacheCategoryCountPlus + 1, _sportDataCache.Categories.Count);
+
+            sportData = await _sportDataCache.GetSportAsync(sportId, TestData.Cultures1);
+            Assert.IsNotNull(sportData);
+            Assert.AreEqual(sportId, sportData.Id);
+            Assert.IsNotNull(sportData.Categories);
+            Assert.AreEqual(1, sportData.Categories.Count());
+            Assert.IsTrue(sportData.Categories.Select(s => s.Id).Contains(categoryId));
+
+            var categoryData = await _sportDataCache.GetCategoryAsync(categoryId, TestData.Cultures1);
+            Assert.IsNotNull(categoryData);
+            Assert.AreEqual(categoryId, categoryData.Id);
+            Assert.AreEqual(1, categoryData.Names.Count);
+        }
+
         private void BaseSportDataValidation(SportData data)
         {
             BaseSportDataValidation(data, TestData.Cultures.Count);
@@ -397,7 +675,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                     foreach (var j in i.Tournaments)
                     {
                         Assert.IsNotNull(j.Id);
-                        //Assert.AreEqual(cultureNbr, j.Names.Count);
                     }
                 }
             }
