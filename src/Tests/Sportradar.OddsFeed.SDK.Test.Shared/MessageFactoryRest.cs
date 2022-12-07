@@ -541,11 +541,11 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                 scheduledSpecified = true,
                 scheduled_end = DateTime.Today,
                 scheduled_endSpecified = true,
-                category = GetCategory(),
-                sport = GetSport(),
+                category = GetCategory(id * id),
+                sport = GetSport(id),
                 tournament_length = GetTournamentLength(),
-                current_season = GetCurrentSeason(),
-                season_coverage_info = GetSeasonCoverageInfo(),
+                current_season = GetCurrentSeason(id * 3),
+                season_coverage_info = GetSeasonCoverageInfo(id * 15),
                 competitors = GetTeamList(subItemCount).ToArray()
             };
             return msg;
@@ -647,7 +647,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             var tours = new List<tournamentExtended>();
             for (var i = 0; i < count; i++)
             {
-                var tour = GetTournamentExtended();
+                var tour = GetTournamentExtended(i * 100);
                 if (tours.Find(f => f.id == tour.id) == null)
                 {
                     tours.Add(tour);

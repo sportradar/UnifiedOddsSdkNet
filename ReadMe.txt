@@ -25,6 +25,10 @@ The package contains:
 For more information please contact support@sportradar.com or visit https://iodocs.betradar.com/unifiedsdk/index.html
 
 CHANGE LOG:
+2022-12-05  1.56.1
+Fix configuration apiHost for replay environment
+Fix merging of new sport and category which is not included in All tournaments for all sports endpoint
+
 2022-11-09  1.56.0
 Enabled BookingStatus for stages fetches fixture
 Fix for variant market descriptions (to ignore default static market description - effects playerprops markets)

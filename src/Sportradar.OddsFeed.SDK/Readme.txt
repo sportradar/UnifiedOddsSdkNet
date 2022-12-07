@@ -9,7 +9,7 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
-2022-11-XY  1.57.0
+2022-12-05  1.56.1
 Fix configuration apiHost for replay environment
 Fix merging of new sport and category which is not included in All tournaments for all sports endpoint
 
