@@ -64,7 +64,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         public static competitorProfileEndpoint GetCompetitorProfileEndpoint(int id = 0, int playerCount = 0, IDictionary<string, string> referenceIds = null)
         {
-            if (playerCount == 0)
+            if (playerCount == -1)
             {
                 playerCount = SR.I(20);
             }
@@ -82,7 +82,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                 competitor = new teamExtended
                 {
                     id = cUrn.ToString(),
-                    name = "my name" + cUrn.Id,
+                    name = "my name " + cUrn.Id,
                     abbreviation = SR.S1000,
                     @virtual = true,
                     virtualSpecified = true,
@@ -90,7 +90,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                     state = "PA",
                     reference_ids = referenceIds?.Select(s => new competitorReferenceIdsReference_id { name = s.Key, value = s.Value }).ToArray()
                 },
-                generated_at = DateTime.Today,
+                generated_at = DateTime.Now,
                 generated_atSpecified = true,
                 players = players.ToArray()
             };
@@ -450,17 +450,21 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                 referee = GetReferee(),
                 attendance = SR.S1000,
                 match_mode = SR.S1000,
-                venue = GetVenue(),
+                venue = GetVenue(id),
                 weather_info = GetWeatherInfo()
             };
         }
 
         public static team GetTeam(int id = 0)
         {
+            if (id == 0)
+            {
+                id = SR.I1000;
+            }
             return new team
             {
-                id = id == 0 ? SR.Urn("team", 100000).ToString() : SR.Urn(id, "team").ToString(),
-                name = "Team " + SR.I1000,
+                id = SR.Urn(id, "team").ToString(),
+                name = "Team " + id,
                 abbreviation = SR.S1000,
                 @virtual = true,
                 virtualSpecified = true,
@@ -481,10 +485,15 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                 }
             }
 
+            if (id == 0)
+            {
+                id = SR.I1000;
+            }
+
             return new teamCompetitor
             {
-                id = id == 0 ? SR.Urn("competitor", 100000).ToString() : SR.Urn(id, "competitor").ToString(),
-                name = "Competitor " + SR.S1000,
+                id = SR.Urn(id, "competitor").ToString(),
+                name = "Competitor " + id,
                 abbreviation = SR.S1000,
                 @virtual = true,
                 country = SR.S1000,
@@ -514,10 +523,15 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         public static tournament GetTournament(int id = 0)
         {
+            if (id == 0)
+            {
+                id = SR.I1000;
+            }
+
             return new tournament
             {
-                id = id == 0 ? SR.Urn("tournament").ToString() : SR.Urn(id, "tournament").ToString(),
-                name = "Tournament name " + SR.S100,
+                id = SR.Urn(id, "tournament").ToString(),
+                name = "Tournament name " + id,
                 scheduled = DateTime.Now,
                 scheduledSpecified = true,
                 scheduled_end = DateTime.Today,
@@ -575,7 +589,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             };
         }
 
-        public static tournamentInfoEndpoint GeTournamentInfoEndpoint(int id = 0, int subItemCount = 0)
+        public static tournamentInfoEndpoint GetTournamentInfoEndpoint(int id = 0, int subItemCount = 0)
         {
             if (subItemCount == 0)
             {
@@ -614,10 +628,14 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         public static venue GetVenue(int id = 0)
         {
-            var msg = new venue
+            if (id == 0)
             {
-                id = id == 0 ? SR.Urn("venue").ToString() : SR.Urn(id, "venue").ToString(),
-                name = "Venue name " + SR.S1000,
+                id = SR.I1000;
+            }
+            return new venue
+            {
+                id = SR.Urn(id, "venue").ToString(),
+                name = "Venue name " + id,
                 capacity = SR.I1000,
                 capacitySpecified = true,
                 city_name = "City " + SR.S1000,
@@ -625,7 +643,6 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                 map_coordinates = "Coordinates" + SR.S1000,
                 state = "PA"
             };
-            return msg;
         }
 
         public static weatherInfo GetWeatherInfo()

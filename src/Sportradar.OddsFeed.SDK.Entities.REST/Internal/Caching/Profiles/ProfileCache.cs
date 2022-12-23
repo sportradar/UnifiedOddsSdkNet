@@ -1,6 +1,15 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.Caching;
+using System.Threading;
+using System.Threading.Tasks;
 using Common.Logging;
 using Dawn;
 using Metrics;
@@ -14,15 +23,6 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.Caching;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
 {
@@ -801,7 +801,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                     {
                         await WaitTillIdIsAvailableAsync(_mergeUrns, id).ConfigureAwait(false);
                     }
-                    ci.Merge(item, culture);
+                    ci?.Merge(item, culture);
                 }
                 catch (Exception ex)
                 {
@@ -809,12 +809,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles
                 }
                 finally
                 {
-                    if (useSemaphore)
+                    if (useSemaphore && !_isDisposed)
                     {
-                        if (!_isDisposed)
-                        {
-                            await ReleaseIdAsync(_mergeUrns, id).ConfigureAwait(false);
-                        }
+                        await ReleaseIdAsync(_mergeUrns, id).ConfigureAwait(false);
                     }
                 }
 

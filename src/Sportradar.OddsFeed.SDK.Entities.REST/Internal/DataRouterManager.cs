@@ -1,6 +1,12 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web;
 using Common.Logging;
 using Dawn;
 using Metrics;
@@ -17,12 +23,6 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.EventArguments;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -1067,16 +1067,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                     result = await _variantMarketDescriptionProvider.GetDataAsync(id.ToString(), culture.TwoLetterISOLanguageName, variant).ConfigureAwait(false);
                     restCallTime = (int)t.Elapsed.TotalMilliseconds;
 
-                    if (!result.Id.Equals(id) || !result.Variant.Equals(variant))
+                    if (result != null)
                     {
-                        _executionLog.Debug($"Received different market variant description then requested. ({id}?{variant} - {result.Id}?{result.Variant})");
+                        if (!result.Id.Equals(id) || !result.Variant.Equals(variant))
+                        {
+                            Metric.Context("DataRouterManager").Meter("GetVariantMarketDescriptionAsync", Unit.Calls).Mark($"{id}?{variant} vs {result.Id}?{result.Variant}");
+                            _executionLog.Debug($"Received different market variant description then requested. ({id}?{variant} - {result.Id}?{result.Variant})");
+                        }
+                    }
+                    else
+                    {
+                        _executionLog.Error($"Error getting market variant description for market id={id}, variant={variant} and lang:[{culture.TwoLetterISOLanguageName}]. Not found.");
                     }
                 }
                 catch (Exception e)
                 {
                     restCallTime = (int)t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
-                    if (e.Message.Contains("NotFound"))
+                    if (e.Message.ToLowerInvariant().Contains("notfound")
+                     || e.Message.ToLowerInvariant().Contains("not_found"))
                     {
                         message = message.Contains(".")
                             ? message.Substring(0, message.IndexOf(".", StringComparison.InvariantCultureIgnoreCase) + 1)

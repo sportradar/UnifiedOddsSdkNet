@@ -1,6 +1,14 @@
 /*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.Caching;
+using System.Threading;
+using System.Threading.Tasks;
 using Common.Logging;
 using Dawn;
 using Metrics;
@@ -14,14 +22,6 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.Caching;
-using System.Threading;
-using System.Threading.Tasks;
 // ReSharper disable InconsistentlySynchronizedField
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
@@ -35,7 +35,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <summary>
         /// A <see cref="ILog"/> instance used for logging
         /// </summary>
-        private new static readonly ILog CacheLog = SdkLoggerFactory.GetLoggerForCache(typeof(SportEventCache));
+        private static new readonly ILog CacheLog = SdkLoggerFactory.GetLoggerForCache(typeof(SportEventCache));
 
         /// <summary>
         /// The list of dates already automatically loaded by the timer
@@ -1383,7 +1383,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             foreach (var type in types.Select(t => t.Name))
             {
                 if (!status.ContainsKey(type))
+                {
                     status[type] = 0;
+                }
             }
             return status;
         }
