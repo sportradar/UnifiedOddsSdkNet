@@ -1,6 +1,14 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Text;
+using System.Threading.Tasks;
 using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
@@ -8,13 +16,6 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles;
 using Sportradar.OddsFeed.SDK.Messages;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
 {
@@ -399,9 +400,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 associatedPlayersStr = string.Join(", ", associatedPlayerIds);
                 associatedPlayersStr = $", AssociatedPlayers=[{associatedPlayersStr}]";
             }
-            var reference = _referenceId?.ReferenceIds == null || !_referenceId.ReferenceIds.Any()
-                                ? string.Empty
-                                : _referenceId.ReferenceIds.Aggregate(string.Empty, (current, item) => current = $"{current}, {item.Key}={item.Value}").Substring(2);
+            var reference = string.Empty;
+            if (_referenceId != null && !_referenceId.ReferenceIds.IsNullOrEmpty())
+            {
+                var stringBuilder = new StringBuilder();
+                foreach (var referenceIdReferenceId in _referenceId.ReferenceIds)
+                {
+                    stringBuilder.Append(", ").Append($"{referenceIdReferenceId.Key}={referenceIdReferenceId.Value}");
+                }
+                reference = stringBuilder.ToString().Substring(2);
+            }
             return $"{base.PrintC()}, Gender={Gender}, Reference={reference}, Abbreviations=[{abbreviations}]{associatedPlayersStr}";
         }
 

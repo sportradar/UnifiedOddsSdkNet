@@ -3,10 +3,9 @@
 */
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Dawn;
 using System.Globalization;
 using System.Linq;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -51,8 +50,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             Name = name;
             if (competitors != null)
             {
-                _competitors = competitors as IReadOnlyCollection<ICompetitor> ??
-                               new ReadOnlyCollection<ICompetitor>(competitors.ToList());
+                _competitors = competitors.ToList();
+            }
+            else
+            {
+                _competitors = new List<ICompetitor>();
             }
         }
 

@@ -3,11 +3,11 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Logging;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
@@ -226,7 +226,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <returns>A <see cref="Task{ITournamentInfo}"/> representing the asynchronous operation</returns>
         public async Task<ITournamentInfo> GetTournamentInfoAsync()
         {
-            var seasonCI = (ITournamentInfoCI) _sportEventCache.GetEventCacheItem(Id);
+            var seasonCI = (ITournamentInfoCI)_sportEventCache.GetEventCacheItem(Id);
             if (seasonCI == null)
             {
                 ExecutionLogPrivate.Debug($"Missing data. No tournament cache item for id={Id}.");
@@ -250,11 +250,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
             var categoryCI = await _sportDataCache.GetCategoryAsync(categoryId, Cultures).ConfigureAwait(false);
             var categorySummary = categoryCI == null ? null : new CategorySummary(categoryCI.Id, categoryCI.Names, categoryCI.CountryCode);
 
-            var currentSeasonCI = tournamentInfoBasicCI.CurrentSeason == null
-                                      ? null
-                                      : Id.Equals(tournamentInfoBasicCI.CurrentSeason.Id)
-                                          ? seasonCI
-                                          : (TournamentInfoCI) SportEventCache.GetEventCacheItem(tournamentInfoBasicCI.CurrentSeason.Id);
+            ITournamentInfoCI currentSeasonCI;
+            if (tournamentInfoBasicCI.CurrentSeason == null)
+            {
+                currentSeasonCI = null;
+            }
+            else
+            {
+                currentSeasonCI = Id.Equals(tournamentInfoBasicCI.CurrentSeason.Id)
+                                      ? seasonCI
+                                      : (TournamentInfoCI)SportEventCache.GetEventCacheItem(tournamentInfoBasicCI.CurrentSeason.Id);
+            }
 
             // there is no current season - return empty TournamentInfo
             if (currentSeasonCI == null)
@@ -296,7 +302,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
 
             var tasks = competitorsIds.Select(s => _sportEntityFactory.BuildCompetitorAsync(s, Cultures, competitorsReferences, ExceptionStrategy)).ToList();
             await Task.WhenAll(tasks).ConfigureAwait(false);
-            return tasks.Select(s=>s.Result);
+            return tasks.Select(s => s.Result);
         }
 
         /// <summary>

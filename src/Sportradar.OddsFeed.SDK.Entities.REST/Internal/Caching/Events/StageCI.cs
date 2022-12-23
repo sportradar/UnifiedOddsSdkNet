@@ -135,8 +135,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             _categoryId = string.IsNullOrEmpty(exportable.CategoryId) ? null : URN.Parse(exportable.CategoryId);
             _parentStageId = string.IsNullOrEmpty(exportable.ParentStageId) ? null : URN.Parse(exportable.ParentStageId);
             _childStages = exportable.ChildStages?.Select(URN.Parse);
-            _additionalParentIds = exportable.AdditionalParentIds == null || !exportable.AdditionalParentIds.Any() 
-                ? null 
+            _additionalParentIds = exportable.AdditionalParentIds == null || !exportable.AdditionalParentIds.Any()
+                ? null
                 : exportable.AdditionalParentIds.Select(URN.Parse).ToList();
         }
 
@@ -196,6 +196,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _childStages;
             }
+
             await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
 
             if (_childStages == null && !_stageScheduleFetched)
@@ -205,13 +206,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                     _stageScheduleFetched = true;
                     var results = await DataRouterManager.GetSportEventsForTournamentAsync(Id, DefaultCulture, this).ConfigureAwait(false);
 
-                    if (!results.IsNullOrEmpty())
+                    if (results != null)
                     {
-                        _childStages = new ReadOnlyCollection<URN>(results.Select(r => r.Item1).ToList());
+                        var sportEventIds = results.ToList();
+                        if (!sportEventIds.IsNullOrEmpty())
+                        {
+                            _childStages = new ReadOnlyCollection<URN>(sportEventIds.Select(r => r.Item1).ToList());
+                        }
                     }
                 }
                 catch
                 {
+                    // ignored
                 }
             }
 
@@ -352,7 +358,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             stage.CategoryId = _categoryId?.ToString();
             stage.ParentStageId = _parentStageId?.ToString();
             stage.ChildStages = _childStages?.Select(s => s.ToString()).ToList();
-            stage.AdditionalParentIds = _additionalParentIds?.Select(s=>s.ToString()).ToList();
+            stage.AdditionalParentIds = _additionalParentIds?.Select(s => s.ToString()).ToList();
 
             return exportable;
         }
