@@ -3,6 +3,7 @@
 */
 using System.Collections.Generic;
 using System.Linq;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
@@ -82,9 +83,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <returns>A <see cref="string" /> containing details of the current instance</returns>
         protected override string PrintF()
         {
-            return References == null || !References.Any()
-                ? "no references"
-                : References.Aggregate(string.Empty, (current, item) => current = $"{current}, {item.Key}={item.Value}").Substring(2);
+            if (References.IsNullOrEmpty())
+            {
+                return "no references";
+            }
+            return string.Join(", ", References.Select(s => $"{s.Key}={s.Value}"));
         }
 
         /// <summary>

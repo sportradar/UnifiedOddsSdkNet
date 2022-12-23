@@ -1,6 +1,11 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 using Common.Logging;
 using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
@@ -10,11 +15,6 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities;
 using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 {
@@ -120,11 +120,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             return marketDescriptor;
         }
 
-        private async Task<IMarketDescription> ProvideFullVariantListEndpointMarketAsync(int marketId, IList<CultureInfo> locales, IMarketDescription marketDescription, string variantValue)
+        private async Task<IMarketDescription> ProvideFullVariantListEndpointMarketAsync(int marketId, IList<CultureInfo> cultures, IMarketDescription marketDescription, string variantValue)
         {
+            var languages = string.Join(",", cultures.Select(s => s.TwoLetterISOLanguageName));
             try
             {
-                var variantDescription = await _variantDescriptionListCache.GetVariantDescriptorAsync(variantValue, locales).ConfigureAwait(false);
+                var variantDescription = await _variantDescriptionListCache.GetVariantDescriptorAsync(variantValue, cultures).ConfigureAwait(false);
 
                 if (variantDescription == null)
                 {
@@ -163,27 +164,27 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             }
             catch (Exception e)
             {
-                var langs = string.Join(",", locales.Select(s => s.TwoLetterISOLanguageName));
-                _executionLog.Warn($"There was an error providing the variant market description -> marketId:{marketId}, variantValue: {variantValue}, locales: [{langs}]", e);
+                _executionLog.Warn($"There was an error providing the variant market description -> marketId:{marketId}, variantValue: {variantValue}, locales: [{languages}]", e);
             }
             return null;
         }
 
-        private async Task<IMarketDescription> ProvideDynamicVariantEndpointMarketAsync(int marketId, IList<CultureInfo> locales, IMarketDescription marketDescription, string variantValue)
+        private async Task<IMarketDescription> ProvideDynamicVariantEndpointMarketAsync(int marketId, IList<CultureInfo> cultures, IMarketDescription marketDescription, string variantValue)
         {
             IMarketDescription variantDescription = null;
+            var languages = string.Join(",", cultures.Select(s => s.TwoLetterISOLanguageName));
             try
             {
-                variantDescription = await _variantMarketsCache.GetMarketDescriptionAsync(marketId, variantValue, locales).ConfigureAwait(false);
+                variantDescription = await _variantMarketsCache.GetMarketDescriptionAsync(marketId, variantValue, cultures).ConfigureAwait(false);
             }
             catch (Exception e)
             {
-                var langs = string.Join(",", locales.Select(s => s.TwoLetterISOLanguageName));
-                _executionLog.Warn($"There was an error providing the explicit variant market description -> marketId:{marketId}, variantValue: {variantValue}, locales: [{langs}]", e);
+                _executionLog.Error($"There was an error providing the explicit variant market description -> marketId:{marketId}, variantValue: {variantValue}, locales: [{languages}]", e);
             }
 
             if (variantDescription == null)
             {
+                _executionLog.Error($"There was no explicit variant market description -> marketId:{marketId}, variantValue: {variantValue}, locales: [{languages}]");
                 return null;
             }
 

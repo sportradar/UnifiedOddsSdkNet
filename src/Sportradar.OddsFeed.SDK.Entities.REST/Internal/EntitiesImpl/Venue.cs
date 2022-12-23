@@ -1,12 +1,12 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Dawn;
 using System.Globalization;
 using System.Linq;
+using Dawn;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -72,25 +72,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// </summary>
         /// <param name="ci">A <see cref="VenueCI"/> used to create new instance</param>
         /// <param name="cultures">A culture of the current instance of <see cref="VenueCI"/></param>
-        public Venue(VenueCI ci, IEnumerable<CultureInfo> cultures)
+        public Venue(VenueCI ci, IReadOnlyCollection<CultureInfo> cultures)
         {
             Guard.Argument(ci, nameof(ci)).NotNull();
-            Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
-            if (!cultures.Any())
-                throw new ArgumentOutOfRangeException(nameof(cultures));
-
-            var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
+            Guard.Argument(cultures, nameof(cultures)).NotNull();
 
             Id = ci.Id;
             Coordinates = ci.Coordinates;
             Capacity = ci.Capacity;
 
-            Names = new ReadOnlyDictionary<CultureInfo, string>(cultureList.Where(c => ci.GetName(c) != null).ToDictionary(c => c, ci.GetName));
-            Cities = new ReadOnlyDictionary<CultureInfo, string>(cultureList.Where(c => ci.GetCity(c) != null).ToDictionary(c => c, ci.GetCity));
-            Countries = new ReadOnlyDictionary<CultureInfo, string>(cultureList.Where(c => ci.GetCountry(c) != null).ToDictionary(c => c, ci.GetCountry));
+            Names = new ReadOnlyDictionary<CultureInfo, string>(cultures.Where(c => ci.GetName(c) != null).ToDictionary(c => c, ci.GetName));
+            Cities = new ReadOnlyDictionary<CultureInfo, string>(cultures.Where(c => ci.GetCity(c) != null).ToDictionary(c => c, ci.GetCity));
+            Countries = new ReadOnlyDictionary<CultureInfo, string>(cultures.Where(c => ci.GetCountry(c) != null).ToDictionary(c => c, ci.GetCountry));
             CountryCode = ci.CountryCode;
             State = ci.State;
-            Course = ci.Course?.Select(s => new Hole(s));
+            Course = ci.Course.IsNullOrEmpty() ? new List<Hole>() : ci.Course.Select(s => new Hole(s)).ToList();
         }
 
         /// <summary>

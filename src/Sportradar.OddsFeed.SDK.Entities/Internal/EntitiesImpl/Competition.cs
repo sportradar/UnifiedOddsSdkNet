@@ -3,11 +3,11 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Logging;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST;
@@ -59,7 +59,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                              IEnumerable<CultureInfo> cultures,
                              ExceptionHandlingStrategy exceptionStrategy,
                              ILocalizedNamedValueCache matchStatusCache)
-            :base(id, sportId, executionLog, sportEventCache, cultures, exceptionStrategy)
+            : base(id, sportId, executionLog, sportEventCache, cultures, exceptionStrategy)
         {
             Guard.Argument(id, nameof(id)).NotNull();
             Guard.Argument(sportEntityFactory, nameof(sportEntityFactory)).NotNull();
@@ -169,7 +169,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
 
             return item == null
                 ? null
-                : new Venue(item, Cultures);
+                : new Venue(item, Cultures.ToList());
         }
 
         /// <summary>
@@ -218,7 +218,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
 
             var tasks = competitorsIds.Select(s => _sportEntityFactory.BuildTeamCompetitorAsync(s, Cultures, competitionCI, ExceptionStrategy)).ToList();
             await Task.WhenAll(tasks).ConfigureAwait(false);
-            return tasks.Select(s=>s.Result);
+            return tasks.Select(s => s.Result);
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <returns>A <see cref="SportEventType"/> for the associated sport event.</returns>
         public async Task<SportEventType?> GetSportEventTypeAsync()
         {
-            var competitionCI = (CompetitionCI) SportEventCache.GetEventCacheItem(Id);
+            var competitionCI = (CompetitionCI)SportEventCache.GetEventCacheItem(Id);
             if (competitionCI == null)
             {
                 ExecutionLog.Debug($"Missing data. No match cache item for id={Id}.");
@@ -246,7 +246,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <returns>A liveOdds</returns>
         public async Task<string> GetLiveOddsAsync()
         {
-            var competitionCI = (CompetitionCI) SportEventCache.GetEventCacheItem(Id);
+            var competitionCI = (CompetitionCI)SportEventCache.GetEventCacheItem(Id);
             if (competitionCI == null)
             {
                 ExecutionLog.Debug($"Missing data. No match cache item for id={Id}.");

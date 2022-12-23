@@ -111,7 +111,7 @@ namespace Sportradar.OddsFeed.SDK.Messages
         /// Initializes a new instance of the <see cref="URN"/> class.
         /// </summary>
         /// <param name="urn">The urn to be used as a template</param>
-        public URN(URN urn) 
+        public URN(URN urn)
             : this(urn?.Prefix, urn?.Type, urn?.Id ?? 0)
         {
         }
@@ -135,7 +135,7 @@ namespace Sportradar.OddsFeed.SDK.Messages
             var type = match.Groups[TypeGroupName].Value;
             if (Types.All(t => t.Item1 != type))
             {
-                //throw new FormatException($"Resource type name: '{type}' is not supported");
+                //SdkLoggerFactory.GetLoggerForExecution(typeof(URN)).LogDebug($"Urn resource type name: '{type}' is not supported. Input={urnString}");
             }
 
             return new URN(
