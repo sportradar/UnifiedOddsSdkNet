@@ -2,6 +2,8 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 
+using System;
+using System.IO;
 using Microsoft.Practices.Unity;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -19,8 +21,6 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.REST;
 using Sportradar.OddsFeed.SDK.Test.Shared;
-using System;
-using System.IO;
 
 // ReSharper disable RedundantTypeArgumentsOfMethod
 
@@ -300,7 +300,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             Assert.AreNotEqual(dataFetcher1, dataFetcher3, "IDataFetcher 1-3 instances resolved must not be equal");
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void HttpClientTimeoutsWorkCorrectly()
         {
             var config = _childContainer1.Resolve<IOddsFeedConfiguration>();
@@ -323,7 +323,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             }
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void HttpClientRecoveryTimeoutsWorkCorrectly()
         {
             var config = _childContainer1.Resolve<IOddsFeedConfiguration>();
@@ -346,7 +346,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             }
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void HttpClientFastTimeoutsWorkCorrectly()
         {
             var dataFetcher1 = _childContainer1.Resolve<LogHttpDataFetcher>("FastLogHttpDataFetcher");

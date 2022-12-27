@@ -94,7 +94,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.IsTrue(result.IsSuccessStatusCode);
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void LoggingTestContent()
         {
             var result = _logHttpDataFetcher.PostDataAsync(_postUri, new StringContent("test string")).Result;
@@ -125,7 +125,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                     }
                     Console.WriteLine(e);
                 }
-                Assert.AreEqual(i, allErrCount-1);
+                Assert.AreEqual(i, allErrCount - 1);
             }
             Assert.AreEqual(loopCount - 5, errCount);
         }
@@ -172,7 +172,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 }
                 Assert.AreEqual(i, allGetErrCount - 1);
             }
-            Assert.AreEqual(loopCount*2-5, errCount);
+            Assert.AreEqual(loopCount * 2 - 5, errCount);
         }
 
         [TestMethod]

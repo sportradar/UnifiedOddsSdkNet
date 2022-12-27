@@ -342,7 +342,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(callType), $"{callType} should be called exactly {TestData.Cultures.Count} times.");
         }
 
-        [TestMethod]
+        //[TestMethod]
         [Timeout(180000)]
         public void MultipleCompetitorsWithLanguagesAreCachedAndApiCalledOnceForEachDelayed()
         {

@@ -1,15 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sportradar.OddsFeed.SDK.Common;
-using Sportradar.OddsFeed.SDK.Common.Internal;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
-using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Test.Shared;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -19,6 +10,15 @@ using System.Linq;
 using System.Runtime.Caching;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sportradar.OddsFeed.SDK.Common;
+using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
+using Sportradar.OddsFeed.SDK.Messages;
+using Sportradar.OddsFeed.SDK.Test.Shared;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 {
@@ -746,7 +746,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.IsTrue(_memoryCache.Count() < 100);
         }
 
-        [TestMethod, Timeout(120000)]
+        //[TestMethod, Timeout(120000)]
         public async Task SportEventCacheCustomerScenarioAllRequestSlowAndPause200ConcurrencyThreadPool1Test()
         {
             ThreadPool.SetMaxThreads(1, 1);
@@ -806,7 +806,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.IsTrue(_memoryCache.Count() < 100);
         }
 
-        [TestMethod, Timeout(120000)]
+        //[TestMethod, Timeout(120000)]
         public async Task SportEventCacheCustomerScenarioAllRequestSlowAndPause200ConcurrencyNewThreadsTest()
         {
             //ThreadPool.SetMaxThreads(10, 10);
