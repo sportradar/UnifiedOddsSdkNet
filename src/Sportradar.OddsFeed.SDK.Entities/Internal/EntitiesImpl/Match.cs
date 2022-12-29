@@ -64,7 +64,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         public new async Task<IMatchStatus> GetStatusAsync()
         {
             var item = await base.GetStatusAsync().ConfigureAwait(false);
-            return item == null ? null : new MatchStatus(((CompetitionStatus) item).SportEventStatusCI, MatchStatusCache);
+            return item == null ? null : new MatchStatus(((CompetitionStatus)item).SportEventStatusCI, MatchStatusCache);
         }
 
         /// <summary>
@@ -181,7 +181,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
             }
             var tournamentId = ExceptionStrategy == ExceptionHandlingStrategy.THROW
                 ? await matchCI.GetTournamentIdAsync(Cultures).ConfigureAwait(false)
-                : await new Func<IEnumerable<CultureInfo>, Task<URN>>(matchCI.GetTournamentIdAsync).SafeInvokeAsync(Cultures, ExecutionLog, GetFetchErrorMessage("ILongTermEvent")).ConfigureAwait(false);
+                : await new Func<IEnumerable<CultureInfo>, Task<URN>>(matchCI.GetTournamentIdAsync).SafeInvokeAsync(Cultures, ExecutionLog, GetFetchErrorMessage("Tournament")).ConfigureAwait(false);
 
             return tournamentId == null
                 ? null
@@ -243,7 +243,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                 return null;
             }
 
-            var oneCulture = new List<CultureInfo> {culture ?? Cultures.First()};
+            var oneCulture = new List<CultureInfo> { culture ?? Cultures.First() };
             var eventTimelineCI = ExceptionStrategy == ExceptionHandlingStrategy.THROW
                 ? await matchCI.GetEventTimelineAsync(oneCulture).ConfigureAwait(false)
                 : await new Func<IEnumerable<CultureInfo>, Task<EventTimelineCI>>(matchCI.GetEventTimelineAsync).SafeInvokeAsync(oneCulture, ExecutionLog, GetFetchErrorMessage("EventTimeline")).ConfigureAwait(false);

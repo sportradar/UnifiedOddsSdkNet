@@ -3,8 +3,8 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Linq;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Messages.REST;
 #pragma warning disable 1591
 
@@ -22,7 +22,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         public SportEventConditionsDTO SportEventConditions { get; }
 
         public SportEventStatusDTO SportEventStatus { get; }
-        
+
         public DateTime? GeneratedAt { get; }
 
         public IEnumerable<BasicEventDTO> BasicEvents { get; }
@@ -54,7 +54,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                 BasicEvents = timeline.timeline.Select(s => new BasicEventDTO(s));
             }
 
-            GeneratedAt = timeline.generated_atSpecified ? timeline.generated_at : (DateTime?) null;
+            GeneratedAt = timeline.generated_atSpecified ? timeline.generated_at : (DateTime?)null;
         }
     }
 }

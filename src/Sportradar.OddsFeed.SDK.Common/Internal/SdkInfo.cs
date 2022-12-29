@@ -1,13 +1,13 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using Common.Logging;
-using Sportradar.OddsFeed.SDK.Messages;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using Common.Logging;
+using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Common.Internal
 {
@@ -178,7 +178,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <summary>
         /// Convert long epoch time to DateTime
         /// </summary>
-        /// <param name="epochTime">The unix time</param>
+        /// <param name="epochTime">The Unix time</param>
         /// <returns>DateTime</returns>
         public static DateTime FromEpochTime(long epochTime)
         {
@@ -189,7 +189,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <summary>
         /// Convert long epoch time to DateTime
         /// </summary>
-        /// <param name="epochTime">The unix time</param>
+        /// <param name="epochTime">The Unix time</param>
         /// <returns>DateTime</returns>
         public static DateTime? TryFromEpochTime(long epochTime)
         {
