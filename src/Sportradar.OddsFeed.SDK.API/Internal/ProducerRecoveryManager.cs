@@ -1,6 +1,10 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
+using System.Threading.Tasks;
 using Common.Logging;
 using Dawn;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
@@ -9,11 +13,6 @@ using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.Feed;
-using System;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -419,23 +418,21 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     }
                     else
                     {
-                        Debug.Assert(Status == ProducerRecoveryStatus.Started
-                                     || Status == ProducerRecoveryStatus.Completed
-                                     || Status == ProducerRecoveryStatus.Delayed);
+                        //Debug.Assert(Status == ProducerRecoveryStatus.Started || Status == ProducerRecoveryStatus.Completed || Status == ProducerRecoveryStatus.Delayed);
 
                         // we are no longer in sync with the feed
                         if (alive.subscribed == 0)
                         {
                             if (_recoveryOperation.IsRunning)
                             {
-                                Debug.Assert(Status == ProducerRecoveryStatus.Started);
+                                //Debug.Assert(Status == ProducerRecoveryStatus.Started);
                                 var timestamp = SdkInfo.FromEpochTime(previousAliveTimestamp);
                                 ExecutionLog.Warn($"Producer={_producer.Id}: Recovery operation interrupted. Current status={Enum.GetName(typeof(ProducerRecoveryStatus), Status)}, Timestamp={timestamp}.");
                                 _recoveryOperation.Interrupt(timestamp);
                             }
                             else
                             {
-                                Debug.Assert(Status == ProducerRecoveryStatus.Completed || Status == ProducerRecoveryStatus.Delayed);
+                                //Debug.Assert(Status == ProducerRecoveryStatus.Completed || Status == ProducerRecoveryStatus.Delayed);
                                 try
                                 {
                                     var started = StartRecovery();
@@ -527,12 +524,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     // Check whether there is an alive violation during recovery
                     if (Status == ProducerRecoveryStatus.Started && _timestampTracker.IsAliveViolated)
                     {
-                        Debug.Assert(_recoveryOperation.IsRunning);
+                        //Debug.Assert(_recoveryOperation.IsRunning);
                         ExecutionLog.Warn($"Producer id={Producer.Id}: alive violation detected during recovery. Additional recovery from {_timestampTracker.SystemAliveTimestamp} will be done once the current is completed.");
                         _recoveryOperation.Interrupt(SdkInfo.FromEpochTime(_timestampTracker.SystemAliveTimestamp));
                     }
 
-                    if (Status == ProducerRecoveryStatus.Started && !_recoveryOperation.IsRunning
+                    if ((Status == ProducerRecoveryStatus.Started && !_recoveryOperation.IsRunning)
                         || Status != ProducerRecoveryStatus.Started && _recoveryOperation.IsRunning)
                     {
                         ExecutionLog.Warn($"Producer id={Producer.Id}: internal recovery status problem ({Status}-{_recoveryOperation.IsRunning}). Recovery will be done on next system alive.");
@@ -542,7 +539,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     // Check whether the recovery is running and has timed-out
                     if (Status == ProducerRecoveryStatus.Started && _recoveryOperation.HasTimedOut())
                     {
-                        Debug.Assert(_recoveryOperation.IsRunning);
+                        //Debug.Assert(_recoveryOperation.IsRunning);
                         _recoveryOperation.CompleteTimedOut();
                         ExecutionLog.Warn($"Producer id={Producer.Id}: recovery timeout. New recovery from {_timestampTracker.SystemAliveTimestamp} will be done.");
                         newStatus = ProducerRecoveryStatus.Error;
@@ -555,6 +552,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                      && SdkInfo.FromEpochTime(_timestampTracker.SystemAliveTimestamp) > _connectionDownTimestamp)
                     {
                         ExecutionLog.Warn($"Producer id={Producer.Id}: no alive messages arrived since {SdkInfo.FromEpochTime(_timestampTracker.SystemAliveTimestamp)}. New recovery will be done.");
+                        if (_recoveryOperation.IsRunning)
+                        {
+                            var timestamp = SdkInfo.FromEpochTime(_timestampTracker.OldestUserAliveTimestamp);
+                            ExecutionLog.Warn($"Producer={_producer.Id}: Recovery operation interrupted. Current status={Enum.GetName(typeof(ProducerRecoveryStatus), Status)}, Timestamp={timestamp}.");
+                            _recoveryOperation.Interrupt(timestamp);
+                            _recoveryOperation.Reset();
+                        }
                         var recoveryStarted = StartRecovery();
                         if (recoveryStarted.HasValue && recoveryStarted.Value)
                         {
@@ -566,6 +570,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     if (Status == ProducerRecoveryStatus.Started && _recoveryOperation.IsRunning && DateTime.Now - _lastRecoveryMessage > TimeSpan.FromSeconds(300))
                     {
                         ExecutionLog.Warn($"Producer id={Producer.Id}: no recovery message arrived since {_lastRecoveryMessage}. New recovery will be done.");
+                        if (_recoveryOperation.IsRunning)
+                        {
+                            var timestamp = SdkInfo.FromEpochTime(_timestampTracker.OldestUserAliveTimestamp);
+                            ExecutionLog.Warn($"Producer={_producer.Id}: Recovery operation interrupted. Current status={Enum.GetName(typeof(ProducerRecoveryStatus), Status)}, Timestamp={timestamp}.");
+                            _recoveryOperation.Interrupt(timestamp);
+                            _recoveryOperation.Reset();
+                        }
                         var recoveryStarted = StartRecovery();
                         if (recoveryStarted.HasValue && recoveryStarted.Value)
                         {
