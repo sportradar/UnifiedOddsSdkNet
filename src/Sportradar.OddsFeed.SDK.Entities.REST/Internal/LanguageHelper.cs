@@ -3,9 +3,10 @@
 */
 
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
+using Dawn;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -17,7 +18,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="wantedCultures">A <see cref="IEnumerable{CultureInfo}"/> containing list of <see cref="CultureInfo"/> we want to get</param>
         /// <param name="alreadyUsedCultures">A <see cref="IEnumerable{CultureInfo}"/> specifying cultures that was already used/fetched</param>
         /// <returns>A <see cref="IEnumerable{CultureInfo}"/> containing missing cultures or a empty list if no cultures are missing</returns>
-        internal static IEnumerable<CultureInfo> GetMissingCultures(IEnumerable<CultureInfo> wantedCultures, IEnumerable<CultureInfo> alreadyUsedCultures)
+        public static IEnumerable<CultureInfo> GetMissingCultures(IEnumerable<CultureInfo> wantedCultures, IEnumerable<CultureInfo> alreadyUsedCultures)
         {
             var wantedCultureInfos = wantedCultures.ToList();
             Guard.Argument(wantedCultureInfos, nameof(wantedCultures)).NotNull();
@@ -31,6 +32,26 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             var missingCultures = wantedCultureInfos.Where(c => !alreadyUsedCultureInfos.Contains(c)).ToList();
 
             return missingCultures.Distinct();
+        }
+
+        /// <summary>
+        /// Get string representation of list of cultures
+        /// </summary>
+        /// <param name="cultures">The list of cultures</param>
+        /// <returns>A string representation of list of cultures</returns>
+        public static string GetCultureList(IReadOnlyCollection<CultureInfo> cultures)
+        {
+            return cultures.IsNullOrEmpty() ? string.Empty : string.Join(",", cultures.Select(s => s.TwoLetterISOLanguageName));
+        }
+
+        /// <summary>
+        /// Get string representation of list of cultures
+        /// </summary>
+        /// <param name="cultures">The list of cultures</param>
+        /// <returns>A string representation of list of cultures</returns>
+        public static string GetCultureList(ICollection<CultureInfo> cultures)
+        {
+            return cultures.IsNullOrEmpty() ? string.Empty : string.Join(",", cultures.Select(s => s.TwoLetterISOLanguageName));
         }
     }
 }

@@ -440,8 +440,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(TestData.Cultures.Count * cidCount, _dataRouterManager.GetCallCount(callType), $"{callType} should be called exactly {TestData.Cultures.Count * cidCount} times.");
         }
 
-        [TestMethod]
-        [Timeout(120000)]
+        //[TestMethod]
+        //[Timeout(120000)]
         public void MultipleCompetitorsWithLanguagesAreCachedAndApiCalledOnceForEachDelayedAsyncPerf()
         {
             const string callType = "GetCompetitorAsync";
