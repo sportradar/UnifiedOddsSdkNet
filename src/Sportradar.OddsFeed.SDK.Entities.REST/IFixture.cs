@@ -49,6 +49,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST
         /// Gets a <see cref="IReadOnlyDictionary{String, String}"/> containing additional information about the
         /// fixture represented by current <see cref="IFixture"/> instance
         /// </summary>
+        /// <remarks>The collection may contain deprecated key 'streaming'.</remarks>
         IReadOnlyDictionary<string, string> ExtraInfo { get; }
 
         /// <summary>
