@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Dawn;
 using System.Linq;
 using Common.Logging;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities;
@@ -96,7 +96,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// Gets a value indicating whether [adjusted after age]
         /// </summary>
         /// <value><c>true</c> if [adjusted after age]; otherwise, <c>false</c></value>
-        private readonly bool _adjustedAfterAge;
+        private bool _adjustedAfterAge;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RecoveryOperation"/> class
@@ -221,6 +221,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             {
                 var actualException = ex.InnerException ?? ex;
                 ExecutionLog.Error($"{_producer.Name} There was an error requesting recovery.", actualException);
+                if (actualException.Message.Contains("Forbidden"))
+                {
+                    _adjustedAfterAge = true;
+                }
                 if (ex is RecoveryInitiationException)
                 {
                     throw;
@@ -231,6 +235,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             IsRunning = true;
             _startTime = TimeProviderAccessor.Current.Now;
             InterruptionTime = null;
+            _adjustedAfterAge = true;
             return true;
         }
 

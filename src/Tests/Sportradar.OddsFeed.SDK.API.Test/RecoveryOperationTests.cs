@@ -2,9 +2,11 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
+using System.Net;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Sportradar.OddsFeed.SDK.API.Internal;
+using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -22,7 +24,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         private readonly Producer _premiumCricketProducer = new Producer(5, "PremiumCricket", "Premium Cricket", "https://api.betradar.com/v1/premium_cricket/", true, 20, 1800, "prematch|live", 4320);
 
         private Mock<IRecoveryRequestIssuer> _recoveryRequestIssuerMock;
-        
+
         [TestInitialize]
         public void Setup()
         {
@@ -77,7 +79,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             {
                 operation.Start();
             }
-            catch(Exception)
+            catch (Exception)
             {
                 _recoveryRequestIssuerMock.Verify(x => x.RequestFullOddsRecoveryAsync(It.IsAny<IProducer>(), 0), Times.Never);
                 _recoveryRequestIssuerMock.Verify(x => x.RequestRecoveryAfterTimestampAsync(It.IsAny<IProducer>(), It.IsAny<DateTime>(), 0), Times.Never);
@@ -374,6 +376,39 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             liveProducer2.SetLastTimestampBeforeDisconnect(TimeProviderAccessor.Current.Now - TimeSpan.FromHours(1));
             operation.Start();
             _recoveryRequestIssuerMock.Verify(x => x.RequestRecoveryAfterTimestampAsync(It.IsAny<IProducer>(), It.IsAny<DateTime>(), 7), Times.Once);
+            Assert.IsTrue(operation.TryComplete(MessageInterest.LiveMessagesOnly, out _));
+        }
+
+        [TestMethod]
+        public void RecoveryIsCalledWithCorrectAdjustedTimestampAfterInitialIsForbidden()
+        {
+            var nodeId = 10;
+            var recoveryRequestIssuerMock = new Mock<IRecoveryRequestIssuer>();
+            recoveryRequestIssuerMock.SetupSequence(arg => arg.RequestRecoveryAfterTimestampAsync(It.IsAny<IProducer>(), It.IsAny<DateTime>(), It.IsAny<int>()))
+                                       .ThrowsAsync(new CommunicationException("request is forbidden", "some url", HttpStatusCode.Forbidden, null))
+                                       .ReturnsAsync(2);
+            var operation = new RecoveryOperation(_liveProducer, recoveryRequestIssuerMock.Object, new[] { MessageInterest.LiveMessagesOnly }, nodeId, false);
+
+            //initial fails with Forbidden status code
+            _liveProducer.SetLastTimestampBeforeDisconnect(TimeProviderAccessor.Current.Now - TimeSpan.FromMinutes(320));
+            operation.Start();
+            recoveryRequestIssuerMock.Verify(x => x.RequestRecoveryAfterTimestampAsync(It.IsAny<IProducer>(), It.IsAny<DateTime>(), It.IsAny<int>()), Times.Once);
+            Assert.IsFalse(operation.IsRunning);
+
+            var liveProducer = new Producer(_liveProducer.Id,
+                                         _liveProducer.Name,
+                                         _liveProducer.Description,
+                                         _liveProducer.ApiUrl,
+                                         _liveProducer.IsAvailable,
+                                         _liveProducer.MaxInactivitySeconds,
+                                         _liveProducer.MaxRecoveryTime,
+                                         "live",
+                                         _liveProducer.StatefulRecoveryWindow);
+            // now it should allow to adjust timestamp
+            liveProducer.SetLastTimestampBeforeDisconnect(TimeProviderAccessor.Current.Now - TimeSpan.FromMinutes(3200));
+            operation.Start();
+            recoveryRequestIssuerMock.Verify(x => x.RequestRecoveryAfterTimestampAsync(It.IsAny<IProducer>(), It.IsAny<DateTime>(), It.IsAny<int>()), Times.Exactly(2));
+            Assert.IsTrue(operation.IsRunning);
             Assert.IsTrue(operation.TryComplete(MessageInterest.LiveMessagesOnly, out _));
         }
     }
