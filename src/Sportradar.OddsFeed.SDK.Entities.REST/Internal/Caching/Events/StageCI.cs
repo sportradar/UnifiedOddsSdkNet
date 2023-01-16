@@ -152,6 +152,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 return _categoryId;
             }
             await FetchMissingSummary(cultures, false).ConfigureAwait(false);
+            if (_categoryId == null)
+            {
+                await FetchMissingFixtures(cultures).ConfigureAwait(false);
+            }
             return _categoryId;
         }
 
@@ -334,13 +338,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 lock (MergeLock)
                 {
                     base.MergeFixture(fixtureDTO, culture, false);
-                    _categoryId = fixtureDTO.Tournament?.Category?.Id;
+                    if (fixtureDTO.Tournament?.Category != null)
+                    {
+                        _categoryId = fixtureDTO.Tournament?.Category?.Id;
+                    }
                 }
             }
             else
             {
                 base.MergeFixture(fixtureDTO, culture, false);
-                _categoryId = fixtureDTO.Tournament?.Category?.Id;
+                if (fixtureDTO.Tournament?.Category != null)
+                {
+                    _categoryId = fixtureDTO.Tournament?.Category?.Id;
+                }
             }
         }
 
