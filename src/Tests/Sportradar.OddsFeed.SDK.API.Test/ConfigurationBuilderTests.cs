@@ -846,7 +846,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
                          .SetRecoveryHttpClientTimeout(65)
                          .Build();
             Assert.AreEqual(SdkEnvironment.Replay, config.Environment);
-            Assert.AreEqual(EnvironmentManager.GetApiHost(SdkEnvironment.GlobalIntegration), config.ApiHost);
+            Assert.AreEqual(EnvironmentManager.GetApiHost(SdkEnvironment.Integration), config.ApiHost);
             ValidateConfiguration(config,
                                   accessToken,
                                   SdkEnvironment.Replay,

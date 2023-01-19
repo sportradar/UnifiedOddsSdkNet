@@ -1,6 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Sportradar.OddsFeed.SDK.API.Internal;
@@ -12,8 +14,6 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
 using Sportradar.OddsFeed.SDK.Messages.REST;
 using Sportradar.OddsFeed.SDK.Test.Shared;
-using System;
-using System.Linq;
 
 namespace Sportradar.OddsFeed.SDK.API.Test
 {
@@ -22,6 +22,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
     {
         private TestSection _testSection;
         private BookmakerDetailsProvider _defaultBookmakerDetailsProvider;
+        private const string NonGlobalReplayMqHost = "replaymq.betradar.com";
 
         [TestInitialize]
         public void Setup()
@@ -313,6 +314,51 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             internalConfig.EnableReplayServer();
             internalConfig.Load();
             Assert.AreEqual(EnvironmentManager.GetApiHost(SdkEnvironment.Production), internalConfig.ApiHost);
+        }
+
+        [TestMethod]
+        public void Should_not_use_replay_mq_server_in_non_replay_environment()
+        {
+            var publicConfig = new Mock<IOddsFeedConfiguration>();
+            publicConfig.Setup(c => c.Environment).Returns(SdkEnvironment.Production);
+
+            var config = new OddsFeedConfigurationInternal(publicConfig.Object, MockBookmakerProvider().Object);
+
+            Assert.AreNotEqual(NonGlobalReplayMqHost, config.Host);
+            Assert.IsTrue(config.ToString().Contains("UseReplayServer=False"));
+        }
+
+        [TestMethod]
+        public void Replay_environment_should_use_replay_mq_server()
+        {
+            var publicConfig = new Mock<IOddsFeedConfiguration>();
+            publicConfig.Setup(c => c.Environment).Returns(SdkEnvironment.Replay);
+
+            var config = new OddsFeedConfigurationInternal(publicConfig.Object, MockBookmakerProvider().Object);
+
+            Assert.AreEqual(NonGlobalReplayMqHost, config.Host);
+            Assert.IsTrue(config.ToString().Contains("UseReplayServer=True"));
+        }
+
+        [TestMethod]
+        public void Enabled_replay_in_non_replay_environment_should_switch_to_using_replay_mq_server()
+        {
+            var publicConfig = new Mock<IOddsFeedConfiguration>();
+            publicConfig.Setup(c => c.Environment).Returns(SdkEnvironment.Production);
+            var config = new OddsFeedConfigurationInternal(publicConfig.Object, MockBookmakerProvider().Object);
+
+            config.EnableReplayServer();
+
+            Assert.AreEqual(NonGlobalReplayMqHost, config.Host);
+            Assert.IsTrue(config.ToString().Contains("UseReplayServer=True"));
+        }
+
+        private Mock<BookmakerDetailsProvider> MockBookmakerProvider()
+        {
+            return new Mock<BookmakerDetailsProvider>("bookmakerDetailsUriFormat",
+                                                      new TestDataFetcher(),
+                                                      new Deserializer<bookmaker_details>(),
+                                                      new BookmakerDetailsMapperFactory());
         }
     }
 }

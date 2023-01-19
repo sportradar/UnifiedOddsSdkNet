@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EnvironmentManagerTests.cs" />
     <Compile Include="IncrementalSequenceGeneratorTests.cs" />
     <Compile Include="LockManagerTests.cs" />
     <Compile Include="OperationManagerTests.cs" />
