@@ -1,6 +1,14 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Globalization;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Runtime.Caching;
 using Common.Logging;
 using Dawn;
 using Metrics;
@@ -27,14 +35,6 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.Feed;
 using Sportradar.OddsFeed.SDK.Messages.REST;
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Globalization;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Runtime.Caching;
 using cashout = Sportradar.OddsFeed.SDK.Messages.REST.cashout;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
@@ -831,7 +831,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<ISportEventCache>(),
                     new ResolvedParameter<ICacheManager>(),
                     new ResolvedParameter<IFeedMessageHandler>(),
-                    new ResolvedParameter<ISportEventStatusCache>()));
+                    new ResolvedParameter<ISportEventStatusCache>(),
+                    new ResolvedParameter<IProducerManager>()));
 
             container.RegisterType<CacheMessageProcessor>(
                 new HierarchicalLifetimeManager(),
