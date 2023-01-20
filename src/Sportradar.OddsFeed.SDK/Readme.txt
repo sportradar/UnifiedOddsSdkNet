@@ -9,6 +9,17 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2022-01-26  1.57.0
+IProducer extended with Scope property (extended with IProducerV3)
+Added support for group urn type
+Changing API host for replay to non-global
+Optimizing number of competitor or player profile api calls
+Improvement so less chance the competition event returns null category
+Improvement so less chance the competition event returns null tournament
+Improved recovery retry on missing messages
+Fix ignore fixture_change_fixture endpoint for virtual producers
+Fix for competitor reference print
+
 2022-12-05  1.56.1
 Fix configuration apiHost for replay environment
 Fix merging of new sport and category which is not included in All tournaments for all sports endpoint
