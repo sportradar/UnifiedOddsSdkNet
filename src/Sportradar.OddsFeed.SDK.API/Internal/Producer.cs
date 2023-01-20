@@ -4,19 +4,20 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Dawn;
 using System.Linq;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
     /// <summary>
-    /// Implementation of the <see cref="IProducerV2"/>
+    /// Implementation of the <see cref="IProducerV3"/>
     /// </summary>
-    /// <seealso cref="IProducerV1" />
     /// <seealso cref="IProducerV2" />
-    public class Producer : IProducerV2
+    /// <seealso cref="IProducerV1" />
+    /// <seealso cref="IProducer" />
+    public class Producer : IProducerV3
     {
         /// <summary>
         /// Gets the id of the producer
@@ -95,7 +96,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// Gets the scope of the producer
         /// </summary>
         /// <value>The scope</value>
-        internal IEnumerable<string> Scope { get; }
+        public IReadOnlyCollection<string> Scope { get; }
 
         /// <summary>
         /// Gets the time of last alive message received from feed
