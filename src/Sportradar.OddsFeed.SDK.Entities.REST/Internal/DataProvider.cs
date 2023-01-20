@@ -1,6 +1,10 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Diagnostics;
+using System.Globalization;
+using System.Threading.Tasks;
 using Common.Logging;
 using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
@@ -8,10 +12,6 @@ using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
 using Sportradar.OddsFeed.SDK.Messages.EventArguments;
 using Sportradar.OddsFeed.SDK.Messages.REST;
-using System;
-using System.Diagnostics;
-using System.Globalization;
-using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -230,7 +230,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             {
                 foreach (var identifier in identifiers)
                 {
-                    if (identifier == null)
+                    if (identifier == null || identifier.Length > 3 || SdkInfo.IsNumeric(identifier))
                     {
                         continue;
                     }
