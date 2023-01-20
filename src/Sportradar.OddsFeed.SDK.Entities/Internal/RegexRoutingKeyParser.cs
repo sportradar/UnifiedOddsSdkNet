@@ -36,6 +36,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <returns>The sportId obtained by parsing the provided <code>routingKey</code></returns>
         public URN GetSportId(string routingKey, string messageTypeName)
         {
+            if (messageTypeName.Equals("alive", StringComparison.InvariantCultureIgnoreCase) ||
+                messageTypeName.Equals("snapshot_complete", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return null;
+            }
+
             var match = Regex.Match(routingKey, string.Format(RegexPatternFormat, messageTypeName));
             if (!match.Success)
             {
@@ -57,16 +63,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             sportId = null;
             try
             {
-                if (routingKey.IsNullOrEmpty())
+                if (routingKey.IsNullOrEmpty() ||
+                    messageTypeName.Equals("alive", StringComparison.InvariantCultureIgnoreCase) ||
+                    messageTypeName.Equals("snapshot_complete", StringComparison.InvariantCultureIgnoreCase))
                 {
                     return false;
                 }
+
                 sportId = GetSportId(routingKey, messageTypeName);
             }
             catch (Exception)
             {
                 return false;
             }
+
             return true;
         }
     }
