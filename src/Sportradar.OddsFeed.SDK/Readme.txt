@@ -9,7 +9,7 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
-2022-01-26  1.57.0
+2023-01-26  1.57.0
 IProducer extended with Scope property (extended with IProducerV3)
 Added support for group urn type
 Changing API host for replay to non-global

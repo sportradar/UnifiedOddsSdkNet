@@ -25,7 +25,7 @@ The package contains:
 For more information please contact support@sportradar.com or visit https://iodocs.betradar.com/unifiedsdk/index.html
 
 CHANGE LOG:
-2022-01-26  1.57.0
+2023-01-26  1.57.0
 IProducer extended with Scope property (extended with IProducerV3)
 Added support for group urn type
 Changing API host for replay to non-global
