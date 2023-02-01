@@ -4,16 +4,17 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Logging;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Common.Internal.Metrics;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -318,75 +319,82 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 return;
             }
 
-            var id = $"{Id}_Summary";
-            SemaphoreSlim semaphore = null;
-            Exception initialException = null;
-            try
+            using (var t = MetricsSettings.TimerFetchMissingSummary.NewContext($"{Id}"))
             {
-                // acquire the lock
-                semaphore = await SemaphorePool.AcquireAsync(id).ConfigureAwait(false);
-                await semaphore.WaitAsync().ConfigureAwait(false);
+                var id = $"{Id}_Summary";
+                SemaphoreSlim semaphore = null;
+                Exception initialException = null;
+                try
+                {
+                    // acquire the lock
+                    semaphore = await SemaphorePool.AcquireAsync(id).ConfigureAwait(false);
+                    await semaphore.WaitAsync().ConfigureAwait(false);
 
-                // make sure there is still some data missing and was not fetched while waiting to acquire the lock
-                missingCultures = forceFetch ? cultureInfos.ToList() : LanguageHelper.GetMissingCultures(cultureInfos, LoadedSummaries).ToList();
-                if (!missingCultures.Any())
-                {
-                    return;
-                }
-
-                // fetch data for missing cultures
-                Dictionary<CultureInfo, Task> fetchTasks;
-                if (Id.TypeGroup == ResourceTypeGroup.DRAW)
-                {
-                    fetchTasks = missingCultures.ToDictionary(missingCulture => missingCulture, missingCulture => DataRouterManager.GetDrawSummaryAsync(Id, missingCulture, this));
-                }
-                else if (Id.TypeGroup == ResourceTypeGroup.LOTTERY)
-                {
-                    fetchTasks = missingCultures.ToDictionary(missingCulture => missingCulture, missingCulture => DataRouterManager.GetLotteryScheduleAsync(Id, missingCulture, this));
-                }
-                else
-                {
-                    fetchTasks = missingCultures.ToDictionary(missingCulture => missingCulture, missingCulture => DataRouterManager.GetSportEventSummaryAsync(Id, missingCulture, this));
-                }
-                await Task.WhenAll(fetchTasks.Values).ConfigureAwait(false);
-
-                foreach (var culture in missingCultures)
-                {
-                    if (!LoadedSummaries.Contains(culture))
+                    // make sure there is still some data missing and was not fetched while waiting to acquire the lock
+                    missingCultures = forceFetch ? cultureInfos.ToList() : LanguageHelper.GetMissingCultures(cultureInfos, LoadedSummaries).ToList();
+                    if (!missingCultures.Any())
                     {
-                        LoadedSummaries.Add(culture);
+                        return;
+                    }
+
+                    // fetch data for missing cultures
+                    Dictionary<CultureInfo, Task> fetchTasks;
+                    if (Id.TypeGroup == ResourceTypeGroup.DRAW)
+                    {
+                        fetchTasks = missingCultures.ToDictionary(missingCulture => missingCulture,
+                                                                  missingCulture => DataRouterManager.GetDrawSummaryAsync(Id, missingCulture, this));
+                    }
+                    else if (Id.TypeGroup == ResourceTypeGroup.LOTTERY)
+                    {
+                        fetchTasks = missingCultures.ToDictionary(missingCulture => missingCulture,
+                                                                  missingCulture => DataRouterManager.GetLotteryScheduleAsync(Id, missingCulture, this));
+                    }
+                    else
+                    {
+                        fetchTasks = missingCultures.ToDictionary(missingCulture => missingCulture,
+                                                                  missingCulture => DataRouterManager.GetSportEventSummaryAsync(Id, missingCulture, this));
+                    }
+
+                    await Task.WhenAll(fetchTasks.Values).ConfigureAwait(false);
+
+                    foreach (var culture in missingCultures)
+                    {
+                        if (!LoadedSummaries.Contains(culture))
+                        {
+                            LoadedSummaries.Add(culture);
+                        }
                     }
                 }
-            }
-            catch (CommunicationException ce)
-            {
-                if (this is TournamentInfoCI && ce.Message.Contains("NotFound")) // especially for tournaments that do not have summary
+                catch (CommunicationException ce)
                 {
-                    LoadedSummaries.AddRange(missingCultures);
-                    ExecutionLog.Warn($"Fetching summary for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH NOT_FOUND.");
+                    if (this is TournamentInfoCI && ce.Message.Contains("NotFound")) // especially for tournaments that do not have summary
+                    {
+                        LoadedSummaries.AddRange(missingCultures);
+                        ExecutionLog.Warn($"Fetching summary for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH NOT_FOUND.");
+                    }
+                    else
+                    {
+                        ExecutionLog.Warn($"Fetching summary for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH ERROR.");
+                        initialException = ce;
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    ExecutionLog.Warn($"Fetching summary for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH ERROR.");
-                    initialException = ce;
+                    ExecutionLog.Error($"Fetching summary for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH EX.", ex);
+                    initialException = ex;
                 }
-            }
-            catch (Exception ex)
-            {
-                ExecutionLog.Error($"Fetching summary for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH EX.", ex);
-                initialException = ex;
-            }
-            finally
-            {
-                // release semaphore
-                // ReSharper disable once PossibleNullReferenceException
-                semaphore.ReleaseSafe();
-                SemaphorePool.Release(id);
-            }
+                finally
+                {
+                    // release semaphore
+                    // ReSharper disable once PossibleNullReferenceException
+                    semaphore.ReleaseSafe();
+                    SemaphorePool.Release(id);
+                }
 
-            if (initialException != null && ((DataRouterManager) DataRouterManager).ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
-            {
-                throw initialException;
+                if (initialException != null && ((DataRouterManager)DataRouterManager).ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                {
+                    throw initialException;
+                }
             }
         }
 
@@ -407,70 +415,75 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 return;
             }
 
-            var id = $"{Id}_Fixture";
-            SemaphoreSlim semaphore = null;
-            Exception potentialException = null;
-            try
+            using (var t = MetricsSettings.TimerFetchMissingFixtures.NewContext($"{Id}"))
             {
-                // acquire the lock
-                semaphore = await SemaphorePool.AcquireAsync(id).ConfigureAwait(false);
-                await semaphore.WaitAsync().ConfigureAwait(false);
+                var id = $"{Id}_Fixture";
+                SemaphoreSlim semaphore = null;
+                Exception potentialException = null;
+                try
+                {
+                    // acquire the lock
+                    semaphore = await SemaphorePool.AcquireAsync(id).ConfigureAwait(false);
+                    await semaphore.WaitAsync().ConfigureAwait(false);
 
-                // make sure there is still some data missing and was not fetched while waiting to acquire the lock
-                missingCultures = LanguageHelper.GetMissingCultures(cultureInfos, LoadedFixtures).ToList();
-                if (!missingCultures.Any())
-                {
-                    return;
-                }
+                    // make sure there is still some data missing and was not fetched while waiting to acquire the lock
+                    missingCultures = LanguageHelper.GetMissingCultures(cultureInfos, LoadedFixtures).ToList();
+                    if (!missingCultures.Any())
+                    {
+                        return;
+                    }
 
-                // fetch data for missing cultures
-                //ExecutionLog.Debug($"Fetching fixtures for eventId={Id} for languages [{string.Join(",", missingCultures)}].");
-                Dictionary<CultureInfo, Task> fetchTasks;
-                if (Id.TypeGroup == ResourceTypeGroup.DRAW)
-                {
-                    fetchTasks = missingCultures.ToDictionary(missingCulture => missingCulture, missingCulture => DataRouterManager.GetDrawFixtureAsync(Id, missingCulture, this));
-                }
-                else
-                {
-                    fetchTasks = missingCultures.ToDictionary(missingCulture => missingCulture, missingCulture => DataRouterManager.GetSportEventFixtureAsync(
-                                                                                                                          Id,
-                                                                                                                          missingCulture,
-                                                                                                                          !FixtureTimestampCache.Contains(Id.ToString()),
-                                                                                                                          this));
-                }
-                await Task.WhenAll(fetchTasks.Values).ConfigureAwait(false);
-                LoadedFixtures.AddRange(missingCultures);
-                //ExecutionLog.Debug($"Fetching fixtures for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED.");
-            }
-            catch (CommunicationException ce)
-            {
-                if (this is TournamentInfoCI && ce.Message.Contains("NotFound"))
-                {
+                    // fetch data for missing cultures
+                    //ExecutionLog.Debug($"Fetching fixtures for eventId={Id} for languages [{string.Join(",", missingCultures)}].");
+                    Dictionary<CultureInfo, Task> fetchTasks;
+                    if (Id.TypeGroup == ResourceTypeGroup.DRAW)
+                    {
+                        fetchTasks = missingCultures.ToDictionary(missingCulture => missingCulture, missingCulture => DataRouterManager.GetDrawFixtureAsync(Id, missingCulture, this));
+                    }
+                    else
+                    {
+                        fetchTasks = missingCultures.ToDictionary(missingCulture => missingCulture,
+                                                                  missingCulture => DataRouterManager.GetSportEventFixtureAsync(
+                                                                   Id,
+                                                                   missingCulture,
+                                                                   !FixtureTimestampCache.Contains(Id.ToString()),
+                                                                   this));
+                    }
+
+                    await Task.WhenAll(fetchTasks.Values).ConfigureAwait(false);
                     LoadedFixtures.AddRange(missingCultures);
-                    ExecutionLog.Warn($"Fetching fixtures for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH NOT_FOUND.");
+                    //ExecutionLog.Debug($"Fetching fixtures for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED.");
                 }
-                else
+                catch (CommunicationException ce)
                 {
-                    ExecutionLog.Warn($"Fetching fixtures for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH ERROR.");
-                    potentialException = ce;
+                    if (this is TournamentInfoCI && ce.Message.Contains("NotFound"))
+                    {
+                        LoadedFixtures.AddRange(missingCultures);
+                        ExecutionLog.Warn($"Fetching fixtures for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH NOT_FOUND.");
+                    }
+                    else
+                    {
+                        ExecutionLog.Warn($"Fetching fixtures for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH ERROR.");
+                        potentialException = ce;
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                ExecutionLog.Error($"Fetching fixtures for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH EX.", ex);
-                potentialException = ex;
-            }
-            finally
-            {
-                // release semaphore
-                // ReSharper disable once PossibleNullReferenceException
-                semaphore.ReleaseSafe();
-                SemaphorePool.Release(id);
-            }
+                catch (Exception ex)
+                {
+                    ExecutionLog.Error($"Fetching fixtures for eventId={Id} for languages [{string.Join(",", missingCultures)}] COMPLETED WITH EX.", ex);
+                    potentialException = ex;
+                }
+                finally
+                {
+                    // release semaphore
+                    // ReSharper disable once PossibleNullReferenceException
+                    semaphore.ReleaseSafe();
+                    SemaphorePool.Release(id);
+                }
 
-            if (potentialException != null && ((DataRouterManager) DataRouterManager).ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
-            {
-                throw potentialException;
+                if (potentialException != null && ((DataRouterManager)DataRouterManager).ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                {
+                    throw potentialException;
+                }
             }
         }
 
@@ -503,7 +516,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             lock (MergeLock)
             {
                 Names[culture] = dto.Name;
-                if(dto.SportId != null)
+                if (dto.SportId != null)
                 {
                     _sportId = dto.SportId;
                 }
