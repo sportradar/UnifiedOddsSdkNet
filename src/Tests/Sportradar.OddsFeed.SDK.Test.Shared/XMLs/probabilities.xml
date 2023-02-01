@@ -40,7 +40,7 @@
     <market specifiers="total=1.5" id="547" status="0"/>
     <market specifiers="hcp=0:2" id="87" status="0"/>
     <market specifiers="hcp=0:3" id="87" status="0"/>
-    <market id="11" status="0">
+    <market id="11" cashout_status="1" status="0">
       <outcome active="0" probabilities="0.9999999936637594" id="4"/>
       <outcome active="0" probabilities="6.304714088973512E-9" id="5"/>
     </market>

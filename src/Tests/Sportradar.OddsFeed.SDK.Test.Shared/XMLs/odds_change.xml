@@ -10,7 +10,7 @@
       <outcome id="70" odds="1.85" probabilities="0.48935" active="1"/>
       <outcome id="72" odds="1.75" probabilities="0.51065" active="1"/>
     </market>
-    <market favourite="1" status="1" id="10">
+    <market favourite="1" cashout_status="1" status="1" id="10">
       <outcome id="9" odds="3.9" probabilities="0.22396" active="1"/>
       <outcome id="10" odds="1.08" probabilities="0.85498" active="1"/>
       <outcome id="11" probabilities="0.92105" active="0"/>

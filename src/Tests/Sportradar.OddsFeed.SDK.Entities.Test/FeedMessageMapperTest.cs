@@ -2,6 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Sportradar.OddsFeed.SDK.Common;
@@ -72,12 +73,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
         [TestMethod]
         public void BetSettlementIsMapped()
         {
-            var stream = FileHelper.OpenFile(TestData.FeedXmlPath,"bet_settlement.xml");
+            var stream = FileHelper.OpenFile(TestData.FeedXmlPath, "bet_settlement.xml");
             var message = _deserializer.Deserialize<bet_settlement>(stream);
             TestData.FillMessageTimestamp(message);
             message.SportId = URN.Parse("sr:sport:1000");
             _validator.Validate(message);
-            var entity = _mapper.MapBetSettlement<ICompetition>(message, new []{TestData.Culture}, null);
+            var entity = _mapper.MapBetSettlement<ICompetition>(message, new[] { TestData.Culture }, null);
             Assert.IsNotNull(entity, "entity should not be a null reference");
         }
 
@@ -89,7 +90,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
             TestData.FillMessageTimestamp(message);
             message.SportId = URN.Parse("sr:sport:1000");
             _validator.Validate(message);
-            var entity = _mapper.MapBetStop<ICompetition>(message, new [] {TestData.Culture}, null);
+            var entity = _mapper.MapBetStop<ICompetition>(message, new[] { TestData.Culture }, null);
             Assert.IsNotNull(entity, "entity should not be a null reference");
         }
 
@@ -101,7 +102,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
             TestData.FillMessageTimestamp(message);
             message.SportId = URN.Parse("sr:sport:1000");
             _validator.Validate(message);
-            var entity = _mapper.MapFixtureChange<ICompetition>(message, new [] {TestData.Culture}, null);
+            var entity = _mapper.MapFixtureChange<ICompetition>(message, new[] { TestData.Culture }, null);
             Assert.IsNotNull(entity, "entity should not be a null reference");
         }
 
@@ -113,7 +114,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
             TestData.FillMessageTimestamp(message);
             message.SportId = URN.Parse("sr:sport:1000");
             _validator.Validate(message);
-            var entity = _mapper.MapOddsChange<ICompetition>(message, new []{TestData.Culture}, null);
+            var entity = _mapper.MapOddsChange<ICompetition>(message, new[] { TestData.Culture }, null);
             Assert.IsNotNull(entity, "entity should not be a null reference");
         }
 
@@ -124,7 +125,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
             var message = _deserializer.Deserialize<cashout>(stream);
             TestData.FillMessageTimestamp(message);
             message.SportId = URN.Parse("sr:sport:1000");
-            var entity = _mapper.MapCashOutProbabilities<ICompetition>(message, new [] {TestData.Culture}, null);
+            var entity = _mapper.MapCashOutProbabilities<ICompetition>(message, new[] { TestData.Culture }, null);
             Assert.IsNotNull(entity, "entity should not be a null reference");
         }
 
@@ -136,7 +137,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
             TestData.FillMessageTimestamp(message);
             message.SportId = URN.Parse("sr:sport:1000");
             message.odds = null;
-            var entity = _mapper.MapCashOutProbabilities<ICompetition>(message, new[] {TestData.Culture}, null);
+            var entity = _mapper.MapCashOutProbabilities<ICompetition>(message, new[] { TestData.Culture }, null);
             Assert.IsNotNull(entity, "entity should not be a null reference");
             Assert.IsNull(entity.Markets, "markets should be a null reference");
             Assert.IsNull(entity.BetStopReason, "BetStopReason should a null reference");
@@ -177,6 +178,35 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
             Assert.AreEqual(2, entity.BetStopReason.Id);
             Assert.IsNotNull(entity.BettingStatus, "BettingStatus should not be a null reference");
             Assert.AreEqual(3, entity.BettingStatus.Id);
+        }
+
+        [TestMethod]
+        public void ProbabilityWithMarketWithCashoutStatusIsMapped()
+        {
+            var stream = FileHelper.OpenFile(TestData.FeedXmlPath, "probabilities.xml");
+            var message = _deserializer.Deserialize<cashout>(stream);
+            TestData.FillMessageTimestamp(message);
+            message.SportId = URN.Parse("sr:sport:1000");
+            var entity = _mapper.MapCashOutProbabilities<ICompetition>(message, new[] { TestData.Culture }, null);
+            Assert.IsNotNull(entity, "entity should not be a null reference");
+            Assert.IsNotNull(entity.Markets);
+            Assert.AreEqual(1, entity.Markets.Count(w => ((IMarketWithProbabilitiesV2)w).CashoutStatus != null));
+            var marketWithCashoutStatus = entity.Markets.First(w => ((IMarketWithProbabilitiesV2)w).CashoutStatus != null);
+            Assert.AreEqual(CashoutStatus.AVAILABLE, ((IMarketWithProbabilitiesV2)marketWithCashoutStatus).CashoutStatus);
+        }
+
+        [TestMethod]
+        public void OddsChangeWithMarketWithCashoutStatusIsMapped()
+        {
+            var stream = FileHelper.OpenFile(TestData.FeedXmlPath, "odds_change.xml");
+            var message = _deserializer.Deserialize<odds_change>(stream);
+            TestData.FillMessageTimestamp(message);
+            message.SportId = URN.Parse("sr:sport:1000");
+            _validator.Validate(message);
+            var entity = _mapper.MapOddsChange<ICompetition>(message, new[] { TestData.Culture }, null);
+            Assert.IsNotNull(entity, "entity should not be a null reference");
+            Assert.IsNotNull(entity.Markets);
+            Assert.AreEqual(1, entity.Markets.Count(w => w.CashoutStatus != null));
         }
     }
 }
