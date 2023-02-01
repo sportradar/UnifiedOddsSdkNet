@@ -1,10 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using Dawn;
-using Sportradar.OddsFeed.SDK.Common.Exceptions;
-using Sportradar.OddsFeed.SDK.Common.Internal;
-using Sportradar.OddsFeed.SDK.Messages.REST;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +8,10 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Dawn;
+using Sportradar.OddsFeed.SDK.Common.Exceptions;
+using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -22,12 +22,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
     /// <seealso cref="IDataFetcher" />
     /// <seealso cref="IDataPoster" />
     /// <seealso cref="IDataFetcher" />
-    public class HttpDataFetcher : MarshalByRefObject, IDataFetcher, IDataPoster
+    internal class HttpDataFetcher : MarshalByRefObject, IDataFetcher, IDataPoster
     {
         /// <summary>
-        /// A <see cref="HttpClient"/> used to invoke HTTP requests
+        /// A <see cref="ISdkHttpClient"/> used to invoke HTTP requests
         /// </summary>
-        private readonly HttpClient _client;
+        private readonly ISdkHttpClient _client;
 
         private readonly int _connectionFailureLimit;
 
@@ -52,27 +52,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpDataFetcher"/> class
         /// </summary>
-        /// <param name="client">A <see cref="HttpClient"/> used to invoke HTTP requests</param>
-        /// <param name="accessToken">A token used when making the http requests</param>
+        /// <param name="client">A <see cref="ISdkHttpClient"/> used to invoke HTTP requests</param>
         /// <param name="responseDeserializer">The deserializer for unexpected response</param>
         /// <param name="connectionFailureLimit">Indicates the limit of consecutive request failures, after which it goes in "blocking mode"</param>
         /// <param name="connectionFailureTimeout">indicates the timeout after which comes out of "blocking mode" (in seconds)</param>
         /// <param name="saveResponseHeader">Indicates if the response header should be obtained</param>
-        public HttpDataFetcher(HttpClient client, string accessToken, IDeserializer<response> responseDeserializer, int connectionFailureLimit = 5, int connectionFailureTimeout = 15, bool saveResponseHeader = true)
+        public HttpDataFetcher(ISdkHttpClient client, IDeserializer<response> responseDeserializer, int connectionFailureLimit = 5, int connectionFailureTimeout = 15, bool saveResponseHeader = true)
         {
             Guard.Argument(client, nameof(client)).NotNull();
             Guard.Argument(client.DefaultRequestHeaders, nameof(client.DefaultRequestHeaders)).NotNull();
-            Guard.Argument(accessToken, nameof(accessToken)).NotNull().NotEmpty();
             Guard.Argument(connectionFailureLimit, nameof(connectionFailureLimit)).Positive();
             Guard.Argument(connectionFailureTimeout, nameof(connectionFailureTimeout)).Positive();
             Guard.Argument(responseDeserializer, nameof(responseDeserializer)).NotNull();
 
             _client = client;
-            if (!_client.DefaultRequestHeaders.Contains("x-access-token"))
-            {
-                _client.DefaultRequestHeaders.Add("x-access-token", accessToken);
-            }
-
             _connectionFailureLimit = connectionFailureLimit;
             _connectionFailureTimeBetweenNewRequestsInSec = connectionFailureTimeout;
             _blockingModeActive = false;

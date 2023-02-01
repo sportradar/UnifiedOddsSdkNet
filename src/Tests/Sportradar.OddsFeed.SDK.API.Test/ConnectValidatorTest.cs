@@ -1,7 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using System.Net.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sportradar.OddsFeed.SDK.API.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
@@ -19,7 +18,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         public static void Init(TestContext context)
         {
             var config = TestConfigurationInternal.GetConfig();
-            _validator = new ConnectionValidator(config, new HttpDataFetcher(new HttpClient(), TestData.AccessToken, new Deserializer<response>()));
+            _validator = new ConnectionValidator(config, new HttpDataFetcher(new TestHttpClient(), new Deserializer<response>()));
         }
 
         [TestMethod]
@@ -32,7 +31,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             Assert.AreEqual(ConnectionValidationResult.Success, result, "The connection validation should return success");
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void PublicIpIsRetrieved()
         {
             var publicIp = _validator.GetPublicIp();

@@ -119,6 +119,9 @@
     <Compile Include="Exceptions\MappingException.cs" />
     <Compile Include="Exceptions\NameExpressionException.cs" />
     <Compile Include="Exceptions\NameGenerationException.cs" />
+    <Compile Include="Internal\SdkHttpClientPool.cs" />
+    <Compile Include="Internal\ISdkHttpClient.cs" />
+    <Compile Include="Internal\SdkHttpClient.cs" />
     <Compile Include="Internal\EnvironmentSetting.cs" />
     <Compile Include="Internal\EnvironmentManager.cs" />
     <Compile Include="Internal\ExtensionMethods.cs" />

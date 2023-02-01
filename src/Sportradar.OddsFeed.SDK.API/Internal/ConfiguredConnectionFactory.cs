@@ -1,15 +1,15 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Net.Security;
+using System.Security.Authentication;
 using Dawn;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
-using System;
-using System.Net.Security;
-using System.Security.Authentication;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -92,10 +92,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 Ssl.AcceptablePolicyErrors = SslPolicyErrors.RemoteCertificateChainErrors | SslPolicyErrors.RemoteCertificateNameMismatch | SslPolicyErrors.RemoteCertificateNotAvailable;
             }
 
-            ClientProperties.Add("SrUfSdkType", ".net");
+            ClientProperties.Add("SrUfSdkType", SdkInfo.SdkType);
             ClientProperties.Add("SrUfSdkVersion", SdkInfo.GetVersion());
             ClientProperties.Add("SrUfSdkInit", $"{DateTime.Now:yyyyMMddHHmm}");
-            ClientProperties.Add("SrUfSdkConnName", "RabbitMQ / NET");
+            ClientProperties.Add("SrUfSdkConnName", $"RabbitMQ / {SdkInfo.SdkType}");
             ClientProperties.Add("SrUfSdkBId", $"{_config.BookmakerDetails?.BookmakerId}");
         }
 

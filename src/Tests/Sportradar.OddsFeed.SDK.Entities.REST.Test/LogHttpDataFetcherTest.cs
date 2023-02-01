@@ -25,8 +25,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         [TestInitialize]
         public void Init()
         {
-            var httpClient = new HttpClient();
-            _logHttpDataFetcher = new LogHttpDataFetcher(httpClient, TestData.AccessToken, new IncrementalSequenceGenerator(), new Deserializer<response>());
+            var httpClient = new TestHttpClient();
+            _logHttpDataFetcher = new LogHttpDataFetcher(httpClient, new IncrementalSequenceGenerator(), new Deserializer<response>());
         }
 
         [TestMethod]
@@ -198,8 +198,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         [TestMethod]
         public void SuccessAfterConsecutiveFailuresResetsTest()
         {
-            var httpClient = new HttpClient();
-            _logHttpDataFetcher = new LogHttpDataFetcher(httpClient, TestData.AccessToken, new IncrementalSequenceGenerator(), new Deserializer<response>(), 5, 1);
+            var httpClient = new TestHttpClient();
+            _logHttpDataFetcher = new LogHttpDataFetcher(httpClient, new IncrementalSequenceGenerator(), new Deserializer<response>(), 5, 1);
             ConsecutivePostFailureTest();
             Thread.Sleep(1000);
             var result = _logHttpDataFetcher.GetDataAsync(_getUri).Result;

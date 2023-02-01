@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssertHelper.cs" />
+    <Compile Include="TestHttpClient.cs" />
     <Compile Include="DemoMethods.cs" />
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="FakeTimeProvider.cs" />

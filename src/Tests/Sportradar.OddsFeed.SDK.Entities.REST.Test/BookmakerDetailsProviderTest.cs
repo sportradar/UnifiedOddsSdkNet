@@ -3,7 +3,6 @@
 */
 using System;
 using System.Net;
-using System.Net.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
@@ -25,14 +24,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             var fetcher = string.IsNullOrEmpty(apiKey)
                 ? new TestDataFetcher()
-                : (IDataFetcher) new HttpDataFetcher(new HttpClient(), apiKey, new Deserializer<response>());
+                : (IDataFetcher)new HttpDataFetcher(new TestHttpClient(), new Deserializer<response>());
             var url = string.IsNullOrEmpty(apiKey)
                 ? TestData.RestXmlPath
                 : "https://api.betradar.com/v1/users/";
             var deserializer = new Deserializer<bookmaker_details>();
             var mapperFactory = new BookmakerDetailsMapperFactory();
 
-            return  new DataProvider<bookmaker_details, BookmakerDetailsDTO>(
+            return new DataProvider<bookmaker_details, BookmakerDetailsDTO>(
                 url + InputXml,
                 fetcher,
                 deserializer,
@@ -61,7 +60,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             }
             catch (AggregateException ex)
             {
-                exception = (CommunicationException) ex.InnerException;
+                exception = (CommunicationException)ex.InnerException;
             }
 
             Assert.IsNotNull(exception, "returned object should not be null");

@@ -1,6 +1,12 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using Common.Logging;
 using Dawn;
 using Metrics;
@@ -9,12 +15,6 @@ using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Common.Internal.Metrics;
 using Sportradar.OddsFeed.SDK.Messages.REST;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -23,7 +23,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
     /// </summary>
     /// <seealso cref="IDataFetcher" />
     /// <remarks>ALL, DEBUG, INFO, WARN, ERROR, FATAL, OFF - the levels are defined in order of increasing priority</remarks>
-    public class LogHttpDataFetcher : HttpDataFetcher, IHealthStatusProvider
+    internal class LogHttpDataFetcher : HttpDataFetcher, IHealthStatusProvider
     {
         private static readonly ILog RestLog = SdkLoggerFactory.GetLoggerForRestTraffic(typeof(LogHttpDataFetcher));
 
@@ -32,14 +32,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <summary>
         /// Initializes a new instance of the <see cref="LogHttpDataFetcher"/> class.
         /// </summary>
-        /// <param name="client">A <see cref="HttpClient"/> used to invoke HTTP requests</param>
-        /// <param name="accessToken">A token used when making the http requests</param>
+        /// <param name="client">A <see cref="ISdkHttpClient"/> used to invoke HTTP requests</param>
         /// <param name="sequenceGenerator">A <see cref="ISequenceGenerator"/> used to identify requests</param>
         /// <param name="responseDeserializer">The deserializer for unexpected response</param>
         /// <param name="connectionFailureLimit">Indicates the limit of consecutive request failures, after which it goes in "blocking mode"</param>
         /// <param name="connectionFailureTimeout">indicates the timeout after which comes out of "blocking mode" (in seconds)</param>
-        public LogHttpDataFetcher(HttpClient client, string accessToken, ISequenceGenerator sequenceGenerator, IDeserializer<response> responseDeserializer, int connectionFailureLimit = 5, int connectionFailureTimeout = 15)
-            : base(client, accessToken, responseDeserializer, connectionFailureLimit, connectionFailureTimeout)
+        public LogHttpDataFetcher(ISdkHttpClient client, ISequenceGenerator sequenceGenerator, IDeserializer<response> responseDeserializer, int connectionFailureLimit = 5, int connectionFailureTimeout = 15)
+            : base(client, responseDeserializer, connectionFailureLimit, connectionFailureTimeout)
         {
             Guard.Argument(sequenceGenerator, nameof(sequenceGenerator)).NotNull();
             Guard.Argument(connectionFailureLimit, nameof(connectionFailureLimit)).Positive();

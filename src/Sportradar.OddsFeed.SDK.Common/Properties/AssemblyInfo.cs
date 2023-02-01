@@ -27,8 +27,10 @@ using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("Sportradar.OddsFeed.SDK.API")]
 [assembly: InternalsVisibleTo("Sportradar.OddsFeed.SDK.Entities")]
+[assembly: InternalsVisibleTo("Sportradar.OddsFeed.SDK.Entities.REST")]
 [assembly: InternalsVisibleTo("Sportradar.OddsFeed.SDK.API.Test")]
 [assembly: InternalsVisibleTo("Sportradar.OddsFeed.SDK.Common.Test")]
+[assembly: InternalsVisibleTo("Sportradar.OddsFeed.SDK.Test.Shared")]
 
 // Version information for an assembly consists of the following four values:
 //

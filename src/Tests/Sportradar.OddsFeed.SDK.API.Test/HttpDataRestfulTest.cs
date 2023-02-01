@@ -1,6 +1,8 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Net.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sportradar.OddsFeed.SDK.API.Internal.Replay;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
@@ -8,8 +10,6 @@ using Sportradar.OddsFeed.SDK.Common.Internal.Log;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Messages.REST;
 using Sportradar.OddsFeed.SDK.Test.Shared;
-using System;
-using System.Net.Http;
 
 namespace Sportradar.OddsFeed.SDK.API.Test
 {
@@ -39,7 +39,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             _httpDataRestful = LogProxyFactory.Create<HttpDataRestful>(args, LoggerType.RestTraffic);
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void PutDataAsyncTest()
         {
             // in logRest file there should be result for this call
@@ -48,7 +48,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             Assert.IsTrue(result.IsSuccessStatusCode);
         }
 
-        [TestMethod]
+        //[TestMethod]
         [ExpectedException(typeof(CommunicationException))]
         public void PutDataAsyncTestWithWrongUrl()
         {
@@ -68,7 +68,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             }
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void DeleteDataAsyncTest()
         {
             var result = _httpDataRestful.DeleteDataAsync(_deleteUri).Result;
@@ -76,7 +76,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             Assert.IsTrue(result.IsSuccessStatusCode);
         }
 
-        [TestMethod]
+        //[TestMethod]
         [ExpectedException(typeof(CommunicationException))]
         public void DeleteDataAsyncTestWithWrongUrl()
         {

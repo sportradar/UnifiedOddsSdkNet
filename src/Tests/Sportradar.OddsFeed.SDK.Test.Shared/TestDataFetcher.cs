@@ -14,7 +14,7 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 namespace Sportradar.OddsFeed.SDK.Test.Shared
 {
     /// <summary>
-    /// Data fetcher and poster for testing (can specify responses to be set or overriden)
+    /// Data fetcher and poster for testing (can specify responses to be set or overridden)
     /// </summary>
     /// <seealso cref="IDataFetcher" />
     /// <seealso cref="IDataPoster" />
@@ -84,6 +84,33 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         {
             CalledUrls.Add(uri.PathAndQuery);
             return FileHelper.OpenFile(GetPathWithReplacements(uri.LocalPath));
+        }
+
+        public virtual Task<HttpResponseMessage> GetAsync(Uri uri)
+        {
+            CalledUrls.Add(uri.PathAndQuery);
+            var response = new HttpResponseMessage();
+            var getResponse = UriReplacements.FirstOrDefault(f => uri.ToString().Contains(f.Item1));
+            if (getResponse != null)
+            {
+                switch (getResponse.Item2)
+                {
+                    case "0":
+                        response = new HttpResponseMessage(HttpStatusCode.BadRequest);
+                        response.Content = new StringContent("response bad request");
+                        break;
+                    case "1":
+                        response = new HttpResponseMessage(HttpStatusCode.Accepted);
+                        response.Content = new StringContent("response content");
+                        break;
+                    case "2":
+                        response = new HttpResponseMessage(HttpStatusCode.NotFound);
+                        response.Content = new StringContent("response not found");
+                        break;
+                }
+            }
+
+            return Task.FromResult(response);
         }
 
         /// <summary>

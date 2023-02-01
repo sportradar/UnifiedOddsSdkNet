@@ -63,10 +63,17 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(userConfig.RecoveryHttpClientTimeout) };
                     return httpClient;
                 }));
+            container.RegisterType<ISdkHttpClient, SdkHttpClient>(new ContainerControlledLifetimeManager(),
+                                                                  new InjectionConstructor(
+                                                                                           userConfig.AccessToken,
+                                                                                           new ResolvedParameter<HttpClient>()));
+            container.RegisterType<ISdkHttpClient, SdkHttpClient>("RecoveryHttpClient", new ContainerControlledLifetimeManager(),
+                                                                  new InjectionConstructor(
+                                                                                           userConfig.AccessToken,
+                                                                                           new ResolvedParameter<HttpClient>("RecoveryHttpClient")));
 
             var seed = (int)DateTime.Now.Ticks;
-            var rand = new Random(seed);
-            var value = rand.Next();
+            var value = SdkInfo.GetRandom(Math.Abs(seed));
             Log.Info($"Initializing sequence generator with MinValue={value}, MaxValue={long.MaxValue}");
             container.RegisterType<ISequenceGenerator, IncrementalSequenceGenerator>(
                 new ContainerControlledLifetimeManager(),
@@ -79,8 +86,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             container.RegisterType<HttpDataFetcher, HttpDataFetcher>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
-                    new ResolvedParameter<HttpClient>(),
-                    userConfig.AccessToken,
+                    new ResolvedParameter<ISdkHttpClient>(),
                     new ResolvedParameter<IDeserializer<response>>(),
                     SdkInfo.RestConnectionFailureLimit,
                     SdkInfo.RestConnectionFailureTimeoutInSec,
@@ -89,8 +95,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             container.RegisterType<LogHttpDataFetcher, LogHttpDataFetcher>(
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
-                    new ResolvedParameter<HttpClient>(),
-                    userConfig.AccessToken,
+                    new ResolvedParameter<ISdkHttpClient>(),
                     new ResolvedParameter<ISequenceGenerator>(),
                     new ResolvedParameter<IDeserializer<response>>(),
                     SdkInfo.RestConnectionFailureLimit,
@@ -104,8 +109,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 "RecoveryLogHttpDataFetcher",
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
-                    new ResolvedParameter<HttpClient>("RecoveryHttpClient"),
-                    userConfig.AccessToken,
+                    new ResolvedParameter<ISdkHttpClient>("RecoveryHttpClient"),
                     new ResolvedParameter<ISequenceGenerator>(),
                     new ResolvedParameter<IDeserializer<response>>(),
                     SdkInfo.RestConnectionFailureLimit,
@@ -345,24 +349,21 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
         private static void RegisterDataRouterManager(IUnityContainer container, IOddsFeedConfigurationInternal config)
         {
-            container.RegisterType<HttpClient, HttpClient>("FastHttpClient", new TransientLifetimeManager(), new InjectionFactory(
-                                                            unityContainer =>
-                                                            {
-                                                                return new HttpClient { Timeout = OperationManager.FastHttpClientTimeout };
-                                                            }));
+            container.RegisterType<ISdkHttpClient, SdkHttpClientPool>("FastHttpClient",
+                                                                      new ContainerControlledLifetimeManager(),
+                                                                      new InjectionConstructor(config.AccessToken,
+                                                                                               config.Locales.Count() == 1 ? 1 : config.Locales.Count() + 1,
+                                                                                               OperationManager.FastHttpClientTimeout));
 
             container.RegisterType<LogHttpDataFetcher, LogHttpDataFetcher>(
                                                                            "FastLogHttpDataFetcher",
                                                                            new TransientLifetimeManager(),
                                                                            new InjectionConstructor(
-                                                                                                    new ResolvedParameter<HttpClient>("FastHttpClient"),
-                                                                                                    config.AccessToken,
+                                                                                                    new ResolvedParameter<ISdkHttpClient>("FastHttpClient"),
                                                                                                     new ResolvedParameter<ISequenceGenerator>(),
                                                                                                     new ResolvedParameter<IDeserializer<response>>(),
                                                                                                     SdkInfo.RestConnectionFailureLimit,
                                                                                                     SdkInfo.RestConnectionFailureTimeoutInSec));
-            //var fastLogFetcher = container.Resolve<LogHttpDataFetcher>("FastLogHttpDataFetcher");
-            //container.RegisterInstance<IDataFetcher>("FastDataFetcher", fastLogFetcher, new ContainerControlledLifetimeManager());
 
             var nodeIdStr = config.NodeId != 0
                                 ? "?node_id=" + config.NodeId
@@ -599,7 +600,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ResolvedParameter<ISingleTypeMapperFactory<market_descriptions, EntityList<MarketDescriptionDTO>>>()));
 
             // variant market description provider
-            //container.RegisterType<IDeserializer<market_descriptions>, Deserializer<market_descriptions>>(new ContainerControlledLifetimeManager());
             container.RegisterType<ISingleTypeMapperFactory<market_descriptions, MarketDescriptionDTO>, MarketDescriptionMapperFactory>(new ContainerControlledLifetimeManager());
             container.RegisterType<IDataProvider<MarketDescriptionDTO>, DataProvider<market_descriptions, MarketDescriptionDTO>>(
                     new ContainerControlledLifetimeManager(),
@@ -1110,17 +1110,17 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
         private static void RegisterReplayManager(IUnityContainer container, IOddsFeedConfigurationInternal config)
         {
+            var sdkHtpClient = container.Resolve<ISdkHttpClient>();
+
             container.RegisterType<IDataRestful, HttpDataRestful>(new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
-                    new ResolvedParameter<HttpClient>(),
-                    config.AccessToken,
+                    sdkHtpClient,
                     new ResolvedParameter<IDeserializer<response>>(),
                     SdkInfo.RestConnectionFailureLimit,
                     SdkInfo.RestConnectionFailureTimeoutInSec));
             object[] argsRest =
             {
-                new HttpClient {Timeout = TimeSpan.FromSeconds(config.HttpClientTimeout)},
-                config.AccessToken,
+                sdkHtpClient,
                 new Deserializer<response>(),
                 SdkInfo.RestConnectionFailureLimit,
                 SdkInfo.RestConnectionFailureTimeoutInSec

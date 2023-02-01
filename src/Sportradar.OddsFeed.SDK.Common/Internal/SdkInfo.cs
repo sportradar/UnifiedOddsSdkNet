@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -21,6 +22,10 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// </summary>
         public static readonly ILog ExecutionLog = SdkLoggerFactory.GetLoggerForExecution(typeof(SdkInfo));
 
+        /// <summary>
+        /// The type of the sdk
+        /// </summary>
+        public const string SdkType = "NET";
         /// <summary>
         /// The unknown producer identifier
         /// </summary>
@@ -151,6 +156,10 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// The soccer sport urns
         /// </summary>
         public static readonly IReadOnlyCollection<URN> SoccerSportUrns = new[] { URN.Parse("sr:sport:1"), URN.Parse("sr:sport:137") };
+        /// <summary>
+        /// The date when it was created
+        /// </summary>
+        public static readonly DateTime Created = DateTime.Now;
 
         /// <summary>
         /// Gets the assembly version number
@@ -499,6 +508,35 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
                 age = TimeSpan.Zero;
             }
             return (long)age.TotalMilliseconds;
+        }
+
+        public static int GetRandom(int maxValue = int.MaxValue)
+        {
+            return GetRandom(0, maxValue);
+        }
+
+        public static int GetRandom(int minValue, int maxValue)
+        {
+            if (maxValue < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(maxValue), $"{maxValue} not valid. Must be 0 or greater.");
+            }
+            if (maxValue == 0)
+            {
+                maxValue = int.MaxValue;
+            }
+
+            if (minValue > maxValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(minValue), $"{minValue} not valid. Must be less then {maxValue}.");
+            }
+            using (var generator = RandomNumberGenerator.Create())
+            {
+                var bytes = new byte[4];
+                generator.GetBytes(bytes);
+                var r = Math.Abs(BitConverter.ToInt32(bytes, 0));
+                return r == 0 ? new Random().Next(minValue, maxValue) : r;
+            }
         }
     }
 }
