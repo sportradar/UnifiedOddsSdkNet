@@ -220,5 +220,18 @@ namespace Sportradar.OddsFeed.SDK.Messages.Test
             Assert.AreEqual(ResourceTypeGroup.UNKNOWN, urn.TypeGroup);
             Assert.AreEqual(1234, urn.Id);
         }
+
+        [TestMethod]
+        public void CustomStageEventUrn()
+        {
+            const string urnString = "ccc:stage:1234";
+            var urn = URN.Parse(urnString);
+
+            Assert.IsNotNull(urn);
+            Assert.AreEqual("ccc", urn.Prefix);
+            Assert.AreEqual("stage", urn.Type);
+            Assert.AreEqual(ResourceTypeGroup.STAGE, urn.TypeGroup);
+            Assert.AreEqual(1234, urn.Id);
+        }
     }
 }
