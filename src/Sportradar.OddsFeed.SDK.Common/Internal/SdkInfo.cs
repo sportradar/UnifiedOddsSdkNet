@@ -538,5 +538,18 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
                 return r == 0 ? new Random().Next(minValue, maxValue) : r;
             }
         }
+
+        public static int GetMidValue(int initialValue, int minValue = 0, int maxValue = int.MaxValue)
+        {
+            if (initialValue < minValue)
+            {
+                return minValue;
+            }
+            if (initialValue > maxValue)
+            {
+                return maxValue;
+            }
+            return initialValue;
+        }
     }
 }

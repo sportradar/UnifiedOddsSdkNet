@@ -26,7 +26,8 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <inheritdoc />
         public async Task<HttpResponseMessage> GetAsync(Uri requestUri)
         {
-            return await _httpClient.GetAsync(requestUri).ConfigureAwait(false);
+            var result = await _httpClient.GetAsync(requestUri).ConfigureAwait(false);
+            return result;
         }
 
         /// <inheritdoc />

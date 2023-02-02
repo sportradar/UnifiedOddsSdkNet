@@ -36,6 +36,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
                 _httpClientPool.Add(httpClient);
             }
 
+            SdkLoggerFactory.GetLoggerForExecution(typeof(SdkHttpClientPool)).Debug($"SdkHttpClientPool with size {poolSize} and timeout {timeout.TotalSeconds}s created.");
             DefaultRequestHeaders = _httpClientPool.First().DefaultRequestHeaders;
         }
 

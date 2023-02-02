@@ -349,17 +349,33 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
         private static void RegisterDataRouterManager(IUnityContainer container, IOddsFeedConfigurationInternal config)
         {
-            container.RegisterType<ISdkHttpClient, SdkHttpClientPool>("FastHttpClient",
+            container.RegisterType<ISdkHttpClient, SdkHttpClientPool>("HttpClientPool",
                                                                       new ContainerControlledLifetimeManager(),
                                                                       new InjectionConstructor(config.AccessToken,
-                                                                                               config.Locales.Count() == 1 ? 1 : config.Locales.Count() + 1,
+                                                                                               SdkInfo.GetMidValue(config.Locales.Count() * 3, 15, 50),
+                                                                                               TimeSpan.FromSeconds(config.HttpClientTimeout)));
+
+            container.RegisterType<ISdkHttpClient, SdkHttpClientPool>("FastHttpClientPool",
+                                                                      new ContainerControlledLifetimeManager(),
+                                                                      new InjectionConstructor(config.AccessToken,
+                                                                                               SdkInfo.GetMidValue(config.Locales.Count() * 7, 30, 100),
                                                                                                OperationManager.FastHttpClientTimeout));
 
             container.RegisterType<LogHttpDataFetcher, LogHttpDataFetcher>(
-                                                                           "FastLogHttpDataFetcher",
+                                                                           "LogHttpDataFetcherPool",
                                                                            new TransientLifetimeManager(),
                                                                            new InjectionConstructor(
-                                                                                                    new ResolvedParameter<ISdkHttpClient>("FastHttpClient"),
+                                                                                                    new ResolvedParameter<ISdkHttpClient>("HttpClientPool"),
+                                                                                                    new ResolvedParameter<ISequenceGenerator>(),
+                                                                                                    new ResolvedParameter<IDeserializer<response>>(),
+                                                                                                    SdkInfo.RestConnectionFailureLimit,
+                                                                                                    SdkInfo.RestConnectionFailureTimeoutInSec));
+
+            container.RegisterType<LogHttpDataFetcher, LogHttpDataFetcher>(
+                                                                           "FastLogHttpDataFetcherPool",
+                                                                           new TransientLifetimeManager(),
+                                                                           new InjectionConstructor(
+                                                                                                    new ResolvedParameter<ISdkHttpClient>("FastHttpClientPool"),
                                                                                                     new ResolvedParameter<ISequenceGenerator>(),
                                                                                                     new ResolvedParameter<IDeserializer<response>>(),
                                                                                                     SdkInfo.RestConnectionFailureLimit,
@@ -379,7 +395,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ContainerControlledLifetimeManager(),
                     new InjectionConstructor(
                         summaryEndpoint,
-                        new ResolvedParameter<LogHttpDataFetcher>("FastLogHttpDataFetcher"),
+                        new ResolvedParameter<LogHttpDataFetcher>("FastLogHttpDataFetcherPool"),
                         new ResolvedParameter<IDeserializer<RestMessage>>(),
                         new ResolvedParameter<ISingleTypeMapperFactory<RestMessage, SportEventSummaryDTO>>()));
 
@@ -395,7 +411,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     fixtureEndpoint,
-                    new ResolvedParameter<IDataFetcher>(),
+                    new ResolvedParameter<LogHttpDataFetcher>("LogHttpDataFetcherPool"),
                     new ResolvedParameter<IDeserializer<fixturesEndpoint>>(),
                     new ResolvedParameter<ISingleTypeMapperFactory<fixturesEndpoint, FixtureDTO>>()));
 
@@ -407,7 +423,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new InjectionConstructor(config.Environment == SdkEnvironment.Replay
                     ? config.ReplayApiBaseUrl + "/sports/{1}/sport_events/{0}/fixture.xml" + nodeIdStr
                     : config.ApiBaseUri + "/v1/sports/{1}/sport_events/{0}/fixture_change_fixture.xml",
-                    new ResolvedParameter<IDataFetcher>(),
+                    new ResolvedParameter<LogHttpDataFetcher>("LogHttpDataFetcherPool"),
                     new ResolvedParameter<IDeserializer<fixturesEndpoint>>(),
                     new ResolvedParameter<ISingleTypeMapperFactory<fixturesEndpoint, FixtureDTO>>()));
 
@@ -419,7 +435,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     fixtureEndpoint,
-                    new ResolvedParameter<IDataFetcher>(),
+                    new ResolvedParameter<LogHttpDataFetcher>("LogHttpDataFetcherPool"),
                     new ResolvedParameter<IDeserializer<tournamentInfoEndpoint>>(),
                     new ResolvedParameter<ISingleTypeMapperFactory<tournamentInfoEndpoint, TournamentInfoDTO>>()));
 
@@ -432,7 +448,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     config.Environment == SdkEnvironment.Replay
                         ? config.ReplayApiBaseUrl + "/sports/{1}/sport_events/{0}/fixture.xml" + nodeIdStr
                         : config.ApiBaseUri + "/v1/sports/{1}/sport_events/{0}/fixture_change_fixture.xml",
-                    new ResolvedParameter<IDataFetcher>(),
+                    new ResolvedParameter<LogHttpDataFetcher>("LogHttpDataFetcherPool"),
                     new ResolvedParameter<IDeserializer<tournamentInfoEndpoint>>(),
                     new ResolvedParameter<ISingleTypeMapperFactory<tournamentInfoEndpoint, TournamentInfoDTO>>()));
 
@@ -504,7 +520,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ContainerControlledLifetimeManager(),
                     new InjectionConstructor(
                         config.ApiBaseUri + "/v1/sports/{1}/players/{0}/profile.xml",
-                        new ResolvedParameter<LogHttpDataFetcher>("FastLogHttpDataFetcher"),
+                        new ResolvedParameter<LogHttpDataFetcher>("FastLogHttpDataFetcherPool"),
                         new ResolvedParameter<IDeserializer<playerProfileEndpoint>>(),
                         new ResolvedParameter<ISingleTypeMapperFactory<playerProfileEndpoint, PlayerProfileDTO>>()));
 
@@ -515,7 +531,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ContainerControlledLifetimeManager(),
                     new InjectionConstructor(
                         config.ApiBaseUri + "/v1/sports/{1}/competitors/{0}/profile.xml",
-                        new ResolvedParameter<LogHttpDataFetcher>("FastLogHttpDataFetcher"),
+                        new ResolvedParameter<LogHttpDataFetcher>("FastLogHttpDataFetcherPool"),
                         new ResolvedParameter<IDeserializer<competitorProfileEndpoint>>(),
                         new ResolvedParameter<ISingleTypeMapperFactory<competitorProfileEndpoint, CompetitorProfileDTO>>()));
 
@@ -526,7 +542,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     config.ApiBaseUri + "/v1/sports/{1}/competitors/{0}/profile.xml",
-                    new ResolvedParameter<IDataFetcher>(),
+                    new ResolvedParameter<LogHttpDataFetcher>("FastLogHttpDataFetcherPool"),
                     new ResolvedParameter<IDeserializer<simpleTeamProfileEndpoint>>(),
                     new ResolvedParameter<ISingleTypeMapperFactory<simpleTeamProfileEndpoint, SimpleTeamProfileDTO>>()));
 
@@ -537,7 +553,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ContainerControlledLifetimeManager(),
                     new InjectionConstructor(
                         config.ApiBaseUri + "/v1/sports/{1}/tournaments/{0}/seasons.xml",
-                        new ResolvedParameter<IDataFetcher>(),
+                        new ResolvedParameter<LogHttpDataFetcher>("LogHttpDataFetcherPool"),
                         new ResolvedParameter<IDeserializer<tournamentSeasons>>(),
                         new ResolvedParameter<ISingleTypeMapperFactory<tournamentSeasons, TournamentSeasonsDTO>>()));
 
@@ -551,7 +567,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ContainerControlledLifetimeManager(),
                     new InjectionConstructor(
                         timelineEndpoint,
-                        new ResolvedParameter<IDataFetcher>(),
+                        new ResolvedParameter<LogHttpDataFetcher>("LogHttpDataFetcherPool"),
                         new ResolvedParameter<IDeserializer<matchTimelineEndpoint>>(),
                         new ResolvedParameter<ISingleTypeMapperFactory<matchTimelineEndpoint, MatchTimelineDTO>>()));
 
@@ -605,7 +621,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     new ContainerControlledLifetimeManager(),
                     new InjectionConstructor(
                         config.ApiBaseUri + "/v1/descriptions/{1}/markets/{0}/variants/{2}?include_mappings=true",
-                        new ResolvedParameter<LogHttpDataFetcher>("FastLogHttpDataFetcher"),
+                        new ResolvedParameter<LogHttpDataFetcher>("FastLogHttpDataFetcherPool"),
                         new ResolvedParameter<IDeserializer<market_descriptions>>(),
                         new ResolvedParameter<ISingleTypeMapperFactory<market_descriptions, MarketDescriptionDTO>>()));
 
@@ -628,7 +644,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     config.ApiBaseUri + "/v1/wns/sports/{1}/sport_events/{0}/summary.xml",
-                    new ResolvedParameter<IDataFetcher>(),
+                    new ResolvedParameter<LogHttpDataFetcher>("LogHttpDataFetcherPool"),
                     new ResolvedParameter<IDeserializer<draw_summary>>(),
                     new ResolvedParameter<ISingleTypeMapperFactory<draw_summary, DrawDTO>>()));
 
@@ -640,7 +656,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor(
                     config.ApiBaseUri + "/v1/wns/sports/{1}/sport_events/{0}/fixture.xml",
-                    new ResolvedParameter<IDataFetcher>(),
+                    new ResolvedParameter<LogHttpDataFetcher>("LogHttpDataFetcherPool"),
                     new ResolvedParameter<IDeserializer<draw_fixtures>>(),
                     new ResolvedParameter<ISingleTypeMapperFactory<draw_fixtures, DrawDTO>>()));
 
@@ -701,7 +717,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                 new ContainerControlledLifetimeManager(),
                 new InjectionConstructor( // v1/sports/en/sport_events/sr:stage:{id}/period_summary.xml?competitors=sr:competitor:{id}&competitors=sr:competitor:{id}&periods=2&periods=3&periods=4
                     config.ApiBaseUri + "/v1/sports/{0}/sport_events/{1}/period_summary.xml{2}",
-                    new ResolvedParameter<IDataFetcher>(),
+                    new ResolvedParameter<LogHttpDataFetcher>("LogHttpDataFetcherPool"),
                     new ResolvedParameter<IDeserializer<stagePeriodEndpoint>>(),
                     new ResolvedParameter<ISingleTypeMapperFactory<stagePeriodEndpoint, PeriodSummaryDTO>>()));
 
