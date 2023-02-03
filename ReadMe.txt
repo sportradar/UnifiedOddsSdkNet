@@ -25,6 +25,9 @@ The package contains:
 For more information please contact support@sportradar.com or visit https://iodocs.betradar.com/unifiedsdk/index.html
 
 CHANGE LOG:
+2023-02-03  1.57.1
+Improved speed on API requests with high concurrency
+
 2023-01-26  1.57.0
 IProducer extended with Scope property (extended with IProducerV3)
 Added support for group urn type
