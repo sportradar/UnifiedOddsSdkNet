@@ -3,12 +3,12 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Common.Logging;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
@@ -113,7 +113,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <exception cref="NameExpressionException">The name of the specified outcome could not be generated</exception>
         private async Task<string> GetOutcomeNameFromProfileAsync(string outcomeId, CultureInfo culture)
         {
-            var idParts = outcomeId.Split(new[] {SdkInfo.NameProviderCompositeIdSeparator}, StringSplitOptions.RemoveEmptyEntries);
+            var idParts = outcomeId.Split(new[] { SdkInfo.NameProviderCompositeIdSeparator }, StringSplitOptions.RemoveEmptyEntries);
             var names = new List<string>(idParts.Length);
 
             foreach (var idPart in idParts)
@@ -130,7 +130,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
                 try
                 {
-                    var fetchCultures = new[] {culture};
+                    var fetchCultures = new[] { culture };
                     if (idPart.StartsWith(SdkInfo.PlayerProfileMarketPrefix))
                     {
                         // first try to fetch all the competitors for the sportEvent, so all player profiles are preloaded
@@ -398,7 +398,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             IEnumerable<Task<string>> tasks;
             try
             {
-                tasks  = expressions.Select(e => e.BuildNameAsync(culture)).ToList();
+                tasks = expressions.Select(e => e.BuildNameAsync(culture)).ToList();
                 await Task.WhenAll(tasks).ConfigureAwait(false);
             }
             catch (NameExpressionException ex)
@@ -433,11 +433,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 if (firstTime)
                 {
                     HandleErrorCondition("Retrieved market descriptor has no outcomes", outcomeId, null, culture, null);
-                    if (((MarketDescription) marketDescriptor).MarketDescriptionCI.CanBeFetched())
+                    if (((MarketDescription)marketDescriptor).MarketDescriptionCI.CanBeFetched())
                     {
                         HandleErrorCondition("Reloading market description", outcomeId, null, culture, null);
-                        await _marketCacheProvider.ReloadMarketDescriptionAsync((int) marketDescriptor.Id,
-                                                                                _specifiers).ConfigureAwait(false);
+                        await _marketCacheProvider.ReloadMarketDescriptionAsync((int)marketDescriptor.Id, _specifiers).ConfigureAwait(false);
                         return await GetMarketDescriptionForOutcomeAsync(outcomeId, culture, false).ConfigureAwait(false);
                     }
                 }
