@@ -145,7 +145,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             //check what needs to be fetched, then go fetched by culture, (not by date)
             var datesToFetch = new List<DateTime>();
 
-            await _timerSemaphoreSlim.WaitAsync().ConfigureAwait(false);
+            await _timerSemaphoreSlim.WaitAsync(TimeSpan.FromMinutes(1)).ConfigureAwait(false);
 
             var date = DateTime.Now;
             for (var i = 0; i < 3; i++)
@@ -162,6 +162,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
 
             if (!datesToFetch.Any())
             {
+                _timerSemaphoreSlim.ReleaseSafe();
                 return;
             }
 

@@ -4,12 +4,12 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Threading;
 using System.Threading.Tasks;
+using Dawn;
 using Metrics;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
@@ -128,7 +128,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         {
             Guard.Argument(requiredTranslations, nameof(requiredTranslations)).NotNull();//.NotEmpty();
             if (!requiredTranslations.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(requiredTranslations));
+            }
 
             if (item == null)
             {
@@ -139,7 +141,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
             return missingCultures.Any()
                        ? missingCultures
-                       : null;
+                       : new List<CultureInfo>();
         }
 
         /// <summary>
@@ -157,12 +159,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             Guard.Argument(variant, nameof(variant)).NotNull().NotEmpty();
             Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
             if (!cultures.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
+            }
 
             var cultureList = cultures as List<CultureInfo> ?? cultures.ToList();
 
             var description = GetItemFromCache(id, variant);
-            if (GetMissingTranslations(description, cultureList) == null)
+            if (GetMissingTranslations(description, cultureList).IsNullOrEmpty())
             {
                 return description;
             }
@@ -172,10 +176,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 return null;
             }
 
-            await _semaphore.WaitAsync().ConfigureAwait(false);
-
             try
             {
+                await _semaphore.WaitAsync().ConfigureAwait(false);
+
                 description = GetItemFromCache(id, variant);
                 var missingLanguages = LanguageHelper.GetMissingCultures(cultureList, description?.FetchedLanguages).ToList();
 
@@ -194,7 +198,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
                 var cachedItem = _cache.GetCacheItem(GetCacheKey(id, variant));
 
-                description = (MarketDescriptionCacheItem) cachedItem?.Value;
+                description = (MarketDescriptionCacheItem)cachedItem?.Value;
 
                 //sometimes it may be null (aka Not Found), but we still do not to re-fetch immediately
                 foreach (var cultureInfo in missingLanguages)
@@ -345,13 +349,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 try
                 {
 
-                foreach (var fetchedVariant in _fetchedVariants)
-                {
-                    if (fetchedVariant.Key.StartsWith(id))
+                    foreach (var fetchedVariant in _fetchedVariants)
                     {
-                        _fetchedVariants.TryRemove(id, out _);
+                        if (fetchedVariant.Key.StartsWith(id))
+                        {
+                            _fetchedVariants.TryRemove(id, out _);
+                        }
                     }
-                }
                 }
                 catch (Exception e)
                 {
@@ -519,11 +523,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 if (cachedItem == null)
                 {
                     cachedItem = new CacheItem(GetCacheKey(description.Id, description.Variant), MarketDescriptionCacheItem.Build(description, _mappingValidatorFactory, culture, CacheName));
-                    _cache.Add(cachedItem, new CacheItemPolicy {SlidingExpiration = OperationManager.VariantMarketDescriptionCacheTimeout});
+                    _cache.Add(cachedItem, new CacheItemPolicy { SlidingExpiration = OperationManager.VariantMarketDescriptionCacheTimeout });
                 }
                 else
                 {
-                    ((MarketDescriptionCacheItem) cachedItem.Value).Merge(description, culture);
+                    ((MarketDescriptionCacheItem)cachedItem.Value).Merge(description, culture);
                 }
             }
             catch (Exception e)

@@ -9,6 +9,9 @@ Important: Version 1.1.0.0 includes breaking changes, below are the steps needed
 
 
 CHANGE LOG:
+2023-02-XY  1.30.2
+Fixed lock issue when calling SportDataProvider.GetActiveTournamentsAsync repeatedly
+
 2023-02-03  1.57.1
 Improved speed on API requests with high concurrency
 

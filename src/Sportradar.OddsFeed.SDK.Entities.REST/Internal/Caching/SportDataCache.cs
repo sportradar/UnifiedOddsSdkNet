@@ -130,8 +130,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <param name="e">The <see cref="EventArgs"/> providing additional information about the event which invoked the method</param>
         private async void OnTimerElapsed(object sender, EventArgs e)
         {
-            if (!await _semaphore.WaitAsyncSafe().ConfigureAwait(false))
+            if (!await _semaphore.WaitAsyncSafe(TimeSpan.FromMinutes(1)).ConfigureAwait(false))
             {
+                _semaphore.ReleaseSafe();
                 return;
             }
             IList<CultureInfo> cultureInfos = new List<CultureInfo>();
@@ -389,16 +390,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         public async Task<IEnumerable<SportData>> GetSportsAsync(IEnumerable<CultureInfo> cultures)
         {
             var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
-
-            //Just lock - don't even check if all the required data is available
-            if (!await _semaphore.WaitAsyncSafe().ConfigureAwait(false))
-            {
-                return null;
-            }
             var missingCultures = cultureList.Where(c => !FetchedCultures.Contains(c)).ToList();
 
             try
             {
+                if (!await _semaphore.WaitAsyncSafe().ConfigureAwait(false))
+                {
+                    return null;
+                }
+
                 // we have all available data - return the requested info
                 if (!missingCultures.Any())
                 {
@@ -447,13 +447,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 return sport;
             }
 
-            if (!await _semaphore.WaitAsyncSafe().ConfigureAwait(false))
-            {
-                return null;
-            }
-
             try
             {
+                if (!await _semaphore.WaitAsyncSafe().ConfigureAwait(false))
+                {
+                    return null;
+                }
+
                 var missingCultures = cultureList.Where(c => !FetchedCultures.Contains(c)).ToList();
                 if (missingCultures.Any())
                 {
@@ -482,16 +482,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         {
             Metric.Context("CACHE").Meter("SportDataCache->GetCategoryAsync", Unit.Calls).Mark();
 
-            if (!await _semaphore.WaitAsyncSafe().ConfigureAwait(false))
-            {
-                return null;
-            }
-
             var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
             var missingCultures = cultureList;
             CategoryCI categoryCI;
             try
             {
+                if (!await _semaphore.WaitAsyncSafe().ConfigureAwait(false))
+                {
+                    return null;
+                }
+
                 if (Categories.TryGetValue(id, out categoryCI))
                 {
                     if (categoryCI.HasTranslationsFor(cultureList))
@@ -531,15 +531,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             Metric.Context("CACHE").Meter("SportDataCache->GetSportForTournamentAsync", Unit.Calls).Mark();
 
             var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
-
-            if (!await _semaphore.WaitAsyncSafe().ConfigureAwait(false))
-            {
-                return null;
-            }
-
             var missingCultures = cultureList.Where(c => !FetchedCultures.Contains(c)).ToList();
             try
             {
+                if (!await _semaphore.WaitAsyncSafe().ConfigureAwait(false))
+                {
+                    return null;
+                }
+
                 if (missingCultures.Any())
                 {
                     await FetchAndMergeAll(missingCultures, false).ConfigureAwait(false);

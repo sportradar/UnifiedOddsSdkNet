@@ -39,8 +39,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             {
                 if (both && interest == MessageInterest.LowPriorityMessages)
                 {
-                   sessionKeys.Add(GetBaseKeys(interest, nodeId).Union(GetLiveKeys()).ToList());
-                   continue;
+                    sessionKeys.Add(GetBaseKeys(interest, nodeId).Union(GetLiveKeys()).ToList());
+                    continue;
                 }
                 sessionKeys.Add(GetBaseKeys(interest, nodeId).Union(GetStandardKeys(nodeId).Union(GetLiveKeys())).ToList());
             }
@@ -54,11 +54,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         public static IEnumerable<string> GetStandardKeys(int nodeId = 0)
         {
             if (nodeId > 0)
+            {
                 return new List<string>
-                {
-                    "-.-.-.product_down.#",
-                    $"-.-.-.snapshot_complete.-.-.-.{nodeId}"
-                };
+                     {
+                         "-.-.-.product_down.#",
+                         $"-.-.-.snapshot_complete.-.-.-.{nodeId}"
+                     };
+            }
             return new List<string>
             {
                 "-.-.-.product_down.#",
