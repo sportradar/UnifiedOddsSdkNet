@@ -3,11 +3,11 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Logging;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl;
 using Sportradar.OddsFeed.SDK.Entities.REST;
@@ -97,7 +97,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="cultures">A <see cref="IEnumerable{CultureInfo}"/> specifying the languages to which the sport data is translated</param>
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how the build instance will handle potential exceptions</param>
         /// <returns>The constructed <see cref="ISport"/> instance</returns>
-        private ISport BuildSportInternal(SportData sportData, IEnumerable<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy)
+        private ISport BuildSportInternal(SportData sportData, IReadOnlyCollection<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy)
         {
             Guard.Argument(sportData, nameof(sportData)).NotNull();
             Guard.Argument(cultures, nameof(cultures)).NotNull();
@@ -124,12 +124,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="cultures">A list of all supported languages</param>
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how the build instance will handle potential exceptions</param>
         /// <returns>A <see cref="Task{T}" /> representing the asynchronous operation</returns>
-        public async Task<IEnumerable<ISport>> BuildSportsAsync(IEnumerable<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy)
+        public async Task<IEnumerable<ISport>> BuildSportsAsync(IReadOnlyCollection<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy)
         {
-            var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
-
-            var sportsData = await _sportDataCache.GetSportsAsync(cultureList).ConfigureAwait(false);
-            return sportsData?.Select(data => BuildSportInternal(data, cultureList, exceptionStrategy)).ToList();
+            var sportsData = await _sportDataCache.GetSportsAsync(cultures).ConfigureAwait(false);
+            return sportsData?.Select(data => BuildSportInternal(data, cultures, exceptionStrategy)).ToList();
         }
 
         /// <summary>
@@ -139,14 +137,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="cultures">A list of all supported languages</param>
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how the build instance will handle potential exceptions</param>
         /// <returns>A <see cref="Task{ITournament}"/> representing the asynchronous operation</returns>
-        public async Task<ISport> BuildSportAsync(URN sportId, IEnumerable<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy)
+        public async Task<ISport> BuildSportAsync(URN sportId, IReadOnlyCollection<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy)
         {
-            var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
-
-            var sportData = await _sportDataCache.GetSportAsync(sportId, cultureList).ConfigureAwait(false);
+            var sportData = await _sportDataCache.GetSportAsync(sportId, cultures).ConfigureAwait(false);
             return sportData == null
                 ? null
-                : BuildSportInternal(sportData, cultureList, exceptionStrategy);
+                : BuildSportInternal(sportData, cultures, exceptionStrategy);
         }
 
         /// <summary>
@@ -156,22 +152,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="cultures">A list of all supported languages</param>
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how the build instance will handle potential exceptions</param>
         /// <returns>A <see cref="Task{IPlayer}"/> representing the asynchronous operation</returns>
-        public async Task<IPlayer> BuildPlayerAsync(URN playerId, IEnumerable<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy)
+        public async Task<IPlayer> BuildPlayerAsync(URN playerId, IReadOnlyCollection<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy)
         {
-            var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
-
             if (playerId.Type.Equals("competitor", StringComparison.InvariantCultureIgnoreCase))
             {
-                var competitorCI = await _profileCache.GetCompetitorProfileAsync(playerId, cultureList).ConfigureAwait(false);
+                var competitorCI = await _profileCache.GetCompetitorProfileAsync(playerId, cultures, false).ConfigureAwait(false);
                 return competitorCI == null
                     ? null
-                    : new Competitor(competitorCI, _profileCache, cultureList, this, exceptionStrategy, (ICompetitionCI) null);
+                    : new Competitor(competitorCI, _profileCache, cultures, this, exceptionStrategy, (ICompetitionCI)null);
             }
 
-            var playerProfileCI = await _profileCache.GetPlayerProfileAsync(playerId, cultureList).ConfigureAwait(false);
+            var playerProfileCI = await _profileCache.GetPlayerProfileAsync(playerId, cultures, false).ConfigureAwait(false);
             return playerProfileCI == null
                 ? null
-                : new PlayerProfile(playerProfileCI, cultureList);
+                : new PlayerProfile(playerProfileCI, cultures);
         }
 
         /// <summary>
@@ -181,21 +175,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="cultures">A list of all supported languages</param>
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how the build instance will handle potential exceptions</param>
         /// <returns>A <see cref="Task{T}"/> representing the asynchronous operation</returns>
-        public async Task<IEnumerable<IPlayer>> BuildPlayersAsync(IEnumerable<URN> playersIds, IEnumerable<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy)
+        public async Task<IEnumerable<IPlayer>> BuildPlayersAsync(IReadOnlyCollection<URN> playersIds, IReadOnlyCollection<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy)
         {
-            var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
-
             var playerTasks = new List<Task<PlayerProfileCI>>();
             var competitorTasks = new List<Task<CompetitorCI>>();
             foreach (var id in playersIds)
             {
                 if (id.Type.Equals("competitor", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    competitorTasks.Add(_profileCache.GetCompetitorProfileAsync(id, cultureList));
+                    competitorTasks.Add(_profileCache.GetCompetitorProfileAsync(id, cultures, false));
                 }
                 else
                 {
-                    playerTasks.Add(_profileCache.GetPlayerProfileAsync(id, cultureList));
+                    playerTasks.Add(_profileCache.GetPlayerProfileAsync(id, cultures, false));
                 }
             }
 
@@ -207,7 +199,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             {
                 if (competitorTask.IsCompleted && competitorTask.Result != null)
                 {
-                    result.Add(new Competitor(competitorTask.Result, _profileCache, cultureList, this, exceptionStrategy,(ICompetitionCI) null));
+                    result.Add(new Competitor(competitorTask.Result, _profileCache, cultures, this, exceptionStrategy, (ICompetitionCI)null));
                 }
             }
 
@@ -215,7 +207,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             {
                 if (playerTask.IsCompleted && playerTask.Result != null)
                 {
-                    result.Add(new PlayerProfile(playerTask.Result, cultureList));
+                    result.Add(new PlayerProfile(playerTask.Result, cultures));
                 }
             }
 
@@ -231,7 +223,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="cultures">The cultures used for returned instance</param>
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how the build instance will handle potential exceptions</param>
         /// <returns>The constructed <see cref="ICompetition"/> derived instance</returns>
-        public T BuildSportEvent<T>(URN eventId, URN sportId, IEnumerable<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy) where T : ISportEvent
+        public T BuildSportEvent<T>(URN eventId, URN sportId, IReadOnlyCollection<CultureInfo> cultures, ExceptionHandlingStrategy exceptionStrategy) where T : ISportEvent
         {
             ISportEvent sportEvent;
             switch (eventId.TypeGroup)
@@ -279,18 +271,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                         break;
                     }
                 case ResourceTypeGroup.UNKNOWN:
-                {
-                    ExecutionLog.Warn($"Received entity with unknown resource type group: id={eventId}, sportId={sportId}");
-                    sportEvent = new SportEvent(eventId, sportId, null, _sportEventCache, cultures, exceptionStrategy);
-                    break;
-                }
+                    {
+                        ExecutionLog.Warn($"Received entity with unknown resource type group: id={eventId}, sportId={sportId}");
+                        sportEvent = new SportEvent(eventId, sportId, null, _sportEventCache, cultures, exceptionStrategy);
+                        break;
+                    }
                 default:
                     throw new ArgumentException($"ResourceTypeGroup:{eventId.TypeGroup} is not supported", nameof(eventId));
             }
             return (T)sportEvent;
         }
 
-        public ICompetitor BuildCompetitor(CompetitorCI competitorCI, IEnumerable<CultureInfo> cultures, ICompetitionCI rootCompetitionCI, ExceptionHandlingStrategy exceptionStrategy)
+        public ICompetitor BuildCompetitor(CompetitorCI competitorCI, IReadOnlyCollection<CultureInfo> cultures, ICompetitionCI rootCompetitionCI, ExceptionHandlingStrategy exceptionStrategy)
         {
             return new Competitor(competitorCI, _profileCache, cultures, this, exceptionStrategy, rootCompetitionCI);
         }
@@ -303,18 +295,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="competitorsReferences">The dictionary of competitor references (associated with specific match)</param>
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how the build instance will handle potential exceptions</param>
         /// <returns>The constructed <see cref="ICompetitor"/> instance</returns>
-        public ICompetitor BuildCompetitor(URN competitorId, IEnumerable<CultureInfo> cultures, IDictionary<URN, ReferenceIdCI> competitorsReferences,
+        public ICompetitor BuildCompetitor(URN competitorId, IReadOnlyCollection<CultureInfo> cultures, IDictionary<URN, ReferenceIdCI> competitorsReferences,
             ExceptionHandlingStrategy exceptionStrategy)
         {
             return new Competitor(competitorId, _profileCache, cultures, this, exceptionStrategy, competitorsReferences);
         }
 
-        public ICompetitor BuildCompetitor(CompetitorCI competitorCI, IEnumerable<CultureInfo> cultures, IDictionary<URN, ReferenceIdCI> competitorsReferences, ExceptionHandlingStrategy exceptionStrategy)
+        public ICompetitor BuildCompetitor(CompetitorCI competitorCI, IReadOnlyCollection<CultureInfo> cultures, IDictionary<URN, ReferenceIdCI> competitorsReferences, ExceptionHandlingStrategy exceptionStrategy)
         {
             return new Competitor(competitorCI, _profileCache, cultures, this, exceptionStrategy, competitorsReferences);
         }
 
-        public ITeamCompetitor BuildTeamCompetitor(TeamCompetitorCI teamCompetitorCI, IEnumerable<CultureInfo> cultures, ICompetitionCI rootCompetitionCI, ExceptionHandlingStrategy exceptionStrategy)
+        public ITeamCompetitor BuildTeamCompetitor(TeamCompetitorCI teamCompetitorCI, IReadOnlyCollection<CultureInfo> cultures, ICompetitionCI rootCompetitionCI, ExceptionHandlingStrategy exceptionStrategy)
         {
             return new TeamCompetitor(teamCompetitorCI, cultures, this, exceptionStrategy, _profileCache, rootCompetitionCI);
         }
@@ -327,13 +319,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="rootCompetitionCI">A root <see cref="CompetitionCI"/> to which this competitor belongs to</param>
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how the build instance will handle potential exceptions</param>
         /// <returns>The constructed <see cref="ICompetitor"/> instance</returns>
-        public async Task<ICompetitor> BuildCompetitorAsync(URN competitorId, IEnumerable<CultureInfo> cultures, ICompetitionCI rootCompetitionCI, ExceptionHandlingStrategy exceptionStrategy)
+        public async Task<ICompetitor> BuildCompetitorAsync(URN competitorId, IReadOnlyCollection<CultureInfo> cultures, ICompetitionCI rootCompetitionCI, ExceptionHandlingStrategy exceptionStrategy)
         {
-            var cultureInfos = cultures.ToList();
-            var competitorCI = await _profileCache.GetCompetitorProfileAsync(competitorId, cultureInfos).ConfigureAwait(false);
+            var competitorCI = await _profileCache.GetCompetitorProfileAsync(competitorId, cultures, false).ConfigureAwait(false);
             if (competitorCI != null)
             {
-                return BuildCompetitor(competitorCI, cultureInfos, rootCompetitionCI, exceptionStrategy);
+                return BuildCompetitor(competitorCI, cultures, rootCompetitionCI, exceptionStrategy);
             }
             return null;
         }
@@ -346,13 +337,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="competitorsReferences">The dictionary of competitor references (associated with specific match)</param>
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how the build instance will handle potential exceptions</param>
         /// <returns>The constructed <see cref="ICompetitor"/> instance</returns>
-        public async Task<ICompetitor> BuildCompetitorAsync(URN competitorId, IEnumerable<CultureInfo> cultures, IDictionary<URN, ReferenceIdCI> competitorsReferences, ExceptionHandlingStrategy exceptionStrategy)
+        public async Task<ICompetitor> BuildCompetitorAsync(URN competitorId, IReadOnlyCollection<CultureInfo> cultures, IDictionary<URN, ReferenceIdCI> competitorsReferences, ExceptionHandlingStrategy exceptionStrategy)
         {
-            var cultureInfos = cultures.ToList();
-            var competitorCI = await _profileCache.GetCompetitorProfileAsync(competitorId, cultureInfos).ConfigureAwait(false);
+            var competitorCI = await _profileCache.GetCompetitorProfileAsync(competitorId, cultures, false).ConfigureAwait(false);
             if (competitorCI != null)
             {
-                return BuildCompetitor(competitorCI, cultureInfos, competitorsReferences, exceptionStrategy);
+                return BuildCompetitor(competitorCI, cultures, competitorsReferences, exceptionStrategy);
             }
             return null;
         }
@@ -365,19 +355,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="rootCompetitionCI">A root <see cref="CompetitionCI"/> to which this competitor belongs to</param>
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how the build instance will handle potential exceptions</param>
         /// <returns>The constructed <see cref="ITeamCompetitor"/> instance</returns>
-        public async Task<ITeamCompetitor> BuildTeamCompetitorAsync(URN teamCompetitorId, IEnumerable<CultureInfo> cultures, ICompetitionCI rootCompetitionCI, ExceptionHandlingStrategy exceptionStrategy)
+        public async Task<ITeamCompetitor> BuildTeamCompetitorAsync(URN teamCompetitorId, IReadOnlyCollection<CultureInfo> cultures, ICompetitionCI rootCompetitionCI, ExceptionHandlingStrategy exceptionStrategy)
         {
-            var cultureInfos = cultures.ToList();
-            var competitorCI = await _profileCache.GetCompetitorProfileAsync(teamCompetitorId, cultureInfos).ConfigureAwait(false);
-            var teamCompetitorCI = competitorCI as TeamCompetitorCI;
-            if (teamCompetitorCI != null)
+            var competitorCI = await _profileCache.GetCompetitorProfileAsync(teamCompetitorId, cultures, false).ConfigureAwait(false);
+            if (competitorCI is TeamCompetitorCI teamCompetitorCI)
             {
-                return BuildTeamCompetitor(teamCompetitorCI, cultureInfos, rootCompetitionCI, exceptionStrategy);
+                return BuildTeamCompetitor(teamCompetitorCI, cultures, rootCompetitionCI, exceptionStrategy);
             }
             if (competitorCI != null)
             {
                 var teamCI = new TeamCompetitorCI(competitorCI);
-                return BuildTeamCompetitor(teamCI, cultureInfos, rootCompetitionCI, exceptionStrategy);
+                return BuildTeamCompetitor(teamCI, cultures, rootCompetitionCI, exceptionStrategy);
             }
             return null;
         }
@@ -388,7 +376,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// <param name="categoryId">A <see cref="URN"/> of the <see cref="ICategorySummary"/> used to create new instance</param>
         /// <param name="cultures">A culture of the current instance of <see cref="ICategorySummary"/></param>
         /// <returns>The constructed <see cref="ITeamCompetitor"/> instance</returns>
-        public async Task<ICategorySummary> BuildCategoryAsync(URN categoryId, IEnumerable<CultureInfo> cultures)
+        public async Task<ICategorySummary> BuildCategoryAsync(URN categoryId, IReadOnlyCollection<CultureInfo> cultures)
         {
             var categoryData = await _sportDataCache.GetCategoryAsync(categoryId, cultures).ConfigureAwait(false);
             return categoryData != null ? new CategorySummary(categoryData.Id, categoryData.Names, categoryData.CountryCode) : null;

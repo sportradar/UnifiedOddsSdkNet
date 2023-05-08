@@ -2,9 +2,9 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using Dawn;
 using System.Threading.Tasks;
 using Common.Logging;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 
 namespace Sportradar.OddsFeed.SDK.Common.Internal
@@ -151,7 +151,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <param name="log">The <see cref="ILog"/> where potential exceptions should be logged.</param>
         /// <param name="errorMessage">The error message to be written along with the exception.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public static async Task<TResult> SafeInvokeAsync<T1, T2, T3, TResult>(this Func<T1, T2, T3, Task<TResult>>  method, T1 arg1, T2 arg2, T3 arg3, ILog log, string errorMessage)
+        public static async Task<TResult> SafeInvokeAsync<T1, T2, T3, TResult>(this Func<T1, T2, T3, Task<TResult>> method, T1 arg1, T2 arg2, T3 arg3, ILog log, string errorMessage)
         {
             Guard.Argument(method, nameof(method)).NotNull();
             Guard.Argument(log, nameof(log)).NotNull();

@@ -137,7 +137,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         public static List<URN> GetUrns(int count, string type)
         {
             var items = new List<URN>();
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 items.Add(SR.Urn(type));
             }
@@ -147,7 +147,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         public static List<market> GetMarkets(int count)
         {
             var items = new List<market>();
-            for (int j = 0; j < count; j++)
+            for (var j = 0; j < count; j++)
             {
                 items.Add(GetMarket(SR.I1000, SR.S1000));
             }

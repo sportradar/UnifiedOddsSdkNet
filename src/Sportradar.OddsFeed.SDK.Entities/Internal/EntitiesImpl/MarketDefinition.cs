@@ -64,10 +64,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <param name="specifiers">The associated market specifiers</param>
         /// <param name="cultures">The cultures</param>
         /// <param name="exceptionHandlingStrategy">The exception handling strategy</param>
-        internal MarketDefinition(int marketId, 
-                                  IMarketCacheProvider marketCacheProvider, 
-                                  URN sportId, 
-                                  int producerId, 
+        internal MarketDefinition(int marketId,
+                                  IMarketCacheProvider marketCacheProvider,
+                                  URN sportId,
+                                  int producerId,
                                   IReadOnlyDictionary<string, string> specifiers,
                                   IEnumerable<CultureInfo> cultures,
                                   ExceptionHandlingStrategy exceptionHandlingStrategy)
@@ -89,7 +89,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         public string GetNameTemplate(CultureInfo culture)
         {
             // name templates need to be always fetched from the cache because of the variant markets (they are not being fetched on market definition creation)
-            //var marketDescription = _marketCacheProvider.GetMarketDescriptionAsync((int) _marketDescription.Id, _specifiers, new[] {culture}, true).Result;
+            //var marketDescription = _marketCacheProvider.GetMarketDescriptionAsync((int) _marketDescription.Id, _specifiers, new[] {culture}, true).GetAwaiter().GetResult();
             //return marketDescription?.GetName(culture);
             GetMarketDefinition();
             return _marketDescription?.GetName(culture);
@@ -137,7 +137,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
             GetMarketDefinition();
             return _marketDescription?.Attributes == null || _marketDescription.Attributes.IsNullOrEmpty()
                 ? null
-                : new ReadOnlyDictionary <string, string> (_marketDescription.Attributes.ToDictionary(k => k.Name, v => v.Description));
+                : new ReadOnlyDictionary<string, string>(_marketDescription.Attributes.ToDictionary(k => k.Name, v => v.Description));
         }
 
         /// <summary>
@@ -173,7 +173,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                 }
                 try
                 {
-                    _marketDescription = _marketCacheProvider.GetMarketDescriptionAsync(_marketId, _specifiers, _cultures, true).Result; // was false and true in GetNameTemplate
+                    _marketDescription = _marketCacheProvider.GetMarketDescriptionAsync(_marketId, _specifiers, _cultures, true).GetAwaiter().GetResult(); // was false and true in GetNameTemplate
                 }
                 catch (CacheItemNotFoundException ci)
                 {

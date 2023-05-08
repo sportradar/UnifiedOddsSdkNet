@@ -28,7 +28,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Test
         }
 
         [TestMethod]
-        public void TimerNormalInitializationTest()
+        public void TimerNormalInitialization()
         {
             Assert.IsNotNull(_sdkTimer);
             Assert.IsFalse(_timerMsgs.Any());
@@ -36,34 +36,34 @@ namespace Sportradar.OddsFeed.SDK.Common.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TimerWrongDueTimeTest()
+        public void TimerWrongDueTime()
         {
             SdkTimer.Create(TimeSpan.FromSeconds(-1), TimeSpan.FromSeconds(10));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TimerWrongPeriodTimeTest()
+        public void TimerWrongPeriodTime()
         {
             SdkTimer.Create(TimeSpan.FromSeconds(1), TimeSpan.Zero);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TimerStartWrongDueTimeTest()
+        public void TimerStartWrongDueTime()
         {
             _sdkTimer.Start(TimeSpan.FromSeconds(-1), TimeSpan.FromSeconds(10));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TimerStartWrongPeriodTimeTest()
+        public void TimerStartWrongPeriodTime()
         {
             _sdkTimer.Start(TimeSpan.FromSeconds(1), TimeSpan.Zero);
         }
 
         [TestMethod]
-        public async Task TimerNormalOperationTest()
+        public async Task TimerNormalOperation()
         {
             _sdkTimer.Elapsed += SdkTimerOnElapsed;
             _sdkTimer.Start();
@@ -74,7 +74,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Test
         }
 
         [TestMethod]
-        public async Task TimerFailedOnTickWillNotBreakTest()
+        public async Task TimerFailedOnTickWillNotBreak()
         {
             _sdkTimer.Elapsed += (sender, args) =>
                                  {
@@ -89,7 +89,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Test
         }
 
         [TestMethod]
-        public async Task TimerFailedOnTickWillContinueOnPeriodTest()
+        public async Task TimerFailedOnTickWillContinueOnPeriod()
         {
             _sdkTimer.Elapsed += (sender, args) =>
                                  {
@@ -104,7 +104,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Test
         }
 
         [TestMethod]
-        public async Task TimerFireOnceTest()
+        public async Task TimerFireOnce()
         {
             var sdkTimer = new SdkTimer(TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(1));
             sdkTimer.Elapsed += SdkTimerOnElapsed;

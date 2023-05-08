@@ -25,7 +25,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         private readonly CultureInfo _cultureSecond = new CultureInfo("de");
 
         [TestMethod]
-        public void CompetitorTest()
+        public void Competitor()
         {
             var teamType1 = new team
             {
@@ -64,7 +64,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void CoverageInfoMergeTest()
+        public void CoverageInfoMerge()
         {
             var coverageInfoType = new coverageInfo
             {
@@ -90,7 +90,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void GroupTest()
+        public void Group()
         {
             var teamType1En = new team
             {
@@ -153,7 +153,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void ProductInfoTest()
+        public void ProductInfo()
         {
             var productInfoType = new productInfo
             {
@@ -192,7 +192,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void ProductInfoLinkTest()
+        public void ProductInfoLink()
         {
             var productInfoLinkType1 = new productInfoLink
             {
@@ -209,7 +209,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void RefereeTest()
+        public void Referee()
         {
             var refereeType = new referee
             {
@@ -228,7 +228,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void RoundMergeTest()
+        public void RoundMerge()
         {
             var matchRoundTypeEn = new matchRound
             {
@@ -269,7 +269,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void SeasonCoverageMergeTest()
+        public void SeasonCoverageMerge()
         {
             var coverageInfoCI = new SeasonCoverageCI(new SeasonCoverageDTO(RestMessageBuilder.BuildCoverageRecord("max", "min", 4, 1, 1, SR.Urn("season").ToString())));
 
@@ -281,7 +281,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void SeasonTest()
+        public void Season()
         {
             var seasonExtendedType1 = new seasonExtended
             {
@@ -304,7 +304,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void SportEntityTest()
+        public void SportEntity()
         {
             var sportEntityCI = new SportEntityDTO("sr:sport:1", "name 1");
 
@@ -315,7 +315,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
 
         //TODO: sportEventConditionsType has Venue, DTO and CI is missing it
         [TestMethod]
-        public void SportEventConditionsTest()
+        public void SportEventConditions()
         {
             var venue1 = new venue
             {
@@ -372,7 +372,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void StreamingChannelTest()
+        public void StreamingChannel()
         {
             var streamingChannelType = new streamingChannel
             {
@@ -388,7 +388,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void TeamCompetitorMergeTest()
+        public void TeamCompetitorMerge()
         {
             var teamType1 = new teamCompetitor
             {
@@ -436,7 +436,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void VenueMergeTest()
+        public void VenueMerge()
         {
             var venue1 = new venue
             {
@@ -478,7 +478,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void WeatherInfoTest()
+        public void WeatherInfo()
         {
             var weatherInfo = new weatherInfo
             {

@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Dawn;
 using System.Globalization;
 using System.Linq;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Entities.REST.Market;
 
@@ -39,7 +39,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
             Guard.Argument(cacheItem, nameof(cacheItem)).NotNull();
             Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
             if (!cultures.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
+            }
 
             var cultureList = cultures as List<CultureInfo> ?? cultures.ToList();
 

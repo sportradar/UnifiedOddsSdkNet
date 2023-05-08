@@ -2,7 +2,6 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using Dawn;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -46,12 +45,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="xmlElementName">The name of the XML element containing id / description attributes</param>
         public NamedValueDataProvider(string uriFormat, IDataFetcher fetcher, string xmlElementName)
         {
-            Guard.Argument(uriFormat, nameof(uriFormat)).NotNull().NotEmpty();
-            Guard.Argument(fetcher, nameof(fetcher)).NotNull();
-            Guard.Argument(xmlElementName, nameof(xmlElementName)).NotNull().NotEmpty();
+            if (string.IsNullOrEmpty(uriFormat))
+            {
+                throw new ArgumentNullException(nameof(uriFormat));
+            }
+
+            if (string.IsNullOrEmpty(xmlElementName))
+            {
+                throw new ArgumentNullException(nameof(xmlElementName));
+            }
 
             _uriFormat = uriFormat;
-            _fetcher = fetcher;
+            _fetcher = fetcher ?? throw new ArgumentNullException(nameof(fetcher));
             _xmlElementName = xmlElementName;
         }
 
@@ -71,17 +76,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
         private EntityList<NamedValueDTO> GetDescriptions(Stream stream, Uri uri)
         {
-            var document = new XmlDocument {XmlResolver = null};
+            var document = new XmlDocument { XmlResolver = null };
             document.Load(stream);
 
             if (document.DocumentElement != null)
             {
                 var nodes = document.DocumentElement.SelectNodes(_xmlElementName);
                 var result = from XmlNode m in nodes
-                    where m.Attributes?["id"] != null && m.Attributes["description"] != null
-                    let id = int.Parse(m.Attributes["id"].Value)
-                    let desc = m.Attributes?["description"].Value
-                    select new NamedValueDTO(id, desc);
+                             where m.Attributes?["id"] != null && m.Attributes["description"] != null
+                             let id = int.Parse(m.Attributes["id"].Value)
+                             let desc = m.Attributes?["description"].Value
+                             select new NamedValueDTO(id, desc);
                 return new EntityList<NamedValueDTO>(result);
             }
 

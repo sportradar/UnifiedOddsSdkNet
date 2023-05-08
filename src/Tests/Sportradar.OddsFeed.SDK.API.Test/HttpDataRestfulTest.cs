@@ -40,10 +40,10 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         }
 
         //[TestMethod]
-        public void PutDataAsyncTest()
+        public void PutDataAsync()
         {
             // in logRest file there should be result for this call
-            var result = _httpDataRestful.PutDataAsync(_putUri).Result;
+            var result = _httpDataRestful.PutDataAsync(_putUri).GetAwaiter().GetResult();
             Assert.IsNotNull(result);
             Assert.IsTrue(result.IsSuccessStatusCode);
         }
@@ -55,7 +55,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             // in logRest file there should be result for this call
             try
             {
-                var result = _httpDataRestful.PutDataAsync(_badUri).Result;
+                var result = _httpDataRestful.PutDataAsync(_badUri).GetAwaiter().GetResult();
                 Assert.IsNotNull(result);
                 Assert.IsFalse(result.IsSuccessStatusCode);
             }
@@ -69,9 +69,9 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         }
 
         //[TestMethod]
-        public void DeleteDataAsyncTest()
+        public void DeleteDataAsync()
         {
-            var result = _httpDataRestful.DeleteDataAsync(_deleteUri).Result;
+            var result = _httpDataRestful.DeleteDataAsync(_deleteUri).GetAwaiter().GetResult();
             Assert.IsNotNull(result);
             Assert.IsTrue(result.IsSuccessStatusCode);
         }
@@ -82,7 +82,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         {
             try
             {
-                var result = _httpDataRestful.PostDataAsync(_badUri).Result;
+                var result = _httpDataRestful.PostDataAsync(_badUri).GetAwaiter().GetResult();
                 Assert.IsNotNull(result);
                 Assert.IsFalse(result.IsSuccessStatusCode);
             }

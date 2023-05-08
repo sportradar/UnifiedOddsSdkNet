@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 using Common.Logging;
-using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
@@ -63,15 +62,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="mapperFactory">A <see cref="ISingleTypeMapperFactory{T, T1}" /> used to construct instances of <see cref="ISingleTypeMapper{T}" /></param>
         public DataProvider(string uriFormat, IDataFetcher fetcher, IDeserializer<TIn> deserializer, ISingleTypeMapperFactory<TIn, TOut> mapperFactory)
         {
-            Guard.Argument(uriFormat, nameof(uriFormat)).NotNull().NotEmpty();
-            Guard.Argument(fetcher, nameof(fetcher)).NotNull();
-            Guard.Argument(deserializer, nameof(deserializer)).NotNull();
-            Guard.Argument(mapperFactory, nameof(mapperFactory)).NotNull();
+            if (string.IsNullOrEmpty(uriFormat))
+            {
+                throw new ArgumentNullException(nameof(uriFormat));
+            }
 
             _uriFormat = uriFormat;
-            _fetcher = fetcher;
-            _deserializer = deserializer;
-            _mapperFactory = mapperFactory;
+            _fetcher = fetcher ?? throw new ArgumentNullException(nameof(fetcher));
+            _deserializer = deserializer ?? throw new ArgumentNullException(nameof(deserializer));
+            _mapperFactory = mapperFactory ?? throw new ArgumentNullException(nameof(mapperFactory));
         }
 
         /// <summary>
@@ -83,7 +82,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <returns>A <see cref="Task{T}"/> representing the ongoing operation</returns>
         protected async Task<TOut> GetDataAsyncInternal(Uri uri, string requestParams, string culture)
         {
-            Guard.Argument(uri, nameof(uri)).NotNull();
+            if (uri == null)
+            {
+                throw new ArgumentNullException(nameof(uri));
+            }
 
             var stopWatch = new Stopwatch();
             stopWatch.Start();
@@ -103,7 +105,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <returns>A <see cref="Task{T}"/> representing the ongoing operation</returns>
         protected TOut GetDataInternal(Uri uri, string requestParams, string culture)
         {
-            Guard.Argument(uri, nameof(uri)).NotNull();
+            if (uri == null)
+            {
+                throw new ArgumentNullException(nameof(uri));
+            }
 
             var stopWatch = new Stopwatch();
             stopWatch.Start();
@@ -121,10 +126,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <returns>an <see cref="Uri"/> instance used to retrieve resource with specified <code>identifiers</code></returns>
         protected virtual Uri GetRequestUri(params object[] identifiers)
         {
-            Guard.Argument(identifiers, nameof(identifiers)).NotNull();//.NotEmpty();
-            if (identifiers.Length == 0)
+            if (identifiers.IsNullOrEmpty())
             {
-                throw new ArgumentOutOfRangeException(nameof(identifiers));
+                throw new ArgumentException(nameof(identifiers));
             }
 
             return new Uri(string.Format(_uriFormat, identifiers));

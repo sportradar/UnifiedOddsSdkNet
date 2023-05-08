@@ -2,8 +2,8 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Threading;
 using System.Threading.Tasks;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Common.Internal.Log;
 
 namespace Sportradar.OddsFeed.SDK.Test.Shared
@@ -22,7 +22,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         public int DemoLongLastingMethodAsyncCaller(int seed, int steps)
         {
-            return DemoLongLastingMethodAsync(seed, steps).Result;
+            return DemoLongLastingMethodAsync(seed, steps).GetAwaiter().GetResult();
         }
 
         public async Task<int> DemoLongLastingMethodAsync(int seed, int steps)
@@ -33,7 +33,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                     {
                         seed += steps;
                         steps--;
-                        Thread.Sleep(20);
+                        Task.Delay(20).GetAwaiter().GetResult();
                     }
 
                     return seed;
@@ -43,14 +43,14 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         public void DemoLongLastingVoidMethod(int sleep)
         {
-            Thread.Sleep(sleep);
+            Task.Delay(sleep).GetAwaiter().GetResult();
         }
 
         public async Task<int> DemoLongLastingSleepMethodAsync(int sleep)
         {
             return await Task.Run(() =>
                 {
-                    Thread.Sleep(sleep);
+                    Task.Delay(sleep).GetAwaiter().GetResult();
                     return sleep;
                 }
             );
@@ -60,7 +60,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         {
             return await Task.Run(() =>
                 {
-                    Thread.Sleep(sleep);
+                    Task.Delay(sleep).GetAwaiter().GetResult();
                     throw new Exception("DemoMethodWithTaskThrowsExceptionAsync exception.");
 #pragma warning disable 162
                     return sleep;
@@ -74,7 +74,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         {
             return await Task.Run(() =>
                 {
-                    Thread.Sleep(sleep);
+                    Task.Delay(sleep).GetAwaiter().GetResult();
                     return new DemoMethods();
                 }
             );
@@ -82,7 +82,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         public override string ToString()
         {
-            return new Random().Next().ToString();
+            return SdkInfo.GetRandom().ToString();
         }
     }
 }

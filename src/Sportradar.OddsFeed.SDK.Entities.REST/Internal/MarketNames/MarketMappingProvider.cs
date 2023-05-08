@@ -3,12 +3,12 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Common.Logging;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
@@ -163,7 +163,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 {
                     if (mapping.MarketId.Equals(marketDescription.Id.ToString()))
                     {
-                        return new[] {mapping};
+                        return new[] { mapping };
                     }
                 }
 
@@ -225,7 +225,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             var result = string.Empty;
             if (sovKey == "$score")
             {
-                var eventStatus = _eventStatusCache.GetSportEventStatusAsync(_sportEvent.Id).Result;
+                var eventStatus = _eventStatusCache.GetSportEventStatusAsync(_sportEvent.Id).GetAwaiter().GetResult();
                 if (eventStatus != null)
                 {
                     result = $"{eventStatus.HomeScore ?? 0}:{eventStatus.AwayScore ?? 0}";

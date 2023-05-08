@@ -1,8 +1,9 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using Dawn;
+
 using System.Threading;
+using Dawn;
 
 namespace Sportradar.OddsFeed.SDK.Common.Internal
 {

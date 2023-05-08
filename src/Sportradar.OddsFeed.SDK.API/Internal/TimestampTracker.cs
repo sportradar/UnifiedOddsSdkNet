@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Dawn;
 using System.Linq;
 using Common.Logging;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities;
@@ -105,7 +105,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             {
                 throw new ArgumentOutOfRangeException(nameof(allInterests));
             }
-            
+
             _maxInactivitySeconds = maxInactivitySeconds;
             _maxMessageAgeInSeconds = maxMessageAgeInSeconds;
             _systemAliveTimingInfo = new MessageTimingInfo(SdkInfo.ToEpochTime(TimeProviderAccessor.Current.Now));
@@ -221,7 +221,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             var nonAliveInfo = string.Join(",", _nonAliveMessagesTimingInfo.Select(pair => pair.Key.Name + ":" + "latency=" + $"{pair.Value.Latency.Hours:D2}:{pair.Value.Latency.Minutes:D2}:{pair.Value.Latency.Seconds:D2}.{pair.Value.Latency.Milliseconds:D3}"));
             var behindInfo = $"IsBehind({IsBehind}):Alive(s)[{aliveInfo}],NonAlives[{nonAliveInfo}]";
             var pingStatus = IsAliveViolated ? "Failed" : "Ok";
-            var violationInfo = $"Ping({pingStatus}):age={ _systemAliveTimingInfo.Age.Hours:D2}:{ _systemAliveTimingInfo.Age.Minutes:D2}:{ _systemAliveTimingInfo.Age.Seconds:D2}.{ _systemAliveTimingInfo.Age.Milliseconds:D3}";
+            var violationInfo = $"Ping({pingStatus}):age={_systemAliveTimingInfo.Age.Hours:D2}:{_systemAliveTimingInfo.Age.Minutes:D2}:{_systemAliveTimingInfo.Age.Seconds:D2}.{_systemAliveTimingInfo.Age.Milliseconds:D3}";
             return $"[[{violationInfo}],[{behindInfo}]]";
         }
 

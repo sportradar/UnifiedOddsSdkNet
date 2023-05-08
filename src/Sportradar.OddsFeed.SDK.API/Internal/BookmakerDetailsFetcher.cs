@@ -2,7 +2,6 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using Dawn;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal.Log;
 using Sportradar.OddsFeed.SDK.Entities.REST;
@@ -26,9 +25,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="bookmakerDetailsProvider">A <see cref="IDataProvider{BookmakerDetailsDTO}"/> used to get <see cref="BookmakerDetailsDTO"/></param>
         public BookmakerDetailsFetcher(IDataProvider<BookmakerDetailsDTO> bookmakerDetailsProvider)
         {
-            Guard.Argument(bookmakerDetailsProvider, nameof(bookmakerDetailsProvider)).NotNull();
-
-            _bookmakerDetailsProvider = bookmakerDetailsProvider;
+            _bookmakerDetailsProvider = bookmakerDetailsProvider ?? throw new ArgumentNullException(nameof(bookmakerDetailsProvider));
         }
 
         /// <summary>

@@ -20,7 +20,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
     {
         private static readonly IDeserializer<fixturesEndpoint> Deserializer = new Deserializer<fixturesEndpoint>();
 
-        private const string InputXml = "fixtures.en.xml";
+        private const string InputXml = "fixtures_en.xml";
 
         private fixturesEndpoint _record;
 
@@ -45,14 +45,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void MappingTest()
+        public void Mapping()
         {
             _assertHelper.AreEqual(() => _entity.Id.ToString(), _record.fixture.id);
 
             _assertHelper.AreEqual(() => _entity.Scheduled, _record.fixture.scheduledSpecified ? (DateTime?)_record.fixture.scheduled : null);
             _assertHelper.AreEqual(() => _entity.StartTime, _record.fixture.start_time);
             _assertHelper.AreEqual(() => _entity.NextLiveTime, SdkInfo.ParseDate(_record.fixture.next_live_time));
-            _assertHelper.AreEqual(() => _entity.StartTimeTbd, _record.fixture.start_time_tbdSpecified ? (bool?) _record.fixture.start_time_tbd : null);
+            _assertHelper.AreEqual(() => _entity.StartTimeTbd, _record.fixture.start_time_tbdSpecified ? (bool?)_record.fixture.start_time_tbd : null);
             _assertHelper.AreEqual(() => _entity.StartTimeConfirmed, _record.fixture.start_time_confirmed);
 
             _assertHelper.AreEqual(() => _entity.Season.Id.ToString(), _record.fixture.season.id);
@@ -60,21 +60,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             TestCompetitors(_entity.Competitors.ToList(), _record.fixture.competitors, _assertHelper);
 
-            MappingExtraInfoTest();
+            MappingExtraInfo();
 
-            MappingProductInfoTest();
+            MappingProductInfo();
 
-            MappingTvChannelsTest();
+            MappingTvChannels();
 
-            MappingTournamentTest();
+            MappingTournament();
 
-            MappingTournamentRoundTest();
+            MappingTournamentRound();
 
-            MappingVenueTest();
+            MappingVenue();
         }
 
         [TestMethod]
-        public void MappingTournamentTest()
+        public void MappingTournament()
         {
             _assertHelper.AreEqual(() => _entity.Tournament.Id.ToString(), _record.fixture.tournament.id);
             _assertHelper.AreEqual(() => _entity.Tournament.Name, _record.fixture.tournament.name);
@@ -87,7 +87,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void MappingTournamentRoundTest()
+        public void MappingTournamentRound()
         {
             _assertHelper.AreEqual(() => _entity.Round.Name, _record.fixture.tournament_round.name);
             _assertHelper.AreEqual(() => _entity.Round.Type, _record.fixture.tournament_round.type);
@@ -97,7 +97,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void MappingVenueTest()
+        public void MappingVenue()
         {
             if (_record.fixture.venue == null)
             {
@@ -114,9 +114,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void MappingTvChannelsTest()
+        public void MappingTvChannels()
         {
-            if (_record.fixture.tv_channels == null) return;
+            if (_record.fixture.tv_channels == null)
+            {
+                return;
+            }
 
             foreach (var i in _record.fixture.tv_channels)
             {
@@ -127,9 +130,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void MappingProductInfoTest()
+        public void MappingProductInfo()
         {
-            if (_record.fixture.product_info == null) return;
+            if (_record.fixture.product_info == null)
+            {
+                return;
+            }
 
             if (_record.fixture.product_info.links != null)
             {
@@ -151,7 +157,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
         [TestMethod]
         [SuppressMessage("ReSharper", "RedundantToStringCall")]
-        public void MappingExtraInfoTest()
+        public void MappingExtraInfo()
         {
             _assertHelper.AreEqual(() => _entity.ExtraInfo.Count, _record.fixture.extra_info.Length);
             foreach (var ei in _record.fixture.extra_info)
@@ -173,7 +179,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 assertHelper.AreEqual(() => m.Name, c.name);
                 assertHelper.AreEqual(() => m.Abbreviation, c.abbreviation);
                 assertHelper.AreEqual(() => m.CountryName, c.country);
-                assertHelper.AreEqual(() => m.State, c.state); 
+                assertHelper.AreEqual(() => m.State, c.state);
                 assertHelper.AreEqual(() => m.IsVirtual, c.virtualSpecified && c.@virtual);
 
                 if (c.divisionSpecified)

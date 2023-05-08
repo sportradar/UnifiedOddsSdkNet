@@ -3,7 +3,6 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using Common.Logging;
@@ -159,20 +158,45 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             bool adjustAfterAge,
             int httpClientTimeout,
             int recoveryHttpClientTimeout,
-            IOddsFeedConfigurationSection section){
+            IOddsFeedConfigurationSection section)
+        {
 
-            Guard.Argument(accessToken, nameof(accessToken)).NotNull().NotEmpty();
-            Guard.Argument(requiredLanguages, nameof(requiredLanguages)).NotNull();//.NotEmpty();
-            if (!requiredLanguages.Any())
-                throw new ArgumentOutOfRangeException(nameof(requiredLanguages));
-
-            Guard.Argument(inactivitySeconds, nameof(inactivitySeconds)).InRange(SdkInfo.MinInactivitySeconds, SdkInfo.MaxInactivitySeconds);
-            Guard.Argument(maxRecoveryTimeInSeconds, nameof(maxRecoveryTimeInSeconds)).Min(SdkInfo.MinRecoveryExecutionInSeconds);
-            Guard.Argument(minIntervalBetweenRecoveryRequests, nameof(minIntervalBetweenRecoveryRequests)).InRange(SdkInfo.MinIntervalBetweenRecoveryRequests, SdkInfo.MaxIntervalBetweenRecoveryRequests);
-            Guard.Argument(apiHost, nameof(apiHost)).NotNull().NotEmpty();
-            Guard.Argument(host, nameof(host)).NotNull().NotEmpty();
-            Guard.Argument(httpClientTimeout, nameof(httpClientTimeout)).InRange(SdkInfo.MinHttpClientTimeout, SdkInfo.MaxHttpClientTimeout);
-            Guard.Argument(recoveryHttpClientTimeout, nameof(recoveryHttpClientTimeout)).InRange(SdkInfo.MinHttpClientTimeout, SdkInfo.MaxHttpClientTimeout);
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                throw new ArgumentNullException(nameof(accessToken));
+            }
+            if (requiredLanguages.IsNullOrEmpty())
+            {
+                throw new ArgumentException(nameof(requiredLanguages));
+            }
+            if (inactivitySeconds < SdkInfo.MinInactivitySeconds || inactivitySeconds > SdkInfo.MaxInactivitySeconds)
+            {
+                throw new ArgumentOutOfRangeException(nameof(inactivitySeconds));
+            }
+            if (minIntervalBetweenRecoveryRequests < SdkInfo.MinIntervalBetweenRecoveryRequests || minIntervalBetweenRecoveryRequests > SdkInfo.MaxIntervalBetweenRecoveryRequests)
+            {
+                throw new ArgumentOutOfRangeException(nameof(minIntervalBetweenRecoveryRequests));
+            }
+            if (httpClientTimeout < SdkInfo.MinHttpClientTimeout || httpClientTimeout > SdkInfo.MaxHttpClientTimeout)
+            {
+                throw new ArgumentOutOfRangeException(nameof(httpClientTimeout));
+            }
+            if (recoveryHttpClientTimeout < SdkInfo.MinHttpClientTimeout || recoveryHttpClientTimeout > SdkInfo.MaxHttpClientTimeout)
+            {
+                throw new ArgumentOutOfRangeException(nameof(recoveryHttpClientTimeout));
+            }
+            if (maxRecoveryTimeInSeconds < SdkInfo.MinRecoveryExecutionInSeconds)
+            {
+                throw new ArgumentOutOfRangeException(nameof(maxRecoveryTimeInSeconds));
+            }
+            if (string.IsNullOrEmpty(apiHost))
+            {
+                throw new ArgumentNullException(apiHost);
+            }
+            if (string.IsNullOrEmpty(host))
+            {
+                throw new ArgumentNullException(host);
+            }
 
             AccessToken = accessToken;
             InactivitySeconds = inactivitySeconds;
@@ -244,17 +268,42 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             int recoveryHttpClientTimeout,
             IOddsFeedConfigurationSection section)
         {
-            Guard.Argument(accessToken, nameof(accessToken)).NotNull().NotEmpty();
-            Guard.Argument(defaultCulture, nameof(defaultCulture)).NotNull();
-            Guard.Argument(inactivitySeconds, nameof(inactivitySeconds)).InRange(SdkInfo.MinInactivitySeconds, SdkInfo.MaxInactivitySeconds);
-            Guard.Argument(maxRecoveryExecutionInSeconds, nameof(maxRecoveryExecutionInSeconds)).Min(SdkInfo.MinRecoveryExecutionInSeconds);
-            Guard.Argument(minIntervalBetweenRecoveryRequests, nameof(minIntervalBetweenRecoveryRequests)).InRange(SdkInfo.MinIntervalBetweenRecoveryRequests, SdkInfo.MaxIntervalBetweenRecoveryRequests);
-            Guard.Argument(httpClientTimeout, nameof(httpClientTimeout)).InRange(SdkInfo.MinHttpClientTimeout, SdkInfo.MaxHttpClientTimeout);
-            Guard.Argument(recoveryHttpClientTimeout, nameof(recoveryHttpClientTimeout)).InRange(SdkInfo.MinHttpClientTimeout, SdkInfo.MaxHttpClientTimeout);
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                throw new ArgumentNullException(nameof(accessToken));
+            }
+            if (inactivitySeconds < SdkInfo.MinInactivitySeconds || inactivitySeconds > SdkInfo.MaxInactivitySeconds)
+            {
+                throw new ArgumentOutOfRangeException(nameof(inactivitySeconds));
+            }
+            if (minIntervalBetweenRecoveryRequests < SdkInfo.MinIntervalBetweenRecoveryRequests || minIntervalBetweenRecoveryRequests > SdkInfo.MaxIntervalBetweenRecoveryRequests)
+            {
+                throw new ArgumentOutOfRangeException(nameof(minIntervalBetweenRecoveryRequests));
+            }
+            if (httpClientTimeout < SdkInfo.MinHttpClientTimeout || httpClientTimeout > SdkInfo.MaxHttpClientTimeout)
+            {
+                throw new ArgumentOutOfRangeException(nameof(httpClientTimeout));
+            }
+            if (recoveryHttpClientTimeout < SdkInfo.MinHttpClientTimeout || recoveryHttpClientTimeout > SdkInfo.MaxHttpClientTimeout)
+            {
+                throw new ArgumentOutOfRangeException(nameof(recoveryHttpClientTimeout));
+            }
+            if (maxRecoveryExecutionInSeconds < SdkInfo.MinRecoveryExecutionInSeconds)
+            {
+                throw new ArgumentOutOfRangeException(nameof(maxRecoveryExecutionInSeconds));
+            }
+            if (string.IsNullOrEmpty(apiHost))
+            {
+                throw new ArgumentNullException(apiHost);
+            }
+            if (string.IsNullOrEmpty(host))
+            {
+                throw new ArgumentNullException(host);
+            }
 
             AccessToken = accessToken;
             Environment = environment;
-            DefaultLocale = defaultCulture;
+            DefaultLocale = defaultCulture ?? throw new ArgumentNullException(nameof(defaultCulture));
             var locales = new List<CultureInfo>();
             if (wantedCultures != null && wantedCultures.Any())
             {

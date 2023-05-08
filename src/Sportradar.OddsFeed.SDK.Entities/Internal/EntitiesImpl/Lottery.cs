@@ -3,11 +3,11 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Logging;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST;
@@ -44,13 +44,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <param name="sportId">A <see cref="URN"/> uniquely identifying the sport associated with the current instance</param>
         /// <param name="sportEventCache">A <see cref="ISportEventCache"/> instance containing <see cref="SportEventCI"/></param>
         /// <param name="sportDataCache">A <see cref="ISportDataCache"/> instance used to retrieve basic tournament information</param>
-        /// <param name="cultures">A <see cref="IEnumerable{CultureInfo}"/> specifying languages the current instance supports</param>
+        /// <param name="cultures">A <see cref="IReadOnlyCollection{CultureInfo}"/> specifying languages the current instance supports</param>
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how the initialized instance will handle potential exceptions</param>
         public Lottery(URN id,
                         URN sportId,
                         ISportEventCache sportEventCache,
                         ISportDataCache sportDataCache,
-                        IEnumerable<CultureInfo> cultures,
+                        IReadOnlyCollection<CultureInfo> cultures,
                         ExceptionHandlingStrategy exceptionStrategy)
             : base(id, sportId, ExecutionLogPrivate, sportEventCache, cultures, exceptionStrategy)
         {
@@ -65,7 +65,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <value>The <see cref="ISportSummary"/> instance representing the sport associated with the current instance</value>
         public async Task<ISportSummary> GetSportAsync()
         {
-            var lotteryCI = (LotteryCI) SportEventCache.GetEventCacheItem(Id);
+            var lotteryCI = (LotteryCI)SportEventCache.GetEventCacheItem(Id);
             if (lotteryCI == null)
             {
                 ExecutionLog.Debug($"Missing data. No lottery cache item for id={Id}.");
@@ -95,7 +95,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <returns>The associated category</returns>
         public async Task<ICategorySummary> GetCategoryAsync()
         {
-            var lotteryCI = (LotteryCI) SportEventCache.GetEventCacheItem(Id);
+            var lotteryCI = (LotteryCI)SportEventCache.GetEventCacheItem(Id);
             if (lotteryCI == null)
             {
                 ExecutionLog.Debug($"Missing data. No lottery cache item for id={Id}.");
@@ -134,7 +134,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <returns>A <see cref="Task{T}"/> representing an async operation</returns>
         public async Task<IBonusInfo> GetBonusInfoAsync()
         {
-            var lotteryCI = (LotteryCI) SportEventCache.GetEventCacheItem(Id);
+            var lotteryCI = (LotteryCI)SportEventCache.GetEventCacheItem(Id);
             if (lotteryCI == null)
             {
                 ExecutionLog.Debug($"Missing data. No lottery cache item for id={Id}.");
@@ -155,7 +155,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <returns>A <see cref="Task{T}"/> representing an async operation</returns>
         public async Task<IDrawInfo> GetDrawInfoAsync()
         {
-            var lotteryCI = (LotteryCI) SportEventCache.GetEventCacheItem(Id);
+            var lotteryCI = (LotteryCI)SportEventCache.GetEventCacheItem(Id);
             if (lotteryCI == null)
             {
                 ExecutionLog.Debug($"Missing data. No lottery cache item for id={Id}.");
@@ -176,7 +176,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <returns>A <see cref="Task{T}"/> representing an async operation</returns>
         public async Task<IEnumerable<URN>> GetScheduledDrawsAsync()
         {
-            var lotteryCI = (LotteryCI) SportEventCache.GetEventCacheItem(Id);
+            var lotteryCI = (LotteryCI)SportEventCache.GetEventCacheItem(Id);
             if (lotteryCI == null)
             {
                 ExecutionLog.Debug($"Missing data. No lottery cache item for id={Id}.");

@@ -3,9 +3,9 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal.Config
@@ -65,11 +65,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <param name="sectionProvider">A <see cref="IConfigurationSectionProvider"/> used to access <see cref="IOddsFeedConfigurationSection"/></param>
         internal ConfigurationBuilderBase(string accessToken, IConfigurationSectionProvider sectionProvider)
         {
-            Guard.Argument(accessToken, nameof(accessToken)).NotNull().NotEmpty();
-            Guard.Argument(sectionProvider, nameof(sectionProvider)).NotNull();
-
-            AccessToken = accessToken;
-            SectionProvider = sectionProvider;
+            AccessToken = accessToken ?? throw new ArgumentNullException(nameof(accessToken));
+            SectionProvider = sectionProvider ?? throw new ArgumentNullException(nameof(sectionProvider));
             ExceptionHandlingStrategy = ExceptionHandlingStrategy.CATCH;
             NodeId = 0;
             DefaultLocale = null;

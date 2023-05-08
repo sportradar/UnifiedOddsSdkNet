@@ -3,10 +3,10 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
@@ -41,7 +41,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         public EventTimelineCI(ExportableEventTimelineCI exportable)
         {
             if (exportable == null)
+            {
                 throw new ArgumentNullException(nameof(exportable));
+            }
 
             _timeline = exportable.Timeline?.Select(t => new TimelineEventCI(t)).ToList();
             _isFinalized = exportable.IsFinalized;
@@ -127,7 +129,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             return new ExportableEventTimelineCI
             {
                 FetchedCultures = new List<CultureInfo>(_fetchedCultures ?? new List<CultureInfo>()),
-                Timeline = timelineTasks.IsNullOrEmpty() ? null : timelineTasks.Select(s=>s.Result).ToList(),
+                Timeline = timelineTasks.IsNullOrEmpty() ? null : timelineTasks.Select(s => s.Result).ToList(),
                 IsFinalized = _isFinalized
             };
         }

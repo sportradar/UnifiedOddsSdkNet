@@ -137,17 +137,35 @@ namespace Sportradar.OddsFeed.SDK.Common
             }
 
             if (logger.IsTraceEnabled)
+            {
                 return LogLevel.Trace;
+            }
+
             if (logger.IsDebugEnabled)
+            {
                 return LogLevel.Debug;
+            }
+
             if (logger.IsInfoEnabled)
+            {
                 return LogLevel.Info;
+            }
+
             if (logger.IsWarnEnabled)
+            {
                 return LogLevel.Warn;
+            }
+
             if (logger.IsErrorEnabled)
+            {
                 return LogLevel.Error;
+            }
+
             if (logger.IsFatalEnabled)
+            {
                 return LogLevel.Fatal;
+            }
+
             return LogLevel.Off;
         }
 
@@ -165,17 +183,34 @@ namespace Sportradar.OddsFeed.SDK.Common
             }
 
             if (logger.IsTraceEnabled)
+            {
                 return minLevel;
+            }
+
             if (logger.IsDebugEnabled && LogLevel.Debug >= minLevel)
+            {
                 return LogLevel.Debug;
+            }
+
             if (logger.IsInfoEnabled && LogLevel.Info >= minLevel)
+            {
                 return LogLevel.Info;
+            }
+
             if (logger.IsWarnEnabled && LogLevel.Warn >= minLevel)
+            {
                 return LogLevel.Warn;
+            }
+
             if (logger.IsErrorEnabled && LogLevel.Error >= minLevel)
+            {
                 return LogLevel.Error;
+            }
+
             if (logger.IsErrorEnabled && LogLevel.Error >= minLevel)
+            {
                 return LogLevel.Error;
+            }
 
             return minLevel;
         }

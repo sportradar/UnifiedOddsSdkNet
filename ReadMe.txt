@@ -25,6 +25,16 @@ The package contains:
 For more information please contact support@sportradar.com or visit https://iodocs.betradar.com/unifiedsdk/index.html
 
 CHANGE LOG:
+2023-04-27  1.58.0
+Introduced OperationManager.MaxConnectionsPerServer property (at feed initialization sets the ServicePointManager.DefaultConnectionLimit)
+Fixed lock issue when calling SportDataProvider.GetActiveTournamentsAsync repeatedly
+Improved performance for market/outcome name generation
+CustomBetManager respects configured ExceptionHandlingStrategy 
+BookingManager respects configured ExceptionHandlingStrategy
+Fixed WNS API endpoints (removed /sports/ from url)
+Optimized daily cache population of available sport and category data (does not delete any previous ones anymore)
+Optimized execution of some internal async methods
+
 2023-02-03  1.57.1
 Improved speed on API requests with high concurrency
 

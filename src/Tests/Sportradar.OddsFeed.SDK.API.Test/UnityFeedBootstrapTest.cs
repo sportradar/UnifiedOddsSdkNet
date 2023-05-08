@@ -16,6 +16,8 @@ using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.Lottery;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -33,14 +35,14 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         /// Mocked dispatcher must be assigned to this variable so the GC does not collect it
         /// since the container only holds a weak reference to it (ExternallyControlledLifetimeManager)
         /// </summary>
-        private static IGlobalEventDispatcher _dispatcher;
+        private IGlobalEventDispatcher _dispatcher;
 
-        private static IUnityContainer _childContainer1;
+        private IUnityContainer _childContainer1;
 
-        private static IUnityContainer _childContainer2;
+        private IUnityContainer _childContainer2;
 
-        [ClassInitialize]
-        public static void Init(TestContext context)
+        [TestInitialize]
+        public void Init()
         {
             var container = new UnityContainer();
             var config = TestConfigurationInternal.GetConfig();
@@ -64,11 +66,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
 
             container.RegisterTypes(_dispatcher);
 
-            container.RegisterType<IProducerManager, ProducerManager>(
-                new ContainerControlledLifetimeManager(),
-                new InjectionConstructor(
-                    new TestProducersProvider(),
-                    config));
+            container.RegisterType<IProducerManager, ProducerManager>(new ContainerControlledLifetimeManager(), new InjectionConstructor(new TestProducersProvider(), newConfig));
 
             container.RegisterAdditionalTypes();
 
@@ -77,7 +75,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         }
 
         [TestMethod]
-        public void configuration_is_resolved()
+        public void Configuration_is_resolved()
         {
             var config = _childContainer1.Resolve<IOddsFeedConfigurationInternal>();
             Assert.IsTrue(!string.IsNullOrEmpty(config.ApiBaseUri));
@@ -273,7 +271,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             var dataFetcher2 = _childContainer1.Resolve<IDataFetcher>("RecoveryDataFetcher");
             Assert.IsNotNull(dataFetcher2, "Resolved IDataFetcher cannot be a null reference");
             Assert.IsInstanceOfType(dataFetcher2, typeof(LogHttpDataFetcher), "Resolved IDataFetcher must be instance of LogHttpDataFetcher");
-            var dataFetcher3 = _childContainer1.Resolve<LogHttpDataFetcher>("FastLogHttpDataFetcher");
+            var dataFetcher3 = _childContainer1.Resolve<LogHttpDataFetcher>("FastLogHttpDataFetcherPool");
             Assert.IsNotNull(dataFetcher3, "Resolved IDataFetcher cannot be a null reference");
             Assert.IsInstanceOfType(dataFetcher3, typeof(LogHttpDataFetcher), "Resolved IDataFetcher must be instance of LogHttpDataFetcher");
 
@@ -285,9 +283,9 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         [TestMethod]
         public void HttpClientFastIsTransient()
         {
-            var dataFetcher1 = _childContainer1.Resolve<LogHttpDataFetcher>("FastLogHttpDataFetcher");
-            var dataFetcher2 = _childContainer1.Resolve<LogHttpDataFetcher>("FastLogHttpDataFetcher");
-            var dataFetcher3 = _childContainer1.Resolve<LogHttpDataFetcher>("FastLogHttpDataFetcher");
+            var dataFetcher1 = _childContainer1.Resolve<LogHttpDataFetcher>("FastLogHttpDataFetcherPool");
+            var dataFetcher2 = _childContainer1.Resolve<LogHttpDataFetcher>("FastLogHttpDataFetcherPool");
+            var dataFetcher3 = _childContainer1.Resolve<LogHttpDataFetcher>("FastLogHttpDataFetcherPool");
             Assert.IsNotNull(dataFetcher1, "Resolved IDataFetcher cannot be a null reference");
             Assert.IsInstanceOfType(dataFetcher1, typeof(LogHttpDataFetcher), "Resolved IDataFetcher must be instance of LogHttpDataFetcher");
             Assert.IsNotNull(dataFetcher2, "Resolved IDataFetcher cannot be a null reference");
@@ -366,6 +364,62 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             {
                 Assert.IsTrue(ExceptionContains(e, "task was"));
             }
+        }
+
+        [TestMethod]
+        public void CustomBetAvailableSelectionsProviderIsResolved()
+        {
+            var availableSelectionProvider = _childContainer1.Resolve<IDataProvider<AvailableSelectionsDto>>();
+            Assert.IsNotNull(availableSelectionProvider);
+        }
+
+        [TestMethod]
+        public void CustomBetCalculateProbabilityProviderIsResolved()
+        {
+            var calculateProbabilityProvider = _childContainer1.Resolve<ICalculateProbabilityProvider>();
+            Assert.IsNotNull(calculateProbabilityProvider);
+        }
+
+        [TestMethod]
+        public void CustomBetCalculateProbabilityFilteredProviderIsResolved()
+        {
+            var calculateProbabilityProvider = _childContainer1.Resolve<ICalculateProbabilityFilteredProvider>();
+            Assert.IsNotNull(calculateProbabilityProvider);
+        }
+
+        [TestMethod]
+        public void CustomBetIsResolved()
+        {
+            var customBetManager = _childContainer1.Resolve<ICustomBetManager>();
+            Assert.IsNotNull(customBetManager);
+        }
+
+        [TestMethod]
+        public void WnsDrawSummaryProviderIsResolved()
+        {
+            var wnsDrawProvider = _childContainer1.Resolve<IDataProvider<DrawDTO>>("drawSummaryProvider");
+            Assert.IsNotNull(wnsDrawProvider);
+        }
+
+        [TestMethod]
+        public void WnsDrawFixtureProviderIsResolved()
+        {
+            var wnsDrawProvider = _childContainer1.Resolve<IDataProvider<DrawDTO>>("drawFixtureProvider");
+            Assert.IsNotNull(wnsDrawProvider);
+        }
+
+        [TestMethod]
+        public void WnsLotteryScheduleProviderIsResolved()
+        {
+            var wnsLotteryScheduleProvider = _childContainer1.Resolve<IDataProvider<LotteryDTO>>("lotteryScheduleProvider");
+            Assert.IsNotNull(wnsLotteryScheduleProvider);
+        }
+
+        [TestMethod]
+        public void WnsLotteryListProviderIsResolved()
+        {
+            var wnsLotteryListProvider = _childContainer1.Resolve<IDataProvider<EntityList<LotteryDTO>>>("lotteryListProvider");
+            Assert.IsNotNull(wnsLotteryListProvider);
         }
 
         private bool ExceptionContains(Exception ex, string msg)

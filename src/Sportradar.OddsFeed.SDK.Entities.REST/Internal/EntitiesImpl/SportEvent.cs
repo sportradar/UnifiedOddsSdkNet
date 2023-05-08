@@ -3,11 +3,11 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Logging;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
@@ -43,9 +43,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         public URN Id { get; }
 
         /// <summary>
-        /// A <see cref="IEnumerable{T}"/> specifying languages the current instance supports
+        /// A <see cref="IReadOnlyCollection{T}"/> specifying languages the current instance supports
         /// </summary>
-        public readonly IEnumerable<CultureInfo> Cultures;
+        public readonly IReadOnlyCollection<CultureInfo> Cultures;
 
         /// <summary>
         /// A <see cref="ISportEventCache"/> instance containing <see cref="SportEventCI"/>
@@ -65,7 +65,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                         URN sportId,
                         ILog executionLog,
                         ISportEventCache sportEventCache,
-                        IEnumerable<CultureInfo> cultures,
+                        IReadOnlyCollection<CultureInfo> cultures,
                         ExceptionHandlingStrategy exceptionStrategy)
         {
             Guard.Argument(id, nameof(id)).NotNull();
@@ -106,10 +106,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 return null;
             }
 
+            var cultureList = new[] { culture };
             var item = ExceptionStrategy == ExceptionHandlingStrategy.THROW
-                ? await sportEventCI.GetNamesAsync(Cultures).ConfigureAwait(false)
+                ? await sportEventCI.GetNamesAsync(cultureList).ConfigureAwait(false)
                 : await new Func<IEnumerable<CultureInfo>, Task<IReadOnlyDictionary<CultureInfo, string>>>(sportEventCI
-                        .GetNamesAsync).SafeInvokeAsync(Cultures, ExecutionLog, GetFetchErrorMessage("Name"))
+                        .GetNamesAsync).SafeInvokeAsync(cultureList, ExecutionLog, GetFetchErrorMessage("Name"))
                     .ConfigureAwait(false);
 
             return item == null || !item.ContainsKey(culture)
@@ -189,7 +190,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         protected override string PrintC()
         {
             var detailsCultures = string.Join(", ", Cultures.Select(k => k.TwoLetterISOLanguageName));
-            string result = $"Id={Id}, Sport={GetSportIdAsync().Result}, ScheduledStartTime={GetScheduledTimeAsync().Result}, ScheduledEndTime={GetScheduledEndTimeAsync().Result}";
+            var result = $"Id={Id}, Sport={GetSportIdAsync().GetAwaiter().GetResult()}, ScheduledStartTime={GetScheduledTimeAsync().GetAwaiter().GetResult()}, ScheduledEndTime={GetScheduledEndTimeAsync().GetAwaiter().GetResult()}";
             result += $", CulturesLoaded=[{detailsCultures}]";
             return result;
         }

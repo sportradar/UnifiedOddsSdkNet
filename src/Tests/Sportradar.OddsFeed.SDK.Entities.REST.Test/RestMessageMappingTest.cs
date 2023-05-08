@@ -23,7 +23,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
     public class RestMessageMappingTest
     {
         [TestMethod]
-        public void BookmakerDetailsDTOMappingTest()
+        public void BookmakerDetailsDTOMapping()
         {
             var msg1 = RMF.GetBookmakerDetails(10);
             var msg2 = RMF.GetBookmakerDetails(0, false, false, false);
@@ -48,7 +48,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void CategoryDTOMappingTest()
+        public void CategoryDTOMapping()
         {
             var tours = RMF.GetTournamentExtendedList(100);
             var dto = new CategoryDTO("sr:category:1", "category name", "en", tours);
@@ -64,14 +64,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void CompetitorDTOMappingTest()
+        public void CompetitorDTOMapping()
         {
             var msg = RMF.GetTeam();
             ValidateTeam(msg, new CompetitorDTO(msg));
         }
 
         [TestMethod]
-        public void CompetitorProfileDTOMappingTest()
+        public void CompetitorProfileDTOMapping()
         {
             var msg = RMF.GetCompetitorProfileEndpoint(0, 10);
 
@@ -86,7 +86,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void CoverageInfoDTOMappingTest()
+        public void CoverageInfoDTOMapping()
         {
             var coverageInfoFeed = RMF.GetCoverageInfo(10);
             var coverageInfo = new CoverageInfo(new CoverageInfoCI(new CoverageInfoDTO(coverageInfoFeed)));
@@ -100,7 +100,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void FixtureDTOMappingTest()
+        public void FixtureDTOMapping()
         {
             var msg = RMF.GetFixture();
             var dto = new FixtureDTO(msg, null);
@@ -132,7 +132,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void GroupDTOMappingTest()
+        public void GroupDTOMapping()
         {
             var msg = RMF.GetTournamentGroup();
             var dto = new GroupDTO(msg);
@@ -141,7 +141,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void MarketDescriptionDTOMappingTest()
+        public void MarketDescriptionDTOMapping()
         {
             var msg = RMF.GetDescMarket();
             var dto = new MarketDescriptionDTO(msg);
@@ -171,7 +171,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void MarketMappingDTOMappingTest()
+        public void MarketMappingDTOMapping()
         {
             var msg = RMF.GetMappingsMapping();
             var dto = new MarketMappingDTO(msg);
@@ -180,7 +180,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void OutcomeDescriptionDTOMappingTest()
+        public void OutcomeDescriptionDTOMapping()
         {
             var msg = RMF.GetDescOutcomesOutcome();
             var dto = new OutcomeDescriptionDTO(msg);
@@ -189,7 +189,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void PlayerDTOTest()
+        public void PlayerDTO()
         {
             var sportEntityDTO = new SportEntityDTO("sr:player:1", "Sport Entity Name");
             var playerCI = new SportEntityCI(sportEntityDTO);
@@ -199,7 +199,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void PlayerProfileDTOTest()
+        public void PlayerProfileDTO()
         {
             var msg = RMF.GetPlayerExtended();
             var dto = new PlayerProfileDTO(msg, null);
@@ -208,31 +208,31 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void ProductInfoTest()
+        public void ProductInfo()
         {
-            new CacheItemMergeTests().ProductInfoTest();
+            new CacheItemMergeTests().ProductInfo();
         }
 
         [TestMethod]
-        public void ProductInfoLinkTest()
+        public void ProductInfoLink()
         {
-            new CacheItemMergeTests().ProductInfoLinkTest();
+            new CacheItemMergeTests().ProductInfoLink();
         }
 
         [TestMethod]
-        public void RefereeTest()
+        public void Referee()
         {
-            new CacheItemMergeTests().RefereeTest();
+            new CacheItemMergeTests().Referee();
         }
 
         [TestMethod]
-        public void RoundTest()
+        public void Round()
         {
-            new CacheItemMergeTests().RoundMergeTest();
+            new CacheItemMergeTests().RoundMerge();
         }
 
         [TestMethod]
-        public void SeasonCoverageInfoDTOTest()
+        public void SeasonCoverageInfoDTO()
         {
             var msg = RMF.GetSeasonCoverageInfo();
             var dto = new SeasonCoverageDTO(msg);
@@ -241,13 +241,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void SeasonTest()
+        public void Season()
         {
-            new CacheItemMergeTests().SeasonTest();
+            new CacheItemMergeTests().Season();
         }
 
         [TestMethod]
-        public void SpecifierDTOMappingTest()
+        public void SpecifierDTOMapping()
         {
             var msg = RMF.GetDescSpecifiersSpecifier();
             var dto = new SpecifierDTO(msg);
@@ -256,7 +256,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void SportDTOMappingTest()
+        public void SportDTOMapping()
         {
             var tours = RMF.GetTournamentExtendedList(100);
             Assert.AreEqual(100, tours.Count);
@@ -277,13 +277,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void StreamingChannelTest()
+        public void StreamingChannel()
         {
-            new CacheItemMergeTests().StreamingChannelTest();
+            new CacheItemMergeTests().StreamingChannel();
         }
 
         [TestMethod]
-        public void TeamCompetitorDTOMappingTest()
+        public void TeamCompetitorDTOMapping()
         {
             var msg = RMF.GetTeamCompetitor();
             var dto = new TeamCompetitorDTO(msg);
@@ -295,7 +295,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void TournamentDTOMappingTest()
+        public void TournamentDTOMapping()
         {
             var msg = RMF.GetTournament();
             var dto = new TournamentDTO(msg);
@@ -304,7 +304,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void TvChannelDTOMappingTest()
+        public void TvChannelDTOMapping()
         {
             var msg = RMF.GetTvChannel();
             var dto = new TvChannelDTO(msg);
@@ -320,15 +320,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void VenueDTOMappingTest()
+        public void VenueDTOMapping()
         {
-            new CacheItemMergeTests().VenueMergeTest();
+            new CacheItemMergeTests().VenueMerge();
         }
 
         [TestMethod]
-        public void WeatherInfoDTOMappingTest()
+        public void WeatherInfoDTOMapping()
         {
-            new CacheItemMergeTests().WeatherInfoTest();
+            new CacheItemMergeTests().WeatherInfo();
         }
 
         private static void ValidateMapping(mappingsMapping msg, MarketMappingDTO dto)

@@ -3,10 +3,10 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -65,7 +65,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         internal SportEventConditionsCI(ExportableSportEventConditionsCI exportable)
         {
             if (exportable == null)
+            {
                 throw new ArgumentNullException(nameof(exportable));
+            }
 
             Attendance = exportable.Attendance;
             EventMode = exportable.EventMode;
@@ -121,13 +123,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 await Task.WhenAll(pitcherTasks).ConfigureAwait(false);
             }
             return new ExportableSportEventConditionsCI
-                   {
-                       Attendance = Attendance,
-                       EventMode = EventMode,
-                       Referee = Referee != null ? await Referee.ExportAsync().ConfigureAwait(false) : null,
-                       WeatherInfo = WeatherInfo != null ? await WeatherInfo.ExportAsync().ConfigureAwait(false) : null,
-                       Pitchers = pitcherTasks.IsNullOrEmpty() ? null : pitcherTasks.Select(s=>s.Result).ToList()
-                   };
+            {
+                Attendance = Attendance,
+                EventMode = EventMode,
+                Referee = Referee != null ? await Referee.ExportAsync().ConfigureAwait(false) : null,
+                WeatherInfo = WeatherInfo != null ? await WeatherInfo.ExportAsync().ConfigureAwait(false) : null,
+                Pitchers = pitcherTasks.IsNullOrEmpty() ? null : pitcherTasks.Select(s => s.GetAwaiter().GetResult()).ToList()
+            };
         }
     }
 }

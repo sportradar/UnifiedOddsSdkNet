@@ -3,9 +3,9 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Linq;
 using System.Threading.Tasks;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
@@ -178,7 +178,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                 ?.Select(s => new ScheduledStartTimeChange(s)).ToList();
             ParentStageId = string.IsNullOrEmpty(exportable.ParentStageId) ? null : URN.Parse(exportable.ParentStageId);
             AdditionalParentsIds = exportable.AdditionalParentsIds == null || !exportable.AdditionalParentsIds.Any()
-                ? null 
+                ? null
                 : exportable.AdditionalParentsIds.Select(URN.Parse).ToList();
         }
 
@@ -228,27 +228,27 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <returns>An <see cref="ExportableCI"/> instance containing all relevant properties</returns>
         public async Task<ExportableFixtureCI> ExportAsync()
         {
-            var scheduledTasks = ScheduledStartTimeChanges?.Select(async s => await ((ScheduledStartTimeChange) s).ExportAsync().ConfigureAwait(false)).ToList();
+            var scheduledTasks = ScheduledStartTimeChanges?.Select(async s => await ((ScheduledStartTimeChange)s).ExportAsync().ConfigureAwait(false)).ToList();
             if (!scheduledTasks.IsNullOrEmpty())
             {
                 await Task.WhenAll(scheduledTasks).ConfigureAwait(false);
             }
-            var channelTasks = TvChannels?.Select(async c => await ((TvChannel) c).ExportAsync().ConfigureAwait(false)).ToList();
+            var channelTasks = TvChannels?.Select(async c => await ((TvChannel)c).ExportAsync().ConfigureAwait(false)).ToList();
             return new ExportableFixtureCI
             {
                 ExtraInfo = ExtraInfo?.ToDictionary(i => i.Key, i => i.Value),
-                CoverageInfo = CoverageInfo != null ? await ((CoverageInfo) CoverageInfo).ExportAsync().ConfigureAwait(false) : null,
-                ProductInfo = ProductInfo != null ? await ((ProductInfo) ProductInfo).ExportAsync().ConfigureAwait(false) : null,
+                CoverageInfo = CoverageInfo != null ? await ((CoverageInfo)CoverageInfo).ExportAsync().ConfigureAwait(false) : null,
+                ProductInfo = ProductInfo != null ? await ((ProductInfo)ProductInfo).ExportAsync().ConfigureAwait(false) : null,
                 ReplacedBy = ReplacedBy?.ToString(),
                 References = References?.References?.ToDictionary(r => r.Key, r => r.Value),
                 NextLiveTime = NextLiveTime,
                 StartTimeConfirmed = StartTimeConfirmed,
-                ScheduledStartTimeChanges = scheduledTasks.IsNullOrEmpty() ? null : scheduledTasks.Select(s=>s.Result).ToList(),
+                ScheduledStartTimeChanges = scheduledTasks.IsNullOrEmpty() ? null : scheduledTasks.Select(s => s.GetAwaiter().GetResult()).ToList(),
                 StartTime = StartTime,
-                TvChannels = channelTasks.IsNullOrEmpty() ? null : channelTasks.Select(s=>s.Result).ToList(),
+                TvChannels = channelTasks.IsNullOrEmpty() ? null : channelTasks.Select(s => s.GetAwaiter().GetResult()).ToList(),
                 StartTimeTBD = StartTimeTBD,
                 ParentStageId = ParentStageId?.ToString(),
-                AdditionalParentsIds = AdditionalParentsIds?.Select(s=>s.ToString()).ToList()
+                AdditionalParentsIds = AdditionalParentsIds?.Select(s => s.ToString()).ToList()
             };
         }
     }

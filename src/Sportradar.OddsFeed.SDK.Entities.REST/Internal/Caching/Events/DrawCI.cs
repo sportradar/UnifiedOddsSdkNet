@@ -3,11 +3,11 @@
 */
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
@@ -181,7 +181,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
             {
                 return _displayId;
             }
-            await FetchMissingSummary(new[] {DefaultCulture}, false).ConfigureAwait(false);
+            await FetchMissingSummary(new[] { DefaultCulture }, false).ConfigureAwait(false);
             return _displayId;
         }
 
@@ -286,7 +286,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events
                 draw.LotteryId = _lotteryId?.ToString();
                 draw.DrawStatus = _drawStatus;
                 draw.ResultsChronological = _resultsChronological;
-                draw.Results = resultTasks.IsNullOrEmpty() ? null : resultTasks.Select(s=>s.Result).ToList();
+                draw.Results = resultTasks.IsNullOrEmpty() ? null : resultTasks.Select(s => s.GetAwaiter().GetResult()).ToList();
                 draw.DisplayId = _displayId;
             }
             return exportable;

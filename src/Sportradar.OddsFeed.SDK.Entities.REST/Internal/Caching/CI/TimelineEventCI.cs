@@ -3,10 +3,10 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
@@ -51,7 +51,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         internal TimelineEventCI(ExportableTimelineEventCI exportable)
         {
             if (exportable == null)
+            {
                 throw new ArgumentNullException(nameof(exportable));
+            }
 
             Id = exportable.Id;
             HomeScore = exportable.HomeScore;
@@ -157,43 +159,43 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             }
 
             return new ExportableTimelineEventCI
-                   {
-                       Id = Id,
-                       Value = Value,
-                       Type = Type,
-                       GoalScorer = GoalScorer != null
+            {
+                Id = Id,
+                Value = Value,
+                Type = Type,
+                GoalScorer = GoalScorer != null
                                         ? new ExportableEventPlayerCI
-                                          {
-                                              Id = GoalScorer.Id.ToString(),
-                                              Name = new Dictionary<CultureInfo, string>(GoalScorer.Name ?? new Dictionary<CultureInfo, string>()),
-                                              Bench = GoalScorer.Bench,
-                                              Method =  GoalScorer.Method
-                                          }
+                                        {
+                                            Id = GoalScorer.Id.ToString(),
+                                            Name = new Dictionary<CultureInfo, string>(GoalScorer.Name ?? new Dictionary<CultureInfo, string>()),
+                                            Bench = GoalScorer.Bench,
+                                            Method = GoalScorer.Method
+                                        }
                                         : null,
-                       MatchStatusCode = MatchStatusCode,
-                       Assists = assistsTasks.IsNullOrEmpty() ? null : assistsTasks.Select(s=>s.Result).ToList(),
-                       HomeScore = HomeScore,
-                       Time = Time,
-                       StoppageTime = StoppageTime,
-                       Period = Period,
-                       Points = Points,
-                       MatchTime = MatchTime,
-                       Team = Team,
-                       PeriodName = PeriodName,
-                       AwayScore = AwayScore,
-                       MatchClock = MatchClock,
-                       Y = Y,
-                       X = X,
-                       Player = Player != null
+                MatchStatusCode = MatchStatusCode,
+                Assists = assistsTasks.IsNullOrEmpty() ? null : assistsTasks.Select(s => s.GetAwaiter().GetResult()).ToList(),
+                HomeScore = HomeScore,
+                Time = Time,
+                StoppageTime = StoppageTime,
+                Period = Period,
+                Points = Points,
+                MatchTime = MatchTime,
+                Team = Team,
+                PeriodName = PeriodName,
+                AwayScore = AwayScore,
+                MatchClock = MatchClock,
+                Y = Y,
+                X = X,
+                Player = Player != null
                                     ? new ExportableEventPlayerCI
-                                      {
-                                          Id = Player.Id.ToString(),
-                                          Name = new Dictionary<CultureInfo, string>(Player.Name ?? new Dictionary<CultureInfo, string>()),
-                                          Bench = Player.Bench,
-                                          Method =  Player.Method
-                                      }
+                                    {
+                                        Id = Player.Id.ToString(),
+                                        Name = new Dictionary<CultureInfo, string>(Player.Name ?? new Dictionary<CultureInfo, string>()),
+                                        Bench = Player.Bench,
+                                        Method = Player.Method
+                                    }
                                     : null
-                   };
+            };
         }
     }
 }

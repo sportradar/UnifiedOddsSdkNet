@@ -1,6 +1,12 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Globalization;
+using System.Linq;
+using System.Threading;
 using Common.Logging;
 using Dawn;
 using Microsoft.Practices.Unity;
@@ -17,12 +23,6 @@ using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Messages;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Globalization;
-using System.Linq;
-using System.Threading;
 
 namespace Sportradar.OddsFeed.SDK.API
 {
@@ -252,7 +252,10 @@ namespace Sportradar.OddsFeed.SDK.API
         /// <param name="isReplay">Value indicating whether the constructed instance will be used to connect to replay server</param>
         protected Feed(IOddsFeedConfiguration config, bool isReplay)
         {
-            Guard.Argument(config, nameof(config)).NotNull();
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
 
             FeedInitialized = false;
 

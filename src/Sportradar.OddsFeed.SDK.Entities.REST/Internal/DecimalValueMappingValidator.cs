@@ -3,7 +3,6 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
@@ -31,7 +30,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="allowedDecimalValue">A value specifying the allowed value of the decimal part.</param>
         public DecimalValueMappingValidator(string specifierName, decimal allowedDecimalValue)
         {
-            Guard.Argument(specifierName, nameof(specifierName)).NotNull().NotEmpty();
+            if (string.IsNullOrEmpty(specifierName))
+            {
+                throw new ArgumentNullException(nameof(specifierName));
+            }
 
             _specifierName = specifierName;
             _allowedDecimalValue = allowedDecimalValue;

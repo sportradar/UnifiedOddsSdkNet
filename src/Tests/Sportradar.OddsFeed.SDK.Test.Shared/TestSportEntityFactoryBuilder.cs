@@ -4,8 +4,10 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
+using System.Threading.Tasks;
 using Moq;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
@@ -22,102 +24,148 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 {
     public class TestSportEntityFactoryBuilder
     {
-        private MemoryCache _eventMemoryCache;
-        private MemoryCache _profileCache;
-        private MemoryCache _statusMemoryCache;
-        private MemoryCache _ignoreTimelineMemoryCache;
-        internal SportEventCache SportEventCache;
-        internal SportDataCache SportDataCache;
-        internal ISportEventStatusCache EventStatusCache;
-
-        private TestTimer _timer;
-
-        internal SportEntityFactory SportEntityFactory;
+        internal readonly List<CultureInfo> Cultures;
+        internal readonly CacheManager CacheManager;
+        internal readonly SportEventCache SportEventCache;
+        internal readonly SportDataCache SportDataCache;
+        internal readonly ISportEventStatusCache EventStatusCache;
+        internal readonly IProfileCache ProfileCache;
+        internal readonly SportEntityFactory SportEntityFactory;
+        internal readonly TestDataRouterManager DataRouterManager;
+        internal readonly TestDataRouterManagerCached DataRouterManagerCached;
+        internal readonly MemoryCache SportEventMemoryCache;
+        internal readonly MemoryCache ProfileMemoryCache;
+        internal readonly MemoryCache SportEventStatusMemoryCache;
+        internal readonly MemoryCache IgnoreTimelineMemoryCache;
+        internal readonly ExceptionHandlingStrategy ThrowingStrategy;
 
         public ICompetition Competition;
         public ITournament Tournament;
         public ISeason Season;
         public ISport Sport;
         public List<ISport> Sports;
-        private CacheManager _cacheManager;
-        private IDataRouterManager _dataRouterManager;
 
-        public void Init()
+        public TestSportEntityFactoryBuilder(IReadOnlyCollection<CultureInfo> cultures = null, bool useCachedDataRouterManager = false)
+            : this(cultures?.ToList(), useCachedDataRouterManager)
         {
-            _timer = new TestTimer(false);
-            _eventMemoryCache = new MemoryCache("EventCache");
-            _profileCache = new MemoryCache("ProfileCache");
-            _statusMemoryCache = new MemoryCache("StatusCache");
-            _ignoreTimelineMemoryCache = new MemoryCache("IgnoreTimeline");
-
-            _cacheManager = new CacheManager();
-            _dataRouterManager = new TestDataRouterManager(_cacheManager);
-
-            var sportEventCacheItemFactory = new SportEventCacheItemFactory(_dataRouterManager, new SemaphorePool(5, ExceptionHandlingStrategy.THROW), TestData.Culture, new MemoryCache("FixtureTimestampCache"));
-            var profileCache = new ProfileCache(_profileCache, _dataRouterManager, _cacheManager);
-            SportEventCache = new SportEventCache(_eventMemoryCache, _dataRouterManager, sportEventCacheItemFactory, _timer, TestData.Cultures3, _cacheManager);
-            SportDataCache = new SportDataCache(_dataRouterManager, _timer, TestData.Cultures3, SportEventCache, _cacheManager);
-
-            var sportEventStatusCache = new TestLocalizedNamedValueCache();
-            var namedValuesProviderMock = new Mock<INamedValuesProvider>();
-            namedValuesProviderMock.Setup(args => args.MatchStatuses).Returns(sportEventStatusCache);
-
-            EventStatusCache = new SportEventStatusCache(_statusMemoryCache, new SportEventStatusMapperFactory(), SportEventCache, _cacheManager, _ignoreTimelineMemoryCache);
-
-            SportEntityFactory = new SportEntityFactory(SportDataCache, SportEventCache, EventStatusCache, sportEventStatusCache, profileCache, SdkInfo.SoccerSportUrns);
         }
 
-        public void InitializeSportEntities()
+        public TestSportEntityFactoryBuilder(List<CultureInfo> cultures = null, bool useCachedDataRouterManager = false)
+        {
+            ThrowingStrategy = ExceptionHandlingStrategy.THROW;
+            Cultures = cultures ?? TestData.Cultures3.ToList();
+            var timer = new TestTimer(false);
+            SportEventMemoryCache = new MemoryCache("EventCache");
+            ProfileMemoryCache = new MemoryCache("ProfileCache");
+            SportEventStatusMemoryCache = new MemoryCache("StatusCache");
+            IgnoreTimelineMemoryCache = new MemoryCache("IgnoreTimeline");
+
+            CacheManager = new CacheManager();
+            DataRouterManager = new TestDataRouterManager(CacheManager);
+            DataRouterManagerCached = new TestDataRouterManagerCached(CacheManager, Cultures);
+
+            var selectedDataRouterManager = useCachedDataRouterManager ? (IDataRouterManager)DataRouterManagerCached : DataRouterManager;
+
+            var sportEventCacheItemFactory = new SportEventCacheItemFactory(selectedDataRouterManager,
+                                                                            new SemaphorePool(5, ThrowingStrategy),
+                                                                            Cultures[0],
+                                                                            new MemoryCache("FixtureTimestampCache"));
+
+            SportEventCache = new SportEventCache(SportEventMemoryCache, selectedDataRouterManager, sportEventCacheItemFactory, timer, Cultures, CacheManager);
+            ProfileCache = new ProfileCache(ProfileMemoryCache, selectedDataRouterManager, CacheManager, SportEventCache);
+            SportDataCache = new SportDataCache(selectedDataRouterManager, timer, Cultures, SportEventCache, CacheManager);
+            var sportEventStatusCache = TestLocalizedNamedValueCache.CreateMatchStatusCache(Cultures, ThrowingStrategy);
+            var namedValuesProviderMock = new Mock<INamedValuesProvider>();
+            namedValuesProviderMock.Setup(args => args.MatchStatuses).Returns(sportEventStatusCache);
+            EventStatusCache =
+                new SportEventStatusCache(SportEventStatusMemoryCache, new SportEventStatusMapperFactory(), SportEventCache, CacheManager, IgnoreTimelineMemoryCache);
+            SportEntityFactory = new SportEntityFactory(SportDataCache, SportEventCache, EventStatusCache, sportEventStatusCache, ProfileCache, SdkInfo.SoccerSportUrns);
+        }
+
+        public async Task InitializeSportEntities()
         {
             var watch = Stopwatch.StartNew();
             if (SportEntityFactory == null)
             {
-                Init();
+                return;
             }
+
             var time = watch.Elapsed.TotalMilliseconds;
             Debug.WriteLine($"Init time: {time}");
-            Competition = SportEntityFactory.BuildSportEvent<ICompetition>(TestData.EventMatchId, URN.Parse("sr:sport:3"), TestData.Cultures3, TestData.ThrowingStrategy);
+            Competition = SportEntityFactory.BuildSportEvent<ICompetition>(TestData.EventMatchId, URN.Parse("sr:sport:3"), Cultures, ThrowingStrategy);
             Debug.WriteLine($"Competition time: {watch.Elapsed.TotalMilliseconds - time}");
             time = watch.Elapsed.TotalMilliseconds;
-            Sport = SportEntityFactory.BuildSportAsync(TestData.SportId, TestData.Cultures3, TestData.ThrowingStrategy).Result;
+            Sport = await SportEntityFactory.BuildSportAsync(TestData.SportId, Cultures, ThrowingStrategy);
             Debug.WriteLine($"Sport time: {watch.Elapsed.TotalMilliseconds - time}");
             time = watch.Elapsed.TotalMilliseconds;
-            Sports = SportEntityFactory.BuildSportsAsync(TestData.Cultures3, TestData.ThrowingStrategy).Result?.ToList();
+            Sports = (await SportEntityFactory.BuildSportsAsync(Cultures, ThrowingStrategy)).ToList();
             Debug.WriteLine($"Sports time: {watch.Elapsed.TotalMilliseconds - time}");
             time = watch.Elapsed.TotalMilliseconds;
-            Tournament = SportEntityFactory.BuildSportEvent<ITournament>(TestData.TournamentId, TestData.SportId, TestData.Cultures3, TestData.ThrowingStrategy);
+            Tournament = SportEntityFactory.BuildSportEvent<ITournament>(TestData.TournamentId, TestData.SportId, Cultures, ThrowingStrategy);
             Debug.WriteLine($"Tournament time: {watch.Elapsed.TotalMilliseconds - time}");
             time = watch.Elapsed.TotalMilliseconds;
-            Season = SportEntityFactory.BuildSportEvent<ISeason>(TestData.SeasonId, TestData.SportId, TestData.Cultures3, TestData.ThrowingStrategy);
+            Season = SportEntityFactory.BuildSportEvent<ISeason>(TestData.SeasonId, TestData.SportId, Cultures, ThrowingStrategy);
             Debug.WriteLine($"Season time: {watch.Elapsed.TotalMilliseconds - time}");
         }
 
-        public void LoadTournamentMissingValues()
+        public async Task LoadTournamentMissingValues()
         {
-            var a = Tournament.GetScheduledTimeAsync().Result;
-            var b = Tournament.GetScheduledEndTimeAsync().Result;
-            var c = Tournament.GetCategoryAsync().Result;
-            var d = Tournament.GetTournamentCoverage().Result;
-            var e = Tournament.GetCurrentSeasonAsync().Result;
-            //var s = Tournament.GetScheduleAsync().Result;
-            //var g = Tournament.GetGroupsAsync().Result;
+            _ = await Tournament.GetScheduledTimeAsync();
+            _ = await Tournament.GetScheduledEndTimeAsync();
+            _ = await Tournament.GetCategoryAsync();
+            _ = await Tournament.GetTournamentCoverage();
+            _ = await Tournament.GetCurrentSeasonAsync();
         }
 
-        public void LoadSeasonMissingValues()
+        public async Task LoadSeasonMissingValues()
         {
-            var a = Season.GetScheduledTimeAsync().Result;
-            var b = Season.GetScheduledEndTimeAsync().Result;
-            var c = Season.GetTournamentCoverage().Result;
-            var d = Season.GetCurrentRoundAsync().Result;
-            var e = Season.GetSeasonCoverageAsync().Result;
-            var s = Season.GetScheduleAsync().Result;
-            var g = Season.GetGroupsAsync().Result;
-            var f = Season.GetYearAsync().Result;
+            _ = await Season.GetScheduledTimeAsync();
+            _ = await Season.GetScheduledEndTimeAsync();
+            _ = await Season.GetTournamentCoverage();
+            _ = await Season.GetCurrentRoundAsync();
+            _ = await Season.GetSeasonCoverageAsync();
+            _ = await Season.GetScheduleAsync();
+            _ = await Season.GetGroupsAsync();
+            _ = await Season.GetYearAsync();
         }
 
-        public ITournament GetNewTournament(int id = 0)
+        public ITournament GetNewTournament(long id = 0, long sportId = 0)
         {
+            if (id > 0)
+            {
+                return SportEntityFactory.BuildSportEvent<ITournament>(URN.Parse($"sr:tournament:{id}"), URN.Parse($"sr:sport:{sportId}"), Cultures, ThrowingStrategy);
+            }
+
             return Tournament;
+        }
+
+        public IMatch GetMatch(long id = 0, long sportId = 0)
+        {
+            return SportEntityFactory.BuildSportEvent<IMatch>(URN.Parse($"sr:match:{id}"), URN.Parse($"sr:sport:{sportId}"), Cultures, ThrowingStrategy);
+        }
+
+        public void WriteProfileMemoryKeys()
+        {
+            foreach (var item in ProfileMemoryCache)
+            {
+                Debug.WriteLine($"ProfileMemory: {item.Key}");
+            }
+        }
+
+        public void WriteDrmMethodsCalls()
+        {
+            foreach (var method in DataRouterManager.RestMethodCalls)
+            {
+                Debug.WriteLine($"Drm method: {method.Key} [{method.Value}]");
+            }
+        }
+
+        public void WriteDrmUrlCalls()
+        {
+            foreach (var url in DataRouterManager.RestUrlCalls)
+            {
+                Debug.WriteLine($"Drm url: {url}");
+            }
         }
     }
 }

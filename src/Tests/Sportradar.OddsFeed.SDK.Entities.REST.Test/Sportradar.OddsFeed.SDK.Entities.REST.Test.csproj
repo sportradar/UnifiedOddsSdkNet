@@ -85,6 +85,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="BookingManagerTests.cs" />
     <Compile Include="BookmakerDetailsMapperTest.cs" />
     <Compile Include="BookmakerDetailsProviderTest.cs" />
     <Compile Include="CacheItems\CacheItemMergeTests.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="CategorySummaryTest.cs" />
     <Compile Include="CustomBetEntityTests.cs" />
     <Compile Include="CompositeMappingValidatorTests.cs" />
+    <Compile Include="CustomBetManagerTests.cs" />
     <Compile Include="DecimalValueMappingValidatorTests.cs" />
     <Compile Include="EntityPrinterTest.cs" />
     <Compile Include="ExpressionOperandTests.cs" />
@@ -108,6 +110,7 @@
     <Compile Include="OperandFactoryTests.cs" />
     <Compile Include="PlayerProfileExpressionTest.cs" />
     <Compile Include="PlusNameExpressionTests.cs" />
+    <Compile Include="ProfileCacheSaveTests.cs" />
     <Compile Include="ScoreTest.cs" />
     <Compile Include="SdkLogTest.cs" />
     <Compile Include="LogHttpDataFetcherTest.cs" />

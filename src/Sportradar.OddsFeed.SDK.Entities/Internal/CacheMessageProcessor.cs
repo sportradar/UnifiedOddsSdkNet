@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
 using Common.Logging;
 using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
@@ -117,23 +116,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 _cacheManager.SaveDto(oddsChange.EventURN, status, CultureInfo.CurrentCulture, DtoType.SportEventStatus, null);
             }
 
-            var betStop = message as bet_stop;
-            if (betStop != null)
+            if (message is bet_stop betStop)
             {
                 // draw event is still removed
                 RemoveCacheItem(betStop.EventURN, removeEvent: false, removeSportEventStatus: true);
             }
 
-            var betSettlement = message as bet_settlement;
-            if (betSettlement != null)
+            if (message is bet_settlement betSettlement)
             {
                 // draw event is still removed
                 RemoveCacheItem(betSettlement.EventURN, removeEvent: false, removeSportEventStatus: false);
             }
 
             // process fixtureChange
-            var fixtureChange = message as fixture_change;
-            if (fixtureChange != null)
+            if (message is fixture_change fixtureChange)
             {
                 RemoveCacheItem(fixtureChange.EventURN, removeEvent: true, removeSportEventStatus: true);
                 if (!_ignoredProducersForFixtureEndpoint.Contains(fixtureChange.ProducerId))
@@ -162,7 +158,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         {
             try
             {
-                Task.Run(async () => await _sportEventCache.GetEventIdsAsync(urn, (IEnumerable<CultureInfo>)null)).ConfigureAwait(false);
+                _sportEventCache.GetEventIdsAsync(urn, (IEnumerable<CultureInfo>)null).GetAwaiter().GetResult();
             }
             catch (Exception e)
             {

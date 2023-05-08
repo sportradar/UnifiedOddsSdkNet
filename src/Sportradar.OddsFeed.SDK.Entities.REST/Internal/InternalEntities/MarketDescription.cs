@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Dawn;
 using System.Globalization;
 using System.Linq;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Entities.REST.Market;
@@ -32,11 +32,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
 
         public string OutcomeType { get; }
 
-        public IEnumerable<IOutcomeDescription> Outcomes { get; internal set; }
+        public IEnumerable<IOutcomeDescription> Outcomes { get; private set; }
 
-        public IEnumerable<ISpecifier> Specifiers { get; }
+        public IEnumerable<ISpecifier> Specifiers { get; private set; }
 
-        public IEnumerable<IMarketMappingData> Mappings { get; internal set; }
+        public IEnumerable<IMarketMappingData> Mappings { get; private set; }
 
         public IEnumerable<IMarketAttribute> Attributes { get; }
 
@@ -50,7 +50,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
             Guard.Argument(cacheItem, nameof(cacheItem)).NotNull();
             Guard.Argument(cultures, nameof(cultures)).NotNull();//.NotEmpty();
             if (!cultures.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
+            }
 
             var cultureList = cultures as IList<CultureInfo> ?? cultures.ToList();
 
@@ -61,16 +63,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
             _descriptions = new ReadOnlyDictionary<CultureInfo, string>(cultureList.Where(cacheItem.HasTranslationsFor).ToDictionary(c => c, cacheItem.GetDescription));
             Outcomes = cacheItem.Outcomes == null
                 ? null
-                : new ReadOnlyCollection<IOutcomeDescription>(cacheItem.Outcomes.Select(o => (IOutcomeDescription) new OutcomeDescription(o, cultureList)).ToList());
+                : new ReadOnlyCollection<IOutcomeDescription>(cacheItem.Outcomes.Select(o => (IOutcomeDescription)new OutcomeDescription(o, cultureList)).ToList());
             Specifiers = cacheItem.Specifiers == null
                 ? null
-                : new ReadOnlyCollection<ISpecifier>(cacheItem.Specifiers.Select(s => (ISpecifier) new Specifier(s)).ToList());
+                : new ReadOnlyCollection<ISpecifier>(cacheItem.Specifiers.Select(s => (ISpecifier)new Specifier(s)).ToList());
             Mappings = cacheItem.Mappings == null
                 ? null
-                : new ReadOnlyCollection<IMarketMappingData>(cacheItem.Mappings.Select(m => (IMarketMappingData) new MarketMapping(m)).ToList());
+                : new ReadOnlyCollection<IMarketMappingData>(cacheItem.Mappings.Select(m => (IMarketMappingData)new MarketMapping(m)).ToList());
             Attributes = cacheItem.Attributes == null
                 ? null
-                : new ReadOnlyCollection<IMarketAttribute>(cacheItem.Attributes.Select(a => (IMarketAttribute) new MarketAttribute(a)).ToList());
+                : new ReadOnlyCollection<IMarketAttribute>(cacheItem.Attributes.Select(a => (IMarketAttribute)new MarketAttribute(a)).ToList());
 
             OutcomeType = cacheItem.OutcomeType;
 
@@ -85,6 +87,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.InternalEntities
         public void SetMappings(IReadOnlyCollection<IMarketMappingData> mappings)
         {
             Mappings = mappings;
+        }
+
+        public void SetSpecifiers(IReadOnlyCollection<ISpecifier> specifiers)
+        {
+            Specifiers = specifiers;
         }
 
         public void SetFetchInfo(string source, DateTime lastDataReceived)

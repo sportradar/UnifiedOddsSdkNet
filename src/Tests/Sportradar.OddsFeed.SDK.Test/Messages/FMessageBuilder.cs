@@ -27,7 +27,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Messages
         {
             if (eventId is -1)
             {
-                eventId = new Random().Next();
+                eventId = SdkInfo.GetRandom();
             }
             return new odds_change
             {
@@ -50,7 +50,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Messages
         {
             if (eventId is -1)
             {
-                eventId = new Random().Next();
+                eventId = SdkInfo.GetRandom();
             }
             return new bet_stop
             {

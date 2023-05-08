@@ -15,14 +15,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         private readonly IOperandFactory _operandFactory = new OperandFactory();
 
         [TestMethod]
-        public void OrdinalNameExpressionTest()
+        public void OrdinalNameExpression()
         {
-            var specifiers = new Dictionary<string, string>{ {"reply_nr", "1"} };
+            var specifiers = new Dictionary<string, string> { { "reply_nr", "1" } };
             var expression = new OrdinalNameExpression(_operandFactory.BuildOperand(new ReadOnlyDictionary<string, string>(specifiers), "reply_nr"));
 
-            var result = expression.BuildNameAsync(new CultureInfo("en")).Result;
+            var result = expression.BuildNameAsync(new CultureInfo("en")).GetAwaiter().GetResult();
             Assert.AreEqual("1st", result, "The result is not correct");
         }
     }
 }
-    

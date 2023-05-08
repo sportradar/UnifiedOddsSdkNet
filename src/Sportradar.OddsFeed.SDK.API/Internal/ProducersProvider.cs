@@ -1,14 +1,16 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Messages.REST;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -35,11 +37,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="config">The <see cref="IOddsFeedConfiguration"/> used to get properties to build <see cref="IProducer"/></param>
         public ProducersProvider(IDataProvider<producers> dataProvider, IOddsFeedConfiguration config)
         {
-            Guard.Argument(dataProvider, nameof(dataProvider)).NotNull();
-            Guard.Argument(config, nameof(config)).NotNull();
-
-            _dataProvider = dataProvider;
-            _config = config;
+            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
         /// <summary>

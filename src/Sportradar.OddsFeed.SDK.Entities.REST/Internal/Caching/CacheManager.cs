@@ -3,11 +3,11 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Logging;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
@@ -64,7 +64,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <returns><c>true</c> if is added/updated, <c>false</c> otherwise</returns>
         public void SaveDto(URN id, object item, CultureInfo culture, DtoType dtoType, ISportEventCI requester)
         {
-            SaveDtoAsync(id, item, culture, dtoType, requester).Wait();
+            SaveDtoAsync(id, item, culture, dtoType, requester).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -86,12 +86,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             {
                 return;
             }
-            
+
             var appropriateCaches = _caches.Where(s => s.Value.RegisteredDtoTypes.Contains(dtoType)).ToList();
 
             if (!appropriateCaches.Any())
             {
-                ExecLog.Warn($"No cache with registered type:{dtoType} and lang:[{culture.TwoLetterISOLanguageName}] to save data.");
+                ExecLog.Debug($"No cache with registered type:{dtoType} and lang:[{culture.TwoLetterISOLanguageName}] to save data.");
                 return;
             }
 
@@ -109,7 +109,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
             }
             else
             {
-                ExecLog.Warn("Cannot save data. There is no registered cache.");
+                ExecLog.Debug("Cannot save data. There is no registered cache.");
             }
         }
 

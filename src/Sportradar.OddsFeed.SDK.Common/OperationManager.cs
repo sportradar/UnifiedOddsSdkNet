@@ -1,6 +1,6 @@
-﻿using Common.Logging;
+﻿using System;
+using Common.Logging;
 using RabbitMQ.Client;
-using System;
 
 namespace Sportradar.OddsFeed.SDK.Common
 {
@@ -68,6 +68,12 @@ namespace Sportradar.OddsFeed.SDK.Common
         public static TimeSpan FastHttpClientTimeout { get; private set; }
 
         /// <summary>
+        /// Gets the maximum number of concurrent connections (per server endpoint) allowed by an HttpClient object.
+        /// </summary>
+        /// <remarks>At feed initialization sets the ServicePointManager.DefaultConnectionLimit</remarks>
+        public static int MaxConnectionsPerServer { get; private set; }
+
+        /// <summary>
         /// Initialization of default values of the <see cref="OperationManager"/>
         /// </summary>
         static OperationManager()
@@ -80,6 +86,7 @@ namespace Sportradar.OddsFeed.SDK.Common
             RabbitConnectionTimeout = ConnectionFactory.DefaultConnectionTimeout / 1000;
             RabbitHeartbeat = ConnectionFactory.DefaultHeartbeat;
             FastHttpClientTimeout = TimeSpan.FromSeconds(5);
+            MaxConnectionsPerServer = 20;
         }
 
         /// <summary>
@@ -199,6 +206,23 @@ namespace Sportradar.OddsFeed.SDK.Common
             }
 
             throw new InvalidOperationException($"Invalid timeout value for FastHttpClientTimeout: {timeout.TotalSeconds} seconds.");
+        }
+
+        /// <summary>
+        /// Sets the maximum number of concurrent connections (per server endpoint) allowed by an HttpClient object.
+        /// </summary>
+        /// <remarks>Sets the ServicePointManager.DefaultConnectionLimit</remarks>
+        /// <param name="maxConnectionsPerServer">The new maximum number of concurrent connections (per server endpoint) allowed by an HttpClient object.</param>
+        public static void SetMaxConnectionsPerServer(int maxConnectionsPerServer)
+        {
+            if (maxConnectionsPerServer > 0)
+            {
+                MaxConnectionsPerServer = maxConnectionsPerServer;
+                InteractionLog.Info($"Set MaxConnectionsPerServer to {maxConnectionsPerServer}.");
+                return;
+            }
+
+            throw new InvalidOperationException($"Invalid value for MaxConnectionsPerServer: {maxConnectionsPerServer}.");
         }
     }
 }

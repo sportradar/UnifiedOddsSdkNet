@@ -11,6 +11,7 @@ using Common.Logging;
 using Dawn;
 using Metrics;
 using Sportradar.OddsFeed.SDK.Common;
+using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
@@ -1381,23 +1382,37 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                     result = await _availableSelectionsProvider.GetDataAsync(id.ToString()).ConfigureAwait(false);
                     restCallTime = (int)t.Elapsed.TotalMilliseconds;
                 }
+                catch (CommunicationException e)
+                {
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    var message = e.InnerException?.Message ?? e.Message;
+                    var filteredResponse = SdkInfo.ExtractHttpResponseMessage(message);
+                    if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                    {
+                        throw new CommunicationException(filteredResponse, e.Url, e.ResponseCode, null);
+                    }
+                    _executionLog.Error($"Error getting available selections for id={id}. Message={filteredResponse}");
+                }
                 catch (Exception e)
                 {
                     restCallTime = (int)t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
-                    _executionLog.Error($"Error getting available selections for id={id}. Message={message}", e.InnerException ?? e);
+                    var filteredResponse = SdkInfo.ExtractHttpResponseMessage(message);
                     if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
                     {
                         throw;
                     }
+                    _executionLog.Error($"Error getting available selections for id={id}. Message={filteredResponse}", e.InnerException ?? e);
                 }
 
+                AvailableSelections availableSelections = null;
                 if (result != null)
                 {
                     await _cacheManager.SaveDtoAsync(id, result, _defaultLocale, DtoType.AvailableSelections, null).ConfigureAwait(false);
+                    availableSelections = new AvailableSelections(result);
                 }
                 WriteLog($"Executing GetAvailableSelectionsAsync for id={id} took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
-                return new AvailableSelections(result);
+                return availableSelections;
             }
         }
 
@@ -1416,19 +1431,36 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                     result = await _calculateProbabilityProvider.GetDataAsync(selections).ConfigureAwait(false);
                     restCallTime = (int)t.Elapsed.TotalMilliseconds;
                 }
+                catch (CommunicationException e)
+                {
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    var message = e.InnerException?.Message ?? e.Message;
+                    var filteredResponse = SdkInfo.ExtractHttpResponseMessage(message);
+                    if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                    {
+                        throw new CommunicationException(filteredResponse, e.Url, e.ResponseCode, null);
+                    }
+                    _executionLog.Error($"Error calculating probabilities. Message={filteredResponse}");
+                }
                 catch (Exception e)
                 {
                     restCallTime = (int)t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
-                    _executionLog.Error($"Error calculating probabilities. Message={message}", e.InnerException ?? e);
+                    var filteredResponse = SdkInfo.ExtractHttpResponseMessage(message);
                     if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
                     {
                         throw;
                     }
+                    _executionLog.Error($"Error calculating probabilities. Message={filteredResponse}", e.InnerException ?? e);
                 }
 
+                Calculation calculation = null;
+                if (result != null)
+                {
+                    calculation = new Calculation(result);
+                }
                 WriteLog($"Executing CalculateProbability took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
-                return new Calculation(result);
+                return calculation;
             }
         }
 
@@ -1447,19 +1479,36 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                     result = await _calculateProbabilityFilteredProvider.GetDataAsync(selections).ConfigureAwait(false);
                     restCallTime = (int)t.Elapsed.TotalMilliseconds;
                 }
+                catch (CommunicationException e)
+                {
+                    restCallTime = (int)t.Elapsed.TotalMilliseconds;
+                    var message = e.InnerException?.Message ?? e.Message;
+                    var filteredResponse = SdkInfo.ExtractHttpResponseMessage(message);
+                    if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
+                    {
+                        throw new CommunicationException(filteredResponse, e.Url, e.ResponseCode, null);
+                    }
+                    _executionLog.Error($"Error calculating probabilities (filtered). Message={filteredResponse}");
+                }
                 catch (Exception e)
                 {
                     restCallTime = (int)t.Elapsed.TotalMilliseconds;
                     var message = e.InnerException?.Message ?? e.Message;
-                    _executionLog.Error($"Error calculating probabilities (filtered). Message={message}", e.InnerException ?? e);
+                    var filteredResponse = SdkInfo.ExtractHttpResponseMessage(message);
                     if (ExceptionHandlingStrategy == ExceptionHandlingStrategy.THROW)
                     {
                         throw;
                     }
+                    _executionLog.Error($"Error calculating probabilities (filtered). Message={filteredResponse}", e.InnerException ?? e);
                 }
 
+                CalculationFilter calculation = null;
+                if (result != null)
+                {
+                    calculation = new CalculationFilter(result);
+                }
                 WriteLog($"Executing CalculateProbabilityFiltered took {restCallTime} ms.{SavingTook(restCallTime, (int)t.Elapsed.TotalMilliseconds)}");
-                return new CalculationFilter(result);
+                return calculation;
             }
         }
 

@@ -3,9 +3,10 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Linq;
+using System.Threading.Tasks;
 using Common.Logging;
+using Dawn;
 using Metrics;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
@@ -44,6 +45,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// </summary>
         private readonly ExceptionHandlingStrategy _exceptionStrategy;
 
+        private readonly string _cacheName;
+
         /// <summary>
         /// An <see cref="object"/> used to sync  access to shared members
         /// </summary>
@@ -59,13 +62,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// </summary>
         /// <param name="dataProvider">A <see cref="IDataProvider{T}"/> used to get the named values</param>
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how potential exceptions should be handled</param>
-        public NamedValueCache(IDataProvider<EntityList<NamedValueDTO>> dataProvider, ExceptionHandlingStrategy exceptionStrategy)
+        /// <param name="cacheName">A name of the cache or the name of the values contained in this cache</param>
+        public NamedValueCache(IDataProvider<EntityList<NamedValueDTO>> dataProvider, ExceptionHandlingStrategy exceptionStrategy, string cacheName)
         {
             Guard.Argument(dataProvider, nameof(dataProvider)).NotNull();
 
             _dataProvider = dataProvider;
             _namedValues = new Dictionary<int, string>();
             _exceptionStrategy = exceptionStrategy;
+            _cacheName = cacheName;
+
+            Task.Run(() =>
+                     {
+                         Task.Delay(300).GetAwaiter().GetResult();
+                         IsValueDefined(1);
+                     });
         }
 
         /// <summary>
@@ -74,11 +85,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
         /// <returns>A value indicating whether the data was successfully fetched</returns>
         private bool FetchAndMerge()
         {
-            Metric.Context("CACHE").Meter("NamedValueCache->FetchAndMerge", Unit.Calls);
+            Metric.Context("CACHE").Meter($"NamedValueCache-{_cacheName}->FetchAndMerge", Unit.Calls);
             EntityList<NamedValueDTO> record;
             try
             {
-                record = _dataProvider.GetDataAsync().Result;
+                record = _dataProvider.GetDataAsync().GetAwaiter().GetResult();
             }
             catch (AggregateException ex)
             {
@@ -86,12 +97,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 return false;
             }
 
-
             foreach (var item in record.Items)
             {
                 _namedValues[item.Id] = item.Description;
             }
-            CacheLog.Debug($"{record.Items.Count()} items retrieved.");
+            CacheLog.Info($"{_cacheName}: {record.Items.Count()} items retrieved.");
             return true;
         }
 

@@ -1,9 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sportradar.OddsFeed.SDK.Common.Internal;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 
 namespace Sportradar.OddsFeed.SDK.Common.Test
 {
@@ -19,14 +19,14 @@ namespace Sportradar.OddsFeed.SDK.Common.Test
         }
 
         [TestMethod]
-        public void WaitTest()
+        public void Wait()
         {
             var id = "some_id";
 
             var stopWatch = Stopwatch.StartNew();
             Task.Run(() =>
                      {
-                         Task.Delay(TimeSpan.FromSeconds(5)).Wait();
+                         Task.Delay(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
                          _lockManager.Release(id);
                      });
             _lockManager.Wait(id);
@@ -36,7 +36,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Test
         }
 
         [TestMethod]
-        public void WaitTillTimeoutTest()
+        public void WaitTillTimeout()
         {
             var id = "some_id";
 

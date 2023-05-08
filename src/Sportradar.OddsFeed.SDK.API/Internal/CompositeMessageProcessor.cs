@@ -3,10 +3,10 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Linq;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.Common;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
@@ -39,11 +39,16 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="processors">The list of processors.</param>
         public CompositeMessageProcessor(List<IFeedMessageProcessor> processors)
         {
-            Guard.Argument(processors, nameof(processors)).NotNull().Require(processors.All(p => p != null));
-            if (!processors.Any())
+            if (processors.IsNullOrEmpty())
+            {
                 throw new ArgumentOutOfRangeException(nameof(processors));
+            }
+            if (processors.Any(p => p == null))
+            {
+                throw new InvalidOperationException("Missing FeedMessageProcessor");
+            }
 
-            ProcessorId = Guid.NewGuid().ToString().Substring(0,4);
+            ProcessorId = Guid.NewGuid().ToString().Substring(0, 4);
 
             _processors = processors;
 
@@ -67,8 +72,14 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="rawMessage">A raw message received from the feed</param>
         public void ProcessMessage(FeedMessage message, MessageInterest interest, byte[] rawMessage)
         {
-            Guard.Argument(message, nameof(message)).NotNull();
-            Guard.Argument(interest, nameof(interest)).NotNull();
+            if (message == null)
+            {
+                throw new ArgumentNullException(nameof(message));
+            }
+            if (interest == null)
+            {
+                throw new NullReferenceException(nameof(interest));
+            }
 
             foreach (var processor in _processors)
             {

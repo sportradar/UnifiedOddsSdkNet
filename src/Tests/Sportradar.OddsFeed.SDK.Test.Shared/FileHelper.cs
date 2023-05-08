@@ -1,18 +1,70 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using Dawn;
+using System;
+using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
+using System.Linq;
+using System.Reflection;
+using Castle.Core.Internal;
 
 namespace Sportradar.OddsFeed.SDK.Test.Shared
 {
     public static class FileHelper
     {
+        public static Stream GetResource(string name)
+        {
+            var execResources = Assembly.GetExecutingAssembly().GetManifestResourceNames().Distinct().ToList();
+            var execResource = execResources.FirstOrDefault(x => x.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            if (execResource != null)
+            {
+                var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(execResource);
+                return stream;
+            }
+
+            var entryResources = Assembly.GetEntryAssembly()?.GetManifestResourceNames();
+            var entryResource = entryResources?.FirstOrDefault(x => x.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            if (entryResource != null)
+            {
+                var stream = Assembly.GetEntryAssembly()?.GetManifestResourceStream(entryResource);
+                return stream;
+            }
+
+            var commonResources = Assembly.GetAssembly(typeof(FileHelper))?.GetManifestResourceNames();
+            var commonResource = commonResources?.FirstOrDefault(x => x.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            if (commonResource != null)
+            {
+                var stream = Assembly.GetEntryAssembly()?.GetManifestResourceStream(commonResource);
+                return stream;
+            }
+
+            var fileStream = OpenFile(FindFile(name));
+            if (fileStream != null)
+            {
+                return fileStream;
+            }
+
+            return null;
+        }
+
+        public static bool ResourceExists(string name)
+        {
+            var resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+            var resource = resources.FirstOrDefault(x => x.EndsWith(name));
+            return resource != null;
+        }
+
         public static Stream OpenFile(string dirPath, string fileName)
         {
-            Guard.Argument(dirPath, nameof(dirPath)).NotNull().NotEmpty();
-            Guard.Argument(fileName, nameof(fileName)).NotNull().NotEmpty();
+            if (string.IsNullOrEmpty(dirPath))
+            {
+                throw new ArgumentNullException(nameof(dirPath));
+            }
+
+            if (string.IsNullOrEmpty(fileName))
+            {
+                throw new ArgumentNullException(nameof(fileName));
+            }
 
             var filePath = dirPath.TrimEnd('/') + "/" + fileName.TrimStart('/');
             return OpenFile(filePath);
@@ -20,27 +72,19 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         public static Stream OpenFile(string filePath)
         {
-            Guard.Argument(filePath, nameof(filePath)).NotNull().NotEmpty();
+            if (string.IsNullOrEmpty(filePath))
+            {
+                throw new ArgumentNullException(nameof(filePath));
+            }
+
+            if (filePath.IsNullOrEmpty() || !File.Exists(filePath))
+            {
+
+                Debug.WriteLine($"OpenFile: {filePath} not found.");
+                return null;
+            }
 
             return File.OpenRead(filePath);
-        }
-
-        public static Task<Stream> OpenFileAsync(string filePath)
-        {
-            Guard.Argument(filePath, nameof(filePath)).NotNull().NotEmpty();
-
-            return Task.Factory.StartNew(() => OpenFile(filePath));
-        }
-
-        public static string ReadFile(string dirPath, string fileName)
-        {
-            Guard.Argument(dirPath, nameof(dirPath)).NotNull().NotEmpty();
-            Guard.Argument(fileName, nameof(fileName)).NotNull().NotEmpty();
-
-            var stream = OpenFile(dirPath, fileName);
-            var reader = new StreamReader(stream);
-            var result = reader.ReadToEnd();
-            return result;
         }
 
         public static string FindFile(string fileName)

@@ -22,7 +22,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
 {
     public abstract class MapEntityTestBase
     {
-        private static readonly IDeserializer<FeedMessage> Deserializer = new Deserializer<FeedMessage>();
+        internal static readonly IDeserializer<FeedMessage> Deserializer = new Deserializer<FeedMessage>();
 
         internal static readonly IFeedMessageMapper Mapper;
 
@@ -32,20 +32,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
             var nameProviderMock = new Mock<INameProvider>();
             nameProviderFactoryMock.Setup(m => m.BuildNameProvider(It.IsAny<ICompetition>(), It.IsAny<int>(), It.IsAny<IReadOnlyDictionary<string, string>>())).Returns(nameProviderMock.Object);
 
-            var voidReasonCache = new NamedValueCache(new NamedValueDataProvider(TestData.RestXmlPath + @"\void_reasons.xml", new TestDataFetcher(), "void_reason"), ExceptionHandlingStrategy.THROW);
+            var voidReasonCache = new NamedValueCache(new NamedValueDataProvider(TestData.RestXmlPath + @"\void_reasons.xml", new TestDataFetcher(), "void_reason"), ExceptionHandlingStrategy.THROW, "VoidReasons");
 
             var namedValuesProviderMock = new Mock<INamedValuesProvider>();
             namedValuesProviderMock.Setup(x => x.VoidReasons).Returns(voidReasonCache);
 
+            var sportEntityFactoryBuilder = new TestSportEntityFactoryBuilder(ScheduleData.Cultures3);
             Mapper = new FeedMessageMapper(
-                new TestSportEntityFactory(),
-                nameProviderFactoryMock.Object,
-                new Mock<IMarketMappingProviderFactory>().Object,
-                namedValuesProviderMock.Object,
-                ExceptionHandlingStrategy.THROW,
-                TestProducerManager.Create(),
-                new Mock<IMarketCacheProvider>().Object,
-                voidReasonCache);
+                                           sportEntityFactoryBuilder.SportEntityFactory,
+                                           nameProviderFactoryMock.Object,
+                                           new Mock<IMarketMappingProviderFactory>().Object,
+                                           namedValuesProviderMock.Object,
+                                           ExceptionHandlingStrategy.THROW,
+                                           TestProducerManager.Create(),
+                                           new Mock<IMarketCacheProvider>().Object,
+                                           voidReasonCache);
         }
 
         protected T Load<T>(string fileName, URN sportId, IEnumerable<CultureInfo> cultures)

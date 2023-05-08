@@ -50,7 +50,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void MarketDescriptionMergeTest()
+        public void MarketDescriptionMerge()
         {
             var msg1 = RMF.GetDescMarket(10);
             var msg2 = RMF.GetDescMarket(msg1);
@@ -119,7 +119,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(msg.product_id, ci.ProducerId);
             if (!string.IsNullOrEmpty(msg.product_ids))
             {
-                var ids = msg.product_ids.Split(new[] {SdkInfo.MarketMappingProductsDelimiter}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
+                var ids = msg.product_ids.Split(new[] { SdkInfo.MarketMappingProductsDelimiter }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
                 Assert.AreEqual(ids.Count, ci.ProducerIds.Count());
                 foreach (var id in ids)
                 {
@@ -169,45 +169,45 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void VariantMarketDescriptionCacheIsCachingTest()
+        public void VariantMarketDescriptionCacheIsCaching()
         {
             const string callType = "GetVariantMarketDescriptionAsync";
             Assert.AreEqual(0, _variantMemoryCache.Count());
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(callType), $"{callType} should be called exactly 0 times.");
 
-            var market =_variantMdCache.GetMarketDescriptionAsync(10030, "lcoo:markettext:33421", TestData.Cultures).Result;
+            var market = _variantMdCache.GetMarketDescriptionAsync(10030, "lcoo:markettext:33421", TestData.Cultures).GetAwaiter().GetResult();
             Assert.IsNotNull(market);
             Assert.AreEqual(1, _variantMemoryCache.Count());
             Assert.AreEqual(3, _dataRouterManager.GetCallCount(callType), $"{callType} should be called exactly 3 times.");
 
-            market = _variantMdCache.GetMarketDescriptionAsync(10030, "lcoo:markettext:33421", TestData.Cultures).Result;
+            market = _variantMdCache.GetMarketDescriptionAsync(10030, "lcoo:markettext:33421", TestData.Cultures).GetAwaiter().GetResult();
             Assert.IsNotNull(market);
             Assert.AreEqual(1, _variantMemoryCache.Count());
             Assert.AreEqual(3, _dataRouterManager.GetCallCount(callType), $"{callType} - no new call should be made.");
         }
 
         [TestMethod]
-        public void InVariantMarketDescriptionCacheIsCachingTest()
+        public void InVariantMarketDescriptionCacheIsCaching()
         {
             const string callType = "GetMarketDescriptionsAsync";
-            var market = _inVariantMdCache.GetMarketDescriptionAsync(178, "lcoo:markettext:1", TestData.Cultures).Result;
+            var market = _inVariantMdCache.GetMarketDescriptionAsync(178, "lcoo:markettext:1", TestData.Cultures).GetAwaiter().GetResult();
             Assert.IsNotNull(market);
             Assert.AreEqual(178, market.Id);
-            Assert.AreEqual(750, _invariantMemoryCache.Count());
+            Assert.AreEqual(TestData.InvariantListCacheCount, _invariantMemoryCache.Count());
             Assert.AreEqual(3, _dataRouterManager.GetCallCount(callType), $"{callType} should be called exactly 3 times.");
 
-            market = _inVariantMdCache.GetMarketDescriptionAsync(178, "lcoo:markettext:1", TestData.Cultures).Result;
+            market = _inVariantMdCache.GetMarketDescriptionAsync(178, "lcoo:markettext:1", TestData.Cultures).GetAwaiter().GetResult();
             Assert.IsNotNull(market);
-            Assert.AreEqual(750, _invariantMemoryCache.Count());
+            Assert.AreEqual(TestData.InvariantListCacheCount, _invariantMemoryCache.Count());
             Assert.AreEqual(3, _dataRouterManager.GetCallCount(callType), $"{callType} - no new call should be made.");
         }
 
         [TestMethod]
-        public void InVariantMarketDescriptionCacheIsAutoCachingTest()
+        public void InVariantMarketDescriptionCacheIsAutoCaching()
         {
             const string callType = "GetMarketDescriptionsAsync";
             //The data is automatically fetched when the cache is constructed and timer is started in the cache constructor
-            Assert.AreEqual(750, _invariantMemoryCache.Count());
+            Assert.AreEqual(TestData.InvariantListCacheCount, _invariantMemoryCache.Count());
             Assert.AreEqual(3, _dataRouterManager.GetCallCount(callType), $"{callType} should be called exactly 3 times.");
         }
     }

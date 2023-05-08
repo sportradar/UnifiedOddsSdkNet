@@ -2,7 +2,6 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using Dawn;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Messages;
 // ReSharper disable RedundantCaseLabel
@@ -23,45 +22,51 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <exception cref="NotImplementedException"></exception>
         public virtual Type Map(URN id, int sportId)
         {
-            Guard.Argument(id, nameof(id)).NotNull();
-            Guard.Argument(sportId, nameof(sportId)).Positive();
+            if (id == null)
+            {
+                throw new ArgumentNullException(nameof(id));
+            }
+            if (sportId < 1)
+            {
+                throw new ArgumentException(nameof(sportId));
+            }
 
             switch (id.TypeGroup)
             {
                 case ResourceTypeGroup.MATCH:
-                {
-                    return typeof(IMatch);
-                }
+                    {
+                        return typeof(IMatch);
+                    }
                 case ResourceTypeGroup.STAGE:
-                {
-                    return typeof(IStage);
-                }
+                    {
+                        return typeof(IStage);
+                    }
                 case ResourceTypeGroup.BASIC_TOURNAMENT:
-                {
-                    return typeof(IBasicTournament);
-                }
+                    {
+                        return typeof(IBasicTournament);
+                    }
                 case ResourceTypeGroup.TOURNAMENT:
-                {
-                    return typeof(ITournament);
-                }
+                    {
+                        return typeof(ITournament);
+                    }
                 case ResourceTypeGroup.SEASON:
-                {
-                    return typeof(ISeason);
-                }
+                    {
+                        return typeof(ISeason);
+                    }
                 case ResourceTypeGroup.DRAW:
-                {
-                    return typeof(IDraw);
-                }
+                    {
+                        return typeof(IDraw);
+                    }
                 case ResourceTypeGroup.LOTTERY:
-                {
-                    return typeof(ILottery);
-                }
+                    {
+                        return typeof(ILottery);
+                    }
                 case ResourceTypeGroup.OTHER:
                 case ResourceTypeGroup.UNKNOWN:
                 default:
-                {
-                    throw new ArgumentException($"ResourceTypeGroup:{id.TypeGroup} is not supported", nameof(id));
-                }
+                    {
+                        throw new ArgumentException($"ResourceTypeGroup:{id.TypeGroup} is not supported", nameof(id));
+                    }
             }
         }
     }

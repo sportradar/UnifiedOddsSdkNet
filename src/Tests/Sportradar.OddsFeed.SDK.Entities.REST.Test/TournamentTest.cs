@@ -24,8 +24,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
     [TestClass]
     public class TournamentTest
     {
-        private const string TourInfoXml = @"Summarys\summary_sr_tournament_40.en.xml";
-        private const string SeasonInfoXml = @"Summarys\summary_sr_season_80242.en.xml";
+        private const string TourInfoXml = @"Summarys\summary_sr_tournament_40_en.xml";
+        private const string SeasonInfoXml = @"Summarys\summary_sr_season_80242_en.xml";
         private static tournamentInfoEndpoint _tourApiData;
         private static TournamentInfoDTO _tourDtoData;
         private static TournamentInfoCI _tourCiData;
@@ -38,7 +38,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
         private CacheManager _cacheManager;
         private TestDataRouterManager _dataRouterManager;
-        private readonly List<CultureInfo> _cultures = new List<CultureInfo> {TestData.Culture};
+        private readonly List<CultureInfo> _cultures = new List<CultureInfo> { TestData.Culture };
 
         [TestInitialize]
         public void Init()
@@ -63,13 +63,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 deserializer,
                 mapperFactory);
             _tourApiData = deserializer.Deserialize(dataFetcher.GetData(new Uri(string.Format(TestData.RestXmlPath + TourInfoXml))));
-            _tourDtoData = dataProvider.GetDataAsync("", "en").Result;
-            _tourCiData = (TournamentInfoCI) _sportEventCache.GetEventCacheItem(URN.Parse("sr:tournament:40"));
+            _tourDtoData = dataProvider.GetDataAsync("", "en").GetAwaiter().GetResult();
+            _tourCiData = (TournamentInfoCI)_sportEventCache.GetEventCacheItem(URN.Parse("sr:tournament:40"));
 
             var seasonDataProvider = new DataProvider<tournamentInfoEndpoint, TournamentInfoDTO>(TestData.RestXmlPath + SeasonInfoXml, dataFetcher, deserializer, mapperFactory);
             _seasonApiData = deserializer.Deserialize(dataFetcher.GetData(new Uri(string.Format(TestData.RestXmlPath + SeasonInfoXml))));
-            _seasonDtoData = seasonDataProvider.GetDataAsync("", "en").Result;
-            _seasonCiData = (TournamentInfoCI) _sportEventCache.GetEventCacheItem(URN.Parse("sr:season:80242"));
+            _seasonDtoData = seasonDataProvider.GetDataAsync("", "en").GetAwaiter().GetResult();
+            _seasonCiData = (TournamentInfoCI)_sportEventCache.GetEventCacheItem(URN.Parse("sr:season:80242"));
         }
 
         [TestMethod]
@@ -82,19 +82,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.IsNotNull(_seasonDtoData);
             Assert.IsNotNull(_seasonCiData);
 
-            Assert.IsNotNull(_tourCiData.GetGroupsAsync(TestData.Cultures3).Result);
-            Assert.IsNotNull(_seasonCiData.GetGroupsAsync(TestData.Cultures3).Result);
+            Assert.IsNotNull(_tourCiData.GetGroupsAsync(TestData.Cultures3).GetAwaiter().GetResult());
+            Assert.IsNotNull(_seasonCiData.GetGroupsAsync(TestData.Cultures3).GetAwaiter().GetResult());
 
             Assert.AreEqual(TestData.Cultures3.Count, _tourCiData.LoadedSummaries.Count);
             Assert.AreEqual(TestData.Cultures3.Count, _seasonCiData.LoadedSummaries.Count);
 
-            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).Result);
+            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
 
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
 
-            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).Result);
+            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
 
-            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
         }
 
         [TestMethod]
@@ -107,11 +107,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             Assert.AreEqual(URN.Parse(_tourApiData.tournament.id), _tourCiData.Id);
             Assert.IsNotNull(_tourApiData.groups);
-            List<GroupCI> groups = _tourCiData.GetGroupsAsync(_cultures).Result.ToList();
+            var groups = _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult().ToList();
             Assert.IsNotNull(groups);
 
-            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
 
             Assert.AreEqual(1, _tourApiData.groups.Length);
             Assert.AreEqual(_tourApiData.groups.Length, groups.Count);
@@ -124,8 +124,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             {
                 Assert.IsTrue(groupCompetitorIds.Contains(URN.Parse(sapiTeam.id)));
             }
-            
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
         }
 
         [TestMethod]
@@ -136,22 +136,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             _tourDtoData = new TournamentInfoDTO(_tourApiData);
             _tourCiData.Merge(_tourDtoData, TestData.Culture, false);
             _tourCiData.LoadedSummaries.Add(TestData.Culture);
-            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
 
             // change group id
             _tourApiData.groups[0].id = "2";
             _tourDtoData = new TournamentInfoDTO(_tourApiData);
             _tourCiData.Merge(_tourDtoData, TestData.Culture, false);
-            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
 
             // remove group
             _tourApiData.groups = null;
             _tourDtoData = new TournamentInfoDTO(_tourApiData);
             _tourCiData.Merge(_tourDtoData, TestData.Culture, false);
-            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
         }
 
         [TestMethod]
@@ -163,23 +163,23 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             _tourDtoData = new TournamentInfoDTO(_tourApiData);
             _tourCiData.Merge(_tourDtoData, TestData.Culture, false);
             _tourCiData.LoadedSummaries.Add(TestData.Culture);
-            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
 
             // change group name
             _tourApiData.groups[0].id = "2";
             _tourApiData.groups[0].name = "Name2";
             _tourDtoData = new TournamentInfoDTO(_tourApiData);
             _tourCiData.Merge(_tourDtoData, TestData.Culture, false);
-            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
 
             // remove group
             _tourApiData.groups = null;
             _tourDtoData = new TournamentInfoDTO(_tourApiData);
             _tourCiData.Merge(_tourDtoData, TestData.Culture, false);
-            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
         }
 
         [TestMethod]
@@ -190,22 +190,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             _tourDtoData = new TournamentInfoDTO(_tourApiData);
             _tourCiData.Merge(_tourDtoData, TestData.Culture, false);
             _tourCiData.LoadedSummaries.Add(TestData.Culture);
-            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
 
             // change group name
             _tourApiData.groups[0].name = "Name2";
             _tourDtoData = new TournamentInfoDTO(_tourApiData);
             _tourCiData.Merge(_tourDtoData, TestData.Culture, false);
-            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
 
             // remove group
             _tourApiData.groups = null;
             _tourDtoData = new TournamentInfoDTO(_tourApiData);
             _tourCiData.Merge(_tourDtoData, TestData.Culture, false);
-            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
         }
 
         [TestMethod]
@@ -216,22 +216,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             _tourDtoData = new TournamentInfoDTO(_tourApiData);
             _tourCiData.Merge(_tourDtoData, TestData.Culture, false);
             _tourCiData.LoadedSummaries.Add(TestData.Culture);
-            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
 
             // change group name
             _tourApiData.groups[0].name = null;
             _tourDtoData = new TournamentInfoDTO(_tourApiData);
             _tourCiData.Merge(_tourDtoData, TestData.Culture, false);
-            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
 
             // remove group
             _tourApiData.groups = null;
             _tourDtoData = new TournamentInfoDTO(_tourApiData);
             _tourCiData.Merge(_tourDtoData, TestData.Culture, false);
-            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
         }
 
         [TestMethod]
@@ -240,16 +240,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             // default
             _tourDtoData = new TournamentInfoDTO(_tourApiData);
             _tourCiData.Merge(_tourDtoData, TestData.Culture, false);
-            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
 
             // set group name
             _tourApiData.groups[0].id = "1";
             _tourApiData.groups[0].name = "Name1";
             _tourDtoData = new TournamentInfoDTO(_tourApiData);
             _tourCiData.Merge(_tourDtoData, TestData.Culture, false);
-            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
 
             // split group
             var oldGroup = _tourApiData.groups[0];
@@ -258,7 +258,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             newGroup.name = "Name2";
             var oldGroupCompetitors = _tourApiData.groups[0].competitor.ToList();
             var newGroupCompetitors = new List<team>();
-            int i = _tourApiData.groups[0].competitor.Length / 2;
+            var i = _tourApiData.groups[0].competitor.Length / 2;
             while (i > 0)
             {
                 newGroupCompetitors.Add(_tourApiData.groups[0].competitor[i]);
@@ -268,32 +268,32 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             newGroup.competitor = newGroupCompetitors.ToArray();
             oldGroup.competitor = oldGroupCompetitors.ToArray();
-            _tourApiData.groups = new[] {oldGroup, newGroup};
+            _tourApiData.groups = new[] { oldGroup, newGroup };
             _tourDtoData = new TournamentInfoDTO(_tourApiData);
             _tourCiData.Merge(_tourDtoData, TestData.Culture, false);
-            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
 
             // remove group
             _tourApiData.groups = null;
             _tourDtoData = new TournamentInfoDTO(_tourApiData);
             _tourCiData.Merge(_tourDtoData, TestData.Culture, false);
-            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_tourApiData.groups, _tourCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_tourApiData.competitors, _tourApiData.groups, _tourCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
         }
-        
+
         [TestMethod]
         public void SeasonGroupsMergedCorrectly()
         {
-            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
         }
 
         [TestMethod]
         public void SeasonGroupSplitGroupCompetitors()
         {
-            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
 
             var oldGroup = _seasonApiData.groups[0];
             var oldGroupCompetitors = _seasonApiData.groups[0].competitor.ToList();
@@ -305,21 +305,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 oldGroupCompetitors.RemoveAt(i);
                 i--;
             }
-            
-            var newGroup = new tournamentGroup {id = "2", name = "Name2", competitor = newGroupCompetitors.ToArray()};
+
+            var newGroup = new tournamentGroup { id = "2", name = "Name2", competitor = newGroupCompetitors.ToArray() };
             oldGroup.competitor = oldGroupCompetitors.ToArray();
-            _seasonApiData.groups = new[] {oldGroup, newGroup};
+            _seasonApiData.groups = new[] { oldGroup, newGroup };
             _seasonDtoData = new TournamentInfoDTO(_seasonApiData);
             _seasonCiData.Merge(_seasonDtoData, TestData.Culture, false);
-            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
         }
 
         [TestMethod]
         public void SeasonGroupRemoveGroupCompetitor()
         {
-            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
 
             var oldGroup = _seasonApiData.groups[0];
             var oldGroupCompetitors = _seasonApiData.groups[0].competitor.ToList();
@@ -333,21 +333,21 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             }
 
             oldGroupCompetitors.RemoveAt(0);
-            
-            var newGroup = new tournamentGroup {id = "2", name = "Name2", competitor = newGroupCompetitors.ToArray()};
+
+            var newGroup = new tournamentGroup { id = "2", name = "Name2", competitor = newGroupCompetitors.ToArray() };
             oldGroup.competitor = oldGroupCompetitors.ToArray();
-            _seasonApiData.groups = new[] {oldGroup, newGroup};
+            _seasonApiData.groups = new[] { oldGroup, newGroup };
             _seasonDtoData = new TournamentInfoDTO(_seasonApiData);
             _seasonCiData.Merge(_seasonDtoData, TestData.Culture, false);
-            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
         }
 
         [TestMethod]
         public void SeasonGroupAddGroupCompetitor()
         {
-            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
 
             var oldGroup = _seasonApiData.groups[0];
             var oldGroupCompetitors = _seasonApiData.groups[0].competitor.ToList();
@@ -361,22 +361,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             }
 
             var compId = URN.Parse(oldGroupCompetitors[0].id);
-            oldGroupCompetitors.Add(new team{ id = $"{compId.Prefix}:{compId.Type}:{compId.Id / 2}", name = "John Doe"});
-            
-            var newGroup = new tournamentGroup {id = "2", name = "Name2", competitor = newGroupCompetitors.ToArray()};
+            oldGroupCompetitors.Add(new team { id = $"{compId.Prefix}:{compId.Type}:{compId.Id / 2}", name = "John Doe" });
+
+            var newGroup = new tournamentGroup { id = "2", name = "Name2", competitor = newGroupCompetitors.ToArray() };
             oldGroup.competitor = oldGroupCompetitors.ToArray();
-            _seasonApiData.groups = new[] {oldGroup, newGroup};
+            _seasonApiData.groups = new[] { oldGroup, newGroup };
             _seasonDtoData = new TournamentInfoDTO(_seasonApiData);
             _seasonCiData.Merge(_seasonDtoData, TestData.Culture, false);
-            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
         }
 
         [TestMethod]
         public void SeasonGroupReplaceGroupCompetitor()
         {
-            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
 
             var oldGroup = _seasonApiData.groups[0];
             var oldGroupCompetitors = _seasonApiData.groups[0].competitor.ToList();
@@ -392,20 +392,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             // replace competitor in group
             var compId = URN.Parse(oldGroupCompetitors[0].id);
             oldGroupCompetitors[0].id = $"{compId.Prefix}:{compId.Type}:{compId.Id / 2}";
-            var newGroup = new tournamentGroup {competitor = newGroupCompetitors.ToArray()};
+            var newGroup = new tournamentGroup { competitor = newGroupCompetitors.ToArray() };
             oldGroup.competitor = oldGroupCompetitors.ToArray();
-            _seasonApiData.groups = new[] {oldGroup, newGroup};
+            _seasonApiData.groups = new[] { oldGroup, newGroup };
             _seasonDtoData = new TournamentInfoDTO(_seasonApiData);
             _seasonCiData.Merge(_seasonDtoData, TestData.Culture, false);
-            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
         }
 
         [TestMethod]
         public void SeasonGroupMultipleChanges()
         {
-            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
 
             var oldGroup = _seasonApiData.groups[0];
             var oldGroupCompetitors = _seasonApiData.groups[0].competitor.ToList();
@@ -418,30 +418,30 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 oldGroupCompetitors.RemoveAt(i);
                 i--;
             }
-            
+
             var compId = URN.Parse(oldGroupCompetitors[0].id);
             oldGroupCompetitors[0].id = $"{compId.Prefix}:{compId.Type}:{compId.Id / 2}";
-            
+
             oldGroupCompetitors2[0].id = $"{compId.Prefix}:{compId.Type}:{compId.Id / 3}";
             oldGroupCompetitors2[1].id = $"{compId.Prefix}:{compId.Type}:{compId.Id / 4}";
             oldGroupCompetitors2[2].id = $"{compId.Prefix}:{compId.Type}:{compId.Id / 5}";
 
-            var newGroup = new tournamentGroup {competitor = newGroupCompetitors.ToArray()};
-            var newGroup2 = new tournamentGroup {id = "2", name = "Group2", competitor = oldGroupCompetitors2.ToArray()};
+            var newGroup = new tournamentGroup { competitor = newGroupCompetitors.ToArray() };
+            var newGroup2 = new tournamentGroup { id = "2", name = "Group2", competitor = oldGroupCompetitors2.ToArray() };
             oldGroup.competitor = oldGroupCompetitors.ToArray();
-            _seasonApiData.groups = new[] {oldGroup, newGroup, newGroup2};
+            _seasonApiData.groups = new[] { oldGroup, newGroup, newGroup2 };
             _seasonDtoData = new TournamentInfoDTO(_seasonApiData);
             _seasonCiData.Merge(_seasonDtoData, TestData.Culture, false);
-            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).Result);
-            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).Result);
+            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(_cultures).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(_cultures).GetAwaiter().GetResult());
         }
 
         [TestMethod]
         public void SeasonGroupMultipleCultures()
         {
-            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(TestData.Cultures3).Result);
-            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(TestData.Cultures3).Result);
-            
+            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(TestData.Cultures3).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(TestData.Cultures3).GetAwaiter().GetResult());
+
             var oldGroup = _seasonApiData.groups[0];
             var oldGroupCompetitors = _seasonApiData.groups[0].competitor.ToList();
             var oldGroupCompetitors2 = _seasonApiData.groups[1].competitor.ToList();
@@ -453,22 +453,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 oldGroupCompetitors.RemoveAt(i);
                 i--;
             }
-            
+
             var compId = URN.Parse(oldGroupCompetitors[0].id);
             oldGroupCompetitors[0].id = $"{compId.Prefix}:{compId.Type}:{compId.Id / 2}";
-            
+
             oldGroupCompetitors2[0].id = $"{compId.Prefix}:{compId.Type}:{compId.Id / 3}";
             oldGroupCompetitors2[1].id = $"{compId.Prefix}:{compId.Type}:{compId.Id / 4}";
             oldGroupCompetitors2[2].id = $"{compId.Prefix}:{compId.Type}:{compId.Id / 5}";
 
-            var newGroup = new tournamentGroup {competitor = newGroupCompetitors.ToArray()};
-            var newGroup2 = new tournamentGroup {id = "2", name = "Group2", competitor = oldGroupCompetitors2.ToArray()};
+            var newGroup = new tournamentGroup { competitor = newGroupCompetitors.ToArray() };
+            var newGroup2 = new tournamentGroup { id = "2", name = "Group2", competitor = oldGroupCompetitors2.ToArray() };
             oldGroup.competitor = oldGroupCompetitors.ToArray();
-            _seasonApiData.groups = new[] {oldGroup, newGroup, newGroup2};
+            _seasonApiData.groups = new[] { oldGroup, newGroup, newGroup2 };
             _seasonDtoData = new TournamentInfoDTO(_seasonApiData);
             _seasonCiData.Merge(_seasonDtoData, TestData.Cultures3.ElementAt(0), false);
-            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(TestData.Cultures3).Result);
-            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(TestData.Cultures3).Result);
+            VerifyTournamentGroups(_seasonApiData.groups, _seasonCiData.GetGroupsAsync(TestData.Cultures3).GetAwaiter().GetResult());
+            VerifyTournamentCompetitors(_seasonApiData.competitors, _seasonApiData.groups, _seasonCiData.GetCompetitorsIdsAsync(TestData.Cultures3).GetAwaiter().GetResult());
         }
 
         private void VerifyTournamentGroups(IEnumerable<tournamentGroup> apiGroups, IEnumerable<GroupCI> ciTourGroups)
@@ -494,7 +494,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                     Assert.IsTrue(ciGroups.Exists(a => a.Name.Equals(sapiGroup.name)));
                 }
 
-                GroupCI matchingGroup = MergerHelper.FindExistingGroup(ciGroups, new GroupDTO(sapiGroup));
+                var matchingGroup = MergerHelper.FindExistingGroup(ciGroups, new GroupDTO(sapiGroup));
 
                 Assert.AreEqual(sapiGroup.competitor.Length, matchingGroup.CompetitorsIds.Count());
 
@@ -515,7 +515,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             if (sapiComps.IsNullOrEmpty())
             {
                 // no groups defined
-                if(sapiGroups.IsNullOrEmpty())
+                if (sapiGroups.IsNullOrEmpty())
                 {
                     Assert.IsNull(ciComps);
                 }
@@ -530,20 +530,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                     {
                         foreach (var team in sapiGroup.competitor)
                         {
-                            Assert.IsTrue(ciComps.Any(a=>a.Equals(URN.Parse(team.id))));
+                            Assert.IsTrue(ciComps.Any(a => a.Equals(URN.Parse(team.id))));
                         }
                     }
 
                     // all ci competitors are at least in one group
                     foreach (var ciCompetitorId in ciComps)
                     {
-                        Assert.IsTrue(sapiGroups.SelectMany(s=>s.competitor).Any(team=> ciCompetitorId.ToString().Equals(team.id)));
+                        Assert.IsTrue(sapiGroups.SelectMany(s => s.competitor).Any(team => ciCompetitorId.ToString().Equals(team.id)));
                     }
-                    
+
                     // all ci competitors are listed only once
                     foreach (var ciCompetitorId in ciComps)
                     {
-                        Assert.AreEqual(1, ciComps.Count(cId=>cId.Equals(ciCompetitorId)));
+                        Assert.AreEqual(1, ciComps.Count(cId => cId.Equals(ciCompetitorId)));
                     }
                 }
             }
@@ -557,13 +557,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 // all ci competitors are in sapi competitors
                 foreach (var ciCompetitorId in ciComps)
                 {
-                    Assert.IsTrue(sapiComps.Any(team=> ciCompetitorId.ToString().Equals(team.id)));
+                    Assert.IsTrue(sapiComps.Any(team => ciCompetitorId.ToString().Equals(team.id)));
                 }
-                    
+
                 // all ci competitors are listed only once
                 foreach (var ciCompetitorId in ciComps)
                 {
-                    Assert.AreEqual(1, ciComps.Count(cId=>cId.Equals(ciCompetitorId)));
+                    Assert.AreEqual(1, ciComps.Count(cId => cId.Equals(ciCompetitorId)));
                 }
             }
         }

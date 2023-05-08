@@ -1,15 +1,14 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using Common.Logging;
-using Dawn;
-using Metrics;
-using Sportradar.OddsFeed.SDK.Common.Internal.Metrics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.Logging;
+using Metrics;
+using Sportradar.OddsFeed.SDK.Common.Internal.Metrics;
 
 namespace Sportradar.OddsFeed.SDK.Common.Internal
 {
@@ -112,7 +111,10 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <returns>A <see cref="Task{SemaphoreSlim}"/> representing an async operation</returns>
         public Task<SemaphoreSlim> AcquireAsync(string id)
         {
-            Guard.Argument(id, nameof(id)).NotNull().NotEmpty();
+            if (string.IsNullOrEmpty(id))
+            {
+                throw new ArgumentNullException(nameof(id));
+            }
 
             using (var t = MetricsSettings.TimerSemaphorePool.NewContext($"{id}"))
             {
@@ -205,7 +207,10 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// <exception cref="ArgumentException"></exception>
         public void Release(string id)
         {
-            Guard.Argument(id, nameof(id)).NotNull().NotEmpty();
+            if (string.IsNullOrEmpty(id))
+            {
+                throw new ArgumentNullException(nameof(id));
+            }
 
             lock (_syncObject)
             {
@@ -258,9 +263,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
             /// <param name="semaphore">The semaphore</param>
             public SemaphoreHolder(SemaphoreSlim semaphore)
             {
-                Guard.Argument(semaphore, nameof(semaphore)).NotNull();
-
-                Semaphore = semaphore;
+                Semaphore = semaphore ?? throw new ArgumentNullException(nameof(semaphore));
             }
 
             /// <summary>

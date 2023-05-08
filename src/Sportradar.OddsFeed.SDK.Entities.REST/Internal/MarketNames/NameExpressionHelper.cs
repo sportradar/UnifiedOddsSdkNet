@@ -3,9 +3,9 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
+using Dawn;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 {
@@ -118,7 +118,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             Guard.Argument(specifierName, nameof(specifierName)).NotNull().NotEmpty();
             Guard.Argument(specifiers, nameof(specifiers)).NotNull();//.NotEmpty();
             if (!specifiers.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(specifiers));
+            }
 
             if (!specifiers.TryGetValue(specifierName, out var specifierValueString))
             {
@@ -143,7 +145,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             Guard.Argument(specifierName, nameof(specifierName)).NotNull().NotEmpty();
             Guard.Argument(specifiers, nameof(specifiers)).NotNull();//.NotEmpty();
             if (!specifiers.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(specifiers));
+            }
 
             if (!specifiers.TryGetValue(specifierName, out var specifierValueString))
             {

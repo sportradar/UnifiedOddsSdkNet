@@ -19,7 +19,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
     [TestClass]
     public class SportListMapperTest
     {
-        private const string InputXml = "tournaments.en.xml";
+        private const string InputXml = "tournaments_en.xml";
 
         private static EntityList<SportDTO> _entity;
 
@@ -35,7 +35,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 dataFetcher,
                 deserializer,
                 mapperFactory);
-            _entity = dataProvider.GetDataAsync("", "en").Result;
+            _entity = dataProvider.GetDataAsync("", "en").GetAwaiter().GetResult();
         }
 
         private static XName GetXName(string localName)
@@ -203,7 +203,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 var attribute = sportElement.Attribute("id");
                 if (attribute != null && attribute.Value == sportId.ToString())
                 {
-                    count ++;
+                    count++;
                 }
             }
             return count;
@@ -234,7 +234,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 }
 
                 distinctTournaments.Add(tournamentIdAttribute.Value);
-                count ++;
+                count++;
             }
             return count;
         }

@@ -44,13 +44,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// </summary>
         /// <param name="name">the name of the group represented by the current <see cref="IGroup" /> instance</param>
         /// <param name="competitors">the <see cref="IEnumerable{ICompetitor}" /> representing group competitors</param>
-        public Group(string name, IEnumerable<ICompetitor> competitors)
+        public Group(string name, IReadOnlyCollection<ICompetitor> competitors)
         {
             Id = string.Empty;
             Name = name;
             if (competitors != null)
             {
-                _competitors = competitors.ToList();
+                _competitors = competitors;
             }
             else
             {
@@ -67,7 +67,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <param name="exceptionStrategy">The exception strategy</param>
         /// <param name="competitorsReferenceIds">A list of <see cref="ReferenceIdCI"/> for all competitors</param>
         public Group(GroupCI ci,
-                     IEnumerable<CultureInfo> cultures,
+                     IReadOnlyCollection<CultureInfo> cultures,
                      ISportEntityFactory sportEntityFactory,
                      ExceptionHandlingStrategy exceptionStrategy,
                      IDictionary<URN, ReferenceIdCI> competitorsReferenceIds)
@@ -98,7 +98,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         protected override string PrintC()
         {
             var comps = Competitors == null ? string.Empty : string.Join(", ", Competitors.Select(c => c.Id));
-            string result = $"{PrintI()}, CompetitorsIds=[{comps}]";
+            var result = $"{PrintI()}, CompetitorsIds=[{comps}]";
             return result;
         }
 
@@ -109,7 +109,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         protected override string PrintF()
         {
             var comps = Competitors == null ? string.Empty : string.Join(", ", Competitors.Select(c => $"{Environment.NewLine}\t " + c.ToString("F")));
-            string result = $"{PrintI()}, CompetitorsIds=[{comps}]";
+            var result = $"{PrintI()}, CompetitorsIds=[{comps}]";
             return result;
         }
 

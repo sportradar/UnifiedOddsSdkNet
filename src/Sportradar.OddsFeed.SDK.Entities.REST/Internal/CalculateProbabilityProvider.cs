@@ -1,12 +1,6 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using Sportradar.OddsFeed.SDK.Common.Exceptions;
-using Sportradar.OddsFeed.SDK.Common.Internal;
-using Sportradar.OddsFeed.SDK.Entities.REST.CustomBet;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
-using Sportradar.OddsFeed.SDK.Messages.REST;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,6 +11,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using Sportradar.OddsFeed.SDK.Common.Exceptions;
+using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities.REST.CustomBet;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
+using Sportradar.OddsFeed.SDK.Messages.REST;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -76,7 +76,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
             if (!responseMessage.IsSuccessStatusCode)
             {
-                throw new CommunicationException($"Getting probability calculations failed with StatusCode={responseMessage.StatusCode}",
+                var message = SdkInfo.ExtractHttpResponseMessage(responseMessage.Content);
+                throw new CommunicationException($"Getting probability calculations failed with message={message}",
                     _uriFormat,
                     responseMessage.StatusCode,
                     null);
@@ -89,17 +90,19 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         private HttpContent GetContent(SelectionsType content)
         {
             using (var stream = new MemoryStream())
-            using (var writer = XmlWriter.Create(stream))
             {
-                _serializer.Serialize(writer, content);
-                writer.Flush();
-                stream.Seek(0, SeekOrigin.Begin);
-                var reader = new StreamReader(stream, Encoding.UTF8);
-                var str = reader.ReadToEnd();
-                var httpContent = new StringContent(str);
-                httpContent.Headers.ContentType = new MediaTypeHeaderValue("application/xml");
+                using (var writer = XmlWriter.Create(stream))
+                {
+                    _serializer.Serialize(writer, content);
+                    writer.Flush();
+                    stream.Seek(0, SeekOrigin.Begin);
+                    var reader = new StreamReader(stream, Encoding.UTF8);
+                    var str = reader.ReadToEnd();
+                    var httpContent = new StringContent(str);
+                    httpContent.Headers.ContentType = new MediaTypeHeaderValue("application/xml");
 
-                return httpContent;
+                    return httpContent;
+                }
             }
         }
     }

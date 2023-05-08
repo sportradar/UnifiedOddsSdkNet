@@ -36,7 +36,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
             var nameProviderFactoryMock = new Mock<INameProviderFactory>();
             var nameProviderMock = new Mock<INameProvider>();
             var mappingProviderFactoryMock = new Mock<IMarketMappingProviderFactory>();
-            nameProviderFactoryMock.Setup(m => m.BuildNameProvider(It.IsAny<ISportEvent>(), It.IsAny<int>(), It.IsAny<IReadOnlyDictionary<string, string>>())).Returns(nameProviderMock.Object);
+            nameProviderFactoryMock.Setup(m => m.BuildNameProvider(It.IsAny<ISportEvent>(), It.IsAny<int>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
+                                   .Returns(nameProviderMock.Object);
 
             var namedValuesCacheMock = new Mock<INamedValueCache>();
             namedValuesCacheMock.Setup(x => x.IsValueDefined(It.IsAny<int>())).Returns(true);
@@ -47,7 +48,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
             namedValuesProviderMock.Setup(x => x.BetStopReasons).Returns(namedValuesCacheMock.Object);
             namedValuesProviderMock.Setup(x => x.BettingStatuses).Returns(namedValuesCacheMock.Object);
 
-            _mapper = new FeedMessageMapper(new TestSportEntityFactory(),
+            var sportEntityFactoryBuilder = new TestSportEntityFactoryBuilder(ScheduleData.Cultures3);
+            _mapper = new FeedMessageMapper(sportEntityFactoryBuilder.SportEntityFactory,
                                             nameProviderFactoryMock.Object,
                                             mappingProviderFactoryMock.Object,
                                             namedValuesProviderMock.Object,

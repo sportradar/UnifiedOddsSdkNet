@@ -4,11 +4,11 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames;
 using Sportradar.OddsFeed.SDK.Entities.REST.MarketMapping;
@@ -81,7 +81,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
             Guard.Argument(nameProvider, nameof(nameProvider)).NotNull();
             Guard.Argument(cultures, nameof(cultures)).NotNull();
             if (!cultures.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(cultures));
+            }
 
             Id = id;
             Specifiers = specifiers;

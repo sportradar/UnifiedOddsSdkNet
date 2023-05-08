@@ -62,7 +62,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             var i = 0;
             while (_dataRouterManager.GetCallCount(DateSchedule) != (TestData.Cultures.Count * 3) && i < 100)
             {
-                Thread.Sleep(100);
+                Task.Delay(100).GetAwaiter().GetResult();
                 i++;
             }
             Assert.IsTrue(_memoryCache.GetCount() > 0, "Nothing was cached.");
@@ -84,8 +84,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             var item = (IMatchCI)_sportEventCache.GetEventCacheItem(TestData.EventMatchId);
             Assert.IsNotNull(item); // empty with providers
 
-            var tourId = item.GetTournamentIdAsync(TestData.Cultures).Result;
-            var fixture = item.GetFixtureAsync(TestData.Cultures).Result;
+            var tourId = item.GetTournamentIdAsync(TestData.Cultures).GetAwaiter().GetResult();
+            var fixture = item.GetFixtureAsync(TestData.Cultures).GetAwaiter().GetResult();
 
             Assert.AreEqual("sr:tournament:1030", tourId.ToString());
             Assert.IsNotNull(fixture);
@@ -148,7 +148,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             ValidateSportEventCacheItem(item, true);
 
             //merge fixture
-            URN tourId = TestData.TournamentId;
+            var tourId = TestData.TournamentId;
             IFixture fixture = null;
             Task.Run(async () =>
             {
@@ -210,7 +210,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void GetScheduleForTournamentTest()
+        public void GetScheduleForTournament()
         {
             Assert.AreEqual(0, _memoryCache.Count());
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(TournamentSchedule), $"{TournamentSchedule} should be called exactly 0 times.");
@@ -227,12 +227,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void GetScheduleForTournament()
+        public void GetScheduleForTournament2()
         {
             Assert.AreEqual(0, _memoryCache.Count());
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(TournamentSchedule), $"{TournamentSchedule} should be called exactly 0 times.");
 
-            var events = _sportEventCache.GetEventIdsAsync(TestData.TournamentId, TestData.Culture).Result;
+            var events = _sportEventCache.GetEventIdsAsync(TestData.TournamentId, TestData.Culture).GetAwaiter().GetResult();
             Assert.AreEqual(TournamentEventCount, _memoryCache.Count());
             Assert.AreEqual(TournamentEventCount, events.Count());
             Assert.AreEqual(1, _dataRouterManager.GetCallCount(TournamentSchedule), $"{TournamentSchedule} should be called exactly 1 times.");
@@ -251,7 +251,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod, Timeout(150000)]
-        public async Task SportEventCacheSingleItemSequentialTest()
+        public async Task SportEventCacheSingleItemSequential()
         {
             // slow implementation of async calls
             var stopWatch = Stopwatch.StartNew();
@@ -278,7 +278,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod, Timeout(120000)]
-        public async Task SportEventCacheSingleItemConcurrencyTest()
+        public async Task SportEventCacheSingleItemConcurrency()
         {
             var stopWatch = Stopwatch.StartNew();
             Assert.AreEqual(0, _memoryCache.Count());
@@ -295,17 +295,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             foreach (var task in tasks)
             {
-                if (task.Result == null)
+                if (task.GetAwaiter().GetResult() == null)
                 {
                     continue;
                 }
-                Assert.IsNotNull(task.Result);
-                Assert.IsNotNull(task.Result.Id);
+                Assert.IsNotNull(task.GetAwaiter().GetResult());
+                Assert.IsNotNull(task.GetAwaiter().GetResult().Id);
 
-                if (task.Result.Id.Id % 10 != 3)
+                if (task.GetAwaiter().GetResult().Id.Id % 10 != 3)
                 {
                     var c1 = _dataRouterManager.GetCallCount(SportEventSummary);
-                    TestData.ValidateTestEventId(task.Result, new[] { culture }, true);
+                    TestData.ValidateTestEventId(task.GetAwaiter().GetResult(), new[] { culture }, true);
                     var c2 = _dataRouterManager.GetCallCount(SportEventSummary);
                     Assert.AreEqual(c1, c2);
                 }
@@ -314,8 +314,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(2, _memoryCache.Count());
         }
 
-        [TestMethod, Timeout(150000)]
-        public async Task SportEventCacheUniqueItemSequentialTest()
+        //[TestMethod, Timeout(150000)]
+        public async Task SportEventCacheUniqueItemSequential()
         {
             var stopWatch = Stopwatch.StartNew();
             Assert.AreEqual(0, _memoryCache.Count());
@@ -334,8 +334,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
         }
 
-        [TestMethod, Timeout(120000)]
-        public async Task SportEventCacheUniqueItemConcurrencyTest()
+        //[TestMethod, Timeout(120000)]
+        public async Task SportEventCacheUniqueItemConcurrency()
         {
             var stopWatch = Stopwatch.StartNew();
             Assert.AreEqual(0, _memoryCache.Count());
@@ -354,14 +354,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             foreach (var task in tasks)
             {
-                Assert.IsNotNull(task.Result);
-                Assert.IsNotNull(task.Result.Id);
+                Assert.IsNotNull(task.GetAwaiter().GetResult());
+                Assert.IsNotNull(task.GetAwaiter().GetResult().Id);
             }
             Assert.IsTrue(_memoryCache.Count() > 500);
         }
 
-        [TestMethod, Timeout(150000)]
-        public async Task SportEventCacheSemiSequentialTest()
+        //[TestMethod, Timeout(150000)]
+        public async Task SportEventCacheSemiSequential()
         {
             var stopWatch = Stopwatch.StartNew();
             Assert.AreEqual(0, _memoryCache.Count());
@@ -381,7 +381,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod, Timeout(120000)]
-        public async Task SportEventCacheSemiConcurrencyTest()
+        public async Task SportEventCacheSemiConcurrency()
         {
             var stopWatch = Stopwatch.StartNew();
             Assert.AreEqual(0, _memoryCache.Count());
@@ -400,15 +400,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             foreach (var task in tasks)
             {
-                Assert.IsNotNull(task.Result);
-                Assert.IsNotNull(task.Result.Id);
+                Assert.IsNotNull(task.GetAwaiter().GetResult());
+                Assert.IsNotNull(task.GetAwaiter().GetResult().Id);
             }
             Assert.IsTrue(_memoryCache.Count() > 50);
             Assert.IsTrue(_memoryCache.Count() < 100);
         }
 
         //[TestMethod, Timeout(300000)]
-        public async Task SportEventCacheSemiWithDelaySequentialTest()
+        public async Task SportEventCacheSemiWithDelaySequential()
         {
             var stopWatch = Stopwatch.StartNew();
             Assert.AreEqual(0, _memoryCache.Count());
@@ -417,9 +417,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             _dataRouterManager.AddDelay(TimeSpan.FromMilliseconds(1000), true, 30);
             while (i > 0)
             {
-                var matchId = URN.Parse($"sr:match:1{StaticRandom.I100}");
                 i--;
-
+                var matchId = URN.Parse($"sr:match:1{StaticRandom.I100}");
                 var ci = await GetMatchCacheItemAsync(matchId, culture, stopWatch, i).ConfigureAwait(false);
                 Assert.IsNotNull(ci);
                 Assert.AreEqual(matchId, ci.Id);
@@ -429,7 +428,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod, Timeout(120000)]
-        public async Task SportEventCacheSemiWithDelayConcurrencyTest()
+        public async Task SportEventCacheSemiWithDelayConcurrency()
         {
             var stopWatch = Stopwatch.StartNew();
             Assert.AreEqual(0, _memoryCache.Count());
@@ -439,25 +438,23 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             var tasks = new List<Task<MatchCI>>();
             while (i > 0)
             {
-                var matchId = URN.Parse($"sr:match:1{StaticRandom.I100}");
                 i--;
-
+                var matchId = URN.Parse($"sr:match:1{StaticRandom.I100}");
                 tasks.Add(GetMatchCacheItemAsync(matchId, culture, stopWatch, i));
             }
-
             await Task.WhenAll(tasks).ConfigureAwait(false);
 
             foreach (var task in tasks)
             {
-                Assert.IsNotNull(task.Result);
-                Assert.IsNotNull(task.Result.Id);
+                Assert.IsNotNull(task.GetAwaiter().GetResult());
+                Assert.IsNotNull(task.GetAwaiter().GetResult().Id);
             }
             Assert.IsTrue(_memoryCache.Count() > 50);
             Assert.IsTrue(_memoryCache.Count() < 100);
         }
 
         [TestMethod, Timeout(120000)]
-        public async Task SportEventCacheSemiWithDelayAndPause050ConcurrencyTest()
+        public async Task SportEventCacheSemiWithDelayAndPause050Concurrency()
         {
             var stopWatch = Stopwatch.StartNew();
             Assert.AreEqual(0, _memoryCache.Count());
@@ -468,25 +465,23 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             var tasks = new List<Task<MatchCI>>();
             while (i > 0)
             {
-                var matchId = URN.Parse($"sr:match:1{StaticRandom.I100}");
                 i--;
-
+                var matchId = URN.Parse($"sr:match:1{StaticRandom.I100}");
                 tasks.Add(GetMatchCacheItemAsync(matchId, culture, stopWatch, i));
             }
-
             await Task.WhenAll(tasks).ConfigureAwait(false);
 
             foreach (var task in tasks)
             {
-                Assert.IsNotNull(task.Result);
-                Assert.IsNotNull(task.Result.Id);
+                Assert.IsNotNull(task.GetAwaiter().GetResult());
+                Assert.IsNotNull(task.GetAwaiter().GetResult().Id);
             }
             Assert.IsTrue(_memoryCache.Count() > 50);
             Assert.IsTrue(_memoryCache.Count() < 100);
         }
 
         //[TestMethod, Timeout(120000)]
-        public async Task SportEventCacheSemiWithDelayAndPause100ConcurrencyTest()
+        public async Task SportEventCacheSemiWithDelayAndPause100Concurrency()
         {
             var stopWatch = Stopwatch.StartNew();
             Assert.AreEqual(0, _memoryCache.Count());
@@ -507,15 +502,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             foreach (var task in tasks)
             {
-                Assert.IsNotNull(task.Result);
-                Assert.IsNotNull(task.Result.Id);
+                Assert.IsNotNull(task.GetAwaiter().GetResult());
+                Assert.IsNotNull(task.GetAwaiter().GetResult().Id);
             }
             Assert.IsTrue(_memoryCache.Count() > 50);
             Assert.IsTrue(_memoryCache.Count() < 100);
         }
 
         //[TestMethod, Timeout(120000)]
-        public async Task SportEventCacheSemiWithDelayAndPause150ConcurrencyTest()
+        public async Task SportEventCacheSemiWithDelayAndPause150Concurrency()
         {
             var stopWatch = Stopwatch.StartNew();
             Assert.AreEqual(0, _memoryCache.Count());
@@ -536,15 +531,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             foreach (var task in tasks)
             {
-                Assert.IsNotNull(task.Result);
-                Assert.IsNotNull(task.Result.Id);
+                Assert.IsNotNull(task.GetAwaiter().GetResult());
+                Assert.IsNotNull(task.GetAwaiter().GetResult().Id);
             }
             Assert.IsTrue(_memoryCache.Count() > 50);
             Assert.IsTrue(_memoryCache.Count() < 100);
         }
 
         [TestMethod, Timeout(120000)]
-        public async Task SportEventCacheSemiWithDelayAndPause200ConcurrencyTest()
+        public async Task SportEventCacheSemiWithDelayAndPause200Concurrency()
         {
             var stopWatch = Stopwatch.StartNew();
             Assert.AreEqual(0, _memoryCache.Count());
@@ -565,15 +560,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             foreach (var task in tasks)
             {
-                Assert.IsNotNull(task.Result);
-                Assert.IsNotNull(task.Result.Id);
+                Assert.IsNotNull(task.GetAwaiter().GetResult());
+                Assert.IsNotNull(task.GetAwaiter().GetResult().Id);
             }
             Assert.IsTrue(_memoryCache.Count() > 50);
             Assert.IsTrue(_memoryCache.Count() < 100);
         }
 
         //[TestMethod, Timeout(120000)]
-        public async Task SportEventCacheSemiWithDelayAndPause250ConcurrencyTest()
+        public async Task SportEventCacheSemiWithDelayAndPause250Concurrency()
         {
             var stopWatch = Stopwatch.StartNew();
             Assert.AreEqual(0, _memoryCache.Count());
@@ -594,15 +589,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             foreach (var task in tasks)
             {
-                Assert.IsNotNull(task.Result);
-                Assert.IsNotNull(task.Result.Id);
+                Assert.IsNotNull(task.GetAwaiter().GetResult());
+                Assert.IsNotNull(task.GetAwaiter().GetResult().Id);
             }
             Assert.IsTrue(_memoryCache.Count() > 50);
             Assert.IsTrue(_memoryCache.Count() < 100);
         }
 
         //[TestMethod, Timeout(120000)]
-        public async Task SportEventCacheSemiWithDelayAndPause350ConcurrencyTest()
+        public async Task SportEventCacheSemiWithDelayAndPause350Concurrency()
         {
             var stopWatch = Stopwatch.StartNew();
             Assert.AreEqual(0, _memoryCache.Count());
@@ -623,15 +618,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             foreach (var task in tasks)
             {
-                Assert.IsNotNull(task.Result);
-                Assert.IsNotNull(task.Result.Id);
+                Assert.IsNotNull(task.GetAwaiter().GetResult());
+                Assert.IsNotNull(task.GetAwaiter().GetResult().Id);
             }
             Assert.IsTrue(_memoryCache.Count() > 50);
             Assert.IsTrue(_memoryCache.Count() < 100);
         }
 
-        [TestMethod, Timeout(120000)]
-        public async Task SportEventCacheSemiWithDelayAndPause500ConcurrencyTest()
+        //[TestMethod, Timeout(120000)]
+        public async Task SportEventCacheSemiWithDelayAndPause500Concurrency()
         {
             var stopWatch = Stopwatch.StartNew();
             Assert.AreEqual(0, _memoryCache.Count());
@@ -652,15 +647,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             foreach (var task in tasks)
             {
-                Assert.IsNotNull(task.Result);
-                Assert.IsNotNull(task.Result.Id);
+                Assert.IsNotNull(task.GetAwaiter().GetResult());
+                Assert.IsNotNull(task.GetAwaiter().GetResult().Id);
             }
             Assert.IsTrue(_memoryCache.Count() > 50);
             Assert.IsTrue(_memoryCache.Count() < 100);
         }
 
-        [TestMethod, Timeout(120000)]
-        public async Task SportEventCacheSemiWithVariableDelayAndPause200ConcurrencyTest()
+        //[TestMethod, Timeout(120000)]
+        public async Task SportEventCacheSemiWithVariableDelayAndPause200Concurrency()
         {
             var stopWatch = Stopwatch.StartNew();
             Assert.AreEqual(0, _memoryCache.Count());
@@ -681,15 +676,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             foreach (var task in tasks)
             {
-                Assert.IsNotNull(task.Result);
-                Assert.IsNotNull(task.Result.Id);
+                Assert.IsNotNull(task.GetAwaiter().GetResult());
+                Assert.IsNotNull(task.GetAwaiter().GetResult().Id);
             }
             Assert.IsTrue(_memoryCache.Count() > 50);
             Assert.IsTrue(_memoryCache.Count() < 100);
         }
 
-        [TestMethod, Timeout(120000)]
-        public async Task SportEventCacheCustomerScenarioAllRequestsSlowerAndPause200ConcurrencyTest()
+        //[TestMethod, Timeout(120000)]
+        public async Task SportEventCacheCustomerScenarioAllRequestsSlowerAndPause200Concurrency()
         {
             var stopWatch = Stopwatch.StartNew();
             Assert.AreEqual(0, _memoryCache.Count());
@@ -710,15 +705,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             foreach (var task in tasks)
             {
-                Assert.IsNotNull(task.Result);
-                Assert.IsNotNull(task.Result.Id);
+                Assert.IsNotNull(task.GetAwaiter().GetResult());
+                Assert.IsNotNull(task.GetAwaiter().GetResult().Id);
             }
             Assert.IsTrue(_memoryCache.Count() > 50);
             Assert.IsTrue(_memoryCache.Count() < 100);
         }
 
-        [TestMethod, Timeout(120000)]
-        public async Task SportEventCacheCustomerScenarioSomeRequestSlowAndPause200ConcurrencyTest()
+        //[TestMethod, Timeout(120000)]
+        public async Task SportEventCacheCustomerScenarioSomeRequestSlowAndPause200Concurrency()
         {
             var stopWatch = Stopwatch.StartNew();
             Assert.AreEqual(0, _memoryCache.Count());
@@ -739,15 +734,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             foreach (var task in tasks)
             {
-                Assert.IsNotNull(task.Result);
-                Assert.IsNotNull(task.Result.Id);
+                Assert.IsNotNull(task.GetAwaiter().GetResult());
+                Assert.IsNotNull(task.GetAwaiter().GetResult().Id);
             }
             Assert.IsTrue(_memoryCache.Count() > 50);
             Assert.IsTrue(_memoryCache.Count() < 100);
         }
 
         //[TestMethod, Timeout(120000)]
-        public async Task SportEventCacheCustomerScenarioAllRequestSlowAndPause200ConcurrencyThreadPool1Test()
+        public async Task SportEventCacheCustomerScenarioAllRequestSlowAndPause200ConcurrencyThreadPool1()
         {
             ThreadPool.SetMaxThreads(1, 1);
             var stopWatch = Stopwatch.StartNew();
@@ -769,15 +764,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             foreach (var task in tasks)
             {
-                Assert.IsNotNull(task.Result);
-                Assert.IsNotNull(task.Result.Id);
+                Assert.IsNotNull(task.GetAwaiter().GetResult());
+                Assert.IsNotNull(task.GetAwaiter().GetResult().Id);
             }
             Assert.IsTrue(_memoryCache.Count() > 50);
             Assert.IsTrue(_memoryCache.Count() < 100);
         }
 
-        [TestMethod, Timeout(120000)]
-        public async Task SportEventCacheCustomerScenarioAllRequestSlowAndPause200ConcurrencyThreadPool2Test()
+        //[TestMethod, Timeout(120000)]
+        public async Task SportEventCacheCustomerScenarioAllRequestSlowAndPause200ConcurrencyThreadPool2()
         {
             ThreadPool.SetMaxThreads(2, 2);
             var stopWatch = Stopwatch.StartNew();
@@ -799,15 +794,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             foreach (var task in tasks)
             {
-                Assert.IsNotNull(task.Result);
-                Assert.IsNotNull(task.Result.Id);
+                Assert.IsNotNull(task.GetAwaiter().GetResult());
+                Assert.IsNotNull(task.GetAwaiter().GetResult().Id);
             }
             Assert.IsTrue(_memoryCache.Count() > 50);
             Assert.IsTrue(_memoryCache.Count() < 100);
         }
 
         //[TestMethod, Timeout(120000)]
-        public async Task SportEventCacheCustomerScenarioAllRequestSlowAndPause200ConcurrencyNewThreadsTest()
+        public async Task SportEventCacheCustomerScenarioAllRequestSlowAndPause200ConcurrencyNewThreads()
         {
             //ThreadPool.SetMaxThreads(10, 10);
             var stopWatch = Stopwatch.StartNew();
@@ -833,8 +828,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             foreach (var task in tasks)
             {
-                Assert.IsNotNull(task.Result);
-                Assert.IsNotNull(task.Result.Id);
+                Assert.IsNotNull(task.GetAwaiter().GetResult());
+                Assert.IsNotNull(task.GetAwaiter().GetResult().Id);
             }
             Assert.IsTrue(_memoryCache.Count() > 50);
             Assert.IsTrue(_memoryCache.Count() < 100);

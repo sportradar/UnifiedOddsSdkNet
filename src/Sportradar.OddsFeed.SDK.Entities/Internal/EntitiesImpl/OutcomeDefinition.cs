@@ -3,9 +3,9 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
@@ -27,7 +27,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         private readonly ExceptionHandlingStrategy _exceptionHandlingStrategy;
         private readonly IDictionary<CultureInfo, string> _names = new Dictionary<CultureInfo, string>();
         private readonly object _lock = new object();
-        
+
         internal OutcomeDefinition(int marketId,
             string outcomeId,
             IMarketCacheProvider marketCacheProvider,
@@ -76,7 +76,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                 }
                 try
                 {
-                    var marketDescription = _marketCacheProvider.GetMarketDescriptionAsync(_marketId, _specifiers, _cultures, true).Result;
+                    var marketDescription = _marketCacheProvider.GetMarketDescriptionAsync(_marketId, _specifiers, _cultures, true).GetAwaiter().GetResult();
                     if (marketDescription?.Outcomes == null || !marketDescription.Outcomes.Any())
                     {
                         return null;

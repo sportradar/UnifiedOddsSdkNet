@@ -3,10 +3,10 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Linq;
 using System.Net.Http;
 using System.Xml;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common.Internal.Log;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
@@ -58,7 +58,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
             }
             var uri = new Uri(url);
 
-            var response = _dataRestful.PutDataAsync(uri).Result;
+            var response = _dataRestful.PutDataAsync(uri).GetAwaiter().GetResult();
 
             return HandleHttpResponseMessage(response);
         }
@@ -76,7 +76,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
 
             var uri = new Uri($"{_apiHost}/events/{eventId}{BuildNodeIdQuery("?")}");
 
-            var response = _dataRestful.DeleteDataAsync(uri).Result;
+            var response = _dataRestful.DeleteDataAsync(uri).GetAwaiter().GetResult();
 
             return HandleHttpResponseMessage(response);
         }
@@ -98,7 +98,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
         {
             var uri = new Uri($"{_apiHost}/{BuildNodeIdQuery("?")}");
 
-            var response = _dataRestful.GetDataAsync(uri).Result;
+            var response = _dataRestful.GetDataAsync(uri).GetAwaiter().GetResult();
 
             if (response == null)
             {
@@ -106,7 +106,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
                 return new List<IReplayEvent>();
             }
 
-            var xml = new XmlDocument {XmlResolver = null};
+            var xml = new XmlDocument { XmlResolver = null };
             xml.Load(response);
 
             var result = new List<IReplayEvent>();
@@ -196,7 +196,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
 
             var uri = new Uri($"{_apiHost}/play?speed={speed}&max_delay={maxDelay}{BuildNodeIdQuery("&")}{paramProducerId}{paramRewriteTimestamps}{paramRunParallel}");
 
-            var response = _dataRestful.PostDataAsync(uri).Result;
+            var response = _dataRestful.PostDataAsync(uri).GetAwaiter().GetResult();
 
             return HandleHttpResponseMessage(response);
         }
@@ -226,7 +226,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
 
             var uri = new Uri($"{_apiHost}/scenario/play/{scenarioId}?speed={speed}&max_delay={maxDelay}{BuildNodeIdQuery("&")}{paramProducerId}{paramRewriteTimestamps}");
 
-            var response = _dataRestful.PostDataAsync(uri).Result;
+            var response = _dataRestful.PostDataAsync(uri).GetAwaiter().GetResult();
 
             return HandleHttpResponseMessage(response);
         }
@@ -238,7 +238,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
         {
             var uri = new Uri($"{_apiHost}/stop{BuildNodeIdQuery("?")}");
 
-            var response = _dataRestful.PostDataAsync(uri).Result;
+            var response = _dataRestful.PostDataAsync(uri).GetAwaiter().GetResult();
 
             return HandleHttpResponseMessage(response);
         }
@@ -250,7 +250,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
         {
             var uri = new Uri($"{_apiHost}/reset{BuildNodeIdQuery("?")}");
 
-            var response = _dataRestful.PostDataAsync(uri).Result;
+            var response = _dataRestful.PostDataAsync(uri).GetAwaiter().GetResult();
 
             return HandleHttpResponseMessage(response);
         }
@@ -263,7 +263,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
         {
             var uri = new Uri($"{_apiHost}/status{BuildNodeIdQuery("?")}");
 
-            var response = _dataRestful.GetDataAsync(uri).Result;
+            var response = _dataRestful.GetDataAsync(uri).GetAwaiter().GetResult();
 
             if (response == null)
             {
@@ -271,7 +271,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
                 return new ReplayStatus(null, ReplayPlayerStatus.NotStarted);
             }
 
-            var xml = new XmlDocument {XmlResolver = null};
+            var xml = new XmlDocument { XmlResolver = null };
             xml.Load(response);
 
             string urn = null;
@@ -302,7 +302,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
         {
             var uri = new Uri($"{_apiHost}/scenario{BuildNodeIdQuery("?")}");
 
-            var response = _dataRestful.GetDataAsync(uri).Result;
+            var response = _dataRestful.GetDataAsync(uri).GetAwaiter().GetResult();
 
             if (response == null)
             {
@@ -310,7 +310,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
                 return new List<IReplayScenario>();
             }
 
-            var xml = new XmlDocument {XmlResolver = null};
+            var xml = new XmlDocument { XmlResolver = null };
             xml.Load(response);
 
             var result = new List<IReplayScenario>();
@@ -364,8 +364,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
             string errorMsg = null;
             if (response.Content != null)
             {
-                var xml = new XmlDocument {XmlResolver = null};
-                xml.Load(response.Content.ReadAsStreamAsync().Result);
+                var xml = new XmlDocument { XmlResolver = null };
+                xml.Load(response.Content.ReadAsStreamAsync().GetAwaiter().GetResult());
 
                 responseMsg = xml.DocumentElement?.SelectSingleNode("action")?.InnerText;
                 if (responseMsg != null && !responseMsg.EndsWith("."))
@@ -377,7 +377,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Replay
                 if (!response.IsSuccessStatusCode)
                 {
                     success = false;
-                    errorMsg = $"Request was not successfully completed. Response: {(int) response.StatusCode}-{response.ReasonPhrase}";
+                    errorMsg = $"Request was not successfully completed. Response: {(int)response.StatusCode}-{response.ReasonPhrase}";
                 }
             }
 

@@ -22,10 +22,10 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         {
             if (!ValidateMessage(message))
             {
-                return ValidationResult.FAILURE;
+                return ValidationResult.Failure;
             }
 
-            return ValidationResult.SUCCESS;
+            return ValidationResult.Success;
         }
 
         /// <summary>
@@ -45,8 +45,8 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                 {
                     return false;
                 }
-                URN eventUrn;
-                if (URN.TryParse(message.EventId, out eventUrn))
+
+                if (URN.TryParse(message.EventId, out var eventUrn))
                 {
                     message.EventURN = eventUrn;
                 }

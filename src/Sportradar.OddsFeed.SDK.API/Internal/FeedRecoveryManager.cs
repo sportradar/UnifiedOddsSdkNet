@@ -1,8 +1,11 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using Common.Logging;
-using Dawn;
 using Metrics;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.Common;
@@ -11,10 +14,6 @@ using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl;
 using Sportradar.OddsFeed.SDK.Entities.Internal.EventArguments;
 using Sportradar.OddsFeed.SDK.Messages;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -115,16 +114,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                                    IProducerManager producerManager,
                                    IFeedSystemSession systemSession)
         {
-            Guard.Argument(producerRecoveryManagerFactory, nameof(producerRecoveryManagerFactory)).NotNull();
-            Guard.Argument(config, nameof(config)).NotNull();
-            Guard.Argument(timer, nameof(timer)).NotNull();
-            Guard.Argument(producerManager, nameof(producerManager)).NotNull();
-            Guard.Argument(systemSession, nameof(systemSession)).NotNull();
-
-            _producerRecoveryManagerFactory = producerRecoveryManagerFactory;
-            _inactivityTimer = timer;
-            _producerManager = producerManager;
-            _systemSession = systemSession;
+            _producerRecoveryManagerFactory = producerRecoveryManagerFactory ?? throw new ArgumentNullException(nameof(producerRecoveryManagerFactory));
+            _inactivityTimer = timer ?? throw new ArgumentNullException(nameof(timer));
+            _producerManager = producerManager ?? throw new ArgumentNullException(nameof(producerManager));
+            _systemSession = systemSession ?? throw new ArgumentNullException(nameof(systemSession));
         }
 
         /// <summary>
@@ -228,10 +221,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="interests">The interests for which to open trackers</param>
         public void Open(IEnumerable<MessageInterest> interests)
         {
-            Guard.Argument(interests, nameof(interests)).NotNull();//.NotEmpty();
-            if (!interests.Any())
+            if (interests.IsNullOrEmpty())
             {
-                throw new ArgumentOutOfRangeException(nameof(interests));
+                throw new ArgumentException(nameof(interests));
             }
 
             var interestList = interests as List<MessageInterest> ?? interests.ToList();

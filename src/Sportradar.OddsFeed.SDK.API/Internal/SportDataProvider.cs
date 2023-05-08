@@ -1,6 +1,11 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 using Common.Logging;
 using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
@@ -16,11 +21,6 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Enums;
 using Sportradar.OddsFeed.SDK.Messages;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -283,7 +283,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             var sportEventCI = _sportEventCache.GetEventCacheItem(id);
 
             var result = _sportEntityFactory.BuildSportEvent<ILongTermEvent>(id,
-                                                                             sportEventCI?.GetSportIdAsync().Result,
+                                                                             sportEventCI?.GetSportIdAsync().GetAwaiter().GetResult(),
                                                                              culture == null
                                                                                  ? _defaultCultures
                                                                                  : new[] { culture },
@@ -311,7 +311,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             if (sportId == null && id.TypeGroup.Equals(ResourceTypeGroup.MATCH))
             {
-                sportId = _sportEventCache.GetEventSportIdAsync(id).Result;
+                sportId = _sportEventCache.GetEventSportIdAsync(id).GetAwaiter().GetResult();
             }
 
             var result = _sportEntityFactory.BuildSportEvent<ICompetition>(id,
@@ -382,7 +382,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             LogInt.Info($"Invoked GetCompetitorAsync: [Id={id}, Cultures={s}]");
             try
             {
-                var cacheItem = await _profileCache.GetCompetitorProfileAsync(id, cs).ConfigureAwait(false);
+                var cacheItem = await _profileCache.GetCompetitorProfileAsync(id, cs, false).ConfigureAwait(false);
                 return cacheItem == null
                            ? null
                            : _sportEntityFactory.BuildCompetitor(cacheItem, cs, (ICompetitionCI)null, _exceptionStrategy);
@@ -413,7 +413,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             LogInt.Info($"Invoked GetPlayerProfileAsync: [Id={id}, Cultures={s}]");
             try
             {
-                var cacheItem = await _profileCache.GetPlayerProfileAsync(id, cs).ConfigureAwait(false);
+                var cacheItem = await _profileCache.GetPlayerProfileAsync(id, cs, false).ConfigureAwait(false);
                 return cacheItem == null
                            ? null
                            : new PlayerProfile(cacheItem, cs);
@@ -535,7 +535,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             {
                 await _sportDataCache.LoadAllTournamentsForAllSportsAsync().ConfigureAwait(false);
                 var tours = await _sportEventCache.GetActiveTournamentsAsync(cul).ConfigureAwait(false);
-                return tours?.Select(t => _sportEntityFactory.BuildSportEvent<ISportEvent>(t.Id, t.GetSportIdAsync().Result, new[] { cul }, _exceptionStrategy));
+                return tours?.Select(t => _sportEntityFactory.BuildSportEvent<ISportEvent>(t.Id, t.GetSportIdAsync().GetAwaiter().GetResult(), new[] { cul }, _exceptionStrategy));
             }
             catch (Exception e)
             {
@@ -596,11 +596,20 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             LogInt.Info($"Invoked CacheExportAsync: [CacheType={cacheType}]");
             var tasks = new List<Task<IEnumerable<ExportableCI>>>();
             if (cacheType.HasFlag(CacheType.SportData))
+            {
                 tasks.Add(_sportDataCache.ExportAsync());
+            }
+
             if (cacheType.HasFlag(CacheType.SportEvent))
+            {
                 tasks.Add(_sportEventCache.ExportAsync());
+            }
+
             if (cacheType.HasFlag(CacheType.Profile))
+            {
                 tasks.Add(_profileCache.ExportAsync());
+            }
+
             tasks.ForEach(t => t.ConfigureAwait(false));
             return (await Task.WhenAll(tasks)).SelectMany(e => e);
         }
@@ -611,7 +620,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="items">Collection of <see cref="ExportableCI"/> containing the items to be imported</param>
         public Task CacheImportAsync(IEnumerable<ExportableCI> items)
         {
-            var cacheItems = items.ToList(); 
+            var cacheItems = items.ToList();
             LogInt.Info($"Invoked CacheImportAsync: [items={cacheItems.Count}]");
             var tasks = new List<Task>
             {
@@ -699,7 +708,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             if (sportId == null && id.TypeGroup.Equals(ResourceTypeGroup.MATCH))
             {
-                sportId = _sportEventCache.GetEventSportIdAsync(id).Result;
+                sportId = _sportEventCache.GetEventSportIdAsync(id).GetAwaiter().GetResult();
             }
 
             var result = _sportEntityFactory.BuildSportEvent<ISportEvent>(id,
@@ -716,7 +725,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         internal ISportEvent GetSportEventForEventChange(URN id)
         {
             var result = _sportEntityFactory.BuildSportEvent<ISportEvent>(id,
-                id.TypeGroup == ResourceTypeGroup.MATCH ? _sportEventCache.GetEventSportIdAsync(id).Result : null,
+                id.TypeGroup == ResourceTypeGroup.MATCH ? _sportEventCache.GetEventSportIdAsync(id).GetAwaiter().GetResult() : null,
                 _defaultCultures,
                 _exceptionStrategy);
 

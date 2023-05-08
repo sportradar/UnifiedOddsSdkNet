@@ -1,12 +1,13 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using Dawn;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
-using Sportradar.OddsFeed.SDK.Messages;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Dawn;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI;
+using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
 {
@@ -39,6 +40,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// <summary>
         /// Gets the group name of the current <see cref="IRound"/> per language
         /// </summary>
+        [Obsolete("GroupName was removed from API")]
         public IDictionary<CultureInfo, string> GroupName { get; }
 
         /// <summary>
@@ -128,6 +130,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         /// </summary>
         /// <param name="culture">The culture</param>
         /// <returns>Return the group name if exists, or null</returns>
+        [Obsolete("GroupName was removed from API")]
+
         public string GetGroupName(CultureInfo culture)
         {
             return GroupName.ContainsKey(culture) ? GroupName[culture] : null;

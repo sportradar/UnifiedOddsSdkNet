@@ -3,7 +3,6 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -29,12 +28,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <returns>IMappingValidator</returns>
         private static IMappingValidator BuildSingle(string name, string value)
         {
-            Guard.Argument(name, nameof(name)).NotNull().NotEmpty();
-            Guard.Argument(value, nameof(value)).NotNull().NotEmpty();
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
 
-            return Regex.IsMatch(value, DecimalPattern)
+            return Regex.IsMatch(value, DecimalPattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1))
                 ? new DecimalValueMappingValidator(name, decimal.Parse(value.Replace("*", "0"), NumberStyles.Any, CultureInfo.InvariantCulture))
-                : (IMappingValidator) new SpecificValueMappingValidator(name, value);
+                : (IMappingValidator)new SpecificValueMappingValidator(name, value);
         }
 
         /// <summary>
@@ -44,7 +49,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <returns>A <see cref="IMappingValidator"/> build from the provided string</returns>
         public IMappingValidator Build(string value)
         {
-            Guard.Argument(value, nameof(value)).NotNull().NotEmpty();
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
 
             IReadOnlyDictionary<string, string> specifiers;
             try

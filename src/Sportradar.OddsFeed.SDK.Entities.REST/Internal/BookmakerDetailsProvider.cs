@@ -3,8 +3,8 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Linq;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
@@ -51,7 +51,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
             Guard.Argument(fetcher, nameof(fetcher)).NotNull();
             Guard.Argument(deserializer, nameof(deserializer)).NotNull();
             Guard.Argument(mapperFactory, nameof(mapperFactory)).NotNull();
-            
+
             _fetcher = fetcher;
             _deserializer = deserializer;
             _mapperFactory = mapperFactory;

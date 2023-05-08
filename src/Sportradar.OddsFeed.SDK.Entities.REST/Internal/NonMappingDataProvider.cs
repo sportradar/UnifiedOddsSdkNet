@@ -2,7 +2,6 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using Dawn;
 using System.Globalization;
 using System.Threading.Tasks;
 using Sportradar.OddsFeed.SDK.Common.Internal;
@@ -45,13 +44,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="deserializer">A <see cref="IDeserializer{T}" /> used to deserialize the fetch data</param>
         public NonMappingDataProvider(string uriFormat, IDataFetcher fetcher, IDeserializer<T> deserializer)
         {
-            Guard.Argument(uriFormat, nameof(uriFormat)).NotNull().NotEmpty();
-            Guard.Argument(fetcher, nameof(fetcher)).NotNull();
-            Guard.Argument(deserializer, nameof(deserializer)).NotNull();
+            if (string.IsNullOrEmpty(uriFormat))
+            {
+                throw new ArgumentNullException(nameof(uriFormat));
+            }
 
             _uriFormat = uriFormat;
-            _fetcher = fetcher;
-            _deserializer = deserializer;
+            _fetcher = fetcher ?? throw new ArgumentNullException(nameof(fetcher));
+            _deserializer = deserializer ?? throw new ArgumentNullException(nameof(deserializer));
         }
 
         /// <summary>
@@ -61,7 +61,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <returns>A <see cref="Task{T}"/> representing the ongoing operation</returns>
         protected async Task<T> GetDataAsyncInternal(Uri uri)
         {
-            Guard.Argument(uri, nameof(uri)).NotNull();
+            if (uri == null)
+            {
+                throw new ArgumentNullException(nameof(uri));
+            }
 
             var stream = await _fetcher.GetDataAsync(uri).ConfigureAwait(false);
             return _deserializer.Deserialize(stream);
@@ -74,7 +77,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <returns>A <see cref="Task{T}"/> representing the ongoing operation</returns>
         protected T GetDataInternal(Uri uri)
         {
-            Guard.Argument(uri, nameof(uri)).NotNull();
+            if (uri == null)
+            {
+                throw new ArgumentNullException(nameof(uri));
+            }
 
             var stream = _fetcher.GetData(uri);
             return _deserializer.Deserialize(stream);
@@ -87,10 +93,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <returns>an <see cref="Uri"/> instance used to retrieve resource with specified <code>identifiers</code></returns>
         protected virtual Uri GetRequestUri(params object[] identifiers)
         {
-            Guard.Argument(identifiers, nameof(identifiers)).NotNull();
-            if (identifiers.Length == 0)
+            if (identifiers.IsNullOrEmpty())
             {
-                throw new ArgumentOutOfRangeException(nameof(identifiers));
+                throw new ArgumentException(nameof(identifiers));
             }
 
             return new Uri(string.Format(_uriFormat, identifiers));

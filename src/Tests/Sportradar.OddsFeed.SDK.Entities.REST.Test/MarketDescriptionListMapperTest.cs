@@ -14,7 +14,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
     [TestClass]
     public class MarketDescriptionListMapperTest
     {
-        private const string InputXml = "invariant_market_descriptions.en.xml";
+        private const string InputXml = "invariant_market_descriptions_en.xml";
 
         private static EntityList<MarketDescriptionDTO> _entity;
 
@@ -30,7 +30,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 dataFetcher,
                 deserializer,
                 mapperFactory);
-            _entity = dataProvider.GetDataAsync("", "en").Result;
+            _entity = dataProvider.GetDataAsync("", "en").GetAwaiter().GetResult();
         }
 
         [TestMethod]
@@ -38,7 +38,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         {
             Assert.IsNotNull(_entity, "IMarketDescriptionList instance cannot be a null reference");
             Assert.IsNotNull(_entity.Items, "Market descriptions cannot be a null reference");
-            Assert.AreEqual(750, _entity.Items.Count(), "The number of market description in fetched entity is not correct");
+            Assert.AreEqual(TestData.InvariantListCacheCount, _entity.Items.Count(), "The number of market description in fetched entity is not correct");
         }
     }
 }

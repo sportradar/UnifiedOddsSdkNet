@@ -28,35 +28,35 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         public void Setup()
         {
             _defaultPlayer = new playerExtended
-                             {
-                                 type = "what",
-                                 country_code = "uk",
-                                 date_of_birth = "2020-09-25",
-                                 full_name = "John Smith",
-                                 gender = "male",
-                                 height = 180,
-                                 heightSpecified = true,
-                                 id = "sr:player:12345",
-                                 jersey_number = 50,
-                                 jersey_numberSpecified = true,
-                                 name = "John Smith",
-                                 nationality = "uk",
-                                 nickname = "smithy",
-                                 weight = 85,
-                                 weightSpecified = true
-                             };
+            {
+                type = "what",
+                country_code = "uk",
+                date_of_birth = "2020-09-25",
+                full_name = "John Smith",
+                gender = "male",
+                height = 180,
+                heightSpecified = true,
+                id = "sr:player:12345",
+                jersey_number = 50,
+                jersey_numberSpecified = true,
+                name = "John Smith",
+                nationality = "uk",
+                nickname = "smithy",
+                weight = 85,
+                weightSpecified = true
+            };
             _defaultPlayerCompetitor = new playerCompetitor
-                                       {
-                                           id = "sr:player:12345",
-                                           name = "John Smith",
-                                           nationality = "uk",
-                                           abbreviation = "JOH"
-                                       };
+            {
+                id = "sr:player:12345",
+                name = "John Smith",
+                nationality = "uk",
+                abbreviation = "JOH"
+            };
             _dataRouterManager = new TestDataRouterManager(new CacheManager());
         }
 
         [TestMethod]
-        public void PlayerTest()
+        public void Player()
         {
             var sportEntityDTO = new SportEntityDTO("sr:player:1", "Sport Entity Name");
             var playerCI = new SportEntityCI(sportEntityDTO);
@@ -66,7 +66,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void PlayerProfileCreateTest()
+        public void PlayerProfileCreate()
         {
             var playerProfileDTO = new PlayerProfileDTO(_defaultPlayer, DateTime.Now);
             Assert.IsNotNull(playerProfileDTO);
@@ -78,7 +78,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void PlayerCompetitorCreateTest()
+        public void PlayerCompetitorCreate()
         {
             var playerCompetitorDTO = new PlayerCompetitorDTO(_defaultPlayerCompetitor);
             Assert.IsNotNull(playerCompetitorDTO);
@@ -93,7 +93,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void PlayerCompetitorNewCultureTest()
+        public void PlayerCompetitorNewCulture()
         {
             var playerCompetitorDTO = new PlayerCompetitorDTO(_defaultPlayerCompetitor);
             Assert.IsNotNull(playerCompetitorDTO);
@@ -111,14 +111,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void PlayerCompetitorExportImportTest()
+        public void PlayerCompetitorExportImport()
         {
             var playerCompetitorDTO = new PlayerCompetitorDTO(_defaultPlayerCompetitor);
             var playerProfileCI = new PlayerProfileCI(playerCompetitorDTO, _competitorId, _cultureFirst, _dataRouterManager);
 
-            var exportable = playerProfileCI.ExportAsync().Result;
+            var exportable = playerProfileCI.ExportAsync().GetAwaiter().GetResult();
             Assert.IsNotNull(exportable);
-            var json = JsonConvert.SerializeObject(exportable, new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.All});
+            var json = JsonConvert.SerializeObject(exportable, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
             var importable = JsonConvert.DeserializeObject<ExportablePlayerProfileCI>(json);
             var playerProfileCI2 = new PlayerProfileCI(importable, _dataRouterManager);
 
@@ -128,7 +128,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void PlayerCompetitorAddProfileTest()
+        public void PlayerCompetitorAddProfile()
         {
             _defaultPlayerCompetitor.nationality = null;
             var playerCompetitorDTO = new PlayerCompetitorDTO(_defaultPlayerCompetitor);
@@ -143,7 +143,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void PlayerProfileMergeTest()
+        public void PlayerProfileMerge()
         {
             var playerProfileDTO = new PlayerProfileDTO(_defaultPlayer, DateTime.Now);
             Assert.IsNotNull(playerProfileDTO);
@@ -167,7 +167,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void PlayerProfileMergeNoDataTest()
+        public void PlayerProfileMergeNoData()
         {
             _defaultPlayer.nationality = null;
             _defaultPlayer.nickname = null;
@@ -193,14 +193,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void PlayerProfileExportImportCreateTest()
+        public void PlayerProfileExportImportCreate()
         {
             var playerProfileDTO = new PlayerProfileDTO(_defaultPlayer, DateTime.Now);
             var playerProfileCI = new PlayerProfileCI(playerProfileDTO, _competitorId, _cultureFirst, new TestDataRouterManager(new CacheManager()));
 
-            var exportable = playerProfileCI.ExportAsync().Result;
+            var exportable = playerProfileCI.ExportAsync().GetAwaiter().GetResult();
             Assert.IsNotNull(exportable);
-            var json = JsonConvert.SerializeObject(exportable, new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.All});
+            var json = JsonConvert.SerializeObject(exportable, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
             var importable = JsonConvert.DeserializeObject<ExportablePlayerProfileCI>(json);
             var playerProfileCI2 = new PlayerProfileCI(importable, _dataRouterManager);
 
@@ -210,12 +210,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void PlayerProfileExportImportTest()
+        public void PlayerProfileExportImport()
         {
             var playerProfileDTO = new PlayerProfileDTO(_defaultPlayer, DateTime.Now);
             var playerProfileCI = new PlayerProfileCI(playerProfileDTO, _competitorId, _cultureFirst, new TestDataRouterManager(new CacheManager()));
 
-            var exportable = (ExportablePlayerProfileCI) playerProfileCI.ExportAsync().Result;
+            var exportable = (ExportablePlayerProfileCI)playerProfileCI.ExportAsync().GetAwaiter().GetResult();
             playerProfileCI.Import(exportable);
             var playerProfileCI2 = new PlayerProfileCI(exportable, _dataRouterManager);
 
@@ -225,7 +225,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
         }
 
         [TestMethod]
-        public void PlayerProfileExportImportMissingDataTest()
+        public void PlayerProfileExportImportMissingData()
         {
             _defaultPlayer.nationality = null;
             _defaultPlayer.nickname = null;
@@ -235,7 +235,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test.CacheItems
             var playerProfileDTO = new PlayerProfileDTO(_defaultPlayer, DateTime.Now);
             var playerProfileCI = new PlayerProfileCI(playerProfileDTO, _competitorId, _cultureFirst, new TestDataRouterManager(new CacheManager()));
 
-            var exportable = (ExportablePlayerProfileCI) playerProfileCI.ExportAsync().Result;
+            var exportable = (ExportablePlayerProfileCI)playerProfileCI.ExportAsync().GetAwaiter().GetResult();
             playerProfileCI.Import(exportable);
             var playerProfileCI2 = new PlayerProfileCI(exportable, _dataRouterManager);
 

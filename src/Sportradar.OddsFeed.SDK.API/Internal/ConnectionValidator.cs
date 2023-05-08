@@ -2,7 +2,6 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using Dawn;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -33,11 +32,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="dataFetcher">A <see cref="IDataFetcher"/> instance used to execute http requests</param>
         public ConnectionValidator(IOddsFeedConfigurationInternal config, IDataFetcher dataFetcher)
         {
-            Guard.Argument(config, nameof(config)).NotNull();
-            Guard.Argument(dataFetcher, nameof(dataFetcher)).NotNull();
-
-            _config = config;
-            _dataFetcher = dataFetcher;
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _dataFetcher = dataFetcher ?? throw new ArgumentNullException(nameof(dataFetcher));
         }
 
         /// <summary>
@@ -78,7 +74,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             try
             {
-                var stream = _dataFetcher.GetDataAsync(new Uri("http://ipecho.net/plain")).Result;
+                var stream = _dataFetcher.GetDataAsync(new Uri("http://ipecho.net/plain")).GetAwaiter().GetResult();
                 using (var reader = new StreamReader(stream, Encoding.UTF8))
                 {
                     data = reader.ReadToEnd();

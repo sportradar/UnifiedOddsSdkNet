@@ -20,18 +20,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping
         /// <returns>New <see cref="ISingleTypeMapper{SportEventSummaryDTO}" /> instance</returns>
         public ISingleTypeMapper<SportEventSummaryDTO> CreateMapper(RestMessage data)
         {
-            var match = data as matchSummaryEndpoint;
-            if (match != null)
+            if (data is matchSummaryEndpoint match)
             {
                 return new SportEventSummaryMapper(match);
             }
-            var stage = data as stageSummaryEndpoint;
-            if (stage != null)
+
+            if (data is stageSummaryEndpoint stage)
             {
                 return new SportEventSummaryMapper(stage);
             }
-            var tour = data as tournamentInfoEndpoint;
-            if (tour != null)
+
+            if (data is tournamentInfoEndpoint tour)
             {
                 return new SportEventSummaryMapper(tour);
             }

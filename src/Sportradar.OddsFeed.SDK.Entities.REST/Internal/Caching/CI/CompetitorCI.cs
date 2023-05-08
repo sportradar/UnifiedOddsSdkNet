@@ -27,6 +27,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// </summary>
         public IDictionary<CultureInfo, string> Names;
 
+        public URN AssociatedSportEventId;
+
         /// <summary>
         /// A <see cref="IDictionary{CultureInfo, String}"/> containing competitor's country name in different languages
         /// </summary>
@@ -468,6 +470,30 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             Import(exportable);
         }
 
+        public void UpdateAssociatedSportEvent(URN associatedSportEventId)
+        {
+            if (associatedSportEventId == null)
+            {
+                return;
+            }
+
+            if (AssociatedSportEventId == null)
+            {
+                AssociatedSportEventId = associatedSportEventId;
+            }
+            else
+            {
+                if (associatedSportEventId.IsCompetition())
+                {
+                    AssociatedSportEventId = associatedSportEventId;
+                }
+                else if (AssociatedSportEventId.IsLongTermEvent() && associatedSportEventId.IsCompetition())
+                {
+                    AssociatedSportEventId = associatedSportEventId;
+                }
+            }
+        }
+
         /// <summary>
         /// Merges the information from the provided <see cref="CompetitorDTO"/> into the current instance
         /// </summary>
@@ -577,6 +603,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                     {
                         _venue.Merge(competitorProfile.Venue, culture);
                     }
+                }
+                if (!string.IsNullOrEmpty(competitorProfile.Competitor.Gender))
+                {
+                    _gender = competitorProfile.Competitor.Gender;
                 }
                 if (!string.IsNullOrEmpty(competitorProfile.Competitor.AgeGroup))
                 {
@@ -761,8 +791,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             {
                 if (IsEligibleForFetch(culture) && _dataRouterManager != null)
                 {
-                    var task = Task.Run(async () => await _dataRouterManager.GetCompetitorAsync(Id, culture, null).ConfigureAwait(false));
-                    task.Wait();
+                    _dataRouterManager.GetCompetitorAsync(Id, culture, null).ConfigureAwait(false).GetAwaiter().GetResult();
                 }
             }
         }
@@ -891,7 +920,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
                 }
                 catch (Exception e)
                 {
-                    SdkLoggerFactory.GetLoggerForExecution(typeof(CompetitorCI)).Error("Importing CompetitorCI", e);
+                    SdkLoggerFactory.GetLoggerForExecution(typeof(CompetitorCI)).Error($"Importing CompetitorCI {exportable.Id}", e);
                 }
             }
         }

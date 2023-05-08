@@ -18,67 +18,60 @@ namespace Sportradar.OddsFeed.SDK.API.Test
     [TestClass]
     public class TimestampTrackerTests
     {
-        private static FakeTimeProvider _timeProvider;
+        private FakeTimeProvider _timeProvider;
+        private readonly Producer _premiumCricketProducer = new Producer(5, "PremiumCricket", "Premium Cricket", "https://api.betradar.com/v1/premium_cricket/", true, 20, 1800, "prematch|live", 4320);
+        private FeedMessageBuilder _messageBuilder;
+        private readonly MessageInterest[] _interests = { MessageInterest.AllMessages };
 
-        private static readonly Producer PremiumCricketProducer = new Producer(5, "PremiumCricket", "Premium Cricket", "https://api.betradar.com/v1/premium_cricket/", true, 20, 1800, "prematch|live", 4320);
-
-        private static readonly FeedMessageBuilder MessageBuilder = new FeedMessageBuilder(PremiumCricketProducer);
-
-        private static readonly MessageInterest[] Interests = {MessageInterest.AllMessages};
-
-        [ClassInitialize]
-        public static void Init(TestContext context)
+        [TestInitialize]
+        public void Init()
         {
             _timeProvider = new FakeTimeProvider();
             TimeProviderAccessor.SetTimeProvider(_timeProvider);
-        }
-
-        [TestInitialize]
-        public void Setup()
-        {
+            _messageBuilder = new FeedMessageBuilder(_premiumCricketProducer);
             _timeProvider.Now = DateTime.Now;
         }
 
         [TestMethod]
-        public void system_alive_timestamp_returns_correct_value()
+        public void System_alive_timestamp_returns_correct_value()
         {
-            var tracker = new TimestampTracker(PremiumCricketProducer, Interests, 20, 20);
+            var tracker = new TimestampTracker(_premiumCricketProducer, _interests, 20, 20);
             Assert.AreEqual(SdkInfo.ToEpochTime(_timeProvider.Now), tracker.SystemAliveTimestamp);
 
             _timeProvider.AddSeconds(4);
-            tracker.ProcessSystemAlive(MessageBuilder.BuildAlive());
+            tracker.ProcessSystemAlive(_messageBuilder.BuildAlive());
             Assert.AreEqual(SdkInfo.ToEpochTime(_timeProvider.Now), tracker.SystemAliveTimestamp);
         }
 
         [TestMethod]
-        public void oldest_user_alive_timestamp_returns_correct_value()
+        public void Oldest_user_alive_timestamp_returns_correct_value()
         {
             // initially a time of instance creation must be returned
-            var tracker = new TimestampTracker(PremiumCricketProducer, new [] {MessageInterest.HighPriorityMessages, MessageInterest.LowPriorityMessages}, 20, 20);
+            var tracker = new TimestampTracker(_premiumCricketProducer, new[] { MessageInterest.HighPriorityMessages, MessageInterest.LowPriorityMessages }, 20, 20);
             Assert.AreEqual(SdkInfo.ToEpochTime(_timeProvider.Now), tracker.OldestUserAliveTimestamp);
 
-            var alive1 = MessageBuilder.BuildAlive();
+            var alive1 = _messageBuilder.BuildAlive();
             // let move the time forward, so the alive above is 4 seconds old
             _timeProvider.AddSeconds(4);
             tracker.ProcessUserMessage(MessageInterest.HighPriorityMessages, alive1);
             Assert.AreEqual(SdkInfo.ToEpochTime(_timeProvider.Now - TimeSpan.FromSeconds(4)), tracker.OldestUserAliveTimestamp);
 
             // lets create an alive 8 seconds old
-            var alive2 = MessageBuilder.BuildAlive(null, _timeProvider.Now - TimeSpan.FromSeconds(8));
+            var alive2 = _messageBuilder.BuildAlive(null, _timeProvider.Now - TimeSpan.FromSeconds(8));
             tracker.ProcessUserMessage(MessageInterest.LowPriorityMessages, alive2);
             Assert.AreEqual(SdkInfo.ToEpochTime(_timeProvider.Now - TimeSpan.FromSeconds(8)), tracker.OldestUserAliveTimestamp);
 
             // lets override the alive above (8 seconds old) with a newer message
-            var alive3 = MessageBuilder.BuildAlive();
+            var alive3 = _messageBuilder.BuildAlive();
             tracker.ProcessUserMessage(MessageInterest.LowPriorityMessages, alive3);
             Assert.AreEqual(SdkInfo.ToEpochTime(_timeProvider.Now - TimeSpan.FromSeconds(4)), tracker.OldestUserAliveTimestamp);
         }
 
         [TestMethod]
-        public void violated_gives_correct_value_before_first_alive()
+        public void Violated_gives_correct_value_before_first_alive()
         {
             _timeProvider.Now = DateTime.Now;
-            var tracker = new TimestampTracker(PremiumCricketProducer, Interests, 20, 20);
+            var tracker = new TimestampTracker(_premiumCricketProducer, _interests, 20, 20);
             Assert.IsFalse(tracker.IsAliveViolated);
             _timeProvider.AddSeconds(15);
             Assert.IsFalse(tracker.IsAliveViolated);
@@ -87,10 +80,10 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         }
 
         [TestMethod]
-        public void behind_gives_correct_value_before_first_alive()
+        public void Behind_gives_correct_value_before_first_alive()
         {
             _timeProvider.Now = DateTime.Now;
-            var tracker = new TimestampTracker(PremiumCricketProducer, Interests, 20, 20);
+            var tracker = new TimestampTracker(_premiumCricketProducer, _interests, 20, 20);
             Assert.IsFalse(tracker.IsBehind);
             _timeProvider.AddSeconds(10);
             Assert.IsFalse(tracker.IsBehind);
@@ -99,31 +92,31 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         }
 
         [TestMethod]
-        public void missing_system_alive_sets_violation()
+        public void Missing_system_alive_sets_violation()
         {
-            var tracker = new TimestampTracker(PremiumCricketProducer, Interests, 20, 20);
+            var tracker = new TimestampTracker(_premiumCricketProducer, _interests, 20, 20);
             _timeProvider.AddSeconds(10);
-            tracker.ProcessSystemAlive(MessageBuilder.BuildAlive());
+            tracker.ProcessSystemAlive(_messageBuilder.BuildAlive());
             _timeProvider.AddSeconds(25);
             Assert.IsTrue(tracker.IsAliveViolated);
         }
 
         [TestMethod]
-        public void system_alive_resets_violation()
+        public void System_alive_resets_violation()
         {
-            var tracker = new TimestampTracker(PremiumCricketProducer, Interests, 20, 20);
+            var tracker = new TimestampTracker(_premiumCricketProducer, _interests, 20, 20);
             _timeProvider.AddSeconds(25);
             Assert.IsTrue(tracker.IsAliveViolated);
-            tracker.ProcessSystemAlive(MessageBuilder.BuildAlive());
+            tracker.ProcessSystemAlive(_messageBuilder.BuildAlive());
             Assert.IsFalse(tracker.IsAliveViolated);
         }
 
         [TestMethod]
-        public void violated_gives_correct_value()
+        public void Violated_gives_correct_value()
         {
             var alive = new alive();
             _timeProvider.Now = DateTime.Now;
-            var tracker = new TimestampTracker(PremiumCricketProducer, Interests, 20, 20);
+            var tracker = new TimestampTracker(_premiumCricketProducer, _interests, 20, 20);
             Assert.IsFalse(tracker.IsAliveViolated);
             _timeProvider.AddSeconds(10);
             Assert.IsFalse(tracker.IsAliveViolated);
@@ -146,31 +139,31 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         }
 
         [TestMethod]
-        public void delayed_message_sets_is_behind()
+        public void Delayed_message_sets_is_behind()
         {
-            var oddsChange = MessageBuilder.BuildOddsChange(null, _timeProvider.Now - TimeSpan.FromSeconds(25));
-            var tracker = new TimestampTracker(PremiumCricketProducer, Interests, 20, 20);
+            var oddsChange = _messageBuilder.BuildOddsChange(null, _timeProvider.Now - TimeSpan.FromSeconds(25));
+            var tracker = new TimestampTracker(_premiumCricketProducer, _interests, 20, 20);
             tracker.ProcessUserMessage(MessageInterest.AllMessages, oddsChange);
             Assert.IsTrue(tracker.IsBehind);
         }
 
         [TestMethod]
-        public void not_delayed_message_resets_is_behind()
+        public void Not_delayed_message_resets_is_behind()
         {
-            var tracker = new TimestampTracker(PremiumCricketProducer, Interests, 20, 20);
-            var oddsChange = MessageBuilder.BuildOddsChange(null, _timeProvider.Now - TimeSpan.FromSeconds(25));
+            var tracker = new TimestampTracker(_premiumCricketProducer, _interests, 20, 20);
+            var oddsChange = _messageBuilder.BuildOddsChange(null, _timeProvider.Now - TimeSpan.FromSeconds(25));
             tracker.ProcessUserMessage(MessageInterest.AllMessages, oddsChange);
             Assert.IsTrue(tracker.IsBehind);
-            tracker.ProcessUserMessage(MessageInterest.AllMessages, MessageBuilder.BuildBetStop());
+            tracker.ProcessUserMessage(MessageInterest.AllMessages, _messageBuilder.BuildBetStop());
             Assert.IsFalse(tracker.IsBehind);
         }
 
         [TestMethod]
-        public void user_alives_on_all_sessions_are_required_to_reset_is_behind()
+        public void User_alives_on_all_sessions_are_required_to_reset_is_behind()
         {
-            var tracker = new TimestampTracker(PremiumCricketProducer, new [] {MessageInterest.LiveMessagesOnly, MessageInterest.PrematchMessagesOnly}, 20, 20);
+            var tracker = new TimestampTracker(_premiumCricketProducer, new[] { MessageInterest.LiveMessagesOnly, MessageInterest.PrematchMessagesOnly }, 20, 20);
             _timeProvider.AddSeconds(25);
-            var alive = MessageBuilder.BuildAlive();
+            var alive = _messageBuilder.BuildAlive();
             tracker.ProcessUserMessage(MessageInterest.LiveMessagesOnly, alive);
             Assert.IsTrue(tracker.IsBehind);
             tracker.ProcessUserMessage(MessageInterest.PrematchMessagesOnly, alive);
@@ -179,35 +172,35 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         }
 
         [TestMethod]
-        public void user_alive_resets_behind_caused_by_non_alive()
+        public void User_alive_resets_behind_caused_by_non_alive()
         {
-            var tracker = new TimestampTracker(PremiumCricketProducer, Interests, 20, 20);
-            var oddsChange = MessageBuilder.BuildOddsChange(null, _timeProvider.Now - TimeSpan.FromSeconds(25));
+            var tracker = new TimestampTracker(_premiumCricketProducer, _interests, 20, 20);
+            var oddsChange = _messageBuilder.BuildOddsChange(null, _timeProvider.Now - TimeSpan.FromSeconds(25));
             tracker.ProcessUserMessage(MessageInterest.AllMessages, oddsChange);
             Assert.IsTrue(tracker.IsBehind);
-            tracker.ProcessUserMessage(MessageInterest.AllMessages, MessageBuilder.BuildAlive());
+            tracker.ProcessUserMessage(MessageInterest.AllMessages, _messageBuilder.BuildAlive());
             Assert.IsFalse(tracker.IsBehind);
         }
 
         [TestMethod]
-        public void oldest_alive_timestamp_gives_correct_value()
+        public void Oldest_alive_timestamp_gives_correct_value()
         {
-            var tracker = new TimestampTracker(PremiumCricketProducer, new [] {MessageInterest.LiveMessagesOnly,MessageInterest.PrematchMessagesOnly}, 20, 20);
+            var tracker = new TimestampTracker(_premiumCricketProducer, new[] { MessageInterest.LiveMessagesOnly, MessageInterest.PrematchMessagesOnly }, 20, 20);
             Assert.AreEqual(SdkInfo.ToEpochTime(_timeProvider.Now), tracker.OldestUserAliveTimestamp);
 
             _timeProvider.AddSeconds(5);
-            tracker.ProcessUserMessage(MessageInterest.LiveMessagesOnly, MessageBuilder.BuildAlive());
+            tracker.ProcessUserMessage(MessageInterest.LiveMessagesOnly, _messageBuilder.BuildAlive());
             Assert.AreEqual(SdkInfo.ToEpochTime(_timeProvider.Now - TimeSpan.FromSeconds(5)), tracker.OldestUserAliveTimestamp);
 
             _timeProvider.AddSeconds(5);
-            tracker.ProcessUserMessage(MessageInterest.PrematchMessagesOnly, MessageBuilder.BuildAlive());
+            tracker.ProcessUserMessage(MessageInterest.PrematchMessagesOnly, _messageBuilder.BuildAlive());
             Assert.AreEqual(SdkInfo.ToEpochTime(_timeProvider.Now - TimeSpan.FromSeconds(5)), tracker.OldestUserAliveTimestamp);
         }
 
         [TestMethod]
-        public void tracker_with_no_interests_never_false_behind()
+        public void Tracker_with_no_interests_never_false_behind()
         {
-            var tracker = new TimestampTracker(PremiumCricketProducer, new[] {MessageInterest.VirtualSportMessages }, 20, 20);
+            var tracker = new TimestampTracker(_premiumCricketProducer, new[] { MessageInterest.VirtualSportMessages }, 20, 20);
             Assert.IsFalse(tracker.IsBehind);
             _timeProvider.AddSeconds(30);
             Assert.IsFalse(tracker.IsBehind);
@@ -215,9 +208,9 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         }
 
         [TestMethod]
-        public void tracker_with_no_interests_always_returns_current_time_for_oldest_alive_timestamp()
+        public void Tracker_with_no_interests_always_returns_current_time_for_oldest_alive_timestamp()
         {
-            var tracker = new TimestampTracker(PremiumCricketProducer, new[] { MessageInterest.VirtualSportMessages }, 20, 20);
+            var tracker = new TimestampTracker(_premiumCricketProducer, new[] { MessageInterest.VirtualSportMessages }, 20, 20);
             Assert.AreEqual(SdkInfo.ToEpochTime(_timeProvider.Now), tracker.OldestUserAliveTimestamp);
             _timeProvider.AddSeconds(10);
             Assert.AreEqual(SdkInfo.ToEpochTime(_timeProvider.Now), tracker.OldestUserAliveTimestamp);
@@ -227,9 +220,9 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         private static readonly Regex TimingEntryRegex = new Regex(@"(?<interest>[a-zA-Z_]{2,}):[a-z]{2,}=(?<interval>\d{2}:\d{2}:\d{2}\.\d{3})");
 
         [TestMethod]
-        public void internal_state_on_creation_is_correct()
+        public void Internal_state_on_creation_is_correct()
         {
-            var tracker = new TimestampTracker(PremiumCricketProducer, new [] {MessageInterest.PrematchMessagesOnly, MessageInterest.LiveMessagesOnly}, 20, 20);
+            var tracker = new TimestampTracker(_premiumCricketProducer, new[] { MessageInterest.PrematchMessagesOnly, MessageInterest.LiveMessagesOnly }, 20, 20);
             var trackerState = ParseLogEntry(tracker.ToString());
             Assert.IsFalse(trackerState.IsAliveViolated);
             Assert.IsFalse(trackerState.IsBehind);
@@ -241,23 +234,23 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         }
 
         [TestMethod]
-        public void processed_value_are_correctly_stored()
+        public void Processed_value_are_correctly_stored()
         {
             //set to some round date to avoid rounding issues
             _timeProvider.Now = new DateTime(2000, 1, 1, 1, 1, 1, 0);
-            var tracker = new TimestampTracker(PremiumCricketProducer, new[] { MessageInterest.PrematchMessagesOnly, MessageInterest.LiveMessagesOnly }, 20, 20);
+            var tracker = new TimestampTracker(_premiumCricketProducer, new[] { MessageInterest.PrematchMessagesOnly, MessageInterest.LiveMessagesOnly }, 20, 20);
 
-            tracker.ProcessSystemAlive(MessageBuilder.BuildAlive());
+            tracker.ProcessSystemAlive(_messageBuilder.BuildAlive());
             _timeProvider.AddMilliSeconds(2500);
 
-            tracker.ProcessUserMessage(MessageInterest.LiveMessagesOnly, MessageBuilder.BuildAlive());
+            tracker.ProcessUserMessage(MessageInterest.LiveMessagesOnly, _messageBuilder.BuildAlive());
             _timeProvider.AddMilliSeconds(1000);
 
-            tracker.ProcessUserMessage(MessageInterest.PrematchMessagesOnly, MessageBuilder.BuildAlive());
+            tracker.ProcessUserMessage(MessageInterest.PrematchMessagesOnly, _messageBuilder.BuildAlive());
             _timeProvider.AddMilliSeconds(1500);
 
-            tracker.ProcessUserMessage(MessageInterest.LiveMessagesOnly, MessageBuilder.BuildBetStop(null, _timeProvider.Now - TimeSpan.FromMilliseconds(6500)));
-            tracker.ProcessUserMessage(MessageInterest.PrematchMessagesOnly, MessageBuilder.BuildOddsChange(null, _timeProvider.Now - TimeSpan.FromMilliseconds(4300)));
+            tracker.ProcessUserMessage(MessageInterest.LiveMessagesOnly, _messageBuilder.BuildBetStop(null, _timeProvider.Now - TimeSpan.FromMilliseconds(6500)));
+            tracker.ProcessUserMessage(MessageInterest.PrematchMessagesOnly, _messageBuilder.BuildOddsChange(null, _timeProvider.Now - TimeSpan.FromMilliseconds(4300)));
 
             var trackerState = ParseLogEntry(tracker.ToString());
             Assert.IsFalse(trackerState.IsAliveViolated);
@@ -270,17 +263,17 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         }
 
         [TestMethod]
-        public void alive_with_lower_latency_overrides_non_alive_with_greater_latency()
+        public void Alive_with_lower_latency_overrides_non_alive_with_greater_latency()
         {
             //set to some round date to avoid rounding issues
             _timeProvider.Now = new DateTime(2000, 1, 1, 1, 1, 1, 0);
-            var tracker = new TimestampTracker(PremiumCricketProducer, new[] { MessageInterest.PrematchMessagesOnly, MessageInterest.LiveMessagesOnly }, 20, 20);
+            var tracker = new TimestampTracker(_premiumCricketProducer, new[] { MessageInterest.PrematchMessagesOnly, MessageInterest.LiveMessagesOnly }, 20, 20);
 
-            tracker.ProcessUserMessage(MessageInterest.LiveMessagesOnly, MessageBuilder.BuildBetStop(null, _timeProvider.Now - TimeSpan.FromMilliseconds(5000)));
-            tracker.ProcessUserMessage(MessageInterest.PrematchMessagesOnly, MessageBuilder.BuildOddsChange(null, _timeProvider.Now - TimeSpan.FromMilliseconds(7000)));
+            tracker.ProcessUserMessage(MessageInterest.LiveMessagesOnly, _messageBuilder.BuildBetStop(null, _timeProvider.Now - TimeSpan.FromMilliseconds(5000)));
+            tracker.ProcessUserMessage(MessageInterest.PrematchMessagesOnly, _messageBuilder.BuildOddsChange(null, _timeProvider.Now - TimeSpan.FromMilliseconds(7000)));
 
-            tracker.ProcessUserMessage(MessageInterest.LiveMessagesOnly, MessageBuilder.BuildAlive(null, _timeProvider.Now - TimeSpan.FromSeconds(4)));
-            tracker.ProcessUserMessage(MessageInterest.PrematchMessagesOnly, MessageBuilder.BuildAlive(null, _timeProvider.Now - TimeSpan.FromSeconds(8)));
+            tracker.ProcessUserMessage(MessageInterest.LiveMessagesOnly, _messageBuilder.BuildAlive(null, _timeProvider.Now - TimeSpan.FromSeconds(4)));
+            tracker.ProcessUserMessage(MessageInterest.PrematchMessagesOnly, _messageBuilder.BuildAlive(null, _timeProvider.Now - TimeSpan.FromSeconds(8)));
 
 
             var trackerState = ParseLogEntry(tracker.ToString());
@@ -292,7 +285,6 @@ namespace Sportradar.OddsFeed.SDK.API.Test
             Assert.AreEqual(TimeSpan.FromSeconds(4), trackerState.NonAlives[MessageInterest.LiveMessagesOnly]);
             Assert.AreEqual(TimeSpan.FromSeconds(7), trackerState.NonAlives[MessageInterest.PrematchMessagesOnly]);
         }
-
 
         private static TimestampTrackerState ParseLogEntry(string entry)
         {
@@ -314,11 +306,11 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         {
             var itemList = from Match aliveEntryMatch
                     in TimingEntryRegex.Matches(timingEntriesString)
-                select new
-                {
-                    Interest = MessageInterest.DefinedInterests.FirstOrDefault(i => i.Name == aliveEntryMatch.Groups["interest"].Value),
-                    Interval = DateTime.ParseExact(aliveEntryMatch.Groups["interval"].Value, "hh:mm:ss.fff", CultureInfo.InvariantCulture).TimeOfDay
-                };
+                           select new
+                           {
+                               Interest = MessageInterest.DefinedInterests.FirstOrDefault(i => i.Name == aliveEntryMatch.Groups["interest"].Value),
+                               Interval = DateTime.ParseExact(aliveEntryMatch.Groups["interval"].Value, "hh:mm:ss.fff", CultureInfo.InvariantCulture).TimeOfDay
+                           };
             return itemList.ToDictionary(item => item.Interest, item => item.Interval);
         }
     }

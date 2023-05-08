@@ -20,8 +20,8 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 {
     public static class TestData
     {
-        public static readonly string RestXmlPath = Directory.GetCurrentDirectory() + @"\REST XMLs\";
-        public static readonly string FeedXmlPath = Directory.GetCurrentDirectory() + @"\XMLs\";
+        public static readonly string RestXmlPath = Directory.GetCurrentDirectory() + "/REST XMLs/";
+        public static readonly string FeedXmlPath = Directory.GetCurrentDirectory() + "/XMLs/";
 
         public static readonly int BookmakerId = 1;
         public static readonly string AccessToken = "token";
@@ -52,6 +52,9 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         public const int CacheCategoryCount = 391;
         public const int CacheCategoryCountPlus = 408;
         public const int CacheTournamentCount = 8455;
+
+        public const int InvariantListCacheCount = 1080;
+        public const int VariantListCacheCount = 110;
 
         public const string SdkTestLogRepositoryName = "SdkTestLogRepositoryName";
         public const ExceptionHandlingStrategy ThrowingStrategy = ExceptionHandlingStrategy.THROW;

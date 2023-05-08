@@ -192,9 +192,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
 
             if (clearExistingData)
             {
-                FetchedCultures.Clear();
-                Categories.Clear();
-                Sports.Clear();
                 _sportEventCache.DeleteSportEventsFromCache(DateTime.Now.AddHours(-12));
             }
 
@@ -234,7 +231,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                     try
                     {
                         cachedTournament = (TournamentInfoCI)_sportEventCache.GetEventCacheItem(tournamentId);
-                        var unused = cachedTournament.GetCompetitorsIdsAsync(cultureList).Result;
+                        var unused = cachedTournament.GetCompetitorsIdsAsync(cultureList).GetAwaiter().GetResult();
                     }
                     catch (Exception e)
                     {
@@ -250,7 +247,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 {
                     try
                     {
-                        var unused = cachedTournament.GetCompetitorsIdsAsync(cultureList).Result;
+                        var unused = cachedTournament.GetCompetitorsIdsAsync(cultureList).GetAwaiter().GetResult();
                     }
                     catch (Exception e)
                     {
@@ -264,7 +261,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                 return null;
             }
 
-            if (!(Categories.TryGetValue(cachedTournament.GetCategoryIdAsync().Result, out var cachedCategory) && cachedCategory.HasTranslationsFor(cultureList)))
+            if (!(Categories.TryGetValue(cachedTournament.GetCategoryIdAsync().GetAwaiter().GetResult(), out var cachedCategory) && cachedCategory.HasTranslationsFor(cultureList)))
             {
                 return null;
             }

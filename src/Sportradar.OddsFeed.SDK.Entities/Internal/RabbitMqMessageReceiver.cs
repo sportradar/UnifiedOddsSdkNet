@@ -3,11 +3,11 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Common.Logging;
+using Dawn;
 using RabbitMQ.Client.Events;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
@@ -112,7 +112,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// </summary>
         /// <param name="sender">The <see cref="object"/> representation of the event sender</param>
         /// <param name="eventArgs">A <see cref="BasicDeliverEventArgs"/> containing event information</param>
-        private void consumer_OnReceived(object sender, BasicDeliverEventArgs eventArgs)
+        private void ConsumerOnReceived(object sender, BasicDeliverEventArgs eventArgs)
         {
             if (eventArgs.Body == null || !eventArgs.Body.Any())
             {
@@ -120,7 +120,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 return;
             }
 
-            var receivedAt =  SdkInfo.ToEpochTime(DateTime.Now);
+            var receivedAt = SdkInfo.ToEpochTime(DateTime.Now);
 
             // NOT used for GetRawMessage()
             var sessionName = _interest == null ? "system" : _interest.Name;
@@ -136,7 +136,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                     feedMessage = _deserializer.Deserialize(new MemoryStream(eventArgs.Body));
                     producer = _producerManager.Get(feedMessage.ProducerId);
                     messageName = feedMessage.GetType().Name;
-                    if (!string.IsNullOrEmpty(feedMessage.EventId) && URN.TryParse(feedMessage.EventId, out URN eventUrn))
+                    if (!string.IsNullOrEmpty(feedMessage.EventId) && URN.TryParse(feedMessage.EventId, out var eventUrn))
                     {
                         feedMessage.EventURN = eventUrn;
                     }
@@ -151,13 +151,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                         if (feedMessage is odds_change oddsChange)
                         {
                             marketCounts = oddsChange.odds?.market?.Length ?? 0;
-                            outcomeCounts = oddsChange.odds?.market?.Where(w=> w.outcome!=null).SelectMany(list => list.outcome).Count() ?? 0;
+                            outcomeCounts = oddsChange.odds?.market?.Where(w => w.outcome != null).SelectMany(list => list.outcome).Count() ?? 0;
                         }
 
                         if (feedMessage is bet_settlement betSettlement)
                         {
                             marketCounts = betSettlement.outcomes?.Length ?? 0;
-                            outcomeCounts = betSettlement.outcomes?.Where(w=> w.Items!=null).SelectMany(list => list.Items).Count() ?? 0;
+                            outcomeCounts = betSettlement.outcomes?.Where(w => w.Items != null).SelectMany(list => list.Items).Count() ?? 0;
                         }
 
                         ExecutionLog.Debug($"Deserialization of {feedMessage.GetType().Name} for {feedMessage.EventId} ({feedMessage.GeneratedAt}) and sport {sportId} took {t.Elapsed.TotalMilliseconds}ms. Markets={marketCounts}, Outcomes={outcomeCounts}");
@@ -215,7 +215,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
             catch (Exception e)
             {
                 ExecutionLog.Error($"Error dispatching raw message for {feedMessage.EventId}", e);
-            } 
+            }
             // continue normal processing
 
             if (!_producerManager.Exists(feedMessage.ProducerId))
@@ -223,7 +223,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
                 ExecutionLog.Warn($"A message for producer which is not defined was received. Producer={feedMessage.ProducerId}");
                 return;
             }
-            
+
             if (!_useReplay && (!producer.IsAvailable || producer.IsDisabled))
             {
                 ExecutionLog.Debug($"A message for producer which is disabled was received. Producer={producer}, MessageType={messageName}");
@@ -276,7 +276,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         {
             _interest = interest;
             _channel.Open(interest, routingKeys);
-            _channel.Received += consumer_OnReceived;
+            _channel.Received += ConsumerOnReceived;
         }
 
         /// <summary>
@@ -284,7 +284,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal
         /// </summary>
         public void Close()
         {
-            _channel.Received -= consumer_OnReceived;
+            _channel.Received -= ConsumerOnReceived;
             _channel.Close();
         }
     }

@@ -1,4 +1,12 @@
-﻿using EasyNetQ.Management.Client;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using EasyNetQ.Management.Client;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Framing;
@@ -7,15 +15,6 @@ using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Messages;
 using Sportradar.OddsFeed.SDK.Test.Messages;
 using Sportradar.OddsFeed.SDK.Test.Shared;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Sportradar.OddsFeed.SDK.Test
 {
@@ -60,30 +59,30 @@ namespace Sportradar.OddsFeed.SDK.Test
             _isRunning = false;
             ManagementClient = new ManagementClient($"http://{RabbitIp}", "guest", "guest");
 
-            //var x = ManagementClient.GetExchangesAsync().Result;
+            //var x = ManagementClient.GetExchangesAsync().GetAwaiter().GetResult();
 
-            //var rabbitUsers = ManagementClient.GetUsersAsync().Result;
+            //var rabbitUsers = ManagementClient.GetUsersAsync().GetAwaiter().GetResult();
             //User testUser;
             //if (rabbitUsers.Any(a => a.Name.Equals("testuser")))
             //{
-            //    testUser = ManagementClient.GetUserAsync("testuser").Result;
+            //    testUser = ManagementClient.GetUserAsync("testuser").GetAwaiter().GetResult();
             //}
             //else
             //{
-            //    testUser = ManagementClient.CreateUserAsync(new UserInfo("testuser", "testpass")).Result;
+            //    testUser = ManagementClient.CreateUserAsync(new UserInfo("testuser", "testpass")).GetAwaiter().GetResult();
             //}
 
-            //var virtualHosts = ManagementClient.GetVhostsAsync().Result;
+            //var virtualHosts = ManagementClient.GetVhostsAsync().GetAwaiter().GetResult();
             //Vhost virtualHost;
             //if (virtualHosts.Any(a => a.Name.Equals(VirtualHostName)))
             //{
-            //    virtualHost = ManagementClient.GetVhostAsync(VirtualHostName).Result;
+            //    virtualHost = ManagementClient.GetVhostAsync(VirtualHostName).GetAwaiter().GetResult();
             //}
             //else
             //{
-            //    virtualHost = ManagementClient.CreateVhostAsync(VirtualHostName).Result;
-            //    ManagementClient.CreatePermissionAsync(new PermissionInfo(testUser, virtualHost)).RunSynchronously();
-            //    ManagementClient.CreatePermissionAsync(new PermissionInfo(ManagementClient.GetUserAsync("guest").Result, virtualHost)).RunSynchronously();
+            //    virtualHost = ManagementClient.CreateVhostAsync(VirtualHostName).GetAwaiter().GetResult();
+            //    ManagementClient.CreatePermissionAsync(new PermissionInfo(testUser, virtualHost)).GetAwaiter().GetResult();
+            //    ManagementClient.CreatePermissionAsync(new PermissionInfo(ManagementClient.GetUserAsync("guest").GetAwaiter().GetResult(), virtualHost)).GetAwaiter().GetResult();
             //}
         }
 
@@ -221,14 +220,14 @@ namespace Sportradar.OddsFeed.SDK.Test
         /// <param name="periodInMs">The period in ms before next is send</param>
         private void SendPeriodicAliveForProducer(int producerId, int periodInMs = 0)
         {
-            Thread.Sleep(5000);
+            Task.Delay(5000).GetAwaiter().GetResult();
             while (ProducersAlive.ContainsKey(producerId))
             {
                 var msgAlive = _fMessageBuilder.BuildAlive(producerId, DateTime.Now, true);
                 Send(msgAlive, "-.-.-.alive.-.-.-.-", msgAlive.timestamp);
 
-                var sleep = periodInMs > 0 ? periodInMs : new Random().Next(10000);
-                Thread.Sleep(sleep);
+                var sleep = periodInMs > 0 ? periodInMs : SdkInfo.GetRandom(10000);
+                Task.Delay(sleep).GetAwaiter().GetResult();
             }
         }
 
@@ -262,13 +261,13 @@ namespace Sportradar.OddsFeed.SDK.Test
                 var content = new StringContent(info, Encoding.UTF8, "application/json");
 
                 //HttpContent httpContent = new StringContent($"{{\"password\":\"{newPassword}\",\"tags\":\"administrator\"}}}}", Encoding.UTF8, "application/json");
-                var httpResponseMessage = httpClient.PutAsync($"http://{RabbitIp}:15672/api/users/{username}", content).Result;
+                var httpResponseMessage = httpClient.PutAsync($"http://{RabbitIp}:15672/api/users/{username}", content).GetAwaiter().GetResult();
                 if (httpResponseMessage != null)
                 {
                     var responseContent = string.Empty;
                     if (httpResponseMessage.Content != null)
                     {
-                        responseContent = httpResponseMessage.Content.ReadAsStringAsync().Result;
+                        responseContent = httpResponseMessage.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                     }
                     Helper.WriteToOutput($"Rabbit ApiCall -> change user password: StatusCode={httpResponseMessage.StatusCode}, RequestContent={content}, ResponseContent={responseContent}");
 
@@ -419,8 +418,10 @@ namespace Sportradar.OddsFeed.SDK.Test
     public class MqUser
     {
         // ReSharper disable once InconsistentNaming
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Needed lowercase")]
         public string password;
         // ReSharper disable once InconsistentNaming
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Needed lowercase")]
         public string tags;
     }
 }

@@ -1,8 +1,8 @@
-﻿using Common.Logging;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Common.Logging;
 
 namespace Sportradar.OddsFeed.SDK.Common.Internal
 {
@@ -134,7 +134,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
             var stopWatch = Stopwatch.StartNew();
             while (_waitAll || (uniqueItems.ContainsKey(key) && stopWatch.ElapsedMilliseconds < lockTimeout.TotalMilliseconds))
             {
-                Task.Delay(lockSleep).Wait();
+                Task.Delay(lockSleep).GetAwaiter().GetResult();
                 //Debug.WriteLine($"Waiting for free processing for key {key} took {stopWatch.ElapsedMilliseconds} ms. {uniqueItems.Count}");
             }
 
@@ -155,7 +155,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
                 {
                     return;
                 }
-                Task.Delay(lockSleep).Wait();
+                Task.Delay(lockSleep).GetAwaiter().GetResult();
                 //Debug.WriteLine($"Waiting for release for key {key} took {stopWatch.ElapsedMilliseconds} ms.");
             }
 

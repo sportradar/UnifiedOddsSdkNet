@@ -3,6 +3,7 @@
 */
 using System.Linq;
 using System.Runtime.Caching;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sportradar.OddsFeed.SDK.API.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
@@ -15,71 +16,64 @@ namespace Sportradar.OddsFeed.SDK.API.Test
     [TestClass]
     public class MarketDescriptionManagerTest
     {
-        private MemoryCache _variantMarketDescriptionMemoryCache;
-        private MemoryCache _variantDescriptionMemoryCache;
-        private MemoryCache _invariantMarketDescriptionMemoryCache;
         private IMarketDescriptionCache _variantMarketDescriptionCache;
         private IVariantDescriptionCache _variantDescriptionListCache;
         private IMarketDescriptionCache _invariantMarketDescriptionCache;
         private IMarketCacheProvider _marketCacheProvider;
-        private IMappingValidatorFactory _mappingValidatorFactory;
 
-        private TestTimer _timerVDL;
-        private TestTimer _timerIDL;
-        private CacheManager _cacheManager;
         private TestDataRouterManager _dataRouterManager;
         private TestProducersProvider _producersProvider;
 
         [TestInitialize]
         public void Init()
         {
-            _variantMarketDescriptionMemoryCache = new MemoryCache("variantMarketDescriptionCache");
-            _variantDescriptionMemoryCache = new MemoryCache("variantDescriptionCache");
-            _invariantMarketDescriptionMemoryCache = new MemoryCache("invariantMarketDescriptionCache");
+            var variantMarketDescriptionMemoryCache = new MemoryCache("variantMarketDescriptionCache");
+            var variantDescriptionMemoryCache = new MemoryCache("variantDescriptionCache");
+            var invariantMarketDescriptionMemoryCache = new MemoryCache("invariantMarketDescriptionCache");
 
-            _cacheManager = new CacheManager();
-            _dataRouterManager = new TestDataRouterManager(_cacheManager);
+            var cacheManager = new CacheManager();
+            _dataRouterManager = new TestDataRouterManager(cacheManager);
             _producersProvider = new TestProducersProvider();
 
-            _mappingValidatorFactory = new MappingValidatorFactory();
+            IMappingValidatorFactory mappingValidatorFactory = new MappingValidatorFactory();
 
-            _timerVDL = new TestTimer(true);
-            _timerIDL = new TestTimer(true);
-            _variantMarketDescriptionCache = new VariantMarketDescriptionCache(_variantMarketDescriptionMemoryCache, _dataRouterManager, _mappingValidatorFactory, _cacheManager);
-            _variantDescriptionListCache = new VariantDescriptionListCache(_variantDescriptionMemoryCache, _dataRouterManager, _mappingValidatorFactory, _timerVDL, TestData.Cultures, _cacheManager);
-            _invariantMarketDescriptionCache = new InvariantMarketDescriptionCache(_invariantMarketDescriptionMemoryCache, _dataRouterManager, _mappingValidatorFactory, _timerIDL, TestData.Cultures, _cacheManager);
+            var timerVdl = new TestTimer(true);
+            var timerIdl = new TestTimer(true);
+            _variantMarketDescriptionCache = new VariantMarketDescriptionCache(variantMarketDescriptionMemoryCache, _dataRouterManager, mappingValidatorFactory, cacheManager);
+            _variantDescriptionListCache = new VariantDescriptionListCache(variantDescriptionMemoryCache, _dataRouterManager, mappingValidatorFactory, timerVdl, TestData.Cultures, cacheManager);
+            _invariantMarketDescriptionCache = new InvariantMarketDescriptionCache(invariantMarketDescriptionMemoryCache, _dataRouterManager, mappingValidatorFactory, timerIdl, TestData.Cultures, cacheManager);
 
             _marketCacheProvider = new MarketCacheProvider(_invariantMarketDescriptionCache, _variantMarketDescriptionCache, _variantDescriptionListCache);
         }
 
         [TestMethod]
-        public void MarketDescriptionManagerInitTest()
+        public void MarketDescriptionManagerInit()
         {
             var marketDescriptionManager = new MarketDescriptionManager(TestConfigurationInternal.GetConfig(), _marketCacheProvider, _invariantMarketDescriptionCache, _variantDescriptionListCache, _variantMarketDescriptionCache);
             Assert.IsNotNull(marketDescriptionManager);
         }
 
         [TestMethod]
-        public void MarketDescriptionManagerGetMarketDescriptionsTest()
+        public async Task MarketDescriptionManagerGetMarketDescriptions()
         {
-            //Thread.Sleep(500); // to wait so all OnTimer loading is done
             // calls from initialization are done
-            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestCalls["GetVariantDescriptionsAsync"]);
-            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestCalls["GetMarketDescriptionsAsync"]);
+            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestMethodCalls[TestDataRouterManager.EndpointVariantDescriptions]);
+            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestMethodCalls[TestDataRouterManager.EndpointMarketDescriptions]);
             var marketDescriptionManager = new MarketDescriptionManager(TestConfigurationInternal.GetConfig(), _marketCacheProvider, _invariantMarketDescriptionCache, _variantDescriptionListCache, _variantMarketDescriptionCache);
-            var marketDescriptions = marketDescriptionManager.GetMarketDescriptionsAsync().Result.ToList();
-            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestCalls["GetVariantDescriptionsAsync"]);
-            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestCalls["GetMarketDescriptionsAsync"]);
-            Assert.AreEqual(750, marketDescriptions.Count);
+            var marketDescriptions = (await marketDescriptionManager.GetMarketDescriptionsAsync()).ToList();
+            // no new calls should be done, since already everything loaded
+            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestMethodCalls[TestDataRouterManager.EndpointVariantDescriptions]);
+            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestMethodCalls[TestDataRouterManager.EndpointMarketDescriptions]);
+            Assert.AreEqual(TestData.InvariantListCacheCount, marketDescriptions.Count);
         }
 
         [TestMethod]
-        public void MarketDescriptionManagerGetMarketMappingTest()
+        public void MarketDescriptionManagerGetMarketMapping()
         {
             var marketDescriptionManager = new MarketDescriptionManager(TestConfigurationInternal.GetConfig(), _marketCacheProvider, _invariantMarketDescriptionCache, _variantDescriptionListCache, _variantMarketDescriptionCache);
-            var marketMapping = marketDescriptionManager.GetMarketMappingAsync(115, _producersProvider.GetProducers().First()).Result.ToList();
-            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestCalls["GetVariantDescriptionsAsync"]);
-            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestCalls["GetMarketDescriptionsAsync"]);
+            var marketMapping = marketDescriptionManager.GetMarketMappingAsync(115, _producersProvider.GetProducers().First()).GetAwaiter().GetResult().ToList();
+            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestMethodCalls[TestDataRouterManager.EndpointVariantDescriptions]);
+            Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.RestMethodCalls[TestDataRouterManager.EndpointMarketDescriptions]);
             Assert.AreEqual(3, marketMapping.Count);
             Assert.AreEqual("6:14", marketMapping[0].MarketId);
         }

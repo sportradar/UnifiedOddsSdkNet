@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 
@@ -27,9 +26,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="validators">The <see cref="IReadOnlyCollection{T}"/> containing actual validators.</param>
         public CompositeMappingValidator(IEnumerable<IMappingValidator> validators)
         {
-            Guard.Argument(validators, nameof(validators)).NotNull();//.NotEmpty();
+            if (validators == null)
+            {
+                throw new ArgumentNullException(nameof(validators));
+            }
             if (!validators.Any())
-                throw new ArgumentOutOfRangeException(nameof(validators));
+            {
+                throw new ArgumentOutOfRangeException(nameof(validators), "Missing validators.");
+            }
 
             _validators = validators as IReadOnlyCollection<IMappingValidator> ?? new ReadOnlyCollection<IMappingValidator>(validators.ToList());
         }

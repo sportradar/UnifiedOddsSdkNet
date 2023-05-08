@@ -180,6 +180,7 @@
     <Compile Include="IBonusInfo.cs" />
     <Compile Include="IBookmakerDetails.cs" />
     <Compile Include="ICompetitionStatusV1.cs" />
+    <Compile Include="ICompetitionV3.cs" />
     <Compile Include="ICompetitionV2.cs" />
     <Compile Include="ICompetitorResult.cs" />
     <Compile Include="ICompetitorV6.cs" />

@@ -14,7 +14,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
     {
         [TestMethod]
         [ExpectedException(typeof(Exception), AllowDerivedTypes = true)]
-        public void NoMessageInterestTest()
+        public void NoMessageInterest()
         {
             var keys = FeedRoutingKeyBuilder.GenerateKeys(new List<MessageInterest>());
             Assert.IsNotNull(keys);
@@ -22,7 +22,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
         }
 
         [TestMethod]
-        public void SingleMessageInterestTest()
+        public void SingleMessageInterest()
         {
             var interests = new List<MessageInterest> { MessageInterest.AllMessages };
             var keys = FeedRoutingKeyBuilder.GenerateKeys(interests);

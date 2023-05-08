@@ -2,7 +2,6 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using Dawn;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Mapping;
@@ -29,18 +28,16 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="fetcher">A <see cref="IDataFetcher" /> used to fetch the data</param>
         /// <param name="deserializer">A <see cref="IDeserializer{scheduleType}" /> used to deserialize the fetch data</param>
         /// <param name="mapperFactory">A <see cref="ISingleTypeMapperFactory{scheduleType, EntityList}" /> used to construct instances of <see cref="ISingleTypeMapper{ISportEventsSchedule}" /></param>
-        public SportEventSummaryProvider(
-            string sportEventSummaryUriFormat,
-            IDataFetcher fetcher,
-            IDeserializer<RestMessage> deserializer,
-            ISingleTypeMapperFactory<RestMessage, EntityList<SportEventSummaryDTO>> mapperFactory)
-            :base(sportEventSummaryUriFormat, fetcher, deserializer, mapperFactory)
+        public SportEventSummaryProvider(string sportEventSummaryUriFormat,
+                                         IDataFetcher fetcher,
+                                         IDeserializer<RestMessage> deserializer,
+                                         ISingleTypeMapperFactory<RestMessage, EntityList<SportEventSummaryDTO>> mapperFactory)
+            : base(sportEventSummaryUriFormat, fetcher, deserializer, mapperFactory)
         {
-
-            Guard.Argument(sportEventSummaryUriFormat, nameof(sportEventSummaryUriFormat)).NotNull().NotEmpty();
-            Guard.Argument(fetcher, nameof(fetcher)).NotNull();
-            Guard.Argument(deserializer, nameof(deserializer)).NotNull();
-            Guard.Argument(mapperFactory, nameof(mapperFactory)).NotNull();
+            if (string.IsNullOrEmpty(sportEventSummaryUriFormat))
+            {
+                throw new ArgumentNullException(nameof(sportEventSummaryUriFormat));
+            }
 
             _sportEventSummaryUriFormat = sportEventSummaryUriFormat;
         }

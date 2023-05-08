@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Dawn;
 using System.Linq;
 using Common.Logging;
+using Dawn;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
@@ -67,10 +67,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public ProducerManager(IProducersProvider producersProvider, IOddsFeedConfiguration config)
         {
-            Guard.Argument(producersProvider, nameof(producersProvider)).NotNull();
             Guard.Argument(config, nameof(config)).NotNull();
 
-            _producersProvider = producersProvider;
+            _producersProvider = producersProvider ?? throw new ArgumentNullException(nameof(producersProvider));
 
             LoadProducers();
 
@@ -181,7 +180,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             Guard.Argument(id, nameof(id)).Positive();
             Guard.Argument(timestamp, nameof(timestamp)).Require(timestamp > DateTime.MinValue);
 
-            var p = (Producer) Get(id);
+            var p = (Producer)Get(id);
             if (timestamp > DateTime.Now)
             {
                 if (_adjustAfterAge)
@@ -220,7 +219,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             Guard.Argument(id, nameof(id)).Positive();
 
-            var p = (Producer) Get(id);
+            var p = (Producer)Get(id);
             p.SetLastTimestampBeforeDisconnect(DateTime.MinValue);
         }
 
@@ -259,8 +258,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             {
                 foreach (var producer in _producers)
                 {
-                    ((Producer) producer).IgnoreRecovery = true;
-                    ((Producer) producer).SetProducerDown(false);
+                    ((Producer)producer).IgnoreRecovery = true;
+                    ((Producer)producer).SetProducerDown(false);
                 }
             }
             else

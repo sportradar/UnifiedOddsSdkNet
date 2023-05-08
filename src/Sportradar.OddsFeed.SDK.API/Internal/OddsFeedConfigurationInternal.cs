@@ -1,19 +1,18 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
 using Common.Logging;
-using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
 {
@@ -208,11 +207,8 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="bookmakerDetailsProvider">A <see cref="BookmakerDetailsProvider"/> used to get bookmaker info</param>
         public OddsFeedConfigurationInternal(IOddsFeedConfiguration publicConfig, BookmakerDetailsProvider bookmakerDetailsProvider)
         {
-            Guard.Argument(publicConfig, nameof(publicConfig)).NotNull();
-            Guard.Argument(bookmakerDetailsProvider, nameof(bookmakerDetailsProvider)).NotNull();
-
-            _publicConfig = publicConfig;
-            _bookmakerDetailsProvider = bookmakerDetailsProvider;
+            _publicConfig = publicConfig ?? throw new ArgumentNullException(nameof(publicConfig));
+            _bookmakerDetailsProvider = bookmakerDetailsProvider ?? throw new ArgumentNullException(nameof(bookmakerDetailsProvider));
 
             StatisticsEnabled = true;
             StatisticsTimeout = 1800;
@@ -238,7 +234,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>True if data was successfully retrieved. False otherwise. May throw <see cref="CommunicationException"/></returns>
         private bool LoadWhoamiData(string hostName, bool useSsl, bool rethrow, SdkEnvironment environment)
         {
-            Guard.Argument(hostName, nameof(hostName)).NotNull().NotEmpty();
+            if (string.IsNullOrEmpty(hostName))
+            {
+                throw new ArgumentNullException(nameof(hostName));
+            }
 
             var hostUrl = useSsl
                               ? "https://" + hostName

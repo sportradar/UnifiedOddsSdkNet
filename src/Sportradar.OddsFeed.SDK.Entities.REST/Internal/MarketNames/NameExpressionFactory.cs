@@ -3,9 +3,9 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Profiles;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
@@ -18,7 +18,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <summary>
         /// A regex pattern used to detect '{$competitor1} expression operands
         /// </summary>
-        private const string SequencedCompetitorOperandRegexPatter = @"\Acompetitor[12]";
+        private const string SequencedCompetitorOperandRegexPattern = @"\Acompetitor[12]";
 
         /// <summary>
         /// A <see cref="IOperandFactory"/> used to build <see cref="IOperand"/> instances required by name expressions
@@ -68,13 +68,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             Guard.Argument(sportEvent, nameof(sportEvent)).NotNull();
 
             // expression {$competitor(1-2)} indicates we need to get the name of the competitor from the sport event
-            if (Regex.IsMatch(operand, SequencedCompetitorOperandRegexPatter))
+            if (Regex.IsMatch(operand, SequencedCompetitorOperandRegexPattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1)))
             {
-                return new EntityNameExpression(operand, sportEvent);
+                return new EntityNameExpression(operand, sportEvent, _profileCache);
             }
-            if(operand.Equals("event", StringComparison.InvariantCultureIgnoreCase))
+            if (operand.Equals("event", StringComparison.InvariantCultureIgnoreCase))
             {
-                return new EntityNameExpression(operand, sportEvent);
+                return new EntityNameExpression(operand, sportEvent, _profileCache);
             }
 
             throw new ArgumentException($"operand:{operand} is not a valid operand for $ operator. Valid operators are: 'competitor1', 'competitor2', 'event'", nameof(operand));
@@ -108,33 +108,33 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             switch (Array.IndexOf(NameExpressionHelper.DefinedOperators, @operator))
             {
                 case 0: //+
-                {
-                    EnsureSpecifiersNotNullOrEmpty(specifiers);
-                    return new PlusNameExpression(_operandFactory.BuildOperand(specifiers, operand));
-                }
+                    {
+                        EnsureSpecifiersNotNullOrEmpty(specifiers);
+                        return new PlusNameExpression(_operandFactory.BuildOperand(specifiers, operand));
+                    }
                 case 1: //-
-                {
-                    EnsureSpecifiersNotNullOrEmpty(specifiers);
-                    return new MinusNameExpression(_operandFactory.BuildOperand(specifiers, operand));
-                }
+                    {
+                        EnsureSpecifiersNotNullOrEmpty(specifiers);
+                        return new MinusNameExpression(_operandFactory.BuildOperand(specifiers, operand));
+                    }
                 case 2: //$
-                {
-                    return BuildEntityNameExpression(operand, sportEvent);
-                }
+                    {
+                        return BuildEntityNameExpression(operand, sportEvent);
+                    }
                 case 3: //!
-                {
-                    EnsureSpecifiersNotNullOrEmpty(specifiers);
-                    return new OrdinalNameExpression(_operandFactory.BuildOperand(specifiers, operand));
-                }
+                    {
+                        EnsureSpecifiersNotNullOrEmpty(specifiers);
+                        return new OrdinalNameExpression(_operandFactory.BuildOperand(specifiers, operand));
+                    }
                 case 4: //%
-                {
-                    EnsureSpecifiersNotNullOrEmpty(specifiers);
-                    return new PlayerProfileExpression(_profileCache, _operandFactory.BuildOperand(specifiers, operand));
-                }
+                    {
+                        EnsureSpecifiersNotNullOrEmpty(specifiers);
+                        return new PlayerProfileExpression(_profileCache, _operandFactory.BuildOperand(specifiers, operand));
+                    }
                 default:
-                {
-                    throw new ArgumentException($"Operator {@operator} is not supported. Supported operators are: {string.Join(",", NameExpressionHelper.DefinedOperators)}", nameof(@operator));
-                }
+                    {
+                        throw new ArgumentException($"Operator {@operator} is not supported. Supported operators are: {string.Join(",", NameExpressionHelper.DefinedOperators)}", nameof(@operator));
+                    }
             }
         }
     }

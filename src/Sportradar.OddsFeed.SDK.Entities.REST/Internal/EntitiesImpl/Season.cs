@@ -59,7 +59,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
                       ISportEntityFactory sportEntityFactory,
                       ISportEventCache sportEventCache,
                       ISportDataCache sportDataCache,
-                      IEnumerable<CultureInfo> cultures,
+                      IReadOnlyCollection<CultureInfo> cultures,
                       ExceptionHandlingStrategy exceptionStrategy)
             : base(id, sportId, ExecutionLogPrivate, sportEventCache, cultures, exceptionStrategy)
         {

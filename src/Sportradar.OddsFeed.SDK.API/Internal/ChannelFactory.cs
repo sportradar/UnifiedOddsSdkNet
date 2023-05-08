@@ -2,8 +2,7 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.Threading;
-using Dawn;
+using System.Threading.Tasks;
 using RabbitMQ.Client;
 
 namespace Sportradar.OddsFeed.SDK.API.Internal
@@ -36,7 +35,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="connectionFactory">The connection factory.</param>
         public ChannelFactory(ConfiguredConnectionFactory connectionFactory)
         {
-            Guard.Argument(connectionFactory, nameof(connectionFactory)).NotNull();
+            if (connectionFactory == null)
+            {
+                throw new ArgumentNullException(nameof(connectionFactory));
+            }
 
             ConnectionFactory = connectionFactory;
         }
@@ -59,7 +61,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             lock (_lock)
             {
                 ConnectionFactory.CloseConnection();
-                Thread.Sleep(5000);
+                Task.Delay(5000).GetAwaiter().GetResult();
                 ConnectionFactory.CreateConnection();
             }
         }

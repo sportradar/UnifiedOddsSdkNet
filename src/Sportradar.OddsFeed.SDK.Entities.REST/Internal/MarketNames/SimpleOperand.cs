@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dawn;
 using System.Threading.Tasks;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
@@ -35,7 +35,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         {
             Guard.Argument(specifiers, nameof(specifiers)).NotNull();//.NotEmpty();
             if (!specifiers.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(specifiers));
+            }
 
             Guard.Argument(operandString, nameof(operandString)).NotNull().NotEmpty();
 

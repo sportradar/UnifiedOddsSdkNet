@@ -4,12 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Threading;
 using System.Threading.Tasks;
+using Dawn;
 using Metrics;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
@@ -102,7 +102,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             Guard.Argument(timer, nameof(timer)).NotNull();
             Guard.Argument(prefetchLanguages, nameof(prefetchLanguages)).NotNull();//.NotEmpty();
             if (!prefetchLanguages.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(prefetchLanguages));
+            }
 
             _cache = cache;
             _dataRouterManager = dataRouterManager;
@@ -174,7 +176,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
             _semaphoreCacheMerge.Wait();
             var cacheItem = _cache.GetCacheItem(id);
             _semaphoreCacheMerge.ReleaseSafe();
-            return (VariantDescriptionCacheItem) cacheItem?.Value;
+            return (VariantDescriptionCacheItem)cacheItem?.Value;
         }
 
         /// <summary>
@@ -207,12 +209,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 await _semaphore.WaitAsync().ConfigureAwait(false);
 
                 description = GetItemFromCache(id);
-                var missingLanguages = LanguageHelper.GetMissingCultures(cultureList, description?.FetchedLanguages).ToList();
+                var missingLanguages = LanguageHelper.GetMissingCultures(cultureList, description?.FetchedLanguages);
 
                 if (missingLanguages.Any())
                 {
                     // dont call for already fetched languages
-                    missingLanguages = LanguageHelper.GetMissingCultures(missingLanguages, _fetchedLanguages).ToList();
+                    missingLanguages = LanguageHelper.GetMissingCultures(missingLanguages, _fetchedLanguages);
                 }
 
                 if (!missingLanguages.Any())
@@ -542,7 +544,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                     }
                     else
                     {
-                        ((VariantDescriptionCacheItem) cachedItem.Value).Merge(marketDescription, culture);
+                        ((VariantDescriptionCacheItem)cachedItem.Value).Merge(marketDescription, culture);
                     }
                 }
                 _fetchedLanguages.Add(culture);

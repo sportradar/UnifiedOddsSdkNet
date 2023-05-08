@@ -82,45 +82,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         public virtual async Task<Stream> GetDataAsync(Uri uri)
         {
             ValidateConnection(uri);
-            var responseMessage = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
+            var responseMessage = new HttpResponseMessage();
             try
             {
                 responseMessage = await _client.GetAsync(uri).ConfigureAwait(false);
-                RecordSuccess();
-                if (!responseMessage.IsSuccessStatusCode)
-                {
-                    var responseContent = string.Empty;
-                    try
-                    {
-                        responseContent = new StreamReader(responseMessage.Content.ReadAsStreamAsync().Result).ReadToEnd();
-                        var memoryStream = new MemoryStream();
-                        var writer = new StreamWriter(memoryStream);
-                        writer.Write(responseContent);
-                        writer.Flush();
-                        memoryStream.Position = 0;
-                        var response = _responseDeserializer.Deserialize(memoryStream);
-                        responseContent = response.action;
-                    }
-                    catch (Exception)
-                    {
-                        // ignored
-                    }
-                    throw new CommunicationException($"Response StatusCode={responseMessage.StatusCode} does not indicate success. Msg={responseContent}", uri.ToString(), responseMessage.StatusCode, responseContent, null);
-                }
-                if (_saveResponseHeaders)
-                {
-                    var responseHeaders = new Dictionary<string, IEnumerable<string>>();
-                    foreach (var header in responseMessage.Headers)
-                    {
-                        if (responseHeaders.ContainsKey(header.Key))
-                        {
-                            continue;
-                        }
-                        responseHeaders.Add(header.Key, header.Value);
-                    }
-                    ResponseHeaders = responseHeaders;
-                }
-                return await responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                return await ProcessGetDataAsync(responseMessage, uri).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -138,53 +104,15 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// </summary>
         /// <param name="uri">The <see cref="Uri" /> of the resource to be fetched</param>
         /// <returns>A <see cref="Task" /> which, when completed will return a <see cref="Stream" /> containing fetched data</returns>
-        /// <exception cref="CommunicationException">
-        /// ll);
-        /// or
-        /// Failed to execute http get
-        /// </exception>
+        /// <exception cref="CommunicationException">Failed to execute http get</exception>
         public virtual Stream GetData(Uri uri)
         {
             ValidateConnection(uri);
-            var responseMessage = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
+            var responseMessage = new HttpResponseMessage();
             try
             {
-                responseMessage = _client.GetAsync(uri).Result;
-                RecordSuccess();
-                if (!responseMessage.IsSuccessStatusCode)
-                {
-                    var responseContent = string.Empty;
-                    try
-                    {
-                        responseContent = new StreamReader(responseMessage.Content.ReadAsStreamAsync().Result).ReadToEnd();
-                        var memoryStream = new MemoryStream();
-                        var writer = new StreamWriter(memoryStream);
-                        writer.Write(responseContent);
-                        writer.Flush();
-                        memoryStream.Position = 0;
-                        var response = _responseDeserializer.Deserialize(memoryStream);
-                        responseContent = response.action;
-                    }
-                    catch (Exception)
-                    {
-                        // ignored
-                    }
-                    throw new CommunicationException($"Response StatusCode={responseMessage.StatusCode} does not indicate success. Msg={responseContent}", uri.ToString(), responseMessage.StatusCode, responseContent, null);
-                }
-                if (_saveResponseHeaders)
-                {
-                    var responseHeaders = new Dictionary<string, IEnumerable<string>>();
-                    foreach (var header in responseMessage.Headers)
-                    {
-                        if (responseHeaders.ContainsKey(header.Key))
-                        {
-                            continue;
-                        }
-                        responseHeaders.Add(header.Key, header.Value);
-                    }
-                    ResponseHeaders = responseHeaders;
-                }
-                return responseMessage.Content.ReadAsStreamAsync().Result;
+                responseMessage = _client.GetAsync(uri).GetAwaiter().GetResult();
+                return ProcessGetDataAsync(responseMessage, uri).GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {
@@ -195,6 +123,51 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
                 }
                 throw;
             }
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Roslynator", "RCS1075:Avoid empty catch clause that catches System.Exception.", Justification = "Ignore all deserialization issues")]
+        private async Task<Stream> ProcessGetDataAsync(HttpResponseMessage responseMessage, Uri uri)
+        {
+            RecordSuccess();
+            if (!responseMessage.IsSuccessStatusCode)
+            {
+                var responseContent = string.Empty;
+                try
+                {
+                    responseContent = new StreamReader(responseMessage.Content.ReadAsStreamAsync().GetAwaiter().GetResult()).ReadToEndAsync().GetAwaiter().GetResult();
+                    var memoryStream = new MemoryStream();
+                    var writer = new StreamWriter(memoryStream);
+                    await writer.WriteAsync(responseContent);
+                    await writer.FlushAsync();
+                    memoryStream.Position = 0;
+                    var response = _responseDeserializer.Deserialize(memoryStream);
+                    responseContent = response.action;
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+                throw new CommunicationException($"Response StatusCode={responseMessage.StatusCode} does not indicate success. Msg={responseContent}", uri.ToString(), responseMessage.StatusCode, responseContent, null);
+            }
+            if (_saveResponseHeaders)
+            {
+                var responseHeaders = new Dictionary<string, IEnumerable<string>>();
+                foreach (var header in responseMessage.Headers)
+                {
+                    if (responseHeaders.ContainsKey(header.Key))
+                    {
+                        continue;
+                    }
+                    responseHeaders.Add(header.Key, header.Value);
+                }
+                ResponseHeaders = responseHeaders;
+            }
+
+            if (responseMessage.Content == null)
+            {
+                throw new CommunicationException("Missing content in the response", uri.ToString(), responseMessage.StatusCode, null);
+            }
+            return await responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
         }
 
         /// <summary>

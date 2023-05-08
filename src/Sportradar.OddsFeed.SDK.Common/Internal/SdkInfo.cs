@@ -5,8 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using Common.Logging;
 using Sportradar.OddsFeed.SDK.Messages;
 
@@ -160,6 +162,14 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         /// The date when it was created
         /// </summary>
         public static readonly DateTime Created = DateTime.Now;
+        /// <summary>
+        /// The regex pattern to extract error message from failed API requests
+        /// </summary>
+        public const string ApiResponseErrorPattern = @"<errors>([a-zA-Z0-9 -_\:.\/'{}]*)<\/errors>";
+        /// <summary>
+        /// The regex pattern to extract response message from failed API requests
+        /// </summary>
+        public const string ApiResponseMessagePattern = @"<message>([a-zA-Z0-9 -_\:.]*)<\/message>";
 
         /// <summary>
         /// Gets the assembly version number
@@ -331,6 +341,27 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         }
 
         /// <summary>
+        /// List of specifiers as string
+        /// </summary>
+        /// <param name="specifiers">The specifiers.</param>
+        /// <returns>Dictionary of specifiers</returns>
+        public static IDictionary<string, string> SpecifiersStringToDictionary(string specifiers)
+        {
+            var result = new Dictionary<string, string>();
+            if (specifiers.IsNullOrEmpty())
+            {
+                return result;
+            }
+            var specs = specifiers.Split('|');
+            foreach (var spec in specs)
+            {
+                var specKeyValue = spec.Split('=');
+                result.Add(specKeyValue[0], specKeyValue[1]);
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Gets the fixed length unique identifier
         /// </summary>
         /// <param name="length">The length of the returned string (min 3)</param>
@@ -424,9 +455,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
             var start = (100 - variablePercent) / (double)100 * baseValue;
             var end = (100 + variablePercent) / (double)100 * baseValue;
 
-            var r = new Random(Environment.TickCount);
-
-            return r.Next((int)start, (int)end);
+            return GetRandom((int)start, (int)end);
         }
 
         /// <summary>
@@ -462,8 +491,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
 
             var end = (100 + variablePercent) / (double)100 * baseValue;
 
-            var r = new Random(Environment.TickCount);
-            return r.Next(baseValue, (int)end);
+            return GetRandom(baseValue, (int)end);
         }
 
         /// <summary>
@@ -517,25 +545,22 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
 
         public static int GetRandom(int minValue, int maxValue)
         {
-            if (maxValue < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(maxValue), $"{maxValue} not valid. Must be 0 or greater.");
-            }
-            if (maxValue == 0)
-            {
-                maxValue = int.MaxValue;
-            }
-
             if (minValue > maxValue)
             {
                 throw new ArgumentOutOfRangeException(nameof(minValue), $"{minValue} not valid. Must be less then {maxValue}.");
+            }
+            var range = maxValue - minValue - 1;
+            if (range == 0)
+            {
+                return minValue;
             }
             using (var generator = RandomNumberGenerator.Create())
             {
                 var bytes = new byte[4];
                 generator.GetBytes(bytes);
                 var r = Math.Abs(BitConverter.ToInt32(bytes, 0));
-                return r == 0 ? new Random().Next(minValue, maxValue) : r;
+                r = r % range;
+                return r == 0 ? new Random().Next(minValue, maxValue) : r + minValue;
             }
         }
 
@@ -550,6 +575,31 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
                 return maxValue;
             }
             return initialValue;
+        }
+
+        public static string ExtractHttpResponseMessage(HttpContent responseContent)
+        {
+            if (responseContent == null)
+            {
+                return string.Empty;
+            }
+
+            var response = responseContent.ReadAsStringAsync().GetAwaiter().GetResult();
+            return ExtractHttpResponseMessage(response);
+        }
+        public static string ExtractHttpResponseMessage(string responseContent)
+        {
+            if (responseContent.IsNullOrEmpty())
+            {
+                return string.Empty;
+            }
+            var errorMatch = Regex.Match(responseContent, ApiResponseErrorPattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
+            var messageMatch = Regex.Match(responseContent, ApiResponseMessagePattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
+            if (messageMatch.Success)
+            {
+                return errorMatch.Success ? $"{messageMatch.Groups[1].Value} (detail: {errorMatch.Groups[1].Value})" : messageMatch.Groups[1].Value;
+            }
+            return responseContent;
         }
     }
 }

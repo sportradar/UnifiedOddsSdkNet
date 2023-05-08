@@ -25,7 +25,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             });
 
             var operand = new SimpleOperand(specifiers, Specifier);
-            Assert.AreEqual(2, operand.GetIntValue().Result, "Int value returned by the operand is not correct");
+            Assert.AreEqual(2, operand.GetIntValue().GetAwaiter().GetResult(), "Int value returned by the operand is not correct");
         }
 
         [TestMethod]

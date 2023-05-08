@@ -49,18 +49,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             _sportEventCache = new SportEventCache(new MemoryCache("tournamentDetailsCache"), _dataRouterManager, new SportEventCacheItemFactory(_dataRouterManager, new SemaphorePool(5, ExceptionHandlingStrategy.THROW), TestData.Cultures.First(), new MemoryCache("FixtureTimestampCache")), _timer, TestData.Cultures, _cacheManager);
             _sportDataCache = new SportDataCache(_dataRouterManager, _timer, TestData.Cultures, _sportEventCache, _cacheManager);
             _profileMemoryCache = new MemoryCache("profileCache");
-            _profileCache = new ProfileCache(_profileMemoryCache, _dataRouterManager, _cacheManager);
+            _profileCache = new ProfileCache(_profileMemoryCache, _dataRouterManager, _cacheManager, _sportEventCache);
         }
 
         [TestMethod]
-        public void SportDataCacheStatusTest()
+        public void SportDataCacheStatus()
         {
             var status = _sportDataCache.CacheStatus();
             Assert.AreEqual(0, status["SportCI"]);
             Assert.AreEqual(0, status["CategoryCI"]);
 
 
-            var sports = _sportDataCache.GetSportsAsync(TestData.Cultures).Result; // initial load
+            var sports = _sportDataCache.GetSportsAsync(TestData.Cultures).GetAwaiter().GetResult(); // initial load
 
             Assert.IsNotNull(sports);
             status = _sportDataCache.CacheStatus();
@@ -69,7 +69,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public async Task SportDataCacheEmptyExportTest()
+        public async Task SportDataCacheEmptyExport()
         {
             var export = (await _sportDataCache.ExportAsync()).ToList();
             Assert.AreEqual(0, export.Count);
@@ -80,13 +80,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public async Task SportDataCacheFullExportTest()
+        public async Task SportDataCacheFullExport()
         {
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(AllTournaments), $"{AllTournaments} should be called exactly 0 times.");
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(AllSports), $"{AllSports} should be called exactly 0 times.");
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly 0 times.");
 
-            var sports = _sportDataCache.GetSportsAsync(TestData.Cultures).Result; // initial load
+            var sports = _sportDataCache.GetSportsAsync(TestData.Cultures).GetAwaiter().GetResult(); // initial load
             Assert.IsNotNull(sports);
 
             Assert.AreEqual(TestData.Cultures.Count, _dataRouterManager.GetCallCount(AllTournaments), $"{AllTournaments} should be called exactly {TestData.Cultures.Count} times.");
@@ -100,7 +100,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             _sportDataCache.Sports.Clear();
             _sportDataCache.Categories.Clear();
             _sportDataCache.FetchedCultures.Clear();
-            
+
             await _sportDataCache.ImportAsync(export);
             Assert.AreEqual(TestData.CacheSportCount, _sportDataCache.Sports.Count);
             Assert.AreEqual(TestData.CacheCategoryCountPlus, _sportDataCache.Categories.Count);
@@ -116,24 +116,24 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void ProfileCacheStatusTest()
+        public void ProfileCacheStatus()
         {
             var status = _profileCache.CacheStatus();
             Assert.AreEqual(0, status["TeamCompetitorCI"]);
             Assert.AreEqual(0, status["CompetitorCI"]);
             Assert.AreEqual(0, status["PlayerProfileCI"]);
 
-            object ci = _profileCache.GetPlayerProfileAsync(URN.Parse("sr:player:1"), TestData.Cultures).Result;
+            object ci = _profileCache.GetPlayerProfileAsync(URN.Parse("sr:player:1"), TestData.Cultures, false).GetAwaiter().GetResult();
             Assert.IsNotNull(ci);
-            ci = _profileCache.GetPlayerProfileAsync(URN.Parse("sr:player:2"), TestData.Cultures).Result;
+            ci = _profileCache.GetPlayerProfileAsync(URN.Parse("sr:player:2"), TestData.Cultures, false).GetAwaiter().GetResult();
             Assert.IsNotNull(ci);
-            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:competitor:1"), TestData.Cultures).Result;
+            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:competitor:1"), TestData.Cultures, false).GetAwaiter().GetResult();
             Assert.IsNotNull(ci);
-            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:competitor:2"), TestData.Cultures).Result;
+            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:competitor:2"), TestData.Cultures, false).GetAwaiter().GetResult();
             Assert.IsNotNull(ci);
-            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:simpleteam:1"), TestData.Cultures).Result;
+            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:simpleteam:1"), TestData.Cultures, false).GetAwaiter().GetResult();
             Assert.IsNotNull(ci);
-            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:simpleteam:2"), TestData.Cultures).Result;
+            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:simpleteam:2"), TestData.Cultures, false).GetAwaiter().GetResult();
             Assert.IsNotNull(ci);
 
             status = _profileCache.CacheStatus();
@@ -144,7 +144,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public async Task ProfileCacheEmptyExportTest()
+        public async Task ProfileCacheEmptyExport()
         {
             var export = (await _profileCache.ExportAsync()).ToList();
             Assert.AreEqual(0, export.Count);
@@ -154,22 +154,22 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public async Task ProfileCacheFullExportTest()
+        public async Task ProfileCacheFullExport()
         {
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(Competitor), $"{Competitor} should be called exactly 0 times.");
             Assert.AreEqual(0, _dataRouterManager.GetCallCount(PlayerProfile), $"{PlayerProfile} should be called exactly 0 times.");
 
             // ReSharper disable once RedundantAssignment
-            object ci = _profileCache.GetPlayerProfileAsync(URN.Parse("sr:player:1"), TestData.Cultures).Result;
-            ci = _profileCache.GetPlayerProfileAsync(URN.Parse("sr:player:2"), TestData.Cultures).Result;
+            object ci = _profileCache.GetPlayerProfileAsync(URN.Parse("sr:player:1"), TestData.Cultures, false).GetAwaiter().GetResult();
+            ci = _profileCache.GetPlayerProfileAsync(URN.Parse("sr:player:2"), TestData.Cultures, false).GetAwaiter().GetResult();
             Assert.IsNotNull(ci);
-            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:competitor:1"), TestData.Cultures).Result;
+            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:competitor:1"), TestData.Cultures, false).GetAwaiter().GetResult();
             Assert.IsNotNull(ci);
-            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:competitor:2"), TestData.Cultures).Result;
+            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:competitor:2"), TestData.Cultures, false).GetAwaiter().GetResult();
             Assert.IsNotNull(ci);
-            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:simpleteam:1"), TestData.Cultures).Result;
+            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:simpleteam:1"), TestData.Cultures, false).GetAwaiter().GetResult();
             Assert.IsNotNull(ci);
-            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:simpleteam:2"), TestData.Cultures).Result;
+            ci = _profileCache.GetCompetitorProfileAsync(URN.Parse("sr:simpleteam:2"), TestData.Cultures, false).GetAwaiter().GetResult();
             Assert.IsNotNull(ci);
 
             Assert.AreEqual(TestData.Cultures.Count * 4, _dataRouterManager.GetCallCount(Competitor), $"{Competitor} should be called exactly {TestData.Cultures.Count * 4} times.");
@@ -193,7 +193,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void SportEventCacheStatusTest()
+        public void SportEventCacheStatus()
         {
             var status = _sportEventCache.CacheStatus();
             Assert.AreEqual(0, status["SportEventCI"]);
@@ -204,7 +204,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(0, status["MatchCI"]);
             Assert.AreEqual(0, status["StageCI"]);
 
-            var tournaments = _sportEventCache.GetActiveTournamentsAsync().Result; // initial load
+            var tournaments = _sportEventCache.GetActiveTournamentsAsync().GetAwaiter().GetResult(); // initial load
 
             Assert.IsNotNull(tournaments);
             status = _sportEventCache.CacheStatus();
@@ -213,7 +213,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public async Task SportEventCacheEmptyExportTest()
+        public async Task SportEventCacheEmptyExport()
         {
             var export = (await _sportEventCache.ExportAsync()).ToList();
             Assert.AreEqual(0, export.Count);
@@ -223,12 +223,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public async Task SportEventCacheFullExportTest()
+        public async Task SportEventCacheFullExport()
         {
-            var tournaments = _sportEventCache.GetActiveTournamentsAsync().Result; // initial load
+            var tournaments = _sportEventCache.GetActiveTournamentsAsync().GetAwaiter().GetResult(); // initial load
             Assert.IsNotNull(tournaments);
 
-             Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly {TestData.Cultures.Count} times.");
+            Assert.AreEqual(0, _dataRouterManager.GetCallCount(SportEventSummary), $"{SportEventSummary} should be called exactly {TestData.Cultures.Count} times.");
 
             var export = (await _sportEventCache.ExportAsync()).ToList();
             Assert.AreEqual(1187, export.Count);

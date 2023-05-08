@@ -30,7 +30,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             var uriFormat = TestData.RestXmlPath + @"\betstop_reasons.xml";
             _cache = new NamedValueCache(new NamedValueDataProvider(uriFormat, _fetcherMock.Object, "betstop_reason"),
-                exceptionStrategy);
+                exceptionStrategy, "BetstopReasons");
 
         }
 

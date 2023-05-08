@@ -1,15 +1,15 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
-using Dawn;
-using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
-using Sportradar.OddsFeed.SDK.Messages;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Dawn;
+using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO;
+using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
 {
@@ -26,6 +26,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// <summary>
         /// A <see cref="IDictionary{CultureInfo,String}"/> containing round group names in different languages
         /// </summary>
+        [Obsolete("GroupName was removed from API")]
         private readonly IDictionary<CultureInfo, string> _groupNames;
 
         /// <summary>
@@ -172,6 +173,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
         /// </summary>
         /// <param name="culture">The culture</param>
         /// <returns>Return the Name if exists, or null</returns>
+        [Obsolete("GroupName was removed from API")]
         public string GetGroupName(CultureInfo culture)
         {
             Guard.Argument(culture, nameof(culture)).NotNull();

@@ -2,7 +2,6 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using Dawn;
 using System.Text;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Messages.Feed;
@@ -37,11 +36,8 @@ namespace Sportradar.OddsFeed.SDK.API.EventArguments
         /// <param name="rawMessage">A raw message received from the feed</param>
         internal AliveEventArgs(IFeedMessageMapper messageMapper, alive feedMessage, byte[] rawMessage)
         {
-            Guard.Argument(messageMapper, nameof(messageMapper)).NotNull();
-            Guard.Argument(feedMessage, nameof(feedMessage)).NotNull();
-
-            _messageMapper = messageMapper;
-            _feedMessage = feedMessage;
+            _messageMapper = messageMapper ?? throw new ArgumentNullException(nameof(messageMapper));
+            _feedMessage = feedMessage ?? throw new ArgumentNullException(nameof(feedMessage));
             _rawMessage = rawMessage;
         }
 

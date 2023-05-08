@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sportradar.OddsFeed.SDK.Common.Internal;
@@ -23,10 +22,10 @@ namespace Sportradar.OddsFeed.SDK.Common.Test
             var task1 = pool.AcquireAsync("1");
             var task2 = pool.AcquireAsync("1");
 
-            Thread.Sleep(10);
+            Task.Delay(10).GetAwaiter().GetResult();
 
-            var semaphore1 = task1.Result;
-            var semaphore2 = task2.Result;
+            var semaphore1 = task1.GetAwaiter().GetResult();
+            var semaphore2 = task2.GetAwaiter().GetResult();
             Assert.AreEqual(semaphore1, semaphore2, "semaphore1 and semaphore2 should be equal");
             Assert.AreEqual(1, pool.SemaphoreHolders.Count);
             Assert.AreEqual(1, pool.AvailableSemaphoreIds.Count);
@@ -44,16 +43,16 @@ namespace Sportradar.OddsFeed.SDK.Common.Test
             var task2 = pool.AcquireAsync("2");
             var task3 = pool.AcquireAsync("3");
 
-            var semaphore1 = task1.Result;
-            var semaphore2 = task2.Result;
-            var semaphore3 = task3.Result;
+            var semaphore1 = task1.GetAwaiter().GetResult();
+            var semaphore2 = task2.GetAwaiter().GetResult();
+            var semaphore3 = task3.GetAwaiter().GetResult();
 
             Assert.IsNotNull(semaphore1);
             Assert.IsNotNull(semaphore2);
             Assert.IsNotNull(semaphore3);
 
             var task4 = pool.AcquireAsync("4");
-            Thread.Sleep(5);
+            Task.Delay(5).GetAwaiter().GetResult();
             Assert.IsFalse(task4.IsCompleted);
 
             Assert.AreNotEqual(semaphore2, semaphore1, "Semaphore1 and Semaphore2 must not be equal");
@@ -69,11 +68,11 @@ namespace Sportradar.OddsFeed.SDK.Common.Test
             var task1 = pool.AcquireAsync("1");
             var task3 = pool.AcquireAsync("1");
 
-            var semaphore1 = task1.Result;
-            var semaphore3 = task3.Result;
+            var semaphore1 = task1.GetAwaiter().GetResult();
+            var semaphore3 = task3.GetAwaiter().GetResult();
 
             var task2 = pool.AcquireAsync("2");
-            Thread.Sleep(5);
+            Task.Delay(5).GetAwaiter().GetResult();
             Assert.IsFalse(task2.IsCompleted);
 
             Assert.IsNotNull(semaphore1);
@@ -99,15 +98,15 @@ namespace Sportradar.OddsFeed.SDK.Common.Test
             var pool = new SemaphorePool(1, ExceptionHandlingStrategy.THROW);
 
             var task1 = pool.AcquireAsync("1");
-            Thread.Sleep(5);
+            Task.Delay(5).GetAwaiter().GetResult();
             var task2 = pool.AcquireAsync("2");
 
-            var semaphore1 = task1.Result;
+            var semaphore1 = task1.GetAwaiter().GetResult();
             Assert.IsNotNull(semaphore1);
             Assert.IsFalse(task2.IsCompleted);
 
             pool.Release("1");
-            var semaphore2 = task2.Result;
+            var semaphore2 = task2.GetAwaiter().GetResult();
             Assert.AreEqual(semaphore2, semaphore1, "Semaphore1 and Semaphore2 should be equal");
             Assert.AreEqual(1, pool.SemaphoreHolders.Count);
             Assert.AreEqual(1, pool.AvailableSemaphoreIds.Count);
@@ -125,10 +124,10 @@ namespace Sportradar.OddsFeed.SDK.Common.Test
             var task12 = pool.AcquireAsync("1");
             var task13 = pool.AcquireAsync("1");
 
-            var semaphore1 = task11.Result;
+            var semaphore1 = task11.GetAwaiter().GetResult();
             Assert.IsNotNull(semaphore1);
-            Assert.AreEqual(semaphore1, task12.Result, "both semaphores should be equal");
-            Assert.AreEqual(semaphore1, task13.Result, "Both semaphores should be equal");
+            Assert.AreEqual(semaphore1, task12.GetAwaiter().GetResult(), "both semaphores should be equal");
+            Assert.AreEqual(semaphore1, task13.GetAwaiter().GetResult(), "Both semaphores should be equal");
             Assert.AreEqual(1, pool.SemaphoreHolders.Count);
             Assert.AreEqual(1, pool.AvailableSemaphoreIds.Count);
             Assert.AreEqual("1", pool.AvailableSemaphoreIds.First());
@@ -136,19 +135,19 @@ namespace Sportradar.OddsFeed.SDK.Common.Test
             Assert.AreEqual(3, pool.SemaphoreHolders[0].UsageCount);
 
             var task2 = pool.AcquireAsync("2");
-            Thread.Sleep(5);
+            Task.Delay(5).GetAwaiter().GetResult();
             Assert.IsFalse(task2.IsCompleted);
 
             pool.Release("1");
-            Thread.Sleep(5);
+            Task.Delay(5).GetAwaiter().GetResult();
             Assert.IsFalse(task2.IsCompleted);
 
             pool.Release("1");
-            Thread.Sleep(5);
+            Task.Delay(5).GetAwaiter().GetResult();
             Assert.IsFalse(task2.IsCompleted);
 
             pool.Release("1");
-            var semaphore2 = task2.Result;
+            var semaphore2 = task2.GetAwaiter().GetResult();
 
             Assert.AreEqual(semaphore2, semaphore1, "Semaphore1 and Semaphore2 should be equal");
             Assert.AreEqual(1, pool.SemaphoreHolders.Count);
@@ -158,22 +157,22 @@ namespace Sportradar.OddsFeed.SDK.Common.Test
         }
 
         [TestMethod]
-        public void ComplexUsageTest()
+        public void ComplexUsage()
         {
             var pool = new SemaphorePool(2, ExceptionHandlingStrategy.THROW);
 
             var task11 = pool.AcquireAsync("1");
             var task21 = pool.AcquireAsync("2");
-            Thread.Sleep(5);
+            Task.Delay(5).GetAwaiter().GetResult();
             var task12 = pool.AcquireAsync("1");
             var task22 = pool.AcquireAsync("2");
             var task3 = pool.AcquireAsync("3");
 
-            Thread.Sleep(5);
-            var semaphore11 = task11.Result;
-            var semaphore12 = task12.Result;
-            var semaphore21 = task21.Result;
-            var semaphore22 = task22.Result;
+            Task.Delay(5).GetAwaiter().GetResult();
+            var semaphore11 = task11.GetAwaiter().GetResult();
+            var semaphore12 = task12.GetAwaiter().GetResult();
+            var semaphore21 = task21.GetAwaiter().GetResult();
+            var semaphore22 = task22.GetAwaiter().GetResult();
 
             Assert.IsNotNull(semaphore11);
             Assert.AreEqual(semaphore12, semaphore11, "semaphore11 and semaphore12 should be equal");
@@ -183,33 +182,33 @@ namespace Sportradar.OddsFeed.SDK.Common.Test
             Assert.IsFalse(task3.IsCompleted);
 
             pool.Release("1");
-            Thread.Sleep(5);
+            Task.Delay(5).GetAwaiter().GetResult();
             Assert.IsFalse(task3.IsCompleted);
 
             pool.Release("1");
-            Thread.Sleep(5);
+            Task.Delay(5).GetAwaiter().GetResult();
             Assert.IsTrue(task3.IsCompleted);
 
             var task4 = pool.AcquireAsync("4");
-            Thread.Sleep(5);
+            Task.Delay(5).GetAwaiter().GetResult();
             Assert.IsFalse(task4.IsCompleted);
 
             pool.Release("2");
-            Thread.Sleep(5);
+            Task.Delay(5).GetAwaiter().GetResult();
             Assert.IsFalse(task4.IsCompleted);
 
             pool.Release("2");
-            Thread.Sleep(5);
+            Task.Delay(5).GetAwaiter().GetResult();
             Assert.IsTrue(task4.IsCompleted);
 
             pool.Release("3");
             pool.Release("4");
-            Thread.Sleep(5);
+            Task.Delay(5).GetAwaiter().GetResult();
 
             var task1 = pool.AcquireAsync("1");
             var task2 = pool.AcquireAsync("2");
 
-            Thread.Sleep(5);
+            Task.Delay(5).GetAwaiter().GetResult();
 
             Assert.IsTrue(task1.IsCompleted);
             Assert.IsTrue(task2.IsCompleted);
@@ -233,14 +232,14 @@ namespace Sportradar.OddsFeed.SDK.Common.Test
                 {
                     var stringId = id.ToString();
                     id++;
-                    var semaphore = pool.AcquireAsync(stringId).Result;
+                    var semaphore = pool.AcquireAsync(stringId).GetAwaiter().GetResult();
                     Assert.IsNotNull(semaphore);
-                    Thread.Sleep(10);
+                    Task.Delay(10).GetAwaiter().GetResult();
                     pool.Release(stringId);
                 }));
             }
             Task.WaitAll(tasks.ToArray());
-            Assert.IsTrue(tasks.All(a=>a.IsCompleted));
+            Assert.IsTrue(tasks.All(a => a.IsCompleted));
             Assert.AreEqual(10, pool.SemaphoreHolders.Count);
             Assert.AreEqual(0, pool.AvailableSemaphoreIds.Count);
             Assert.IsNull(pool.SemaphoreHolders[0].Id);
@@ -263,13 +262,13 @@ namespace Sportradar.OddsFeed.SDK.Common.Test
                                        await semaphore.WaitAsync().ConfigureAwait(false);
                                        Assert.IsTrue(pool.AvailableSemaphoreIds.Contains(stringId));
                                        //Debug.WriteLine($"Id={stringId}, semaphore usage={pool.SemaphoreHolders.First(f=>f.Id.Equals(stringId)).UsageCount}");
-                                       Thread.Sleep(StaticRandom.I100);
+                                       Task.Delay(StaticRandom.I100).GetAwaiter().GetResult();
                                        semaphore.ReleaseSafe();
                                        pool.Release(stringId);
                                    }));
             }
             Task.WaitAll(tasks.ToArray());
-            Assert.IsTrue(tasks.All(a=>a.IsCompleted));
+            Assert.IsTrue(tasks.All(a => a.IsCompleted));
             Assert.AreEqual(10, pool.SemaphoreHolders.Count);
             Assert.AreEqual(0, pool.AvailableSemaphoreIds.Count);
             Assert.IsNull(pool.SemaphoreHolders[0].Id);

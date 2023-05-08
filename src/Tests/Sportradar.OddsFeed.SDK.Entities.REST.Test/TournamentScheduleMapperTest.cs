@@ -15,12 +15,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
     [TestClass]
     public class TournamentScheduleMapperTest
     {
-        private const string InputXml = "tournament_schedule.{1}.xml";
+        private const string InputXml = "tournament_schedule_{1}.xml";
 
-        private static EntityList<SportEventSummaryDTO> _entity;
+        private EntityList<SportEventSummaryDTO> _entity;
 
-        [ClassInitialize]
-        public static void Init(TestContext context)
+        [TestInitialize]
+        public void Init()
         {
             var deserializer = new Deserializer<tournamentSchedule>();
             var dataFetcher = new TestDataFetcher();
@@ -31,7 +31,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 dataFetcher,
                 deserializer,
                 mapperFactory);
-            _entity = dataProvider.GetDataAsync("", "en").Result;
+            _entity = dataProvider.GetDataAsync("", "en").GetAwaiter().GetResult();
         }
 
         private static XName GetXName(string localName)
@@ -49,7 +49,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
             var allXmlSportEvents = doc.Descendants(GetXName("sport_event")).ToList();
             Assert.AreEqual(_entity.Items.Count(), allXmlSportEvents.Count);
-            foreach(var sportEvent in allXmlSportEvents)
+            foreach (var sportEvent in allXmlSportEvents)
             {
                 var xmlId = sportEvent.Attribute(XName.Get("id"))?.Value;
                 var entityEvent = _entity.Items.ToList().Find(t => t.Id.ToString() == xmlId);
@@ -63,9 +63,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.IsNotNull(eventSummary);
             Assert.IsNotNull(element);
             Assert.AreEqual(eventSummary.Id.ToString(), element.Attribute(XName.Get("id"))?.Value);
-            string scheduled = element.Attribute(XName.Get("scheduled")) == null
-                ? null
-                : element.Attribute(XName.Get("scheduled"))?.Value.Substring(0, 10);
+            var scheduled = element.Attribute(XName.Get("scheduled")) == null
+                                ? null
+                                : element.Attribute(XName.Get("scheduled"))?.Value.Substring(0, 10);
 
             Assert.AreEqual(eventSummary.Scheduled?.ToString("yyyy-MM-dd"), scheduled);
 
@@ -124,7 +124,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             Assert.AreEqual(competitor.CountryName, element.Attribute("country")?.Value);
             Assert.AreEqual(competitor.Abbreviation, element.Attribute("abbreviation")?.Value);
             Assert.AreEqual(competitor.CountryCode, element.Attribute("country_code")?.Value);
-            Assert.AreEqual(competitor.State, element.Attribute("state")?.Value); 
+            Assert.AreEqual(competitor.State, element.Attribute("state")?.Value);
             var refs = element.Element(GetXName("reference_ids"));
             if (refs == null)
             {

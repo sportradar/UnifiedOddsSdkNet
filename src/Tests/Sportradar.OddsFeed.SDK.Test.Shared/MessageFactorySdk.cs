@@ -1,7 +1,13 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.Caching;
 using Sportradar.OddsFeed.SDK.Common;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Entities.REST.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Enums;
@@ -13,10 +19,6 @@ using Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO.CustomBet;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl.CustomBet;
 using Sportradar.OddsFeed.SDK.Messages.REST;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using MFR = Sportradar.OddsFeed.SDK.Test.Shared.MessageFactoryRest;
 using SR = Sportradar.OddsFeed.SDK.Test.Shared.StaticRandom;
 // ReSharper disable UnusedMember.Local
@@ -29,20 +31,29 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
     /// </summary>
     public class MessageFactorySdk
     {
+        private static TestSportEntityFactoryBuilder SportEntityFactoryBuilder;
+
+        public static void SetOutputHelper()
+        {
+            SportEntityFactoryBuilder = new TestSportEntityFactoryBuilder(ScheduleData.Cultures3.ToList());
+        }
+
         private static Dictionary<CultureInfo, string> GetNames(List<CultureInfo> cultures)
         {
             if (cultures == null || !cultures.Any())
             {
-                cultures = TestData.Cultures3;
+                cultures = TestData.Cultures3.ToList();
             }
+
             return cultures.ToDictionary(c => c, c => $"{c.TwoLetterISOLanguageName} name " + SR.S1000);
         }
 
         public static IAssist GetAssist(int id = 0)
         {
             return new Assist(
-                SR.Urn(id == 0 ? SR.I1000 : id),
-                new Dictionary<CultureInfo, string> { { new CultureInfo("en"), "Assist name" } }, "assist type");
+                              SR.Urn(id == 0 ? SR.I1000 : id),
+                              new Dictionary<CultureInfo, string> { { new CultureInfo("en"), "Assist name" } },
+                              "assist type");
         }
 
         public static IBookmakerDetails GetBookmakerDetails(int id = 0, bool idSpecified = true, bool expireAtSpecified = true, bool responseCodeSpecified = true)
@@ -52,31 +63,43 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         public static ICategory GetCategory(int id = 0)
         {
-            return new Category(SR.Urn(id == 0 ? SR.I1000 : id, "category"), GetNames(null), "SR", GetTournamentList(SR.I100));
+            return new Category(SR.Urn(id == 0 ? SR.I1000 : id, "category"), GetNames(null), "SR", GetTournamentListStatic(SR.I(15)));
         }
 
         public static ICompetitor GetCompetitor(int id = 0, int playerCount = 0)
         {
-            return new Competitor(new CompetitorCI(new CompetitorDTO(MFR.GetTeam(id)), TestData.Culture, null), null, TestData.Cultures3, new TestSportEntityFactory(), ExceptionHandlingStrategy.THROW, (ICompetitionCI)null);
+            return new Competitor(new CompetitorCI(new CompetitorDTO(MFR.GetTeam(id)), ScheduleData.CultureEn, SportEntityFactoryBuilder.DataRouterManager),
+                                  SportEntityFactoryBuilder.ProfileCache,
+                                  ScheduleData.Cultures3.ToList(),
+                                  SportEntityFactoryBuilder.SportEntityFactory,
+                                  ExceptionHandlingStrategy.THROW,
+                                  (ICompetitionCI)null);
         }
 
-        internal static CoverageInfo GetCoverageInfo(int subItemCount = 0)
+        internal static ICoverageInfo GetCoverageInfo(int subItemCount = 0)
         {
             if (subItemCount < 1)
             {
                 subItemCount = SR.I(20);
             }
+
             var items = new List<string>();
             for (var j = 0; j < subItemCount; j++)
             {
                 items.Add(SR.S1000);
             }
+
             return new CoverageInfo(SR.S100, true, new List<string>(items), CoveredFrom.Tv);
         }
 
         internal static IEventClock GetEventClock()
         {
-            return new EventClock(DateTime.Now.ToString(TestData.Culture), DateTime.Now.AddDays(1).ToString(TestData.Culture), DateTime.Today.ToString(TestData.Culture), DateTime.Today.ToString(TestData.Culture), "10", false);
+            return new EventClock(DateTime.Now.ToString(TestData.Culture),
+                                  DateTime.Now.AddDays(1).ToString(TestData.Culture),
+                                  DateTime.Today.ToString(TestData.Culture),
+                                  DateTime.Today.ToString(TestData.Culture),
+                                  "10",
+                                  false);
         }
 
         public static IFixture GetFixture(int id = 0, int subItemCount = 0)
@@ -86,12 +109,20 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         public static IGroup GetGroup()
         {
-            return new Group(new GroupCI(new GroupDTO(MFR.GetGroup()), TestData.Culture), TestData.Cultures3, new TestSportEntityFactory(), ExceptionHandlingStrategy.THROW, null);
+            return new Group(new GroupCI(new GroupDTO(MFR.GetGroup()), TestData.Culture),
+                             TestData.Cultures3,
+                             SportEntityFactoryBuilder.SportEntityFactory,
+                             ExceptionHandlingStrategy.THROW,
+                             null);
         }
 
         public static IGroup GetGroupWithCompetitors()
         {
-            return new Group(new GroupCI(new GroupDTO(MFR.GetTournamentGroup()), TestData.Culture), TestData.Cultures3, new TestSportEntityFactory(), ExceptionHandlingStrategy.THROW, null);
+            return new Group(new GroupCI(new GroupDTO(MFR.GetTournamentGroup()), TestData.Culture),
+                             TestData.Cultures3,
+                             SportEntityFactoryBuilder.SportEntityFactory,
+                             ExceptionHandlingStrategy.THROW,
+                             null);
         }
 
         public static IPeriodScore GetPeriodScore()
@@ -103,21 +134,26 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                 type = "regular_period",
                 numberSpecified = true,
                 number = 1
-            }), null);
+            }),
+                                   null);
         }
 
         public static IPlayer GetPlayer(int id = 0)
         {
             return new Player(
-                id == 0
-                    ? SR.Urn("", 10000)
-                    : SR.Urn(id),
-                new Dictionary<CultureInfo, string> { { new CultureInfo("en"), "Player " + SR.I1000 } });
+                              id == 0
+                                  ? SR.Urn("", 10000)
+                                  : SR.Urn(id),
+                              new Dictionary<CultureInfo, string> { { new CultureInfo("en"), "Player " + SR.I1000 } });
         }
 
         internal static IPlayerProfile GetPlayerProfile(int id = 0)
         {
-            return new PlayerProfile(new PlayerProfileCI(new PlayerProfileDTO(MFR.GetPlayerExtended(id), null), null, TestData.Culture, new TestDataRouterManager(new CacheManager())), TestData.Cultures3);
+            return new PlayerProfile(new PlayerProfileCI(new PlayerProfileDTO(MFR.GetPlayerExtended(id), null),
+                                                         null,
+                                                         TestData.Culture,
+                                                         new TestDataRouterManager(new CacheManager())),
+                                     TestData.Cultures3.ToList());
         }
 
         internal static IProductInfo GetProductInfo(int subItemCount = 0)
@@ -126,6 +162,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             {
                 subItemCount = SR.I(20);
             }
+
             var pil = new List<productInfoLink>();
             var sc = new List<streamingChannel>();
             while (subItemCount > 0)
@@ -134,6 +171,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
                 pil.Add(GetProductInfoLinkApi());
                 sc.Add(GetStreamingChannelApi());
             }
+
             return new ProductInfo(new ProductInfoDTO(new productInfo()
             {
                 is_auto_traded = new productInfoItem(),
@@ -164,8 +202,8 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
         internal static IReferee GetReferee(int id = 0)
         {
             return new Referee(
-                new RefereeCI(new RefereeDTO(MFR.GetReferee(id)), new CultureInfo("en")),
-                new[] { new CultureInfo("en") });
+                               new RefereeCI(new RefereeDTO(MFR.GetReferee(id)), new CultureInfo("en")),
+                               new[] { new CultureInfo("en") });
         }
 
         public static IRound GetRoundSummary(int id = 0)
@@ -179,48 +217,58 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             {
                 subItemCount = SR.I(20);
             }
+
             var c = new List<ICategory>();
             while (subItemCount > 0)
             {
                 subItemCount--;
                 c.Add(GetCategory());
             }
+
             return new Sport(SR.Urn(id == 0 ? SR.I1000 : id, "sport"), GetNames(null), c);
         }
 
         public static ISportEventConditions GetSportEventConditions()
         {
             return new SportEventConditions(
-                new SportEventConditionsCI(new SportEventConditionsDTO(MFR.GetSportEventConditions()), new CultureInfo("en")),
-                new[] { new CultureInfo("en") });
+                                            new SportEventConditionsCI(new SportEventConditionsDTO(MFR.GetSportEventConditions()), new CultureInfo("en")),
+                                            new[] { new CultureInfo("en") });
         }
 
         internal static IStreamingChannel GetStreamingChannel(int id = 0)
         {
-            return new StreamingChannel(id == 0 ? SR.I1000 : id, "Name " + SR.S1000);
+            var finalId = id == 0 ? SR.I1000 : id;
+            return new StreamingChannel(finalId, "Name " + finalId);
         }
 
         public static ITeamCompetitor GetTeamCompetitor(int id = 0)
         {
-            return new TeamCompetitor(new TeamCompetitorCI(new TeamCompetitorDTO(MFR.GetTeamCompetitor()), TestData.Culture, new TestDataRouterManager(new CacheManager())), TestData.Cultures3, new TestSportEntityFactory(), ExceptionHandlingStrategy.THROW, null, null);
+            return new TeamCompetitor(new TeamCompetitorCI(new TeamCompetitorDTO(MFR.GetTeamCompetitor(id)),
+                                                           ScheduleData.CultureEn,
+                                                           SportEntityFactoryBuilder.DataRouterManager),
+                                      ScheduleData.Cultures3.ToList(),
+                                      SportEntityFactoryBuilder.SportEntityFactory,
+                                      ExceptionHandlingStrategy.THROW,
+                                      SportEntityFactoryBuilder.ProfileCache,
+                                      null);
         }
 
         public static ITournament GetTournament(int id = 0)
         {
-            var sef = new TestSportEntityFactoryBuilder();
-            sef.InitializeSportEntities();
-            sef.LoadTournamentMissingValues();
+            var sef = new TestSportEntityFactoryBuilder(ScheduleData.Cultures3);
+            sef.InitializeSportEntities().GetAwaiter().GetResult();
+            sef.LoadTournamentMissingValues().GetAwaiter().GetResult();
             return (Tournament)sef.GetNewTournament();
         }
 
-        internal static TvChannel GetTvChannel(bool startTimeSpecified = true)
+        internal static ITvChannel GetTvChannel(bool startTimeSpecified = true)
         {
-            return new TvChannel("Name " + SR.S1000, DateTime.Now, "Url:" + SR.S10000P);
+            return new TvChannel("Name " + SR.S1000, startTimeSpecified ? DateTime.Now : (DateTime?)null, "Url:" + SR.S10000P);
         }
 
         public static IVenue GetVenue(int id = 0)
         {
-            return new Venue(new VenueCI(new VenueDTO(MFR.GetVenue(id)), TestData.Culture), TestData.Cultures3);
+            return new Venue(new VenueCI(new VenueDTO(MFR.GetVenue(id)), TestData.Culture), TestData.Cultures3.ToList());
         }
 
         internal static IWeatherInfo GetWeatherInfo()
@@ -230,15 +278,49 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         public static List<ITournament> GetTournamentList(int count)
         {
-            var sef = new TestSportEntityFactoryBuilder();
-            sef.InitializeSportEntities();
-            sef.LoadTournamentMissingValues();
+            var sef = new TestSportEntityFactoryBuilder(ScheduleData.Cultures3);
+            sef.InitializeSportEntities().GetAwaiter().GetResult();
+            sef.LoadTournamentMissingValues().GetAwaiter().GetResult();
 
             var tours = new List<ITournament>();
             for (var i = 0; i < count; i++)
             {
                 tours.Add(sef.GetNewTournament());
             }
+
+            return tours;
+        }
+
+        public static List<ITournament> GetTournamentListStatic(int count)
+        {
+            var semaphorePool = new SemaphorePool(20, ExceptionHandlingStrategy.THROW);
+            var fixtureMemoryCache = new MemoryCache("fixtureMemoryCache");
+
+            var tours = new List<ITournament>();
+            for (var i = 0; i < count; i++)
+            {
+                var tid = StaticRandom.I();
+                var tour = MessageFactoryRest.GetTournamentInfoEndpoint(tid);
+                if (tour != null)
+                {
+                    var tourDto = new TournamentInfoDTO(tour);
+                    var tourCI = new TournamentInfoCI(tourDto,
+                                                      SportEntityFactoryBuilder.DataRouterManager,
+                                                      semaphorePool,
+                                                      ScheduleData.CultureEn,
+                                                      ScheduleData.CultureEn,
+                                                      fixtureMemoryCache);
+                    var tourEntity = new Tournament(tourCI.Id,
+                                                    tourCI.GetSportIdAsync().GetAwaiter().GetResult(),
+                                                    SportEntityFactoryBuilder.SportEntityFactory,
+                                                    SportEntityFactoryBuilder.SportEventCache,
+                                                    SportEntityFactoryBuilder.SportDataCache,
+                                                    TestData.Cultures.ToList(),
+                                                    ExceptionHandlingStrategy.THROW);
+                    tours.Add(tourEntity);
+                }
+            }
+
             return tours;
         }
 

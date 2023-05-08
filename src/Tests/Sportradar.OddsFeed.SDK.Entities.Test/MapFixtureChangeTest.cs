@@ -46,7 +46,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
             record.change_typeSpecified = true;
             record.change_type = 1;
             var typeValidation = ValidateFixtureChangeType(record);
-            Assert.AreEqual(ValidationResult.SUCCESS, typeValidation);
+            Assert.AreEqual(ValidationResult.Success, typeValidation);
             var entity = Mapper.MapFixtureChange<ICompetition>(record, Cultures, null);
             Assert.IsNotNull(entity);
             Assert.AreEqual(FixtureChangeType.NEW, entity.ChangeType);
@@ -60,7 +60,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
             record.change_typeSpecified = true;
             record.change_type = 10;
             var typeValidation = ValidateFixtureChangeType(record);
-            Assert.AreEqual(ValidationResult.PROBLEMS_DETECTED, typeValidation);
+            Assert.AreEqual(ValidationResult.ProblemsDetected, typeValidation);
             var entity = Mapper.MapFixtureChange<ICompetition>(record, Cultures, null);
             Assert.IsNotNull(entity);
             Assert.AreEqual(FixtureChangeType.OTHER, entity.ChangeType);
@@ -74,7 +74,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
             record.change_typeSpecified = false;
             record.change_type = 1;
             var typeValidation = ValidateFixtureChangeType(record);
-            Assert.AreEqual(ValidationResult.SUCCESS, typeValidation);
+            Assert.AreEqual(ValidationResult.Success, typeValidation);
             var entity = Mapper.MapFixtureChange<ICompetition>(record, Cultures, null);
             Assert.IsNotNull(entity);
             Assert.AreEqual(FixtureChangeType.NA, entity.ChangeType);
@@ -96,9 +96,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.Test
         {
             if (message.change_typeSpecified && !MessageMapperHelper.IsEnumMember<FixtureChangeType>(message.change_type))
             {
-                return ValidationResult.PROBLEMS_DETECTED;
+                return ValidationResult.ProblemsDetected;
             }
-            return ValidationResult.SUCCESS;
+            return ValidationResult.Success;
         }
     }
 }

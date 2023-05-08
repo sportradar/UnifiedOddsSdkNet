@@ -21,7 +21,7 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
 
         public Task<HttpResponseMessage> GetAsync(Uri requestUri)
         {
-            return Task.FromResult(DataFetcher.GetAsync(requestUri).Result);
+            return Task.FromResult(DataFetcher.GetAsync(requestUri).GetAwaiter().GetResult());
         }
 
         public async Task<HttpResponseMessage> PostAsync(Uri requestUri, HttpContent content)

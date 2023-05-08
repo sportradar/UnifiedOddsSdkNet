@@ -1,6 +1,7 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -39,6 +40,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST
         /// <summary>
         /// Gets the group name of the current <see cref="IRound"/> per language
         /// </summary>
+        [Obsolete("GroupName was removed from API")]
         IDictionary<CultureInfo, string> GroupName { get; }
 
         /// <summary>

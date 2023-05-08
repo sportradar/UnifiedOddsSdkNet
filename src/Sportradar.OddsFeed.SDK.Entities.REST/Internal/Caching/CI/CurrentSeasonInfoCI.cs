@@ -3,10 +3,10 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Caching.Exportable;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Events;
@@ -76,7 +76,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             : base(dto.Id, dto.Name, culture)
         {
             Guard.Argument(dto, nameof(dto)).NotNull();
-            
+
             Year = dto.Year;
             StartDate = dto.StartDate;
             EndDate = dto.EndDate;
@@ -155,18 +155,18 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.CI
             }
 
             return new ExportableCurrentSeasonInfoCI
-                   {
-                       Id = Id.ToString(),
-                       Name = new Dictionary<CultureInfo, string>(Name),
-                       Year = Year,
-                       StartDate = StartDate,
-                       EndDate = EndDate,
-                       SeasonCoverage = SeasonCoverage != null ? await SeasonCoverage.ExportAsync().ConfigureAwait(false) : null,
-                       Groups = groupsTasks.IsNullOrEmpty() ? null : groupsTasks.Select(s=>s.Result).ToList(),
-                       CurrentRound = CurrentRound != null ? await CurrentRound.ExportAsync().ConfigureAwait(false) : null,
-                       Competitors = CompetitorsIds?.Select(s=>s.ToString()).ToList(),
-                       Schedule = Schedule?.Select(s => s.ToString()).ToList()
-                   };
+            {
+                Id = Id.ToString(),
+                Name = new Dictionary<CultureInfo, string>(Name),
+                Year = Year,
+                StartDate = StartDate,
+                EndDate = EndDate,
+                SeasonCoverage = SeasonCoverage != null ? await SeasonCoverage.ExportAsync().ConfigureAwait(false) : null,
+                Groups = groupsTasks.IsNullOrEmpty() ? null : groupsTasks.Select(s => s.GetAwaiter().GetResult()).ToList(),
+                CurrentRound = CurrentRound != null ? await CurrentRound.ExportAsync().ConfigureAwait(false) : null,
+                Competitors = CompetitorsIds?.Select(s => s.ToString()).ToList(),
+                Schedule = Schedule?.Select(s => s.ToString()).ToList()
+            };
         }
     }
 }

@@ -41,14 +41,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             _mappingValidatorFactory = new MappingValidatorFactory();
 
             _variantMdCache = new VariantMarketDescriptionCache(_variantMemoryCache, _dataRouterManager, _mappingValidatorFactory, _cacheManager);
-            _inVariantMdCache = new InvariantMarketDescriptionCache(_invariantMemoryCache, _dataRouterManager, _mappingValidatorFactory, _timer, new[] {TestData.Culture}, _cacheManager);
+            _inVariantMdCache = new InvariantMarketDescriptionCache(_invariantMemoryCache, _dataRouterManager, _mappingValidatorFactory, _timer, new[] { TestData.Culture }, _cacheManager);
         }
 
         [TestMethod]
-        public void InVariantMarketDescriptionCacheGetMarketMappingsTest()
+        public void InVariantMarketDescriptionCacheGetMarketMappings()
         {
-            var market1 = _inVariantMdCache.GetMarketDescriptionAsync(399, null, new[] {TestData.Culture}).Result;
-            var market2 = _variantMdCache.GetMarketDescriptionAsync(10030, "lcoo:markettext:33421", new[] {TestData.Culture}).Result;
+            var market1 = _inVariantMdCache.GetMarketDescriptionAsync(399, null, new[] { TestData.Culture }).GetAwaiter().GetResult();
+            var market2 = _variantMdCache.GetMarketDescriptionAsync(10030, "lcoo:markettext:33421", new[] { TestData.Culture }).GetAwaiter().GetResult();
 
             Assert.IsNotNull(market1);
             Assert.IsNotNull(market2);
@@ -59,14 +59,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void InVariantMarketWithSpecifiersDescriptionCacheGetMarketMappingsTest()
+        public void InVariantMarketWithSpecifiersDescriptionCacheGetMarketMappings()
         {
-            var market1 = _inVariantMdCache.GetMarketDescriptionAsync(203, null, TestData.Cultures3).Result;
+            var market1 = _inVariantMdCache.GetMarketDescriptionAsync(203, null, TestData.Cultures3).GetAwaiter().GetResult();
 
             Assert.IsNotNull(market1);
             Assert.AreEqual(203, market1.Id);
             Assert.IsTrue(market1.Mappings.Any());
-            Assert.AreEqual(2, market1.Mappings.Count());
+            Assert.AreEqual(3, market1.Mappings.Count());
             Assert.IsTrue(market1.Outcomes.Any());
         }
     }

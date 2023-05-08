@@ -4,7 +4,6 @@
 using System;
 using System.Net.Security;
 using System.Security.Authentication;
-using Dawn;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
@@ -65,9 +64,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="config">A <see cref="IOddsFeedConfigurationInternal"/> instance containing configuration information</param>
         public ConfiguredConnectionFactory(IOddsFeedConfigurationInternal config)
         {
-            Guard.Argument(config, nameof(config)).NotNull();
-
-            _config = config;
+            _config = config ?? throw new ArgumentNullException(nameof(config));
             ConnectionCreated = DateTime.MinValue;
         }
 

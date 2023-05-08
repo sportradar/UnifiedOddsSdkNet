@@ -20,7 +20,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         [TestMethod]
         public void FixtureIsDeserialized()
         {
-            var stream = FileHelper.OpenFile(TestData.RestXmlPath, @"fixtures.en.xml");
+            var stream = FileHelper.OpenFile(TestData.RestXmlPath, @"fixtures_en.xml");
             var fixture = Deserializer.Deserialize<fixturesEndpoint>(stream);
             Assert.IsNotNull(fixture, "fixture cannot be a null reference");
         }
@@ -68,7 +68,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         [TestMethod]
         public void TournamentScheduleIsDeserialized()
         {
-            var stream = FileHelper.OpenFile(TestData.RestXmlPath, @"tournament_schedule.en.xml");
+            var stream = FileHelper.OpenFile(TestData.RestXmlPath, @"tournament_schedule_en.xml");
             var schedule = Deserializer.Deserialize<tournamentSchedule>(stream);
             Assert.IsNotNull(schedule, "schedule cannot be a null reference");
         }
@@ -84,7 +84,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         [TestMethod]
         public void AllTournamentsAreDeserialized()
         {
-            var stream = FileHelper.OpenFile(TestData.RestXmlPath, @"tournaments.en.xml");
+            var stream = FileHelper.OpenFile(TestData.RestXmlPath, @"tournaments_en.xml");
             var tournaments = Deserializer.Deserialize<tournamentsEndpoint>(stream);
             Assert.IsNotNull(tournaments, "tournaments cannot be a null reference");
         }
@@ -100,7 +100,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         [TestMethod]
         public void PlayerProfileIsDeserialized()
         {
-            var stream = FileHelper.OpenFile(TestData.RestXmlPath, @"Profiles\en.player.1.xml");
+            var stream = FileHelper.OpenFile(TestData.RestXmlPath, @"Profiles\player_1_en.xml");
             var playerProfile = Deserializer.Deserialize<playerProfileEndpoint>(stream);
             Assert.IsNotNull(playerProfile, "playerProfile cannot be a null reference");
         }
@@ -108,7 +108,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         [TestMethod]
         public void CompetitorProfileIsDeserialized()
         {
-            var stream = FileHelper.OpenFile(TestData.RestXmlPath, @"Profiles\en.competitor.1.xml");
+            var stream = FileHelper.OpenFile(TestData.RestXmlPath, @"Profiles\competitor_1_en.xml");
             var competitorProfile = Deserializer.Deserialize<competitorProfileEndpoint>(stream);
             Assert.IsNotNull(competitorProfile, "competitorProfile cannot be a null reference");
         }

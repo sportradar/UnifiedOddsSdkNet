@@ -205,6 +205,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 {
                     ((MarketDescription)variantDescription).SetMappings((mappings ?? marketDescription.Mappings) as IReadOnlyCollection<IMarketMappingData>);
                 }
+
+                if (variantDescription.Specifiers.IsNullOrEmpty() && !marketDescription.Specifiers.IsNullOrEmpty())
+                {
+                    ((MarketDescription)variantDescription).SetSpecifiers(marketDescription.Specifiers as IReadOnlyCollection<ISpecifier>);
+                }
             }
 
             return variantDescription;

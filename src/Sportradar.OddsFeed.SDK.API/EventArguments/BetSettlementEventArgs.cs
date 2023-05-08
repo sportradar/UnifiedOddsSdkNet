@@ -3,10 +3,9 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
-using System.Linq;
 using System.Text;
+using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST;
@@ -51,13 +50,13 @@ namespace Sportradar.OddsFeed.SDK.API.EventArguments
         /// <param name="rawMessage">A raw message received from the feed</param>
         internal BetSettlementEventArgs(IFeedMessageMapper messageMapper, bet_settlement feedMessage, IEnumerable<CultureInfo> cultures, byte[] rawMessage)
         {
-            Guard.Argument(messageMapper, nameof(messageMapper)).NotNull();
-            Guard.Argument(feedMessage, nameof(feedMessage)).NotNull();
-            if (!cultures.Any())
-                throw new ArgumentOutOfRangeException(nameof(cultures));
+            if (cultures.IsNullOrEmpty())
+            {
+                throw new ArgumentException(nameof(cultures));
+            }
 
-            _messageMapper = messageMapper;
-            _feedMessage = feedMessage;
+            _messageMapper = messageMapper ?? throw new ArgumentNullException(nameof(messageMapper));
+            _feedMessage = feedMessage ?? throw new ArgumentNullException(nameof(feedMessage));
             _defaultCultures = cultures as IReadOnlyCollection<CultureInfo>;
             _rawMessage = rawMessage;
 

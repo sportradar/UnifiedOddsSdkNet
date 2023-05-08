@@ -19,7 +19,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
         public SdkHttpClient(string accessToken, HttpClient httpClient)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            httpClient.DefaultRequestHeaders.Add("x-access-token", accessToken); //
+            httpClient.DefaultRequestHeaders.Add("x-access-token", accessToken);
             httpClient.DefaultRequestHeaders.Add("User-Agent", $"UfSdk-{SdkInfo.SdkType}/{SdkInfo.GetVersion()} (NET: {Environment.Version}, OS: {Environment.OSVersion}, Init: {SdkInfo.Created:yyyyMMddHHmm})");
         }
 

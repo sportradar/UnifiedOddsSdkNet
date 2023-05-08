@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dawn;
 using System.Threading.Tasks;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Common.Exceptions;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
@@ -49,7 +49,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         {
             Guard.Argument(specifiers, nameof(specifiers)).NotNull();//.NotEmpty();
             if (!specifiers.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(specifiers));
+            }
 
             Guard.Argument(operand, nameof(operand)).NotNull().NotEmpty();
             Guard.Argument(operation, nameof(operation)).Require(Enum.IsDefined(typeof(SimpleMathOperation), operation));
@@ -82,9 +84,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
             switch (_operation)
             {
-                case SimpleMathOperation.ADD:
+                case SimpleMathOperation.Add:
                     return Task.FromResult(value + _staticValue);
-                case SimpleMathOperation.SUBTRACT:
+                case SimpleMathOperation.Subtract:
                     return Task.FromResult(value - _staticValue);
                 default:
                     throw new InvalidOperationException($"Operation {Enum.GetName(typeof(SimpleMathOperation), _operation)} is not supported");
@@ -114,9 +116,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
             switch (_operation)
             {
-                case SimpleMathOperation.ADD:
+                case SimpleMathOperation.Add:
                     return Task.FromResult(value + _staticValue);
-                case SimpleMathOperation.SUBTRACT:
+                case SimpleMathOperation.Subtract:
                     return Task.FromResult(value - _staticValue);
                 default:
                     throw new InvalidOperationException($"Operation {Enum.GetName(typeof(SimpleMathOperation), _operation)} is not supported");

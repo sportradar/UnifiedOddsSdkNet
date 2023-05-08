@@ -20,7 +20,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         /// <exception cref="FormatException">The format of the <code>operandExpression</code> is not correct</exception>
         public IOperand BuildOperand(IReadOnlyDictionary<string, string> specifiers, string operandExpression)
         {
-            if((operandExpression.StartsWith("(") && !operandExpression.EndsWith(")")) ||
+            if ((operandExpression.StartsWith("(") && !operandExpression.EndsWith(")")) ||
                 (!operandExpression.StartsWith("(") && operandExpression.EndsWith(")")))
             {
                 throw new FormatException($"Format of the operand {operandExpression} is not correct. It contains un-closed parenthesis");
@@ -34,12 +34,12 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 string[] parts;
                 if (operandExpression.Contains("+"))
                 {
-                    operation = SimpleMathOperation.ADD;
+                    operation = SimpleMathOperation.Add;
                     parts = operandExpression.Split(new[] { '+' }, StringSplitOptions.RemoveEmptyEntries);
                 }
                 else if (operandExpression.Contains("-"))
                 {
-                    operation = SimpleMathOperation.SUBTRACT;
+                    operation = SimpleMathOperation.Subtract;
                     parts = operandExpression.Split(new[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
                 }
                 else

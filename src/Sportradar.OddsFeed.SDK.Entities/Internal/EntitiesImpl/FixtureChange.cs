@@ -17,14 +17,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// </summary>
         /// <param name="timestamp">The value specifying timestamps related to the message (in the milliseconds since EPOCH UTC)</param>
         /// <param name="producer">The <see cref="IProducer" /> specifying the producer / service which dispatched the current <see cref="Message" /> message</param>
-        /// <param name="event">An <see cref="ICompetition" /> derived instance representing the sport event associated with the current <see cref="EventMessage{T}" /></param>
+        /// <param name="sportEvent">An <see cref="ICompetition" /> derived instance representing the sport event associated with the current <see cref="EventMessage{T}" /></param>
         /// <param name="requestId">The id of the request which triggered the current <see cref="EventMessage{T}" /> message or a null reference</param>
         /// <param name="changeType">A <see cref="FixtureChangeType"/> indicating how the fixture was changed (added, re-scheduled, ...)</param>
         /// <param name="nextLiveTime">The next live time</param>
         /// <param name="startTime">A value specifying the start time of the fixture in milliseconds since EPOCH UTC </param>
         /// <param name="rawMessage">The raw message</param>
-        public FixtureChange(IMessageTimestamp timestamp, IProducer producer, T @event, long? requestId, FixtureChangeType changeType, long? nextLiveTime, long startTime, byte[] rawMessage)
-            : base(timestamp, producer, @event, requestId, rawMessage)
+        public FixtureChange(IMessageTimestamp timestamp, IProducer producer, T sportEvent, long? requestId, FixtureChangeType changeType, long? nextLiveTime, long startTime, byte[] rawMessage)
+            : base(timestamp, producer, sportEvent, requestId, rawMessage)
         {
             ChangeType = changeType;
             NextLiveTime = nextLiveTime;

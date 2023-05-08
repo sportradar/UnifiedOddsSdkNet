@@ -21,11 +21,11 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         [TestInitialize]
         public void Init()
         {
-            _demoClass = LogProxyFactory.Create<DemoMethods>(null, m=> m.Name.Contains("D"), LoggerType.ClientInteraction);
+            _demoClass = LogProxyFactory.Create<DemoMethods>(null, m => m.Name.Contains("D"), LoggerType.ClientInteraction);
         }
 
         [TestMethod]
-        public void LogInputAndOutputParametersOfVoidMethodTest()
+        public void LogInputAndOutputParametersOfVoidMethod()
         {
             _demoClass.DemoVoidMethod();
             var res = _demoClass.DemoIntMethod(10, 50);
@@ -33,24 +33,24 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         }
 
         [TestMethod]
-        public void LogInputAndOutputParametersOfAsyncCallerMethodTest()
+        public void LogInputAndOutputParametersOfAsyncCallerMethod()
         {
             var res = _demoClass.DemoLongLastingMethodAsyncCaller(45, 10);
             Assert.AreEqual(100, res);
         }
 
         [TestMethod]
-        public void LogInputAndOutputParametersOfAsyncMethodTest()
+        public void LogInputAndOutputParametersOfAsyncMethod()
         {
-            var res = _demoClass.DemoLongLastingMethodAsync(10, 25).Result;
-            res = res + _demoClass.DemoLongLastingMethodAsync(15, 20).Result;
-            res = res + _demoClass.DemoLongLastingMethodAsync(40, 15).Result;
-            res = res + _demoClass.DemoLongLastingMethodAsync(40, 10).Result;
+            var res = _demoClass.DemoLongLastingMethodAsync(10, 25).GetAwaiter().GetResult();
+            res = res + _demoClass.DemoLongLastingMethodAsync(15, 20).GetAwaiter().GetResult();
+            res = res + _demoClass.DemoLongLastingMethodAsync(40, 15).GetAwaiter().GetResult();
+            res = res + _demoClass.DemoLongLastingMethodAsync(40, 10).GetAwaiter().GetResult();
             Assert.IsTrue(res > 100);
         }
 
         [TestMethod]
-        public void LogInputAndOutputParametersOfAsyncGroupTest()
+        public void LogInputAndOutputParametersOfAsyncGroup()
         {
             var res = 120;
             Task.Run(async () =>
@@ -66,7 +66,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         }
 
         [TestMethod]
-        public void LogInputAndOutParametersOfGroupAsyncMethodTest()
+        public void LogInputAndOutParametersOfGroupAsyncMethod()
         {
             var tasks = new List<Task>
             {
@@ -85,7 +85,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         }
 
         [TestMethod]
-        public void LogInAndOutParamsOfGroupAsyncMethodTest()
+        public void LogInAndOutParamsOfGroupAsyncMethod()
         {
             var res = 120;
             Task.Run(async () =>
@@ -98,7 +98,7 @@ namespace Sportradar.OddsFeed.SDK.API.Test
         }
 
         [TestMethod]
-        public void LogInAndOutParamsOfCustomMethodTest()
+        public void LogInAndOutParamsOfCustomMethod()
         {
             const int res = 100;
             Task.Run(async () =>
@@ -111,12 +111,12 @@ namespace Sportradar.OddsFeed.SDK.API.Test
 
         [TestMethod]
         [ExpectedException(typeof(Exception), AllowDerivedTypes = true)]
-        public void MethodWithTaskThrowsExceptionAsyncTest()
+        public void MethodWithTaskThrowsExceptionAsync()
         {
             var res = 100;
             Task.Run(async () =>
             {
-               res = await _demoClass.DemoMethodWithTaskThrowsExceptionAsync(450);
+                res = await _demoClass.DemoMethodWithTaskThrowsExceptionAsync(450);
             }).GetAwaiter().GetResult();
 
             Assert.AreEqual(100, res);

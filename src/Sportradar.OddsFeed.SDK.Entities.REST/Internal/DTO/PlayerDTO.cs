@@ -1,6 +1,7 @@
 ﻿/*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+
 using Dawn;
 using Sportradar.OddsFeed.SDK.Messages.REST;
 
@@ -17,7 +18,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// </summary>
         /// <param name="record">A <see cref="player"/> containing information about a player</param>
         internal PlayerDTO(player record)
-            :base(record.id, record.name)
+            : base(record.id, record.name)
         {
             Guard.Argument(record, nameof(record)).NotNull();
         }

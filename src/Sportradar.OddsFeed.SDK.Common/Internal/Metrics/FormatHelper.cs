@@ -27,7 +27,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal.Metrics
 
         public string U(Unit unit, TimeUnit time, bool useSpace)
         {
-            string t = _printMode == 0 ? time.ToString() : TimeShort(time);
+            var t = _printMode == 0 ? time.ToString() : TimeShort(time);
 
             return useSpace ? $"{unit} {t}" : $"{unit}/{t}";
         }
@@ -54,7 +54,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal.Metrics
 
         public static string Time(TimeUnit unit, MetricsReportPrintMode printMode)
         {
-            return (printMode == MetricsReportPrintMode.Normal || printMode == MetricsReportPrintMode.Full) ? unit.ToString() : TimeShort(unit);
+            return printMode == MetricsReportPrintMode.Normal || printMode == MetricsReportPrintMode.Full ? unit.ToString() : TimeShort(unit);
         }
 
         private static string TimeShort(TimeUnit unit)

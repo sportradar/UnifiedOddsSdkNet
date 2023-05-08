@@ -3,9 +3,9 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports
@@ -35,7 +35,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching.Sports
             Guard.Argument(id, nameof(id)).NotNull();
             Guard.Argument(names, nameof(names)).NotNull();//.NotEmpty();
             if (!names.Any())
+            {
                 throw new ArgumentOutOfRangeException(nameof(names));
+            }
 
             Id = id;
             Names = names;

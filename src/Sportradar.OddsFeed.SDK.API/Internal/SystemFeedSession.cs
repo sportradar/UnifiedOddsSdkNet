@@ -2,10 +2,10 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using Dawn;
 using System.Linq;
 using System.Threading;
 using Common.Logging;
+using Dawn;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
@@ -115,7 +115,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             var alive = feedMessage as alive;
             if (alive != null)
             {
-                var args = new FeedMessageReceivedEventArgs(alive, null,  rawMessage);
+                var args = new FeedMessageReceivedEventArgs(alive, null, rawMessage);
                 Dispatch(AliveReceived, args, "AliveReceived");
             }
         }
@@ -131,7 +131,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             var validationResult = _messageValidator.Validate(message);
             switch (validationResult)
             {
-                case ValidationResult.FAILURE:
+                case ValidationResult.Failure:
                     _log.Warn($"Validation of message=[{message}] failed. Raising OnUnparsableMessageReceived event");
                     MessageType messageType;
                     try
@@ -146,10 +146,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
                     var eventArgs = new UnparsableMessageEventArgs(messageType, message.ProducerId.ToString(), message.EventId, e.RawMessage);
                     Dispatch(UnparsableMessageReceived, eventArgs, "OnUnparsableMessageReceived");
                     return;
-                case ValidationResult.PROBLEMS_DETECTED:
+                case ValidationResult.ProblemsDetected:
                     _log.Warn($"Problems were detected while validating message=[{message}], but the message is still eligible for further processing.");
                     return;
-                case ValidationResult.SUCCESS:
+                case ValidationResult.Success:
                     _log.Debug($"Message=[{message}] successfully validated. Continuing with message processing");
                     ProcessMessage(message, e.RawMessage);
                     return;

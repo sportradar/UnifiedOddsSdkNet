@@ -1,23 +1,23 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sportradar.OddsFeed.SDK.API;
-using Sportradar.OddsFeed.SDK.API.EventArguments;
-using Sportradar.OddsFeed.SDK.API.Extended;
-using Sportradar.OddsFeed.SDK.Common.Internal;
-using Sportradar.OddsFeed.SDK.Entities;
-using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
-using Sportradar.OddsFeed.SDK.Messages;
-using Sportradar.OddsFeed.SDK.Messages.EventArguments;
-using Sportradar.OddsFeed.SDK.Test.Shared;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
+using System.Threading.Tasks;
 using EasyNetQ.Management.Client;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sportradar.OddsFeed.SDK.API;
+using Sportradar.OddsFeed.SDK.API.EventArguments;
+using Sportradar.OddsFeed.SDK.API.Extended;
 using Sportradar.OddsFeed.SDK.Common;
+using Sportradar.OddsFeed.SDK.Common.Internal;
+using Sportradar.OddsFeed.SDK.Entities;
+using Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching;
+using Sportradar.OddsFeed.SDK.Messages;
+using Sportradar.OddsFeed.SDK.Messages.EventArguments;
 using Sportradar.OddsFeed.SDK.Test.Messages;
+using Sportradar.OddsFeed.SDK.Test.Shared;
 
 namespace Sportradar.OddsFeed.SDK.Test
 {
@@ -75,7 +75,7 @@ namespace Sportradar.OddsFeed.SDK.Test
         }
 
         [TestMethod]
-        public void NormalRunTest()
+        public void NormalRun()
         {
             // setup for producer 1
             // open feed and check that recovery was done
@@ -132,14 +132,14 @@ namespace Sportradar.OddsFeed.SDK.Test
             Assert.AreEqual(1, _calledEvents.Count(c => c.Contains("Recovery initiated")));
             Assert.AreEqual(1, _calledEvents.Count(c => c.Contains("Producer LO is up")));
 
-            Thread.Sleep(10000);
+            Task.Delay(10000).GetAwaiter().GetResult();
 
             Assert.AreEqual(2, simpleMessageProcessor.FeedMessages.Count);
             simpleMessageProcessor.Close();
         }
 
         [TestMethod]
-        public void NormalStartWithSetAfterTest()
+        public void NormalStartWithSetAfter()
         {
             // setup for producer 1
             // open feed and check that recovery was done
@@ -205,7 +205,7 @@ namespace Sportradar.OddsFeed.SDK.Test
         }
 
         [TestMethod]
-        public void MultipleProducersWithAfterTest()
+        public void MultipleProducersWithAfter()
         {
             // setup for producer 1 and 3
             // open feed and check that recovery was done
@@ -297,7 +297,7 @@ namespace Sportradar.OddsFeed.SDK.Test
         }
 
         [TestMethod]
-        public void MultipleProducersMultiSessionTest()
+        public void MultipleProducersMultiSession()
         {
             // setup for producer 1 and 3, with 3 sessions (Live, Pre and Virtuals)
             // open feed and check that recovery was done
@@ -400,7 +400,7 @@ namespace Sportradar.OddsFeed.SDK.Test
         }
 
         [TestMethod]
-        public void RecoveryUnsuccessfulRetryTest()
+        public void RecoveryUnsuccessfulRetry()
         {
             // setup for producer 1
             // open feed and check that recovery was done (at first unsuccessful - testing if it retries)
@@ -427,7 +427,7 @@ namespace Sportradar.OddsFeed.SDK.Test
 
             _feed.Open();
 
-            Thread.Sleep(2000);
+            Task.Delay(2000).GetAwaiter().GetResult();
 
             // setup for recovery request and fails
             Helper.WriteToOutput("Waiting for first recovery call");
@@ -445,7 +445,7 @@ namespace Sportradar.OddsFeed.SDK.Test
             Assert.AreEqual(1, _calledEvents.Count(c => c.Contains("Full odds recovery") && c.Contains("failed")));
             var oldRecoveryRequestId = producer.RecoveryInfo.RequestId;
 
-            Thread.Sleep(_config.MinIntervalBetweenRecoveryRequests * 1000);
+            Task.Delay(_config.MinIntervalBetweenRecoveryRequests * 1000).GetAwaiter().GetResult();
 
             // call second one and fail
             Helper.WriteToOutput("Waiting for second recovery call");
@@ -457,7 +457,7 @@ namespace Sportradar.OddsFeed.SDK.Test
             recoveryCalled = _feed.RecoveryDataPoster.CalledUrls.FindAll(f => f.Contains("/liveodds/recovery/")); // failed one
             Assert.AreEqual(2, recoveryCalled.Count);
             Assert.AreEqual(0, recoveryCalled.Count(c => c.Contains("after")));
-            Assert.IsTrue(recoveryCalled.Any(c => c.Contains(producer.RecoveryInfo.RequestId.ToString())), $"RequestId={ producer.RecoveryInfo.RequestId}");
+            Assert.IsTrue(recoveryCalled.Any(c => c.Contains(producer.RecoveryInfo.RequestId.ToString())), $"RequestId={producer.RecoveryInfo.RequestId}");
             Assert.AreEqual(2, _calledEvents.Count(c => c.Contains("Full odds recovery") && c.Contains("failed")));
             oldRecoveryRequestId = producer.RecoveryInfo.RequestId;
 
@@ -474,7 +474,7 @@ namespace Sportradar.OddsFeed.SDK.Test
             WaitAndCheckTillTimeout(() => !producer.IsProducerDown, "Producer is not down", 250, 5000);
             Assert.IsTrue(producer.IsProducerDown);
 
-            Thread.Sleep(_config.MinIntervalBetweenRecoveryRequests * 1000);
+            Task.Delay(_config.MinIntervalBetweenRecoveryRequests * 1000).GetAwaiter().GetResult();
 
             // now get the valid recovery and complete it
             _feed.RecoveryDataPoster.PostResponses.Clear();
@@ -515,7 +515,7 @@ namespace Sportradar.OddsFeed.SDK.Test
         }
 
         [TestMethod]
-        public void ProducerNoAlivesMakeRecoveryTest()
+        public void ProducerNoAlivesMakeRecovery()
         {
             // setup for producer 1
             // open feed and check that recovery was done (at first unsuccessful - testing if it retries)
@@ -579,7 +579,7 @@ namespace Sportradar.OddsFeed.SDK.Test
         }
 
         [TestMethod]
-        public void UnsuccessfulRecoveryDoesNotRepeatToOftenTest()
+        public void UnsuccessfulRecoveryDoesNotRepeatToOften()
         {
             // setup for producer 1
             // open feed and check that recovery was done (at first unsuccessful - testing if it retries)
@@ -617,7 +617,7 @@ namespace Sportradar.OddsFeed.SDK.Test
             Assert.AreEqual(1, recoveryCalled.Count(c => c.Contains(producer.RecoveryInfo.RequestId.ToString())));
             Assert.AreEqual(1, _calledEvents.Count(c => c.Contains($"RequestId={producer.RecoveryInfo.RequestId}")));
 
-            Thread.Sleep(30000); // wait till new recovery request can be done
+            Task.Delay(30000).GetAwaiter().GetResult(); // wait till new recovery request can be done
             _feed.RecoveryDataPoster.PostResponses.Clear();
             _feed.RecoveryDataPoster.PostResponses.Add(new Tuple<string, int, HttpResponseMessage>("/liveodds/", 0, new HttpResponseMessage(HttpStatusCode.Accepted)));
             Assert.IsNotNull(producer.RecoveryInfo);
@@ -656,7 +656,7 @@ namespace Sportradar.OddsFeed.SDK.Test
         }
 
         [TestMethod]
-        public void AliveSubscribedFalseTest()
+        public void AliveSubscribedFalse()
         {
             // setup for producer 1
             // open feed and check that recovery was done
@@ -756,7 +756,7 @@ namespace Sportradar.OddsFeed.SDK.Test
         }
 
         [TestMethod]
-        public void ConnectionBreakTest()
+        public void ConnectionBreak()
         {
             // setup for producer 1
             // open feed and check that recovery was done
@@ -823,15 +823,15 @@ namespace Sportradar.OddsFeed.SDK.Test
             var connections = _rabbitProducer.ManagementClient.GetConnections().ToList();
             Assert.AreEqual(2, connections.Count); // producer and sdk connection
             var sdkConnection = connections.First(f => f.User.Equals(SdkUsername));
-            var channels = _rabbitProducer.ManagementClient.GetChannelsAsync(sdkConnection).Result;
+            var channels = _rabbitProducer.ManagementClient.GetChannelsAsync(sdkConnection).GetAwaiter().GetResult();
             Assert.AreEqual(2, channels.Count());
 
             // close connection and wait to auto restart
             userChanged = _rabbitProducer.RabbitChangeUserPassword(SdkUsername, "testpass67"); // disable sdk rabbit connection user
             Assert.IsTrue(userChanged);
             _rabbitProducer.ManagementClient.CloseConnection(sdkConnection);
-            Thread.Sleep(2000);
-            connections = _rabbitProducer.ManagementClient.GetConnectionsAsync().Result.ToList();
+            Task.Delay(2000).GetAwaiter().GetResult();
+            connections = _rabbitProducer.ManagementClient.GetConnectionsAsync().GetAwaiter().GetResult().ToList();
             Assert.AreEqual(1, connections.Count); // producer connection only
 
             WaitAndCheckTillTimeout(() => _calledEvents.Count(c => c.Contains("Connection to the feed lost")) == 1, "Connection drop event called", 3000, 60000);
@@ -850,10 +850,10 @@ namespace Sportradar.OddsFeed.SDK.Test
             Assert.AreNotEqual(oldRequestId, producer.RecoveryInfo.RequestId);
 
             // check for new connection is done and new alives arrive
-            connections = _rabbitProducer.ManagementClient.GetConnectionsAsync().Result.ToList();
+            connections = _rabbitProducer.ManagementClient.GetConnectionsAsync().GetAwaiter().GetResult().ToList();
             Assert.AreEqual(2, connections.Count); // producer and sdk connection
             sdkConnection = connections.First(f => f.User.Equals(SdkUsername));
-            channels = _rabbitProducer.ManagementClient.GetChannelsAsync(sdkConnection).Result;
+            channels = _rabbitProducer.ManagementClient.GetChannelsAsync(sdkConnection).GetAwaiter().GetResult();
             Assert.AreEqual(2, channels.Count());
 
             // send 2 changeOdds and snapshotComplete for recovery request id - should trigger producerUp
@@ -882,7 +882,7 @@ namespace Sportradar.OddsFeed.SDK.Test
         }
 
         [TestMethod]
-        public void ConnectionBreakMultiSessionTest()
+        public void ConnectionBreakMultiSession()
         {
             // setup for producer 1, 3, 6 and 3 different session
             // open feed and check that recovery was done
@@ -999,19 +999,19 @@ namespace Sportradar.OddsFeed.SDK.Test
             var connections = _rabbitProducer.ManagementClient.GetConnections().ToList();
             Assert.AreEqual(2, connections.Count); // producer and sdk connection
             var sdkConnection = connections.First(f => f.User.Equals(SdkUsername));
-            var channels = _rabbitProducer.ManagementClient.GetChannelsAsync(sdkConnection).Result;
+            var channels = _rabbitProducer.ManagementClient.GetChannelsAsync(sdkConnection).GetAwaiter().GetResult();
             Assert.AreEqual(4, channels.Count());
 
             // close connection and wait to auto restart
             userChanged = _rabbitProducer.RabbitChangeUserPassword(SdkUsername, "testpass67"); // disable sdk rabbit connection user
             Assert.IsTrue(userChanged);
             _rabbitProducer.ManagementClient.CloseConnection(sdkConnection);
-            Thread.Sleep(2000);
-            connections = _rabbitProducer.ManagementClient.GetConnectionsAsync().Result.ToList();
+            Task.Delay(2000).GetAwaiter().GetResult();
+            connections = _rabbitProducer.ManagementClient.GetConnectionsAsync().GetAwaiter().GetResult().ToList();
             Assert.AreEqual(1, connections.Count); // producer connection only
 
             WaitAndCheckTillTimeout(() => _calledEvents.Count(c => c.Contains("Connection to the feed lost")) == 1, "Connection drop event called", 3000, 60000);
-            Thread.Sleep(1000); // so all events can be called
+            Task.Delay(1000).GetAwaiter().GetResult(); // so all events can be called
             Assert.AreEqual(1, _calledEvents.Count(c => c.Contains("Producer LO is down"))); // producers are marked down
             Assert.AreEqual(1, _calledEvents.Count(c => c.Contains("Producer Ctrl is down")));
             Assert.AreEqual(1, _calledEvents.Count(c => c.Contains("Producer VF is down")));
@@ -1031,10 +1031,10 @@ namespace Sportradar.OddsFeed.SDK.Test
             Assert.AreNotEqual(oldRequestId1, producer1.RecoveryInfo.RequestId);
 
             // check for new connection is done and new alives arrive
-            connections = _rabbitProducer.ManagementClient.GetConnectionsAsync().Result.ToList();
+            connections = _rabbitProducer.ManagementClient.GetConnectionsAsync().GetAwaiter().GetResult().ToList();
             Assert.AreEqual(2, connections.Count); // producer and sdk connection
             sdkConnection = connections.First(f => f.User.Equals(SdkUsername));
-            channels = _rabbitProducer.ManagementClient.GetChannelsAsync(sdkConnection).Result;
+            channels = _rabbitProducer.ManagementClient.GetChannelsAsync(sdkConnection).GetAwaiter().GetResult();
             Assert.AreEqual(4, channels.Count());
 
             // send 2 changeOdds and snapshotComplete for recovery request id - should trigger producerUp
@@ -1090,7 +1090,7 @@ namespace Sportradar.OddsFeed.SDK.Test
         }
 
         [TestMethod]
-        public void ChannelNoMessagesTest()
+        public void ChannelNoMessages()
         {
             // connection started but no message arrive on channel
             // open feed and check that recovery was done
@@ -1130,7 +1130,7 @@ namespace Sportradar.OddsFeed.SDK.Test
             var recoveryCalled = _feed.RecoveryDataPoster.CalledUrls.FindAll(f => f.Contains("/liveodds/recovery/"));
             Assert.AreEqual(1, recoveryCalled.Count);
             Assert.AreEqual(0, recoveryCalled.Count(c => c.Contains("after")));
-            Assert.AreEqual(1, _calledEvents.Count(c => c.Contains($"Recovery initiated. RequestId={producer.RecoveryInfo.RequestId}"))); 
+            Assert.AreEqual(1, _calledEvents.Count(c => c.Contains($"Recovery initiated. RequestId={producer.RecoveryInfo.RequestId}")));
             var recoveryRequestId1 = producer.RecoveryInfo.RequestId;
 
             // send 2 changeOdds and snapshotComplete for recovery request id - should trigger producerUp
@@ -1155,21 +1155,21 @@ namespace Sportradar.OddsFeed.SDK.Test
             var connections = _rabbitProducer.ManagementClient.GetConnections().ToList();
             Assert.AreEqual(2, connections.Count); // producer and sdk connection
             var sdkConnection = connections.First(f => f.User.Equals(SdkUsername));
-            var channels = _rabbitProducer.ManagementClient.GetChannelsAsync(sdkConnection).Result.ToList();
+            var channels = _rabbitProducer.ManagementClient.GetChannelsAsync(sdkConnection).GetAwaiter().GetResult().ToList();
             Assert.AreEqual(2, channels.Count);
             var channelId1 = channels[0].Name;
             var channelId2 = channels[1].Name;
             Assert.AreNotEqual(channelId1, channelId2);
 
-            Thread.Sleep(TimeSpan.FromSeconds(200)); // timeout for creating new channel
+            Task.Delay(TimeSpan.FromSeconds(200)).GetAwaiter().GetResult(); // timeout for creating new channel
             //_rabbitProducer.AddProducersAlive(1, 5000);
-            //Thread.Sleep(TimeSpan.FromSeconds(30));
+            //Task.Delay(TimeSpan.FromSeconds(30)).GetAwaiter().GetResult();
 
             // new channel should be made
-            connections = _rabbitProducer.ManagementClient.GetConnectionsAsync().Result.ToList();
+            connections = _rabbitProducer.ManagementClient.GetConnectionsAsync().GetAwaiter().GetResult().ToList();
             Assert.AreEqual(2, connections.Count); // producer connection only
             sdkConnection = connections.First(f => f.User.Equals(SdkUsername));
-            channels = _rabbitProducer.ManagementClient.GetChannelsAsync(sdkConnection).Result.ToList();
+            channels = _rabbitProducer.ManagementClient.GetChannelsAsync(sdkConnection).GetAwaiter().GetResult().ToList();
             Assert.AreEqual(2, channels.Count);
             Assert.AreNotEqual(channels[0].Name, channels[1].Name);
 
@@ -1247,7 +1247,7 @@ namespace Sportradar.OddsFeed.SDK.Test
                 {
                     Helper.WriteToOutput($"Condition {message}not true yet (error) ({(DateTime.Now - start).TotalMilliseconds:0000}ms)");
                 }
-                Thread.Sleep(checkPeriod);
+                Task.Delay(checkPeriod).GetAwaiter().GetResult();
             }
             Helper.WriteToOutput($"Condition {message}not true (final) ({(DateTime.Now - start).TotalMilliseconds:0000}ms)");
         }

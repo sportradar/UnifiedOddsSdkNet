@@ -2,209 +2,185 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sportradar.OddsFeed.SDK.Common.Exceptions;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 using Sportradar.OddsFeed.SDK.Entities.REST.Internal;
 using Sportradar.OddsFeed.SDK.Messages.REST;
-using Sportradar.OddsFeed.SDK.Test.Shared;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 {
     [TestClass]
     public class LogHttpDataFetcherTest
     {
-        private LogHttpDataFetcher _logHttpDataFetcher; // = new LogHttpDataFetcher();
-        private readonly Uri _badUri = new Uri("http://www.unexisting-url.com");
-        private readonly Uri _getUri = new Uri("http://httpbin.org/get");
-        private readonly Uri _postUri = new Uri("http://httpbin.org/post");
+        private LogHttpDataFetcher _logHttpDataFetcher;
+        private LogHttpDataFetcher _logHttpDataFetcherPool;
 
         [TestInitialize]
         public void Init()
         {
-            var httpClient = new TestHttpClient();
-            _logHttpDataFetcher = new LogHttpDataFetcher(httpClient, new IncrementalSequenceGenerator(), new Deserializer<response>());
-        }
+            var httpMessageHandler = new TestMessageHandler(200, 0);
+            var httpClient = new HttpClient(httpMessageHandler);
+            var sdkHttpClient = new SdkHttpClient("aaa", httpClient);
+            var sdkHttpClientPool = new SdkHttpClientPool("aaa", 200, TimeSpan.FromSeconds(5), httpMessageHandler);
 
-        [TestMethod]
-        public void GetDataAsyncTest()
-        {
-            // in logRest file there should be result for this call
-            var result = _logHttpDataFetcher.GetDataAsync(_getUri).Result;
-            Assert.IsNotNull(result);
-            Assert.IsTrue(result.CanRead);
-            var s = new StreamReader(result).ReadToEnd();
-            Assert.IsTrue(!string.IsNullOrEmpty(s));
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(CommunicationException))]
-        public void GetDataAsyncTestWithWrongUrl()
-        {
-            // in logRest file there should be result for this call
-            try
-            {
-                var stream = _logHttpDataFetcher.GetDataAsync(_badUri).Result;
-                Assert.IsNotNull(stream);
-            }
-            catch (AggregateException ex)
-            {
-                if (ex.InnerException != null)
-                {
-                    throw ex.InnerException;
-                }
-            }
-        }
-
-        [TestMethod]
-        public void PostDataAsyncTest()
-        {
-            var result = _logHttpDataFetcher.PostDataAsync(_postUri).Result;
-            Assert.IsNotNull(result);
-            Assert.IsTrue(result.IsSuccessStatusCode);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(CommunicationException))]
-        public void PostDataAsyncTestWithWrongUrl()
-        {
-            try
-            {
-                var result = _logHttpDataFetcher.PostDataAsync(_badUri).Result;
-                Assert.IsNotNull(result);
-                Assert.IsTrue(result.IsSuccessStatusCode);
-            }
-            catch (AggregateException ex)
-            {
-                if (ex.InnerException != null)
-                {
-                    throw ex.InnerException;
-                }
-            }
-        }
-
-        [TestMethod]
-        public void PostDataAsyncTestContent()
-        {
-            var result = _logHttpDataFetcher.PostDataAsync(_postUri, new StringContent("test string")).Result;
-            Assert.IsNotNull(result);
-            Assert.IsTrue(result.IsSuccessStatusCode);
+            _logHttpDataFetcher = new LogHttpDataFetcher(sdkHttpClient, new IncrementalSequenceGenerator(), new Deserializer<response>());
+            _logHttpDataFetcherPool = new LogHttpDataFetcher(sdkHttpClientPool, new IncrementalSequenceGenerator(), new Deserializer<response>());
         }
 
         //[TestMethod]
-        public void LoggingTestContent()
+        [Timeout(30000)]
+        public async Task PerformanceOf100SequentialRequests()
         {
-            var result = _logHttpDataFetcher.PostDataAsync(_postUri, new StringContent("test string")).Result;
-            Assert.IsNotNull(result);
-            Assert.IsTrue(result.IsSuccessStatusCode);
-        }
-
-        [TestMethod]
-        public void ConsecutivePostFailureTest()
-        {
-            const int loopCount = 10;
-            var errCount = 0;
-            var allErrCount = 0;
-            for (var i = 0; i < loopCount; i++)
+            var stopwatch = Stopwatch.StartNew();
+            for (var i = 0; i < 100; i++)
             {
-                try
-                {
-                    var result = _logHttpDataFetcher.PostDataAsync(_badUri).Result;
-                    Assert.IsNotNull(result);
-                    Assert.IsTrue(result.IsSuccessStatusCode);
-                }
-                catch (Exception e)
-                {
-                    allErrCount++;
-                    if (e.InnerException?.Message == "Failed to execute request due to previous failures.")
-                    {
-                        errCount++;
-                    }
-                    Console.WriteLine(e);
-                }
-                Assert.AreEqual(i, allErrCount - 1);
-            }
-            Assert.AreEqual(loopCount - 5, errCount);
-        }
-
-        [TestMethod]
-        public void ConsecutivePostAndGetFailureTest()
-        {
-            const int loopCount = 10;
-            var errCount = 0;
-            var allPostErrCount = 0;
-            var allGetErrCount = 0;
-            for (var i = 0; i < loopCount; i++)
-            {
-                try
-                {
-                    var result = _logHttpDataFetcher.PostDataAsync(_badUri).Result;
-                    Assert.IsNotNull(result);
-                    Assert.IsTrue(result.IsSuccessStatusCode);
-                }
-                catch (Exception e)
-                {
-                    allPostErrCount++;
-                    if (e.InnerException?.Message == "Failed to execute request due to previous failures.")
-                    {
-                        errCount++;
-                    }
-                    Console.WriteLine(e);
-                }
-                Assert.AreEqual(i, allPostErrCount - 1);
-
-                try
-                {
-                    var result = _logHttpDataFetcher.GetDataAsync(_badUri).Result;
-                    Assert.IsNotNull(result);
-                }
-                catch (Exception e)
-                {
-                    allGetErrCount++;
-                    if (e.InnerException?.Message == "Failed to execute request due to previous failures.")
-                    {
-                        errCount++;
-                    }
-                    Console.WriteLine(e);
-                }
-                Assert.AreEqual(i, allGetErrCount - 1);
-            }
-            Assert.AreEqual(loopCount * 2 - 5, errCount);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(CommunicationException))]
-        public void ExceptionAfterConsecutivePostFailuresTest()
-        {
-            ConsecutivePostFailureTest();
-            try
-            {
-                var result = _logHttpDataFetcher.PostDataAsync(_getUri).Result;
+                var result = await _logHttpDataFetcher.GetDataAsync(GetRequestUri(false)).ConfigureAwait(false);
                 Assert.IsNotNull(result);
-                Assert.IsFalse(result.IsSuccessStatusCode);
+                Assert.IsTrue(result.CanRead);
             }
-            catch (Exception e)
-            {
-                if (e.InnerException is CommunicationException)
-                {
-                    throw e.InnerException;
-                }
-            }
+            Debug.WriteLine($"Elapsed {stopwatch.ElapsedMilliseconds} ms");
         }
 
         [TestMethod]
-        public void SuccessAfterConsecutiveFailuresResetsTest()
+        [Timeout(30000)]
+        public async Task PerformanceOfManyParallelRequests()
         {
-            var httpClient = new TestHttpClient();
-            _logHttpDataFetcher = new LogHttpDataFetcher(httpClient, new IncrementalSequenceGenerator(), new Deserializer<response>(), 5, 1);
-            ConsecutivePostFailureTest();
-            Thread.Sleep(1000);
-            var result = _logHttpDataFetcher.GetDataAsync(_getUri).Result;
-            Assert.IsNotNull(result);
-            Assert.IsTrue(result.Length > 0);
+            var stopwatch = Stopwatch.StartNew();
+            var tasks = new List<Task>();
+            for (var i = 0; i < 10000; i++)
+            {
+                var task = _logHttpDataFetcher.GetDataAsync(GetRequestUri(false));
+                tasks.Add(task);
+            }
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+            Assert.IsTrue(tasks.TrueForAll(a => a.IsCompleted));
+            Debug.WriteLine($"Elapsed {stopwatch.ElapsedMilliseconds} ms");
+        }
+
+        [TestMethod]
+        [Timeout(30000)]
+        public async Task PerformancePoolOfManyParallelRequests()
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var tasks = new List<Task>();
+            for (var i = 0; i < 10000; i++)
+            {
+                var task = _logHttpDataFetcherPool.GetDataAsync(GetRequestUri(false));
+                tasks.Add(task);
+            }
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+            Assert.IsTrue(tasks.TrueForAll(a => a.IsCompleted));
+            Debug.WriteLine($"Elapsed {stopwatch.ElapsedMilliseconds} ms");
+        }
+
+        [TestMethod]
+        [Timeout(30000)]
+        public async Task PerformanceOfManyUniqueParallelRequests()
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var tasks = new List<Task>();
+            for (var i = 0; i < 10000; i++)
+            {
+                var task = _logHttpDataFetcher.GetDataAsync(GetRequestUri(true));
+                tasks.Add(task);
+            }
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+            Assert.IsTrue(tasks.TrueForAll(a => a.IsCompleted));
+            Debug.WriteLine($"Elapsed {stopwatch.ElapsedMilliseconds} ms");
+        }
+
+        [TestMethod]
+        [Timeout(30000)]
+        public async Task PerformancePoolOfManyUniqueParallelRequests()
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var tasks = new List<Task>();
+            for (var i = 0; i < 10000; i++)
+            {
+                var task = _logHttpDataFetcherPool.GetDataAsync(GetRequestUri(true));
+                tasks.Add(task);
+            }
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+            Assert.IsTrue(tasks.TrueForAll(a => a.IsCompleted));
+            Debug.WriteLine($"Elapsed {stopwatch.ElapsedMilliseconds} ms");
+        }
+
+        [TestMethod]
+        [Timeout(30000)]
+        public async Task PerformanceOfManyUniqueUriParallelRequests()
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var tasks = new List<Task>();
+            for (var i = 0; i < 10000; i++)
+            {
+                var task = _logHttpDataFetcher.GetDataAsync(GetRandomUri(true));
+                tasks.Add(task);
+            }
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+            Assert.IsTrue(tasks.TrueForAll(a => a.IsCompleted));
+            Debug.WriteLine($"Elapsed {stopwatch.ElapsedMilliseconds} ms");
+        }
+
+        [TestMethod]
+        [Timeout(30000)]
+        public async Task PerformancePoolOfManyUniqueUriParallelRequests()
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var tasks = new List<Task>();
+            for (var i = 0; i < 10000; i++)
+            {
+                var task = _logHttpDataFetcherPool.GetDataAsync(GetRandomUri(true));
+                tasks.Add(task);
+            }
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+            Assert.IsTrue(tasks.TrueForAll(a => a.IsCompleted));
+            Debug.WriteLine($"Elapsed {stopwatch.ElapsedMilliseconds} ms");
+        }
+
+        private Uri GetRequestUri(bool isRandom)
+        {
+            var id = isRandom ? SdkInfo.GetRandom() : 1;
+            return new Uri($"http://test.domain.com/api/v1/sr:match:{id}/summary.xml");
+        }
+
+        private Uri GetRandomUri(bool isRandom)
+        {
+            var id = isRandom ? SdkInfo.GetRandom() : 1;
+            return new Uri($"http://test.domain.com/api/v1/sr:match:{id}.xml");
+        }
+
+        private class TestMessageHandler : HttpMessageHandler
+        {
+            private readonly int _timeoutMs;
+            private readonly int _timeoutVariablePercent;
+
+            public TestMessageHandler(int timeoutMs, int timeoutVariablePercent = 0)
+            {
+                _timeoutMs = timeoutMs;
+                _timeoutVariablePercent = timeoutVariablePercent;
+            }
+
+            protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            {
+                var stopWatch = Stopwatch.StartNew();
+                var timeout = _timeoutVariablePercent < 1 ? _timeoutMs : SdkInfo.GetVariableNumber(_timeoutMs, _timeoutVariablePercent);
+
+                await Task.Delay(timeout, cancellationToken).ConfigureAwait(false);
+                Debug.WriteLine($"Request to {request.RequestUri} took {stopWatch.ElapsedMilliseconds} ms");
+                return new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.Accepted,
+                    ReasonPhrase = HttpStatusCode.Accepted.ToString(),
+                    RequestMessage = request,
+                    Content = new StringContent("some text")
+                };
+            }
         }
     }
 }

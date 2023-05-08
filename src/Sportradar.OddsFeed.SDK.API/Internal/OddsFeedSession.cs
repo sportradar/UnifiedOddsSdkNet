@@ -3,10 +3,10 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using Common.Logging;
+using Dawn;
 using Metrics;
 using Sportradar.OddsFeed.SDK.API.EventArguments;
 using Sportradar.OddsFeed.SDK.Common;
@@ -97,22 +97,14 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             MessageInterest messageInterest,
             IEnumerable<CultureInfo> defaultCultures,
             Func<OddsFeedSession, IEnumerable<string>> getRoutingKeys)
-            :base(messageMapper, defaultCultures)
+            : base(messageMapper, defaultCultures)
         {
-            Guard.Argument(messageReceiver, nameof(messageReceiver)).NotNull();
-            Guard.Argument(messageInterest, nameof(messageInterest)).NotNull();
-            Guard.Argument(messageProcessor, nameof(messageProcessor)).NotNull();
-            Guard.Argument(messageValidator, nameof(messageValidator)).NotNull();
-            Guard.Argument(messageDataExtractor, nameof(messageDataExtractor)).NotNull();
-            Guard.Argument(dispatcherStore, nameof(dispatcherStore)).NotNull();
-
-            MessageReceiver = messageReceiver;
-            _messageProcessor = messageProcessor;
-            _messageValidator = messageValidator;
-            _messageDataExtractor = messageDataExtractor;
-            MessageInterest = messageInterest;
-
-            _sportSpecificDispatchers = dispatcherStore;
+            MessageReceiver = messageReceiver ?? throw new ArgumentNullException(nameof(messageReceiver));
+            _messageProcessor = messageProcessor ?? throw new ArgumentNullException(nameof(messageProcessor));
+            _messageValidator = messageValidator ?? throw new ArgumentNullException(nameof(messageValidator));
+            _messageDataExtractor = messageDataExtractor ?? throw new ArgumentNullException(nameof(messageDataExtractor));
+            MessageInterest = messageInterest ?? throw new ArgumentNullException(nameof(messageInterest));
+            _sportSpecificDispatchers = dispatcherStore ?? throw new ArgumentNullException(nameof(dispatcherStore));
 
             _getRoutingKeys = getRoutingKeys;
 
@@ -130,18 +122,18 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             var validationResult = _messageValidator.Validate(message);
             switch (validationResult)
             {
-                case ValidationResult.FAILURE:
+                case ValidationResult.Failure:
                     ExecutionLog.Warn($"{WriteMessageInterest()}Validation of message=[{message}] failed. Raising OnUnparsableMessageReceived event");
                     var messageType = _messageDataExtractor.GetMessageTypeFromMessage(message);
 
                     var eventArgs = new UnparsableMessageEventArgs(messageType, message.ProducerId.ToString(), message.EventId, e.RawMessage);
                     Dispatch(OnUnparsableMessageReceived, eventArgs, "OnUnparsableMessageReceived", message.ProducerId);
                     return;
-                case ValidationResult.PROBLEMS_DETECTED:
+                case ValidationResult.ProblemsDetected:
                     ExecutionLog.Warn($"{WriteMessageInterest()}Problems were detected while validating message=[{message}], but the message is still eligible for further processing.");
                     _messageProcessor.ProcessMessage(message, MessageInterest, e.RawMessage);
                     return;
-                case ValidationResult.SUCCESS:
+                case ValidationResult.Success:
                     Metric.Context("FEED").Meter($"OddsFeedSession->MessageReceived ({MessageInterest.ProducerId})", Unit.Items).Mark();
                     ExecutionLog.Debug($"{WriteMessageInterest()}Message=[{message}] successfully validated. Continuing with message processing.");
                     _messageProcessor.ProcessMessage(message, MessageInterest, e.RawMessage);
@@ -206,7 +198,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
             var specificDispatcher = _sportSpecificDispatchers.Get(URN.Parse(message.EventId), message.SportId);
             return specificDispatcher == null
                 ? this
-                : (IEntityDispatcherInternal) specificDispatcher;
+                : (IEntityDispatcherInternal)specificDispatcher;
         }
 
         /// <summary>

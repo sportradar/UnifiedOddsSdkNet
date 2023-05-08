@@ -44,6 +44,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// </summary>
         internal string Coordinates { get; }
 
+        //TODO - this was changed
         /// <summary>
         /// Gets the course
         /// </summary>
@@ -60,7 +61,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             Guard.Argument(venue, nameof(venue)).NotNull();
 
             Capacity = venue.capacitySpecified
-                ? (int?) venue.capacity
+                ? (int?)venue.capacity
                 : null;
             City = venue.city_name;
             Country = venue.country_name;
@@ -69,7 +70,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             Coordinates = venue.map_coordinates;
             if (venue.course != null && venue.course.Any())
             {
-                Course = venue.course.Select(s => new HoleDTO(s));
+                //TODO - this was changed
+                Course = venue.course.First().hole.Select(s => new HoleDTO(s));
             }
         }
     }

@@ -375,17 +375,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.Caching
                         var ci = (SportEventCI)keyValuePair.Value;
                         if (ci.Scheduled != null)
                         {
-                            if (ci.Scheduled < before)
+                            if (ci.Scheduled < before && ci.ScheduledEnd == null)
                             {
                                 Cache.Remove(keyValuePair.Key);
                             }
                         }
-                        else if (ci.ScheduledEnd != null)
+                        else if (ci.ScheduledEnd != null && ci.ScheduledEnd < before)
                         {
-                            if (ci.ScheduledEnd < before)
-                            {
-                                Cache.Remove(keyValuePair.Key);
-                            }
+                            Cache.Remove(keyValuePair.Key);
                         }
                     }
                     catch

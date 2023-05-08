@@ -3,7 +3,6 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 {
@@ -29,9 +28,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <param name="specifierValue">The required value of the specifier.</param>
         public SpecificValueMappingValidator(string specifierName, string specifierValue)
         {
-            Guard.Argument(specifierName, nameof(specifierName)).NotNull().NotEmpty();
-            Guard.Argument(specifierValue, nameof(specifierValue)).NotNull().NotEmpty();
-
+            if (string.IsNullOrEmpty(specifierName))
+            {
+                throw new ArgumentNullException(nameof(specifierName));
+            }
+            if (string.IsNullOrEmpty(specifierValue))
+            {
+                throw new ArgumentNullException(nameof(specifierValue));
+            }
             _specifierName = specifierName;
             _specifierValue = specifierValue;
         }

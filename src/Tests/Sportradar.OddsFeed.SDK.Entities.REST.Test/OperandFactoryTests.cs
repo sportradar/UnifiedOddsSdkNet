@@ -104,7 +104,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 BuildSpecifiers(Specifier, "1"),
                 $"({Specifier}+1)");
 
-            Assert.AreEqual(2, operand.GetIntValue().Result, "Value of the operand is not correct");
+            Assert.AreEqual(2, operand.GetIntValue().GetAwaiter().GetResult(), "Value of the operand is not correct");
         }
 
         [TestMethod]
@@ -114,7 +114,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 BuildSpecifiers(Specifier, "2"),
                 $"({Specifier}-1)");
 
-            Assert.AreEqual(1, operand.GetIntValue().Result, "Value of the operand is not correct");
+            Assert.AreEqual(1, operand.GetIntValue().GetAwaiter().GetResult(), "Value of the operand is not correct");
         }
     }
 }

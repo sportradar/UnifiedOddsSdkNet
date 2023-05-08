@@ -2,8 +2,10 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -22,50 +24,53 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         private Uri _deMatchStatusUri;
         private Uri _huMatchStatusUri;
         private Uri _nlMatchStatusUri;
-        private LocalizedNamedValueCache _cache;
 
-        private void Setup(ExceptionHandlingStrategy exceptionStrategy)
+        private LocalizedNamedValueCache Setup(ExceptionHandlingStrategy exceptionStrategy)
         {
             var dataFetcher = new TestDataFetcher();
             _fetcherMock = new Mock<IDataFetcher>();
 
-            _enMatchStatusUri = new Uri(TestData.RestXmlPath + @"\match_status_descriptions.en.xml", UriKind.Absolute);
+            _enMatchStatusUri = new Uri(TestData.RestXmlPath + "/match_status_descriptions_en.xml", UriKind.Absolute);
             _fetcherMock.Setup(args => args.GetDataAsync(_enMatchStatusUri))
                 .Returns(dataFetcher.GetDataAsync(_enMatchStatusUri));
 
-            _deMatchStatusUri = new Uri(TestData.RestXmlPath + @"\match_status_descriptions.de.xml", UriKind.Absolute);
+            _deMatchStatusUri = new Uri(TestData.RestXmlPath + "/match_status_descriptions_de.xml", UriKind.Absolute);
             _fetcherMock.Setup(args => args.GetDataAsync(_deMatchStatusUri))
                 .Returns(dataFetcher.GetDataAsync(_deMatchStatusUri));
 
-            _huMatchStatusUri = new Uri(TestData.RestXmlPath + @"\match_status_descriptions.hu.xml", UriKind.Absolute);
+            _huMatchStatusUri = new Uri(TestData.RestXmlPath + "/match_status_descriptions_hu.xml", UriKind.Absolute);
             _fetcherMock.Setup(args => args.GetDataAsync(_huMatchStatusUri))
                 .Returns(dataFetcher.GetDataAsync(_huMatchStatusUri));
 
-            _nlMatchStatusUri = new Uri(TestData.RestXmlPath + @"\match_status_descriptions.nl.xml", UriKind.Absolute);
+            _nlMatchStatusUri = new Uri(TestData.RestXmlPath + "/match_status_descriptions_nl.xml", UriKind.Absolute);
             _fetcherMock.Setup(args => args.GetDataAsync(_nlMatchStatusUri))
                 .Returns(dataFetcher.GetDataAsync(_nlMatchStatusUri));
 
-            var uriFormat = TestData.RestXmlPath + @"\match_status_descriptions.{0}.xml";
-            _cache = new LocalizedNamedValueCache(new NamedValueDataProvider(uriFormat, _fetcherMock.Object, "match_status"),
-                new[] { new CultureInfo("en"), new CultureInfo("de"), new CultureInfo("hu") }, exceptionStrategy);
-        }
-
-        [TestCleanup]
-        public void CleanUp()
-        {
-            _cache.Dispose();
+            var uriFormat = TestData.RestXmlPath + "/match_status_descriptions_{0}.xml";
+            return new LocalizedNamedValueCache(new NamedValueDataProvider(uriFormat, _fetcherMock.Object, "match_status"),
+                new[] { new CultureInfo("en"), new CultureInfo("de"), new CultureInfo("hu") }, exceptionStrategy, "MatchStatus");
         }
 
         [TestMethod]
-        public void data_is_fetched_once_per_locale()
+        [SuppressMessage("ReSharper", "RedundantAssignment")]
+        [SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed", Justification = "Allowed in this test")]
+        public async Task DataIsFetchedOnlyOncePerLocale()
         {
-            Setup(ExceptionHandlingStrategy.THROW);
-            var namedValue = _cache.GetAsync(0).Result;
-            namedValue = _cache.GetAsync(0, new[] {new CultureInfo("en")}).Result;
-            namedValue = _cache.GetAsync(0, new[] { new CultureInfo("de") }).Result;
-            namedValue = _cache.GetAsync(0, new[] { new CultureInfo("hu") }).Result;
-            namedValue = _cache.GetAsync(0, new[] { new CultureInfo("nl") }).Result;
-            namedValue = _cache.GetAsync(0, TestData.Cultures4).Result;
+            var cache = Setup(ExceptionHandlingStrategy.THROW);
+            var namedValue = await cache.GetAsync(0);
+            namedValue = await cache.GetAsync(0, new[] { new CultureInfo("en") });
+            namedValue = await cache.GetAsync(0, new[] { new CultureInfo("de") });
+            namedValue = await cache.GetAsync(0, new[] { new CultureInfo("hu") });
+
+            Assert.IsNotNull(namedValue);
+
+            _fetcherMock.Verify(x => x.GetDataAsync(_enMatchStatusUri), Times.Once);
+            _fetcherMock.Verify(x => x.GetDataAsync(_deMatchStatusUri), Times.Once);
+            _fetcherMock.Verify(x => x.GetDataAsync(_huMatchStatusUri), Times.Once);
+            _fetcherMock.Verify(x => x.GetDataAsync(_nlMatchStatusUri), Times.Never);
+
+            namedValue = await cache.GetAsync(0, new[] { new CultureInfo("nl") });
+            namedValue = await cache.GetAsync(0, TestData.Cultures4);
 
             Assert.IsNotNull(namedValue);
 
@@ -76,30 +81,43 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void only_requested_locales_are_fetched()
+        public void InitialDataFetchDoesNotBlockConstructor()
         {
-            Setup(ExceptionHandlingStrategy.THROW);
-            var namedValue = _cache.GetAsync(0, new[] {new CultureInfo("en")}).Result;
-            namedValue = _cache.GetAsync(0, new[] { new CultureInfo("de") }).Result;
-
-            Assert.IsNotNull(namedValue);
-
-            _fetcherMock.Verify(x => x.GetDataAsync(_enMatchStatusUri), Times.Once);
-            _fetcherMock.Verify(x => x.GetDataAsync(_deMatchStatusUri), Times.Once);
+            Setup(ExceptionHandlingStrategy.CATCH);
+            _fetcherMock.Verify(x => x.GetDataAsync(_enMatchStatusUri), Times.Never);
+            _fetcherMock.Verify(x => x.GetDataAsync(_deMatchStatusUri), Times.Never);
             _fetcherMock.Verify(x => x.GetDataAsync(_huMatchStatusUri), Times.Never);
             _fetcherMock.Verify(x => x.GetDataAsync(_nlMatchStatusUri), Times.Never);
         }
 
         [TestMethod]
-        public void correct_value_are_loaded()
+        public void InitialDataFetchStartedByConstructor()
         {
-            Setup(ExceptionHandlingStrategy.THROW);
-            var doc = XDocument.Load(TestData.RestXmlPath + @"\match_status_descriptions.en.xml");
+            Setup(ExceptionHandlingStrategy.CATCH);
+
+            var finished = ExecutionHelper.WaitToComplete(() =>
+            {
+                _fetcherMock.Verify(x => x.GetDataAsync(_enMatchStatusUri), Times.Once);
+                _fetcherMock.Verify(x => x.GetDataAsync(_deMatchStatusUri), Times.Once);
+                _fetcherMock.Verify(x => x.GetDataAsync(_huMatchStatusUri), Times.Once);
+                _fetcherMock.Verify(x => x.GetDataAsync(_nlMatchStatusUri), Times.Never);
+            }, 5000);
+            Assert.IsTrue(finished);
+        }
+
+        [TestMethod]
+        public async Task CorrectValuesAreLoaded()
+        {
+            var cache = Setup(ExceptionHandlingStrategy.THROW);
+            var doc = XDocument.Load($"{TestData.RestXmlPath}/match_status_descriptions_en.xml");
+            Assert.IsNotNull(doc);
+            Assert.IsNotNull(doc.Element("match_status_descriptions"));
 
             foreach (var xElement in doc.Element("match_status_descriptions").Elements("match_status"))
             {
+                Assert.IsNotNull(xElement.Attribute("id"));
                 var id = int.Parse(xElement.Attribute("id").Value);
-                var namedValue = _cache.GetAsync(id).Result;
+                var namedValue = await cache.GetAsync(id);
 
                 Assert.IsNotNull(namedValue);
                 Assert.AreEqual(id, namedValue.Id);
@@ -109,35 +127,25 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
                 Assert.IsTrue(namedValue.Descriptions.ContainsKey(new CultureInfo("hu")));
                 Assert.IsFalse(namedValue.Descriptions.ContainsKey(new CultureInfo("nl")));
 
-                Assert.AreNotEqual(namedValue.GetDescription(new CultureInfo("en")), new CultureInfo("de"), "English and German translations must not be the same");
-                Assert.AreNotEqual(namedValue.GetDescription(new CultureInfo("en")), new CultureInfo("hu"), "English and Hungarian translations must not be the same");
-                Assert.AreNotEqual(namedValue.GetDescription(new CultureInfo("de")), new CultureInfo("hu"), "German and Hungarian translations must not be the same");
+                Assert.AreNotEqual(namedValue.GetDescription(new CultureInfo("en")), new CultureInfo("de").Name);
+                Assert.AreNotEqual(namedValue.GetDescription(new CultureInfo("en")), new CultureInfo("hu").Name);
+                Assert.AreNotEqual(namedValue.GetDescription(new CultureInfo("de")), new CultureInfo("hu").Name);
             }
         }
 
         [TestMethod]
-        public void throwing_exception_strategy_is_respected()
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public async Task ThrowingExceptionStrategyIsRespected()
         {
-            Setup(ExceptionHandlingStrategy.THROW);
-            try
-            {
-                var value = _cache.GetAsync(1000).Result;
-                Assert.Fail("The operation should throw an exception");
-            }
-            catch (AggregateException ex)
-            {
-                if (!(ex.InnerException is ArgumentOutOfRangeException))
-                {
-                    Assert.Fail("The operation should throw ArgumentOutOfRangeException exception");
-                }
-            }
+            var cache = Setup(ExceptionHandlingStrategy.THROW);
+            await cache.GetAsync(1000);
         }
 
         [TestMethod]
-        public void catching_exception_strategy_is_respected()
+        public async Task CatchingExceptionStrategyIsRespected()
         {
-            Setup(ExceptionHandlingStrategy.CATCH);
-            var value = _cache.GetAsync(1000).Result;
+            var cache = Setup(ExceptionHandlingStrategy.CATCH);
+            var value = await cache.GetAsync(1000);
 
             Assert.AreEqual(1000, value.Id);
             Assert.IsNotNull(value.Descriptions);

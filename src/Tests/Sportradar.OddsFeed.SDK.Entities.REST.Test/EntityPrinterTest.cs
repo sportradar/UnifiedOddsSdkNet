@@ -17,6 +17,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         public void Init()
         {
             _log = SdkLoggerFactory.GetLogger(typeof(EntityPrinterTest));
+            MF.SetOutputHelper();
         }
 
         [TestMethod]

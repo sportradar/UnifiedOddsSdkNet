@@ -31,7 +31,26 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
             for (var i = 0; i < poolSize; i++)
             {
                 var httpClient = new HttpClient { Timeout = timeout };
-                httpClient.DefaultRequestHeaders.Add("x-access-token", accessToken); //
+                httpClient.DefaultRequestHeaders.Add("x-access-token", accessToken);
+                httpClient.DefaultRequestHeaders.Add("User-Agent", $"UfSdk-{SdkInfo.SdkType}/{SdkInfo.GetVersion()} (NET: {Environment.Version}, OS: {Environment.OSVersion}, Init: {SdkInfo.Created:yyyyMMddHHmm})");
+                _httpClientPool.Add(httpClient);
+            }
+
+            SdkLoggerFactory.GetLoggerForExecution(typeof(SdkHttpClientPool)).Debug($"SdkHttpClientPool with size {poolSize} and timeout {timeout.TotalSeconds}s created.");
+            DefaultRequestHeaders = _httpClientPool.First().DefaultRequestHeaders;
+        }
+
+        internal SdkHttpClientPool(string accessToken, int poolSize, TimeSpan timeout, HttpMessageHandler httpMessageHandler)
+        {
+            if (poolSize < 1)
+            {
+                poolSize = 1;
+            }
+            _httpClientPool = new List<HttpClient>(poolSize);
+            for (var i = 0; i < poolSize; i++)
+            {
+                var httpClient = new HttpClient(httpMessageHandler) { Timeout = timeout };
+                httpClient.DefaultRequestHeaders.Add("x-access-token", accessToken);
                 httpClient.DefaultRequestHeaders.Add("User-Agent", $"UfSdk-{SdkInfo.SdkType}/{SdkInfo.GetVersion()} (NET: {Environment.Version}, OS: {Environment.OSVersion}, Init: {SdkInfo.Created:yyyyMMddHHmm})");
                 _httpClientPool.Add(httpClient);
             }
@@ -78,7 +97,7 @@ namespace Sportradar.OddsFeed.SDK.Common.Internal
 
             lock (_lock)
             {
-                _latest = _latest == _httpClientPool.Count - 1 ? 0 : _latest + 1;
+                _latest = _latest >= _httpClientPool.Count - 1 ? 0 : _latest + 1;
                 return _httpClientPool[_latest];
             }
         }

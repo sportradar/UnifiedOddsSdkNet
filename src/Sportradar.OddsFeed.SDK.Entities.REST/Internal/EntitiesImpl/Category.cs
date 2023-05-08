@@ -3,9 +3,9 @@
 */
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Dawn;
 using System.Globalization;
 using System.Linq;
+using Dawn;
 using Sportradar.OddsFeed.SDK.Messages;
 
 namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
@@ -55,7 +55,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.EntitiesImpl
         {
             var names = Names == null ? string.Empty : string.Join(", ", Names.Keys.Select(k => $"{k}={Names[k]}"));
             //var tournaments = string.Join(" ,", Tournaments.Select(k => k.Id.ToString()));
-            string tournaments = Tournaments.Aggregate(string.Empty, (current, t) => current + $"\t {((Tournament) t).ToString("f")}");
+            var tournaments = Tournaments.Aggregate(string.Empty, (current, t) => current + $"\t {((Tournament)t).ToString("f")}");
             return $"Id={Id}, Names=[{names}], Tournaments=[{tournaments}]";
         }
 

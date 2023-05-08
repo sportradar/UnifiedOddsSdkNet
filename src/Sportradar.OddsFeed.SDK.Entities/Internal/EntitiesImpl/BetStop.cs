@@ -29,13 +29,13 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// </summary>
         /// <param name="timestamp">The value specifying timestamps related to the message (in the milliseconds since EPOCH UTC)</param>
         /// <param name="producer">The <see cref="IProducer" /> specifying the producer / service which dispatched the current <see cref="Message" /> message</param>
-        /// <param name="event">An <see cref="ICompetition" /> derived instance representing the sport event associated with the current <see cref="EventMessage{T}" /></param>
+        /// <param name="sportEvent">An <see cref="ICompetition" /> derived instance representing the sport event associated with the current <see cref="EventMessage{T}" /></param>
         /// <param name="requestId">The id of the request which triggered the current <see cref="EventMessage{T}" /> message or a null reference</param>
         /// <param name="marketStatus">a <see cref="MarketStatus" /> specifying the new status of the associated markets</param>
         /// <param name="groups">a list of <see cref="string"/> specifying which market groups needs to be stopped</param>
         /// <param name="rawMessage">The raw message</param>
-        public BetStop(IMessageTimestamp timestamp, IProducer producer, T @event, long? requestId, MarketStatus marketStatus, IEnumerable<string> groups, byte[] rawMessage)
-            : base(timestamp, producer, @event, requestId, rawMessage)
+        public BetStop(IMessageTimestamp timestamp, IProducer producer, T sportEvent, long? requestId, MarketStatus marketStatus, IEnumerable<string> groups, byte[] rawMessage)
+            : base(timestamp, producer, sportEvent, requestId, rawMessage)
         {
             MarketStatus = marketStatus;
             Groups = groups;

@@ -1,8 +1,8 @@
 /*
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
+using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities;
 using Sportradar.OddsFeed.SDK.Entities.Internal;
@@ -39,13 +39,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="config">The <see cref="IOddsFeedConfiguration"/> instance used to create <see cref="IProducerRecoveryManager"/> instances</param>
         public ProducerRecoveryManagerFactory(IRecoveryRequestIssuer recoveryRequestIssuer, IFeedMessageMapper messageMapper, IOddsFeedConfiguration config)
         {
-            Guard.Argument(recoveryRequestIssuer, nameof(recoveryRequestIssuer)).NotNull();
-            Guard.Argument(messageMapper, nameof(messageMapper)).NotNull();
-            Guard.Argument(config, nameof(config)).NotNull();
-
-            _recoveryRequestIssuer = recoveryRequestIssuer;
-            _messageMapper = messageMapper;
-            _config = config;
+            _recoveryRequestIssuer = recoveryRequestIssuer ?? throw new ArgumentNullException(nameof(recoveryRequestIssuer));
+            _messageMapper = messageMapper ?? throw new ArgumentNullException(nameof(messageMapper));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
         /// <summary>
@@ -57,7 +53,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         public IProducerRecoveryManager GetRecoveryTracker(IProducer producer, IEnumerable<MessageInterest> allInterests)
         {
             var allInterestsList = allInterests as IList<MessageInterest> ?? allInterests.ToList();
-            var timestampTracker = new TimestampTracker((Producer) producer, allInterestsList, _config.InactivitySeconds, _config.InactivitySeconds);
+            var timestampTracker = new TimestampTracker((Producer)producer, allInterestsList, _config.InactivitySeconds, _config.InactivitySeconds);
             var recoveryOperation = new RecoveryOperation((Producer)producer, _recoveryRequestIssuer, allInterestsList, _config.NodeId, _config.AdjustAfterAge);
             return new ProducerRecoveryManager(producer, recoveryOperation, timestampTracker, _config.MinIntervalBetweenRecoveryRequests);
         }

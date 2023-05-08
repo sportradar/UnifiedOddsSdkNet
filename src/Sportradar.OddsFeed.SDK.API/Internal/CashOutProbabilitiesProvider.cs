@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Dawn;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -57,37 +56,32 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public CashOutProbabilitiesProvider(IDataProvider<cashout> dataProvider, IFeedMessageMapper messageMapper, IEnumerable<CultureInfo> defaultCultures, ExceptionHandlingStrategy exceptionStrategy)
         {
-            Guard.Argument(dataProvider, nameof(dataProvider)).NotNull();
-            Guard.Argument(messageMapper, nameof(messageMapper)).NotNull();
-            Guard.Argument(defaultCultures, nameof(defaultCultures)).NotNull();//.NotEmpty();
-            if (!defaultCultures.Any())
+            if (defaultCultures.IsNullOrEmpty())
+            {
                 throw new ArgumentOutOfRangeException(nameof(defaultCultures));
+            }
 
-
-            _dataProvider = dataProvider;
-            _messageMapper = messageMapper;
-            _defaultCultures = defaultCultures;
+            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
+            _messageMapper = messageMapper ?? throw new ArgumentNullException(nameof(messageMapper));
+            _defaultCultures = defaultCultures ?? throw new ArgumentNullException(nameof(defaultCultures));
             _exceptionStrategy = exceptionStrategy;
         }
         /// <summary>
         /// Asynchronously gets the cash out probabilities for the specified sport event
         /// </summary>
         /// <typeparam name="T">The type of the sport event</typeparam>
-        /// <param name="param">a <see cref="String"/> specifying which probabilities to get</param>
+        /// <param name="param">a specifying which probabilities to get</param>
         /// <param name="culture">A <see cref="CultureInfo"/> specifying the language of the returned data, or a null reference to use default languages</param>
         /// <returns>A <see cref="Task{T}" /> representing the asynchronous operation</returns>
         private async Task<ICashOutProbabilities<T>> GetProbabilitiesInternalAsync<T>(string param, CultureInfo culture = null) where T : ISportEvent
         {
             var data = _exceptionStrategy == ExceptionHandlingStrategy.THROW
                 ? await _dataProvider.GetDataAsync(param).ConfigureAwait(false)
-                : await new Func<string, Task<cashout>>(_dataProvider.GetDataAsync).SafeInvokeAsync(
-                    param,
-                    ExecutionLog,
-                    "Error occurred while fetching probabilities for " + param).ConfigureAwait(false);
+                : await new Func<string, Task<cashout>>(_dataProvider.GetDataAsync).SafeInvokeAsync(param, ExecutionLog, "Error occurred while fetching probabilities for " + param).ConfigureAwait(false);
 
             return data == null
                 ? null
-                : _messageMapper.MapCashOutProbabilities<T>(data, culture == null ? _defaultCultures : new[] {culture}, null);
+                : _messageMapper.MapCashOutProbabilities<T>(data, culture == null ? _defaultCultures : new[] { culture }, null);
         }
 
         /// <summary>
@@ -99,7 +93,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>A <see cref="Task{T}" /> representing the asynchronous operation</returns>
         public Task<ICashOutProbabilities<T>> GetCashOutProbabilitiesAsync<T>(URN eventId, CultureInfo culture = null) where T : ISportEvent
         {
-            Guard.Argument(eventId, nameof(eventId)).NotNull();
+            if (eventId == null)
+            {
+                throw new ArgumentNullException(nameof(eventId));
+            }
 
             return GetProbabilitiesInternalAsync<T>(eventId.ToString(), culture);
         }
@@ -115,7 +112,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>A <see cref="Task{T}" /> representing the asynchronous operation</returns>
         public Task<ICashOutProbabilities<T>> GetCashOutProbabilitiesAsync<T>(URN eventId, int marketId, IReadOnlyDictionary<string, string> specifiers, CultureInfo culture = null) where T : ISportEvent
         {
-            Guard.Argument(eventId, nameof(eventId)).NotNull();
+            if (eventId == null)
+            {
+                throw new ArgumentNullException(nameof(eventId));
+            }
 
             var param = $"{eventId}/{marketId}";
             if (specifiers != null && specifiers.Any())

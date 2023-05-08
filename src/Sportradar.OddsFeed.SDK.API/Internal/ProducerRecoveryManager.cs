@@ -94,14 +94,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="minIntervalBetweenRecoveryRequests">The minimal interval between recovery requests initiated by alive messages (seconds)</param>
         internal ProducerRecoveryManager(IProducer producer, IRecoveryOperation recoveryOperation, ITimestampTracker timestampTracker, int minIntervalBetweenRecoveryRequests)
         {
-            Guard.Argument(producer, nameof(producer)).NotNull();
-            Guard.Argument(recoveryOperation, nameof(recoveryOperation)).NotNull();
-            Guard.Argument(timestampTracker, nameof(timestampTracker)).NotNull();
-
-            Producer = producer;
+            Producer = producer ?? throw new ArgumentNullException(nameof(producer));
             _producer = (Producer)producer;
-            _recoveryOperation = recoveryOperation;
-            _timestampTracker = timestampTracker;
+            _recoveryOperation = recoveryOperation ?? throw new ArgumentNullException(nameof(recoveryOperation));
+            _timestampTracker = timestampTracker ?? throw new ArgumentNullException(nameof(timestampTracker));
             _minIntervalBetweenRecoveryRequests = minIntervalBetweenRecoveryRequests;
 
             Status = ProducerRecoveryStatus.NotStarted;

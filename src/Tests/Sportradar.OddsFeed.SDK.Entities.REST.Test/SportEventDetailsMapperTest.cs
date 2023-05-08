@@ -53,7 +53,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void MappingTest()
+        public void Mapping()
         {
             _assertHelper.AreEqual(() => _entity.Id.ToString(), _record.sport_event.id);
 
@@ -115,7 +115,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
         private void MappingVenueTest(MatchDTO dto, matchSummaryEndpoint record)
         {
-            if (record.sport_event_conditions?.venue == null) return;
+            if (record.sport_event_conditions?.venue == null)
+            {
+                return;
+            }
 
             _assertHelper.AreEqual(() => dto.Venue.Id.ToString(), record.sport_event_conditions.venue.id);
             _assertHelper.AreEqual(() => dto.Venue.Name, record.sport_event_conditions.venue.name);
@@ -128,7 +131,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
 
         private void MappingConditionsTest(MatchDTO dto, matchSummaryEndpoint record)
         {
-            if (record.sport_event_conditions == null) return;
+            if (record.sport_event_conditions == null)
+            {
+                return;
+            }
 
             _assertHelper.AreEqual(() => dto.Conditions.Attendance, record.sport_event_conditions.attendance);
             _assertHelper.AreEqual(() => dto.Conditions.EventMode, record.sport_event_conditions.match_mode);
@@ -145,7 +151,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
             _assertHelper.AreEqual(() => dto.Conditions.WeatherInfo.WindAdvantage, record.sport_event_conditions.weather_info.wind_advantage);
             _assertHelper.AreEqual(() => dto.Conditions.WeatherInfo.TemperatureCelsius,
                                    record.sport_event_conditions.weather_info.temperature_celsiusSpecified
-                                       ? (int?) record.sport_event_conditions.weather_info.temperature_celsius
+                                       ? (int?)record.sport_event_conditions.weather_info.temperature_celsius
                                        : null);
 
             MappingVenueTest(dto, record);

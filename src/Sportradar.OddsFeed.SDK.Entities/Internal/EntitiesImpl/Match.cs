@@ -42,7 +42,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         /// <param name="sportEventCache">A <see cref="ISportEventCache"/> instances containing cache data associated with the current instance</param>
         /// <param name="sportEventStatusCache">A <see cref="ISportEventStatusCache"/> instance containing cache data information about the progress of a match associated with the current instance</param>
         /// <param name="matchStatusCache">A localized match statuses cache</param>
-        /// <param name="cultures">A <see cref="IEnumerable{CultureInfo}"/> specifying languages the current instance supports</param>
+        /// <param name="cultures">A <see cref="IReadOnlyCollection{CultureInfo}"/> specifying languages the current instance supports</param>
         /// <param name="exceptionStrategy">A <see cref="ExceptionHandlingStrategy"/> enum member specifying how the initialized instance will handle potential exceptions</param>
         public Match(URN id,
                     URN sportId,
@@ -50,7 +50,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
                     ISportEventCache sportEventCache,
                     ISportEventStatusCache sportEventStatusCache,
                     ILocalizedNamedValueCache matchStatusCache,
-                    IEnumerable<CultureInfo> cultures,
+                    IReadOnlyCollection<CultureInfo> cultures,
                     ExceptionHandlingStrategy exceptionStrategy)
             : base(ExecutionLogPrivate, id, sportId, sportEntityFactory, sportEventStatusCache, sportEventCache, cultures, exceptionStrategy, matchStatusCache)
         {
@@ -137,6 +137,40 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
         }
 
         /// <summary>
+        /// Asynchronously gets a <see cref="ITeamCompetitor" /> representing home competitor of the match associated with the current instance
+        /// </summary>
+        /// <param name="culture">The culture in which we want to return competitor data</param>
+        /// <returns>A <see cref="Task{ITeamCompetitor}"/> representing the retrieval operation</returns>
+        public async Task<ITeamCompetitor> GetHomeCompetitorAsync(CultureInfo culture)
+        {
+            var matchCI = (IMatchCI)SportEventCache.GetEventCacheItem(Id);
+            if (matchCI == null)
+            {
+                ExecutionLog.Debug($"Missing data. No match cache item for id={Id}.");
+                return null;
+            }
+
+            var cultureList = new[] { culture };
+            var items = ExceptionStrategy == ExceptionHandlingStrategy.THROW
+                            ? await matchCI.GetCompetitorsIdsAsync(cultureList).ConfigureAwait(false)
+                            : await new Func<IEnumerable<CultureInfo>, Task<IEnumerable<URN>>>(matchCI.GetCompetitorsIdsAsync).SafeInvokeAsync(cultureList, ExecutionLog, GetFetchErrorMessage("CompetitorsIds")).ConfigureAwait(false);
+
+            if (items == null)
+            {
+                return null;
+            }
+
+            var competitorUrns = items.ToList();
+            if (competitorUrns.Count == 2)
+            {
+                return await _sportEntityFactory.BuildTeamCompetitorAsync(competitorUrns[0], cultureList, matchCI, ExceptionStrategy).ConfigureAwait(false);
+            }
+
+            ExecutionLog.Error($"Received {competitorUrns.Count} competitors for match[Id = {Id}]. Match can have only 2 competitors");
+            throw new InvalidOperationException($"Invalid number of competitors. Match must have exactly 2 competitors, received {competitorUrns.Count}");
+        }
+
+        /// <summary>
         /// Asynchronously gets a <see cref="ITeamCompetitor" /> representing away competitor of the match associated with the current instance
         /// </summary>
         /// <returns>A <see cref="Task{ITeamCompetitor}"/> representing the retrieval operation</returns>
@@ -161,6 +195,40 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
             if (competitorUrns.Count == 2)
             {
                 return await _sportEntityFactory.BuildTeamCompetitorAsync(competitorUrns[1], Cultures, matchCI, ExceptionStrategy).ConfigureAwait(false);
+            }
+
+            ExecutionLog.Error($"Received {competitorUrns.Count} competitors for match[Id = {Id}]. Match can have only 2 competitors.");
+            throw new InvalidOperationException($"Invalid number of competitors. Match must have exactly 2 competitors, received {competitorUrns.Count}");
+        }
+
+        /// <summary>
+        /// Asynchronously gets a <see cref="ITeamCompetitor" /> representing away competitor of the match associated with the current instance
+        /// </summary>
+        /// <param name="culture">The culture in which we want to return competitor data</param>
+        /// <returns>A <see cref="Task{ITeamCompetitor}"/> representing the retrieval operation</returns>
+        public async Task<ITeamCompetitor> GetAwayCompetitorAsync(CultureInfo culture)
+        {
+            var matchCI = (IMatchCI)SportEventCache.GetEventCacheItem(Id);
+            if (matchCI == null)
+            {
+                ExecutionLog.Debug($"Missing data. No match cache item for id={Id}.");
+                return null;
+            }
+
+            var cultureList = new[] { culture };
+            var items = ExceptionStrategy == ExceptionHandlingStrategy.THROW
+                            ? await matchCI.GetCompetitorsIdsAsync(cultureList).ConfigureAwait(false)
+                            : await new Func<IEnumerable<CultureInfo>, Task<IEnumerable<URN>>>(matchCI.GetCompetitorsIdsAsync).SafeInvokeAsync(cultureList, ExecutionLog, GetFetchErrorMessage("CompetitorsIds")).ConfigureAwait(false);
+
+            if (items == null)
+            {
+                return null;
+            }
+
+            var competitorUrns = items.ToList();
+            if (competitorUrns.Count == 2)
+            {
+                return await _sportEntityFactory.BuildTeamCompetitorAsync(competitorUrns[1], cultureList, matchCI, ExceptionStrategy).ConfigureAwait(false);
             }
 
             ExecutionLog.Error($"Received {competitorUrns.Count} competitors for match[Id = {Id}]. Match can have only 2 competitors.");
@@ -304,8 +372,8 @@ namespace Sportradar.OddsFeed.SDK.Entities.Internal.EntitiesImpl
 
             if (string.IsNullOrEmpty(name))
             {
-                var homeCompetitor = await GetHomeCompetitorAsync().ConfigureAwait(false);
-                var awayCompetitor = await GetAwayCompetitorAsync().ConfigureAwait(false);
+                var homeCompetitor = await GetHomeCompetitorAsync(culture).ConfigureAwait(false);
+                var awayCompetitor = await GetAwayCompetitorAsync(culture).ConfigureAwait(false);
 
                 if (homeCompetitor != null && awayCompetitor != null)
                 {

@@ -25,66 +25,66 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void correct_int_value_for_addition_is_returned()
+        public void Correct_int_value_for_addition_is_returned()
         {
             var operand = new ExpressionOperand(
                 GetSpecifiers(SpecifierName, "2"),
                 SpecifierName,
-                SimpleMathOperation.ADD,
+                SimpleMathOperation.Add,
                 1);
 
-            Assert.AreEqual(3, operand.GetIntValue().Result, "Int value returned by operand is not correct");
+            Assert.AreEqual(3, operand.GetIntValue().GetAwaiter().GetResult(), "Int value returned by operand is not correct");
         }
 
         [TestMethod]
-        public void correct_int_value_for_subtraction_is_returned()
+        public void Correct_int_value_for_subtraction_is_returned()
         {
             var operand = new ExpressionOperand(
                 GetSpecifiers(SpecifierName, "2"),
                 SpecifierName,
-                SimpleMathOperation.SUBTRACT,
+                SimpleMathOperation.Subtract,
                 1);
 
-            Assert.AreEqual(1, operand.GetIntValue().Result, "Int value returned by operand is not correct");
+            Assert.AreEqual(1, operand.GetIntValue().GetAwaiter().GetResult(), "Int value returned by operand is not correct");
         }
 
         [TestMethod]
-        public void correct_decimal_value_for_addition_is_returned()
+        public void Correct_decimal_value_for_addition_is_returned()
         {
             var operand = new ExpressionOperand(
                 GetSpecifiers(SpecifierName, "1.5"),
                 SpecifierName,
-                SimpleMathOperation.SUBTRACT,
+                SimpleMathOperation.Subtract,
                 1);
 
-            Assert.AreEqual((decimal)0.5, operand.GetDecimalValue().Result, "Decimal value returned by operand is not correct");
+            Assert.AreEqual((decimal)0.5, operand.GetDecimalValue().GetAwaiter().GetResult(), "Decimal value returned by operand is not correct");
         }
 
         [TestMethod]
-        public void correct_decimal_value_for_subtraction_is_returned()
+        public void Correct_decimal_value_for_subtraction_is_returned()
         {
             var operand = new ExpressionOperand(
                 GetSpecifiers(SpecifierName, "1.5"),
                 SpecifierName,
-                SimpleMathOperation.SUBTRACT,
+                SimpleMathOperation.Subtract,
                 1);
 
-            Assert.AreEqual((decimal)0.5, operand.GetDecimalValue().Result, "Decimal value returned by operand is not correct");
+            Assert.AreEqual((decimal)0.5, operand.GetDecimalValue().GetAwaiter().GetResult(), "Decimal value returned by operand is not correct");
         }
 
         [TestMethod]
         [ExpectedException(typeof(NotSupportedException))]
-        public void get_string_value_causes_exception()
+        public void Get_string_value_causes_exception()
         {
             var operand = new ExpressionOperand(
                 GetSpecifiers(SpecifierName, "1.5"),
                 SpecifierName,
-                SimpleMathOperation.SUBTRACT,
+                SimpleMathOperation.Subtract,
                 1);
 
             try
             {
-                var x = operand.GetStringValue().Result;
+                var x = operand.GetStringValue().GetAwaiter().GetResult();
                 Assert.IsNotNull(x);
             }
             catch (AggregateException ex)
@@ -94,17 +94,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void get_int_value_for_decimal_value_throws()
+        public void Get_int_value_for_decimal_value_throws()
         {
             var operand = new ExpressionOperand(
                GetSpecifiers(SpecifierName, "1.5"),
                SpecifierName,
-               SimpleMathOperation.ADD,
+               SimpleMathOperation.Add,
                1);
 
             try
             {
-                var x = operand.GetIntValue().Result;
+                var x = operand.GetIntValue().GetAwaiter().GetResult();
                 Assert.IsNotNull(x);
             }
             catch (NameExpressionException)
@@ -115,17 +115,17 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Test
         }
 
         [TestMethod]
-        public void get_int_value_with_missing_specifier_throws()
+        public void Get_int_value_with_missing_specifier_throws()
         {
             var operand = new ExpressionOperand(
                GetSpecifiers(SpecifierName, "1.5"),
                "missing",
-               SimpleMathOperation.ADD,
+               SimpleMathOperation.Add,
                1);
 
             try
             {
-                var x = operand.GetIntValue().Result;
+                var x = operand.GetIntValue().GetAwaiter().GetResult();
                 Assert.IsNotNull(x);
             }
             catch (NameExpressionException)

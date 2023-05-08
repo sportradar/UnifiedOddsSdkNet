@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 
@@ -23,13 +22,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <returns>The <see cref="IReadOnlyDictionary{TKey,TValue}"/> obtained by splitting the provided values</returns>
         private static IReadOnlyDictionary<string, string> CreateDictionary(string[] values, params string[] separators)
         {
-            Guard.Argument(values, nameof(values)).NotNull();//.NotEmpty();
-            Guard.Argument(separators, nameof(separators)).NotNull();//.NotEmpty();
-            if (values.Length == 0)
-                throw new ArgumentOutOfRangeException(nameof(values));
-            if (separators.Length == 0)
-                throw new ArgumentOutOfRangeException(nameof(separators));
-
+            if (values.IsNullOrEmpty())
+            {
+                throw new ArgumentNullException(nameof(values));
+            }
+            if (separators.IsNullOrEmpty())
+            {
+                throw new InvalidOperationException(nameof(separators));
+            }
 
             var tuples = new List<Tuple<string, string>>(values.Length);
             foreach (var specifier in values)
@@ -66,7 +66,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
 
         public static IReadOnlyDictionary<string, string> GetValidForAttributes(string value)
         {
-            Guard.Argument(value, nameof(value)).NotNull().NotEmpty();
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentException(nameof(value));
+            }
 
             var parts = value.Split(new[] { SdkInfo.SpecifiersDelimiter }, StringSplitOptions.None);
             return CreateDictionary(parts, "=", "~");
@@ -79,7 +82,10 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal
         /// <returns>A <see cref="IDictionary{String, String}"/> containing market specifiers</returns>
         public static IReadOnlyDictionary<string, string> GetSpecifiers(string specifiers)
         {
-            Guard.Argument(specifiers, nameof(specifiers)).NotNull().NotEmpty();
+            if (string.IsNullOrEmpty(specifiers))
+            {
+                throw new ArgumentNullException(nameof(specifiers));
+            }
 
             var splitSpecifiers = specifiers.Split(new[] { SdkInfo.SpecifiersDelimiter }, StringSplitOptions.None);
             return CreateDictionary(splitSpecifiers, "=");

@@ -2,7 +2,6 @@
 * Copyright (C) Sportradar AG. See LICENSE for full license governing this code
 */
 using System;
-using Dawn;
 using System.Linq;
 using System.Text;
 using Common.Logging;
@@ -67,7 +66,10 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>The <see cref="MessageType"/> member specifying the type of the provided xml message.</returns>
         private static MessageType ExtractMessageName(string message)
         {
-            Guard.Argument(message, nameof(message)).NotNull().NotEmpty();
+            if (string.IsNullOrEmpty(message))
+            {
+                throw new ArgumentNullException(nameof(message));
+            }
 
             foreach (var messageName in MessageTypes)
             {
@@ -90,8 +92,14 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>The value of the specified attribute or a null reference if value could not be determined</returns>
         private static string ExtractAttributeValue(string message, string attributeName)
         {
-            Guard.Argument(message, nameof(message)).NotNull().NotEmpty();
-            Guard.Argument(attributeName, nameof(attributeName)).NotNull().NotEmpty();
+            if (string.IsNullOrEmpty(message))
+            {
+                throw new ArgumentNullException(nameof(message));
+            }
+            if (string.IsNullOrEmpty(attributeName))
+            {
+                throw new ArgumentNullException(nameof(attributeName));
+            }
 
             var startIndex = message.IndexOf(attributeName, StringComparison.Ordinal);
             if (startIndex < 0)

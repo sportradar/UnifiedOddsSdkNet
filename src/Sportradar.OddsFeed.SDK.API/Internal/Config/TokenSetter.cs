@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Globalization;
 using System.Linq;
-using Dawn;
 using Sportradar.OddsFeed.SDK.Common;
 using Sportradar.OddsFeed.SDK.Common.Internal;
 
@@ -29,9 +28,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
         /// <param name="configurationSectionProvider">A <see cref="IConfigurationSectionProvider"/> instance used to access <see cref="IOddsFeedConfigurationSection"/></param>
         internal TokenSetter(IConfigurationSectionProvider configurationSectionProvider)
         {
-            Guard.Argument(configurationSectionProvider, nameof(configurationSectionProvider)).NotNull();
-
-            _configurationSectionProvider = configurationSectionProvider;
+            _configurationSectionProvider = configurationSectionProvider ?? throw new ArgumentNullException(nameof(configurationSectionProvider));
         }
 
         /// <summary>
@@ -76,7 +73,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
             {
                 sdkEnvironment = SdkEnvironment.Production;
             }
-                
+
             var supportedLanguages = new List<CultureInfo>();
             if (!string.IsNullOrEmpty(section.SupportedLanguages))
             {
@@ -106,9 +103,9 @@ namespace Sportradar.OddsFeed.SDK.API.Internal.Config
                 disabledProducers = producerIds.Select(producerId => int.Parse(producerId.Trim())).ToList();
             }
 
-             var mqHost = string.IsNullOrEmpty(section.Host)
-                             ? EnvironmentManager.GetMqHost(sdkEnvironment)
-                             : section.Host;
+            var mqHost = string.IsNullOrEmpty(section.Host)
+                            ? EnvironmentManager.GetMqHost(sdkEnvironment)
+                            : section.Host;
             var apiHost = string.IsNullOrEmpty(section.ApiHost)
                              ? EnvironmentManager.GetApiHost(sdkEnvironment)
                              : section.ApiHost;

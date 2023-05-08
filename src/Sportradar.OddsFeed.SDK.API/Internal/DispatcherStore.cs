@@ -3,7 +3,6 @@
 */
 using System;
 using System.Collections.Generic;
-using Dawn;
 using System.Linq;
 using Sportradar.OddsFeed.SDK.Entities.REST;
 using Sportradar.OddsFeed.SDK.Messages;
@@ -42,9 +41,7 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="typeMapper">The <see cref="IEntityTypeMapper"/> used to determine the SDK type used to represent a specific sport entity.</param>
         public DispatcherStore(IEntityTypeMapper typeMapper)
         {
-            Guard.Argument(typeMapper, nameof(typeMapper)).NotNull();
-
-            _typeMapper = typeMapper;
+            _typeMapper = typeMapper ?? throw new ArgumentNullException(nameof(typeMapper));
         }
 
         /// <summary>
@@ -70,11 +67,13 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <returns>A <see cref="List{Type}"/> representing the implemented interfaces</returns>
         private List<Type> GetHierarchy(Type type)
         {
-            Guard.Argument(type, nameof(type)).NotNull();
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
 
             var key = type.Name;
-            List<Type> hierarchies;
-            if (_cachedHierarchies.TryGetValue(key, out hierarchies))
+            if (_cachedHierarchies.TryGetValue(key, out var hierarchies))
             {
                 return hierarchies;
             }
@@ -92,14 +91,17 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         /// <param name="dispatcher">The <see cref="ISpecificEntityDispatcherInternal"/> instance to be added.</param>
         public void Add(ISpecificEntityDispatcherInternal dispatcher)
         {
-            Guard.Argument(dispatcher, nameof(dispatcher)).NotNull();
+            if (dispatcher == null)
+            {
+                throw new ArgumentNullException(nameof(dispatcher));
+            }
 
             var key = dispatcher.GetType().GetGenericArguments().First().Name;
             lock (_syncLock)
             {
                 if (_dispatchers.ContainsKey(key))
                 {
-                    throw new InvalidOperationException($"Dispatcher for entities of type:{0} is already registered");
+                    throw new InvalidOperationException($"Dispatcher for entities of type:{key} is already registered");
                 }
                 dispatcher.OnClosed += OnDispatcherClosed;
                 _dispatchers.Add(key, dispatcher);
@@ -120,14 +122,12 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
 
             lock (_syncLock)
             {
-                ISpecificEntityDispatcherInternal dispatcher;
-                if (_dispatchers.TryGetValue(key, out dispatcher) && dispatcher.IsOpened)
+                if (_dispatchers.TryGetValue(key, out var dispatcher) && dispatcher.IsOpened)
                 {
                     return dispatcher;
                 }
 
-                var entityHierarchy = GetHierarchy(entityType);
-                foreach (var baseType in entityHierarchy)
+                foreach (var baseType in GetHierarchy(entityType))
                 {
                     key = baseType.Name;
                     if (_dispatchers.TryGetValue(key, out dispatcher) && dispatcher.IsOpened)
