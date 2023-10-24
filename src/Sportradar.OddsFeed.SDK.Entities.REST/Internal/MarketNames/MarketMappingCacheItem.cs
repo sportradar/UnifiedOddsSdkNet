@@ -24,7 +24,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
 
         public int MarketTypeId { get; }
 
-        public  int? MarketSubTypeId { get; }
+        public int? MarketSubTypeId { get; }
 
         public string SovTemplate { get; }
 
@@ -87,20 +87,20 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 OrgMarketId = dto.OrgMarketId;
             }
 
-            foreach (var outcomeMappingDTO in dto.OutcomeMappings)
+            foreach (var outcomeMappingDto in dto.OutcomeMappings)
             {
-                var mapping = OutcomeMappings.FirstOrDefault(f=>f.OutcomeId.Equals(outcomeMappingDTO.OutcomeId, StringComparison.InvariantCultureIgnoreCase));
-                if (mapping == null && shouldHave)
+                var outcomeMappingCacheItem = OutcomeMappings.FirstOrDefault(f => f.OutcomeId.Equals(outcomeMappingDto.OutcomeId, StringComparison.InvariantCultureIgnoreCase));
+                if (outcomeMappingCacheItem == null && shouldHave)
                 {
                     //investigate
                 }
-                if (mapping != null)
+                if (outcomeMappingCacheItem != null)
                 {
-                    mapping.Merge(outcomeMappingDTO, culture);
+                    outcomeMappingCacheItem.Merge(outcomeMappingDto, culture);
                 }
                 else
                 {
-                    OutcomeMappings.Add(new OutcomeMappingCacheItem(outcomeMappingDTO, culture));
+                    OutcomeMappings.Add(new OutcomeMappingCacheItem(outcomeMappingDto, culture));
                 }
             }
         }

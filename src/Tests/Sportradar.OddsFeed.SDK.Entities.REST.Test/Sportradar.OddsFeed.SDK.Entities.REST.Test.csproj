@@ -90,7 +90,10 @@
     <Compile Include="BookmakerDetailsProviderTest.cs" />
     <Compile Include="CacheItems\CacheItemMergeTests.cs" />
     <Compile Include="CacheExportTest.cs" />
+    <Compile Include="CacheItems\StageDTOTests.cs" />
+    <Compile Include="CacheItems\StageCiTests.cs" />
     <Compile Include="CacheItems\PlayerProfileTests.cs" />
+    <Compile Include="CacheItems\RestMapperHelperTests.cs" />
     <Compile Include="CategorySummaryTest.cs" />
     <Compile Include="CustomBetEntityTests.cs" />
     <Compile Include="CompositeMappingValidatorTests.cs" />

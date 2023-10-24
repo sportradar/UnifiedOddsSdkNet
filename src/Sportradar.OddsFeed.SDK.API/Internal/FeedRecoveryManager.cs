@@ -156,7 +156,6 @@ namespace Sportradar.OddsFeed.SDK.API.Internal
         {
             var manager = _producerRecoveryManagers.FirstOrDefault(f => f.Key.Id == feedMessageReceivedEventArgs.Message.ProducerId).Value;
             manager?.ProcessSystemMessage(feedMessageReceivedEventArgs.Message);
-
         }
 
         private void OnUserSessionMessageReceived(object sender, FeedMessageReceivedEventArgs feedMessageReceivedEventArgs)

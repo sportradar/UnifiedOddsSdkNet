@@ -762,6 +762,7 @@ namespace Sportradar.OddsFeed.SDK.API
         {
             ((IGlobalEventDispatcher)this).DispatchEventRecoveryCompleted(e.GetRequestId(), e.GetEventId());
         }
+
         private void OnRecoveryInitiated(object sender, RecoveryInitiatedEventArgs e)
         {
             RecoveryInitiated?.Invoke(this, e);

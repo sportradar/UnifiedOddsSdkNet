@@ -1,5 +1,12 @@
 UnifiedOdds Feed SDK .NET library
 
+Important: 
+There is a new major release (https://sdk.sportradar.com/unifiedfeed/netcore2) available along with detailed migration guide for upgrading from current version.
+
+Current published version will only be supported for a limited amount of time. Support will include only bug fixes, all new product features will only be available in new version.
+
+Users are encouraged to upgrade their solution to the newest version and test it in integration environment. 
+
 Notice: before starting DemoProject make sure to enter your bookmaker access token in app.config file and restore nuget packages by right-clicking the solution item and selecting "Restore NuGet Packages".
 
 The SDK is also available via NuGet package manager. Use the following command in the Package Manager Console to install it along with it's dependencies:
@@ -25,6 +32,9 @@ The package contains:
 For more information please contact support@sportradar.com or visit https://iodocs.betradar.com/unifiedsdk/index.html
 
 CHANGE LOG:
+2023-04-27  1.59.0
+Added support for new stage type SprintRace
+
 2023-04-27  1.58.0
 Introduced OperationManager.MaxConnectionsPerServer property (at feed initialization sets the ServicePointManager.DefaultConnectionLimit)
 Fixed lock issue when calling SportDataProvider.GetActiveTournamentsAsync repeatedly

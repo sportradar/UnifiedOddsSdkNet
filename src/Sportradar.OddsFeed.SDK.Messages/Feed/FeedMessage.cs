@@ -164,10 +164,10 @@ namespace Sportradar.OddsFeed.SDK.Messages.Feed
         public override long GeneratedAt => timestamp;
 
         /// <inheritdoc />
-        public override long SentAt { get;  set; }
+        public override long SentAt { get; set; }
 
         /// <inheritdoc />
-        public override long ReceivedAt { get;  set; }
+        public override long ReceivedAt { get; set; }
     }
 
     [OverrideXmlNamespace(RootElementName = "snapshot_complete", IgnoreNamespace = false)]
@@ -203,10 +203,10 @@ namespace Sportradar.OddsFeed.SDK.Messages.Feed
         public override long GeneratedAt => timestamp;
 
         /// <inheritdoc />
-        public override long SentAt { get;  set; }
+        public override long SentAt { get; set; }
 
         /// <inheritdoc />
-        public override long ReceivedAt { get;  set; }
+        public override long ReceivedAt { get; set; }
     }
 
     [OverrideXmlNamespace(RootElementName = "odds_change", IgnoreNamespace = false)]
@@ -242,10 +242,10 @@ namespace Sportradar.OddsFeed.SDK.Messages.Feed
         public override long GeneratedAt => timestamp;
 
         /// <inheritdoc />
-        public override long SentAt { get;  set; }
+        public override long SentAt { get; set; }
 
         /// <inheritdoc />
-        public override long ReceivedAt { get;  set; }
+        public override long ReceivedAt { get; set; }
     }
 
     [OverrideXmlNamespace(RootElementName = "bet_stop", IgnoreNamespace = false)]
@@ -281,10 +281,10 @@ namespace Sportradar.OddsFeed.SDK.Messages.Feed
         public override long GeneratedAt => timestamp;
 
         /// <inheritdoc />
-        public override long SentAt { get;  set; }
+        public override long SentAt { get; set; }
 
         /// <inheritdoc />
-        public override long ReceivedAt { get;  set; }
+        public override long ReceivedAt { get; set; }
     }
 
     [OverrideXmlNamespace(RootElementName = "bet_settlement", IgnoreNamespace = false)]
@@ -320,10 +320,10 @@ namespace Sportradar.OddsFeed.SDK.Messages.Feed
         public override long GeneratedAt => timestamp;
 
         /// <inheritdoc />
-        public override long SentAt { get;  set; }
+        public override long SentAt { get; set; }
 
         /// <inheritdoc />
-        public override long ReceivedAt { get;  set; }
+        public override long ReceivedAt { get; set; }
     }
 
     [OverrideXmlNamespace(RootElementName = "rollback_bet_settlement", IgnoreNamespace = false)]
@@ -359,10 +359,10 @@ namespace Sportradar.OddsFeed.SDK.Messages.Feed
         public override long GeneratedAt => timestamp;
 
         /// <inheritdoc />
-        public override long SentAt { get;  set; }
+        public override long SentAt { get; set; }
 
         /// <inheritdoc />
-        public override long ReceivedAt { get;  set; }
+        public override long ReceivedAt { get; set; }
     }
 
     [OverrideXmlNamespace(RootElementName = "bet_cancel", IgnoreNamespace = false)]
@@ -398,10 +398,10 @@ namespace Sportradar.OddsFeed.SDK.Messages.Feed
         public override long GeneratedAt => timestamp;
 
         /// <inheritdoc />
-        public override long SentAt { get;  set; }
+        public override long SentAt { get; set; }
 
         /// <inheritdoc />
-        public override long ReceivedAt { get;  set; }
+        public override long ReceivedAt { get; set; }
     }
 
     [OverrideXmlNamespace(RootElementName = "rollback_bet_cancel", IgnoreNamespace = false)]
@@ -437,10 +437,10 @@ namespace Sportradar.OddsFeed.SDK.Messages.Feed
         public override long GeneratedAt => timestamp;
 
         /// <inheritdoc />
-        public override long SentAt { get;  set; }
+        public override long SentAt { get; set; }
 
         /// <inheritdoc />
-        public override long ReceivedAt { get;  set; }
+        public override long ReceivedAt { get; set; }
     }
 
     [OverrideXmlNamespace(RootElementName = "fixture_change", IgnoreNamespace = false)]
@@ -476,9 +476,9 @@ namespace Sportradar.OddsFeed.SDK.Messages.Feed
         public override long GeneratedAt => timestamp;
 
         /// <inheritdoc />
-        public override long SentAt { get;  set; }
+        public override long SentAt { get; set; }
 
         /// <inheritdoc />
-        public override long ReceivedAt { get;  set; }
+        public override long ReceivedAt { get; set; }
     }
 }

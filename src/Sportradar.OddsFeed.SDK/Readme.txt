@@ -2,13 +2,18 @@
 
 For more information please contact support@sportradar.com or visit https://iodocs.betradar.com/unifiedsdk/index.html
 
-Important: Version 1.1.0.0 includes breaking changes, below are the steps needed to update 3rd party code.
-1. replace/rename ISportEvent to ICompetition (make sure to search whole words with 'Match case' enabled)
-2. replace/rename ISportEntity to ISportEvent (make sure to search whole words with 'Match case' enabled)
-3. resolve any remaining issues
+Important: 
+There is a new major release (https://sdk.sportradar.com/unifiedfeed/netcore2) available along with detailed migration guide for upgrading from current version.
+
+Current published version will only be supported for a limited amount of time. Support will include only bug fixes, all new product features will only be available in new version.
+
+Users are encouraged to upgrade their solution to the newest version and test it in integration environment. 
 
 
 CHANGE LOG:
+2023-04-27  1.59.0
+Added support for new stage type SprintRace
+
 2023-04-27  1.58.0
 Introduced OperationManager.MaxConnectionsPerServer property (at feed initialization sets the ServicePointManager.DefaultConnectionLimit)
 Fixed lock issue when calling SportDataProvider.GetActiveTournamentsAsync repeatedly

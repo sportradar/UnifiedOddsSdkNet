@@ -24,7 +24,7 @@ namespace Sportradar.OddsFeed.SDK.Test
     /// <remarks>On rabbit server there should be additional user:testuser/testpass and virtual host: /virtualhost with read/write permission</remarks>
     class RabbitProducer
     {
-        public const string RabbitIp = "192.168.64.101";
+        public const string RabbitIp = "10.27.121.167";
         private const string UfExchange = "unifiedfeed";
         private const string VirtualHostName = "/virtualhost";
         private IConnection _connection;

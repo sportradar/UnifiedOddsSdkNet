@@ -46,9 +46,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                         return new StageDTO(item);
                     }
                 case ResourceTypeGroup.BASIC_TOURNAMENT:
-                {
-                    return new BasicTournamentDTO(item);
-                }
+                    {
+                        return new BasicTournamentDTO(item);
+                    }
                 case ResourceTypeGroup.TOURNAMENT:
                 case ResourceTypeGroup.SEASON:
                     {
@@ -80,14 +80,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
             switch (id.TypeGroup)
             {
                 case ResourceTypeGroup.BASIC_TOURNAMENT:
-                {
-                    return new BasicTournamentDTO(item);
-                }
+                    {
+                        return new BasicTournamentDTO(item);
+                    }
                 case ResourceTypeGroup.TOURNAMENT:
                 case ResourceTypeGroup.SEASON:
-                {
-                    return new TournamentInfoDTO(item);
-                }
+                    {
+                        return new TournamentInfoDTO(item);
+                    }
                 default:
                     throw new ArgumentException($"ResourceTypeGroup: {id.TypeGroup} is not supported", nameof(id));
             }
@@ -308,11 +308,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <returns>A <see cref="SportEventType"/> member obtained by mapping. A null reference is mapped to null reference</returns>
         public static bool TryGetSportEventType(string value, out SportEventType? result)
         {
-            if (string.IsNullOrEmpty(value))
-            {
-                result = null;
-                return true;
-            }
             switch (value)
             {
                 case "parent":
@@ -335,11 +330,6 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
         /// <returns>A <see cref="SportEventType"/> member obtained by mapping. A null reference is mapped to null reference</returns>
         public static bool TryGetStageType(string value, out StageType? result)
         {
-            if (string.IsNullOrEmpty(value))
-            {
-                result = null;
-                return true;
-            }
             switch (value)
             {
                 case "parent":
@@ -387,6 +377,9 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.DTO
                     return true;
                 case "run":
                     result = StageType.Run;
+                    return true;
+                case "sprint_race":
+                    result = StageType.SprintRace;
                     return true;
                 default:
                     result = null;

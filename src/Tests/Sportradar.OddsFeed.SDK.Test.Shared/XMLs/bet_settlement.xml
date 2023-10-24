@@ -86,14 +86,14 @@
       <outcome id="844" result="1"/>
       <outcome id="845" result="0"/>
     </market>
-    <market id="215" specifiers="setnr=3|gamenr=3">
+    <market id="215" specifiers="setnr=3|gamenr=3|server=sr:competitor:66390">
       <outcome id="894" result="0"/>
       <outcome id="895" result="0"/>
       <outcome id="896" result="0"/>
       <outcome id="897" result="0"/>
       <outcome id="898" result="1"/>
     </market>
-    <market id="215" specifiers="setnr=3|gamenr=2">
+    <market id="215" specifiers="setnr=3|gamenr=2|server=sr:competitor:66390">
       <outcome id="894" result="1"/>
       <outcome id="895" result="0"/>
       <outcome id="896" result="0"/>
@@ -104,7 +104,7 @@
       <outcome id="13" result="0"/>
       <outcome id="12" result="1"/>
     </market>
-    <market id="215" specifiers="setnr=3|gamenr=4">
+    <market id="215" specifiers="setnr=3|gamenr=4|server=sr:competitor:66390">
       <outcome id="894" result="0"/>
       <outcome id="895" result="1"/>
       <outcome id="896" result="0"/>

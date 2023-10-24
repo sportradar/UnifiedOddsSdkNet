@@ -81,6 +81,11 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Enums
         /// <summary>
         /// The run
         /// </summary>
-        Run
+        Run,
+
+        /// <summary>
+        /// The sprint race
+        /// </summary>
+        SprintRace
     }
 }

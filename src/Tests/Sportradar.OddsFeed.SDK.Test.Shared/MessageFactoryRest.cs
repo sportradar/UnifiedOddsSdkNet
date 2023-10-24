@@ -303,6 +303,60 @@ namespace Sportradar.OddsFeed.SDK.Test.Shared
             };
         }
 
+        public static sportEvent GetSportEventEndpoint(int id = 0, int subItemCount = 2)
+        {
+            var sportEvent = new sportEvent
+            {
+                competitors = GetTeamCompetitorList(subItemCount).ToArray(),
+                id = id == 0 ? SR.Urn("match", 10000).ToString() : SR.Urn(id, "match").ToString(),
+                liveodds = "booked",
+                scheduledSpecified = true,
+                scheduled = new DateTime(DateTime.Now.Year, 2, 17),
+                scheduled_endSpecified = true,
+                scheduled_end = new DateTime(DateTime.Now.Year, 2, 18)
+            };
+
+            return sportEvent;
+        }
+
+        public static stageSummaryEndpoint GetStageSummaryEndpoint(int id = 0, int subItemCount = 10)
+        {
+            var sportEvent = new sportEvent
+            {
+                competitors = GetTeamCompetitorList(subItemCount).ToArray(),
+                id = id == 0 ? SR.Urn("stage", 10000).ToString() : SR.Urn(id, "stage").ToString(),
+                liveodds = "booked",
+                scheduledSpecified = true,
+                scheduled = new DateTime(DateTime.Now.Year, 2, 17),
+                scheduled_endSpecified = true,
+                scheduled_end = new DateTime(DateTime.Now.Year, 2, 18),
+                stage_type = "race",
+                status = "live"
+            };
+
+            return new stageSummaryEndpoint
+            {
+                sport_event = sportEvent,
+                generated_at = DateTime.Now,
+                generated_atSpecified = true
+            };
+        }
+
+        public static parentStage GetParentStageSummaryEndpoint(int id = 0)
+        {
+            return new parentStage
+            {
+                id = id == 0 ? SR.Urn("stage", 10000).ToString() : SR.Urn(id, "stage").ToString(),
+                scheduledSpecified = true,
+                scheduled = new DateTime(DateTime.Now.Year, 2, 17),
+                scheduled_endSpecified = true,
+                scheduled_end = new DateTime(DateTime.Now.Year, 2, 18),
+                stage_type = "parent",
+                type = "parent",
+                name = "Parent stage " + id,
+            };
+        }
+
         public static tournamentGroup GetGroup()
         {
             return new tournamentGroup

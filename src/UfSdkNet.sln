@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31019.35
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.API", "Sportradar.OddsFeed.SDK.API\Sportradar.OddsFeed.SDK.API.csproj", "{0138441B-7929-4B88-85B1-378AB8556C74}"
 EndProject
@@ -17,18 +17,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{650E8DE9
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK", "Sportradar.OddsFeed.SDK\Sportradar.OddsFeed.SDK.csproj", "{D3C006AD-BB07-449F-A537-7CE7DC72A1D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.API.Test", "Tests\Sportradar.OddsFeed.SDK.API.Test\Sportradar.OddsFeed.SDK.API.Test.csproj", "{782FDD8F-E0E5-423F-95E0-26C7549EABF2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.Common.Test", "Tests\Sportradar.OddsFeed.SDK.Common.Test\Sportradar.OddsFeed.SDK.Common.Test.csproj", "{CFCBD5DF-F043-4331-9D4B-FC9548ECE86F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.Entities.REST.Test", "Tests\Sportradar.OddsFeed.SDK.Entities.REST.Test\Sportradar.OddsFeed.SDK.Entities.REST.Test.csproj", "{A256B019-19C2-44BC-AAAB-D91DE5B8DD6E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.Entities.Test", "Tests\Sportradar.OddsFeed.SDK.Entities.Test\Sportradar.OddsFeed.SDK.Entities.Test.csproj", "{14AAF846-E7FC-45F1-8150-5C890854D972}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.Test.Shared", "Tests\Sportradar.OddsFeed.SDK.Test.Shared\Sportradar.OddsFeed.SDK.Test.Shared.csproj", "{F3B33428-1A5D-4E42-8DC7-6E1434D94F36}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.Messages.Test", "Tests\Sportradar.OddsFeed.SDK.Messages.Test\Sportradar.OddsFeed.SDK.Messages.Test.csproj", "{030F413F-F582-4838-BA8C-87B661FA405D}"
-EndProject
 Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "Sportradar.OddsFeed.SDK.Docs", "Sportradar.OddsFeed.SDK.Docs\Sportradar.OddsFeed.SDK.Docs.shfbproj", "{6DDCEA15-1F22-4FBB-84FE-F2396CD05009}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0138441B-7929-4B88-85B1-378AB8556C74} = {0138441B-7929-4B88-85B1-378AB8556C74}
@@ -38,7 +26,19 @@ Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "Sportradar.OddsFeed.SDK.Doc
 		{70A849EA-72AC-43C3-A68A-5089D9A591D4} = {70A849EA-72AC-43C3-A68A-5089D9A591D4}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.Test.Shared", "Tests\Sportradar.OddsFeed.SDK.Test.Shared\Sportradar.OddsFeed.SDK.Test.Shared.csproj", "{F3B33428-1A5D-4E42-8DC7-6E1434D94F36}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.Test", "Tests\Sportradar.OddsFeed.SDK.Test\Sportradar.OddsFeed.SDK.Test.csproj", "{D498DBE3-EC81-4042-B2C5-7CBA2FD5EFF0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.Messages.Test", "Tests\Sportradar.OddsFeed.SDK.Messages.Test\Sportradar.OddsFeed.SDK.Messages.Test.csproj", "{030F413F-F582-4838-BA8C-87B661FA405D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.Entities.Test", "Tests\Sportradar.OddsFeed.SDK.Entities.Test\Sportradar.OddsFeed.SDK.Entities.Test.csproj", "{14AAF846-E7FC-45F1-8150-5C890854D972}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.Entities.REST.Test", "Tests\Sportradar.OddsFeed.SDK.Entities.REST.Test\Sportradar.OddsFeed.SDK.Entities.REST.Test.csproj", "{A256B019-19C2-44BC-AAAB-D91DE5B8DD6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.Common.Test", "Tests\Sportradar.OddsFeed.SDK.Common.Test\Sportradar.OddsFeed.SDK.Common.Test.csproj", "{CFCBD5DF-F043-4331-9D4B-FC9548ECE86F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sportradar.OddsFeed.SDK.API.Test", "Tests\Sportradar.OddsFeed.SDK.API.Test\Sportradar.OddsFeed.SDK.API.Test.csproj", "{782FDD8F-E0E5-423F-95E0-26C7549EABF2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -70,49 +70,49 @@ Global
 		{D3C006AD-BB07-449F-A537-7CE7DC72A1D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3C006AD-BB07-449F-A537-7CE7DC72A1D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3C006AD-BB07-449F-A537-7CE7DC72A1D6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{782FDD8F-E0E5-423F-95E0-26C7549EABF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{782FDD8F-E0E5-423F-95E0-26C7549EABF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{782FDD8F-E0E5-423F-95E0-26C7549EABF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{782FDD8F-E0E5-423F-95E0-26C7549EABF2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CFCBD5DF-F043-4331-9D4B-FC9548ECE86F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CFCBD5DF-F043-4331-9D4B-FC9548ECE86F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CFCBD5DF-F043-4331-9D4B-FC9548ECE86F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CFCBD5DF-F043-4331-9D4B-FC9548ECE86F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A256B019-19C2-44BC-AAAB-D91DE5B8DD6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A256B019-19C2-44BC-AAAB-D91DE5B8DD6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A256B019-19C2-44BC-AAAB-D91DE5B8DD6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A256B019-19C2-44BC-AAAB-D91DE5B8DD6E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{14AAF846-E7FC-45F1-8150-5C890854D972}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{14AAF846-E7FC-45F1-8150-5C890854D972}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{14AAF846-E7FC-45F1-8150-5C890854D972}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{14AAF846-E7FC-45F1-8150-5C890854D972}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DDCEA15-1F22-4FBB-84FE-F2396CD05009}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DDCEA15-1F22-4FBB-84FE-F2396CD05009}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DDCEA15-1F22-4FBB-84FE-F2396CD05009}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F3B33428-1A5D-4E42-8DC7-6E1434D94F36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F3B33428-1A5D-4E42-8DC7-6E1434D94F36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3B33428-1A5D-4E42-8DC7-6E1434D94F36}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3B33428-1A5D-4E42-8DC7-6E1434D94F36}.Release|Any CPU.Build.0 = Release|Any CPU
-		{030F413F-F582-4838-BA8C-87B661FA405D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{030F413F-F582-4838-BA8C-87B661FA405D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{030F413F-F582-4838-BA8C-87B661FA405D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{030F413F-F582-4838-BA8C-87B661FA405D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6DDCEA15-1F22-4FBB-84FE-F2396CD05009}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6DDCEA15-1F22-4FBB-84FE-F2396CD05009}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6DDCEA15-1F22-4FBB-84FE-F2396CD05009}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D498DBE3-EC81-4042-B2C5-7CBA2FD5EFF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D498DBE3-EC81-4042-B2C5-7CBA2FD5EFF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D498DBE3-EC81-4042-B2C5-7CBA2FD5EFF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D498DBE3-EC81-4042-B2C5-7CBA2FD5EFF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{030F413F-F582-4838-BA8C-87B661FA405D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{030F413F-F582-4838-BA8C-87B661FA405D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{030F413F-F582-4838-BA8C-87B661FA405D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{030F413F-F582-4838-BA8C-87B661FA405D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14AAF846-E7FC-45F1-8150-5C890854D972}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14AAF846-E7FC-45F1-8150-5C890854D972}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14AAF846-E7FC-45F1-8150-5C890854D972}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14AAF846-E7FC-45F1-8150-5C890854D972}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A256B019-19C2-44BC-AAAB-D91DE5B8DD6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A256B019-19C2-44BC-AAAB-D91DE5B8DD6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A256B019-19C2-44BC-AAAB-D91DE5B8DD6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A256B019-19C2-44BC-AAAB-D91DE5B8DD6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFCBD5DF-F043-4331-9D4B-FC9548ECE86F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFCBD5DF-F043-4331-9D4B-FC9548ECE86F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFCBD5DF-F043-4331-9D4B-FC9548ECE86F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFCBD5DF-F043-4331-9D4B-FC9548ECE86F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{782FDD8F-E0E5-423F-95E0-26C7549EABF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{782FDD8F-E0E5-423F-95E0-26C7549EABF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{782FDD8F-E0E5-423F-95E0-26C7549EABF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{782FDD8F-E0E5-423F-95E0-26C7549EABF2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{782FDD8F-E0E5-423F-95E0-26C7549EABF2} = {650E8DE9-1627-4D2D-B3C0-3DC92BAFAD30}
-		{CFCBD5DF-F043-4331-9D4B-FC9548ECE86F} = {650E8DE9-1627-4D2D-B3C0-3DC92BAFAD30}
-		{A256B019-19C2-44BC-AAAB-D91DE5B8DD6E} = {650E8DE9-1627-4D2D-B3C0-3DC92BAFAD30}
-		{14AAF846-E7FC-45F1-8150-5C890854D972} = {650E8DE9-1627-4D2D-B3C0-3DC92BAFAD30}
 		{F3B33428-1A5D-4E42-8DC7-6E1434D94F36} = {650E8DE9-1627-4D2D-B3C0-3DC92BAFAD30}
-		{030F413F-F582-4838-BA8C-87B661FA405D} = {650E8DE9-1627-4D2D-B3C0-3DC92BAFAD30}
 		{D498DBE3-EC81-4042-B2C5-7CBA2FD5EFF0} = {650E8DE9-1627-4D2D-B3C0-3DC92BAFAD30}
+		{030F413F-F582-4838-BA8C-87B661FA405D} = {650E8DE9-1627-4D2D-B3C0-3DC92BAFAD30}
+		{14AAF846-E7FC-45F1-8150-5C890854D972} = {650E8DE9-1627-4D2D-B3C0-3DC92BAFAD30}
+		{A256B019-19C2-44BC-AAAB-D91DE5B8DD6E} = {650E8DE9-1627-4D2D-B3C0-3DC92BAFAD30}
+		{CFCBD5DF-F043-4331-9D4B-FC9548ECE86F} = {650E8DE9-1627-4D2D-B3C0-3DC92BAFAD30}
+		{782FDD8F-E0E5-423F-95E0-26C7549EABF2} = {650E8DE9-1627-4D2D-B3C0-3DC92BAFAD30}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9ED7FC12-41D3-41DB-95D2-ACDA57E2DB90}

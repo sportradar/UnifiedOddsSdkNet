@@ -105,7 +105,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 case 1:
                     return await GetAwayCompetitor(culture).ConfigureAwait(false);
                 default:
-                    throw new NameExpressionException($"Operand {_propertyName} is not supported [{_sportEvent.Id}]. Supported operands are: {string.Join(", ", SupportedOperands)}", null);
+                    throw new NameExpressionException($"No valid operand found. Operand {_propertyName} is not supported [{_sportEvent.Id}]. Supported operands are: {string.Join(", ", SupportedOperands)}", null);
             }
         }
 
@@ -127,7 +127,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 }
             }
 
-            throw new NameExpressionException($"Operand {_propertyName} is not supported [{_sportEvent.Id}]. Supported operands are: {string.Join(",", SupportedOperands)}", null);
+            throw new NameExpressionException($"No home competitor found. Operand {_propertyName} is not supported [{_sportEvent.Id}]. Supported operands are: {string.Join(",", SupportedOperands)}", null);
         }
 
         private async Task<string> GetAwayCompetitor(CultureInfo culture)
@@ -148,7 +148,7 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
                 }
             }
 
-            throw new NameExpressionException($"Operand {_propertyName} is not supported [{_sportEvent.Id}]. Supported operands are: {string.Join(",", SupportedOperands)}", null);
+            throw new NameExpressionException($"No away competitor found. Operand {_propertyName} is not supported [{_sportEvent.Id}]. Supported operands are: {string.Join(",", SupportedOperands)}", null);
         }
     }
 }

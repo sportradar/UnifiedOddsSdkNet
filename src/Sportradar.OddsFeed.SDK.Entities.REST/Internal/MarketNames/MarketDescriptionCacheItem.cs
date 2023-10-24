@@ -128,16 +128,14 @@ namespace Sportradar.OddsFeed.SDK.Entities.REST.Internal.MarketNames
         {
             Guard.Argument(culture, nameof(culture)).NotNull();
 
-            string name;
-            return _names.TryGetValue(culture, out name) ? name : null;
+            return _names.TryGetValue(culture, out var name) ? name : null;
         }
 
         internal string GetDescription(CultureInfo culture)
         {
             Guard.Argument(culture, nameof(culture)).NotNull();
 
-            string description;
-            if (_descriptions.TryGetValue(culture, out description))
+            if (_descriptions.TryGetValue(culture, out var description))
             {
                 return description;
             }
